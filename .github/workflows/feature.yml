@@ -1,0 +1,20 @@
+name: Ejecutar pruebas en feature y hotfix
+
+on:
+  push:
+    branches:
+      - 'feature/**'
+      - 'hotfix/**'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 'latest'
+      - name: Instalar dependencias
+        run: bun install
+      - name: Ejecutar tests
+        run: bun run test
