@@ -1,0 +1,29 @@
+name: Validate branch standard
+
+on:
+  push:
+    branches:
+      - "*"
+  pull_request:
+    branches:
+      - "*"
+  create:
+
+jobs:
+  check-branch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate branch name
+        run: |
+          # Skip tags
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            echo "Tag detected (${GITHUB_REF}). Skipping branch name validation."
+            exit 0
+          fi
+
+          branch="${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}"
+          echo "Checking branch: ${branch}"
+          if [[ ! "${branch}" =~ ^(main|develop|(feature|hotfix)\/[a-z0-9._-]+)$ ]]; then
+            echo "❌ Nombre de rama inválido: ${branch}"
+            exit 1
+          fi
