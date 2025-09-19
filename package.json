@@ -1,0 +1,37 @@
+{
+  "name": "caritas-app",
+  "private": true,
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "test": "turbo run test:ci",
+    "lint": "biome check . --write",
+    "check-types": "turbo run check-types",
+    "prepare": "husky",
+    "setup": "bun run scripts/develop.ts"
+  },
+  "lint-staged": {
+    "*": "bun lint"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.2.4",
+    "@commitlint/cli": "19.8.1",
+    "@commitlint/config-conventional": "19.8.1",
+    "@workspace/typescript-config": "workspace:*",
+    "husky": "^9.1.7",
+    "lint-staged": "16.1.6",
+    "turbo": "^2.5.6",
+    "typescript": "5.9.2"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "packageManager": "bun@1.2.22",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "dependencies": {
+    "@types/minimatch": "6.0.0"
+  }
+}
