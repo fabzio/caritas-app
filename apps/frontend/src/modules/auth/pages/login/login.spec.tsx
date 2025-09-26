@@ -1,14 +1,22 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import type React from 'react'
+import React from 'react'
 import { vi } from 'vitest'
 import FormLogin from './index'
 
 const mutate = vi.fn()
 let isPending = false
 
-vi.mock('@/modules/auth/hooks/use-login', () => ({
+vi.mock('@/modules/auth/pages/login/hooks/use-login', () => ({
   useLogin: (_redirect: string) => ({ mutate, isPending }),
+}))
+
+vi.mock('@/modules/auth/pages/login/hooks/use-google', () => ({
+  useGoogle: () => ({ mutate, isPending }),
+}))
+
+vi.mock('@/modules/auth/pages/login/hooks/use-passkey', () => ({
+  usePasskey: () => ({ mutate, isPending }),
 }))
 
 vi.mock('@tanstack/react-router', () => ({
@@ -16,6 +24,15 @@ vi.mock('@tanstack/react-router', () => ({
     <a href={to}>{children}</a>
   ),
   useSearch: (_opts?: unknown) => ({ redirect: '/dashboard' }),
+}))
+
+vi.mock('@marsidev/react-turnstile', () => ({
+  Turnstile: ({ onSuccess }: { onSuccess: (token: string) => void }) => {
+    React.useEffect(() => {
+      onSuccess('mocked-token')
+    }, [onSuccess])
+    return <div data-testid="turnstile-mock">Turnstile Mock</div>
+  },
 }))
 
 describe('Login form', () => {
@@ -54,10 +71,12 @@ describe('Login form', () => {
 
     await waitFor(() => {
       expect(mutate).toHaveBeenCalledTimes(1)
-      expect(mutate).toHaveBeenCalledWith(
-        { email: 'user@example.com', password: 'secret12', rememberMe: false },
-        expect.any(Object),
-      )
+      expect(mutate).toHaveBeenCalledWith({
+        email: 'user@example.com',
+        password: 'secret12',
+        rememberMe: false,
+        token: 'mocked-token',
+      })
     })
   })
 
@@ -78,14 +97,16 @@ describe('Login form', () => {
     await user.click(submit)
 
     await waitFor(() => {
-      expect(mutate).toHaveBeenCalledWith(
-        { email: 'user2@example.com', password: 'secret34', rememberMe: true },
-        expect.any(Object),
-      )
+      expect(mutate).toHaveBeenCalledWith({
+        email: 'user2@example.com',
+        password: 'secret34',
+        rememberMe: true,
+        token: 'mocked-token',
+      })
     })
   })
 
-  it('disables submit button when isPending is true', async () => {
+  it('disables submit button when isPending is true', () => {
     isPending = true
     const { container } = render(<FormLogin />)
 
@@ -93,7 +114,5 @@ describe('Login form', () => {
       'button[type="submit"]',
     ) as HTMLButtonElement
     expect(submit.disabled).toBe(true)
-
-    isPending = false
   })
 })
