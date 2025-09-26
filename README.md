@@ -414,6 +414,8 @@ docker compose --env-file .env.development up -d
 # 3. Esperar a que la DB esté lista y aplicar esquema (desde apps/api)
 cd ../api
 bun run db:push
+bun run db:seed  # Sembrar datos iniciales
+```
 
 # 4. Iniciar desarrollo
 cd ../..

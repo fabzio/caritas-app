@@ -66,6 +66,9 @@ async function setupDevelopment() {
       console.log('📊 Migrando esquema de la base de datos...')
       await runCommand('bun run db:push', API_PATH)
       console.log('✅ Esquema migrado\n')
+      console.log('🌱 Sembrando datos iniciales...')
+      await runCommand('bun run db:seed', API_PATH)
+      console.log('✅ Datos sembrados\n')
     }
 
     console.log('🎉 ¡Entorno de desarrollo configurado correctamente!')
