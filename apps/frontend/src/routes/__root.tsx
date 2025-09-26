@@ -7,6 +7,7 @@ import {
 } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { Toaster } from '@workspace/ui/components/sonner'
+import { env } from '@/env'
 import type authClient from '@/lib/authClient.ts'
 import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
 
@@ -23,7 +24,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
         content: 'Cáritas Lima - Sistema de Gestión',
       },
       {
-        title: 'Cáritas Lima 365',
+        title: env.VITE_APP_TITLE,
       },
     ],
   }),

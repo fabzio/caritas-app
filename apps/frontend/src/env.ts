@@ -13,7 +13,8 @@ export const env = createEnv({
   clientPrefix: 'VITE_',
 
   client: {
-    VITE_APP_TITLE: z.string().min(1).optional(),
+    VITE_APP_TITLE: z.string().min(1).default('Caritas Lima 365'),
+    VITE_ORG_NAME: z.string().min(1).default('Caritas Lima'),
     VITE_API_URL: z.url().default('http://localhost:5173'),
     VITE_GOOGLE_CLIENT_ID: z
       .string()

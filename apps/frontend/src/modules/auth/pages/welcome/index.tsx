@@ -1,3 +1,4 @@
+import { Button } from '@workspace/ui/components/button'
 import {
   Tabs,
   TabsContent,
@@ -10,7 +11,13 @@ import Person from './components/person'
 export default function Welcome() {
   return (
     <div>
-      <h1 className="text-2xl font-semibold">Le damos la bienvenida</h1>
+      <h1 className="text-2xl font-semibold">
+        ¡Gracias por unirte a nosotros!
+      </h1>
+      <p>
+        Queremos conocer un poco más sobre usted para brindarle la mejor
+        experiencia
+      </p>
       <Tabs defaultValue="person">
         <TabsList>
           <TabsTrigger value="organization">Organización</TabsTrigger>
@@ -23,6 +30,9 @@ export default function Welcome() {
           <Person />
         </TabsContent>
       </Tabs>
+      <div className="mt-4 w-full flex justify-end">
+        <Button>Continuar</Button>
+      </div>
     </div>
   )
 }

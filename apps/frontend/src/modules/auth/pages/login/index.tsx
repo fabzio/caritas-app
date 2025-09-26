@@ -14,6 +14,7 @@ import { Input } from '@workspace/ui/components/input'
 import { KeyRound, Loader2 } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
+import { env } from '@/env'
 import { useLogin } from '@/modules/auth/pages/login/hooks/use-login'
 import TurnstileWidget from '@/shared/components/turnsile-widget'
 import type { ValidRoutes } from '@/shared/types/valid-routes'
@@ -46,7 +47,7 @@ export default function FormLogin() {
         <div className="flex flex-col items-center gap-2 text-center">
           <h1 className="text-2xl font-bold">Le damos la bienvenida</h1>
           <p className="text-muted-foreground text-sm text-balance">
-            Inicie sesión para continuar a <b> Cáritas Lima 365</b>
+            Inicie sesión para continuar a <b> {env.VITE_APP_TITLE}</b>
           </p>
         </div>
         <FormField
