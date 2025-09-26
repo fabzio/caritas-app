@@ -9,10 +9,14 @@ updates:
   
  - package-ecosystem: "npm"
    directories:
-     - "/apps/frontend"
-     - "/apps/api"
-     - "/"
+   - "/apps/frontend"
+   - "/apps/api"
+   - "/"
    schedule:
-     interval: weekly
+    interval: weekly
+   ignore:
+   - dependency-name: "*"
+     update-types: ["version-update:semver-patch"]
 
   
+
