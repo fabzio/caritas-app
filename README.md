@@ -646,4 +646,5 @@ chore: cambios en build, etc
   - CRUD type-safe end-to-end con Drizzle ORM + Elysia + Eden RPC
   - Todos los procesos que involucran autenticación usan los clientes de [better-auth](https://www.better-auth.com/docs/introduction)
   - Estructura de carpetas por dominio (modular)
-- Mantén el código limpio para que tu PR sea aprobado (ts-ignore = ban) \:)
+- Mantén el código limpio para que tu PR sea aprobado. ts-ignore = ban \:)
+- Corre los tests antes de hacer un PR para asegurarte que todo funciona correctamente

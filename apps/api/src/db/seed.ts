@@ -47,7 +47,7 @@ const districts = [
   { name: 'Villa Maria Del Triunfo', code: 'Lima 35' },
 ] as const
 
-const seed = async () => {
+export const seed = async () => {
   await db.insert(region).values(
     districts.map((district) => ({
       name: district.name,

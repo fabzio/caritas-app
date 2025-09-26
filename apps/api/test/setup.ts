@@ -1,12 +1,14 @@
 import { beforeAll } from 'bun:test'
 import { pushSchema } from 'drizzle-kit/api'
 import db, { schema } from '@/db'
+import { seed } from '@/db/seed'
 import { auth } from '@/lib/auth'
 
 beforeAll(async () => {
   // biome-ignore lint/suspicious/noExplicitAny: for testing only
   const { apply } = await pushSchema(schema, db as any)
   await apply()
+  await seed()
 
   console.info('🧪 Setting up test user with credentials:')
   console.info('🧪 - Email: test@example.com')
@@ -25,7 +27,7 @@ beforeAll(async () => {
         sex: 'M',
         birthDate: '1990-01-01',
         phone: '+5112345678',
-        district: 'Miraflores',
+        regionId: 1,
       },
     },
   })
