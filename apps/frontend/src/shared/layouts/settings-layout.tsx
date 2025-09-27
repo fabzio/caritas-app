@@ -66,11 +66,11 @@ const subRoutes: {
   label: string
 }[] = [
   {
-    path: '/settings',
+    path: '/user/settings',
     label: 'Perfil',
   },
   {
-    path: '/settings/authentication',
+    path: '/user/settings/authentication',
     label: 'Autenticación',
   },
 ]

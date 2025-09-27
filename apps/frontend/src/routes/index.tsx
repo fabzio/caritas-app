@@ -9,6 +9,6 @@ export const Route = createFileRoute('/')({
     })
     if (!data) throw redirect({ to: '/auth/login', search: { redirect: '/' } })
     else if (data.user.role?.includes('admin')) throw redirect({ to: '/admin' })
-    else throw redirect({ to: '/web' })
+    else throw redirect({ to: '/user' })
   },
 })

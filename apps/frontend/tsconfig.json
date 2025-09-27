@@ -1,5 +1,9 @@
 {
-  "include": ["**/*.ts", "**/*.tsx", "src/routes/_authenticated/settings.tsx"],
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    "src/routes/_authenticated/user/settings.tsx"
+  ],
   "compilerOptions": {
     "target": "ES2022",
     "jsx": "react-jsx",
