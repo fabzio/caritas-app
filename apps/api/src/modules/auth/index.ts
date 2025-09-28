@@ -1,4 +1,5 @@
 import Elysia from 'elysia'
+import access from './access'
 import setup from './setup'
 import { welcome } from './welcome'
 
@@ -9,5 +10,5 @@ const authModule = new Elysia({
 })
   .use(setup)
   .use(welcome)
-
+  .use(access)
 export default authModule

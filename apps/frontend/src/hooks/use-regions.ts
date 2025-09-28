@@ -6,6 +6,7 @@ export const useRegions = () => {
     queryKey: ['regions'],
     queryFn: async () => {
       const res = await rpc.regions.get()
+      if (res.error) throw res.error
       return res.data
     },
   })

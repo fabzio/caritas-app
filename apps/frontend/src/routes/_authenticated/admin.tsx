@@ -17,7 +17,7 @@ export const Route = createFileRoute('/_authenticated/admin')({
     const isAdmin = data?.user?.role?.includes('admin')
     if (!isAdmin) {
       throw redirect({
-        to: '/',
+        to: '/user',
         search: { redirect: location.href },
       })
     }

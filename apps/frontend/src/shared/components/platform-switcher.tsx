@@ -1,3 +1,4 @@
+import { useNavigate } from '@tanstack/react-router'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,17 +14,24 @@ import {
 } from '@workspace/ui/components/sidebar.tsx'
 import { ChevronsUpDown } from 'lucide-react'
 import { useState } from 'react'
+import type { ValidRoutes } from '../types/valid-routes'
 
 type Props = {
   platforms: {
     name: string
     logo: React.ElementType
+    path: ValidRoutes
   }[]
 }
 function PlatformSwitcher({ platforms }: Readonly<Props>) {
+  const navigate = useNavigate()
   const { isMobile } = useSidebar()
   const [selectedPlatform, setSelectedPlatform] = useState(platforms[0])
-  if (!selectedPlatform) return null
+
+  const onChangePlatform = (platform: typeof selectedPlatform) => {
+    setSelectedPlatform(platform)
+    navigate({ to: platform.path })
+  }
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -58,7 +66,7 @@ function PlatformSwitcher({ platforms }: Readonly<Props>) {
               <DropdownMenuItem
                 key={platform.name}
                 className="gap-2 p-2"
-                onClick={() => setSelectedPlatform(platform)}
+                onClick={() => onChangePlatform(platform)}
               >
                 <div className="flex size-6 items-center justify-center rounded-md border">
                   <platform.logo className="size-3.5 shrink-0" />
