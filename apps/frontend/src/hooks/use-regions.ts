@@ -5,7 +5,7 @@ export const useRegions = () => {
   return useQuery({
     queryKey: ['regions'],
     queryFn: async () => {
-      const res = await rpc.auth.regions.get()
+      const res = await rpc.regions.get()
       return res.data
     },
   })

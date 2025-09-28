@@ -36,8 +36,9 @@ export default function FormLogin() {
   })
 
   const handleSubmit = form.handleSubmit((data) => {
-    console.log(data)
-    mutate(data)
+    const token = data.token
+    if (!token) return
+    mutate({ ...data, token })
   })
   const { mutate: googleLogin } = useGoogle()
   const { mutate: passkeyLogin, isPending: isPasskeyPending } = usePasskey()
@@ -106,7 +107,10 @@ export default function FormLogin() {
             </FormItem>
           )}
         />
-        <TurnstileWidget onSuccess={(token) => form.setValue('token', token)} />
+        <TurnstileWidget
+          onSuccess={(token) => form.setValue('token', token)}
+          onExpire={() => form.setValue('token', undefined)}
+        />
         {form.formState.errors.token && (
           <p className="text-sm text-red-600">
             {form.formState.errors.token.message}
@@ -145,10 +149,15 @@ export default function FormLogin() {
   )
 }
 
-const schema = z.object({
-  email: z.string().min(2).max(100),
-  password: z.string().min(6).max(100),
-  rememberMe: z.boolean(),
-  token: z.string('Completa el captcha'),
-})
+const schema = z
+  .object({
+    email: z.string().min(2).max(100),
+    password: z.string().min(6).max(100),
+    rememberMe: z.boolean(),
+    token: z.string('Completa el captcha').optional(),
+  })
+  .refine((data) => !!data.token, {
+    message: 'Completa el captcha',
+    path: ['token'],
+  })
 type FormSchema = z.infer<typeof schema>

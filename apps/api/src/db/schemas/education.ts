@@ -12,15 +12,29 @@ import { organization, region, user } from './auth'
 
 export const educationSchema = pgSchema('education')
 
-export const organizationMajor = educationSchema.table('organization_major', {
-  id: integer().primaryKey().generatedByDefaultAsIdentity(),
-  name: varchar().notNull(),
+export const studentInfo = educationSchema.table('student_info', {
+  userId: varchar('user_id', { length: 32 })
+    .primaryKey()
+    .notNull()
+    .references(() => user.id, { onDelete: 'cascade' }),
+  guardianEmail: varchar('guardian_email', { length: 254 }).notNull(),
+  grade: varchar('grade', { length: 50 }).notNull(),
   createdAt: timestamp().defaultNow().notNull(),
   updatedAt: timestamp()
     .defaultNow()
     .notNull()
     .$onUpdateFn(() => new Date()),
-  organizationId: text()
+})
+
+export const organizationMajor = educationSchema.table('organization_major', {
+  id: integer().primaryKey().generatedByDefaultAsIdentity(),
+  name: varchar('name', { length: 100 }).notNull(),
+  createdAt: timestamp().defaultNow().notNull(),
+  updatedAt: timestamp()
+    .defaultNow()
+    .notNull()
+    .$onUpdateFn(() => new Date()),
+  organizationId: varchar('organization_id', { length: 32 })
     .notNull()
     .references(() => organization.id, { onDelete: 'cascade' }),
 })
@@ -28,7 +42,7 @@ export const organizationMajor = educationSchema.table('organization_major', {
 export const organizationLocation = educationSchema.table(
   'organization_location',
   {
-    organizationId: text()
+    organizationId: varchar('organization_id', { length: 32 })
       .notNull()
       .references(() => organization.id, { onDelete: 'cascade' }),
     regionId: integer()
@@ -40,24 +54,26 @@ export const organizationLocation = educationSchema.table(
       .defaultNow()
       .notNull()
       .$onUpdateFn(() => new Date()),
-    createdBy: text()
+    createdBy: varchar('created_by', { length: 32 })
       .notNull()
       .references(() => user.id, { onDelete: 'set null' }),
     state: boolean().default(true).notNull(),
   },
   (table) => [primaryKey({ columns: [table.organizationId, table.regionId] })],
 )
+
 export const organizationOpportunity = educationSchema.table('opportunity', {
-  id: varchar().primaryKey(),
-  title: text().notNull(),
-  organizationId: text()
+  id: varchar('id', { length: 32 }).primaryKey(),
+  title: varchar('title', { length: 200 }).notNull(),
+  organizationId: varchar('organization_id', { length: 32 })
     .notNull()
     .references(() => organization.id, { onDelete: 'cascade' }),
   description: text().notNull(),
-  type: varchar({
+  type: varchar('type', {
+    length: 20,
     enum: ['discount', 'scholarship'],
   }).notNull(),
-  createdBy: text()
+  createdBy: varchar('created_by', { length: 32 })
     .notNull()
     .references(() => user.id, { onDelete: 'set null' }),
   createdAt: timestamp().defaultNow().notNull(),
@@ -69,12 +85,12 @@ export const organizationOpportunity = educationSchema.table('opportunity', {
 })
 
 export const scholarship = educationSchema.table('scholarship', {
-  id: varchar().primaryKey(),
-  name: text().notNull(),
-  organizationId: text()
+  id: varchar('id', { length: 32 }).primaryKey(),
+  name: varchar('name', { length: 100 }).notNull(),
+  organizationId: varchar('organization_id', { length: 32 })
     .notNull()
     .references(() => organization.id, { onDelete: 'cascade' }),
-  createdBy: text()
+  createdBy: varchar('created_by', { length: 32 })
     .notNull()
     .references(() => user.id, { onDelete: 'set null' }),
   description: text().notNull(),
@@ -93,20 +109,24 @@ export const scholarship = educationSchema.table('scholarship', {
 export const scholarshipApplication = educationSchema.table(
   'scholarship_application',
   {
-    id: varchar().primaryKey(),
-    scholarshipId: varchar()
+    id: varchar('id', { length: 32 }).primaryKey(),
+    scholarshipId: varchar('scholarship_id', { length: 32 })
       .notNull()
       .references(() => scholarship.id, { onDelete: 'cascade' }),
-    userId: text()
+    userId: varchar('user_id', { length: 32 })
       .notNull()
       .references(() => user.id, { onDelete: 'cascade' }),
     applicationDate: timestamp().defaultNow().notNull(),
-    status: varchar({
+    status: varchar('status', {
+      length: 20,
       enum: ['pending', 'accepted', 'rejected'],
     })
       .default('pending')
       .notNull(),
-    reviewedBy: text().references(() => user.id, { onDelete: 'set null' }),
+    reviewedBy: varchar('reviewed_by', { length: 32 }).references(
+      () => user.id,
+      { onDelete: 'set null' },
+    ),
     reviewDate: timestamp(),
     comments: text(),
   },
@@ -115,17 +135,20 @@ export const scholarshipApplication = educationSchema.table(
 export const scholarshipStudentReport = educationSchema.table(
   'scholarship_student_report',
   {
-    id: varchar().primaryKey(),
-    scholarshipId: varchar()
+    id: varchar('id', { length: 32 }).primaryKey(),
+    scholarshipId: varchar('scholarship_id', { length: 32 })
       .notNull()
       .references(() => scholarship.id, { onDelete: 'cascade' }),
-    userId: text()
+    userId: varchar('user_id', { length: 32 })
       .notNull()
       .references(() => user.id, { onDelete: 'cascade' }),
-    reportedBy: text()
+    reportedBy: varchar('reported_by', { length: 32 })
       .notNull()
       .references(() => user.id, { onDelete: 'set null' }),
-    cause: varchar({ enum: ['absence', 'performance', 'other'] }).notNull(),
+    cause: varchar('cause', {
+      length: 20,
+      enum: ['absence', 'performance', 'other'],
+    }).notNull(),
     causeDetail: text(),
     reason: integer().references(() => reportReason.id, {
       onDelete: 'cascade',
@@ -141,13 +164,13 @@ export const scholarshipStudentReport = educationSchema.table(
 
 export const reportReason = educationSchema.table('report_reason', {
   id: integer().primaryKey().generatedByDefaultAsIdentity(),
-  name: varchar().notNull(),
+  name: varchar('name', { length: 100 }).notNull(),
   createdAt: timestamp().defaultNow().notNull(),
   updatedAt: timestamp()
     .defaultNow()
     .notNull()
     .$onUpdateFn(() => new Date()),
-  createdBy: text()
+  createdBy: varchar('created_by', { length: 32 })
     .notNull()
     .references(() => user.id, { onDelete: 'set null' }),
 })
@@ -155,7 +178,7 @@ export const reportReason = educationSchema.table('report_reason', {
 export const scholarshipMajor = educationSchema.table(
   'scholarship_major',
   {
-    scholarshipId: varchar()
+    scholarshipId: varchar('scholarship_id', { length: 32 })
       .notNull()
       .references(() => scholarship.id, { onDelete: 'cascade' }),
     majorId: integer()

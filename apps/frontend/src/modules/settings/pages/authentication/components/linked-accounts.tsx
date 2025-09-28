@@ -5,7 +5,6 @@ import GoogleButton from '@/shared/components/google-button'
 export default function LinkedAccounts() {
   const { data: linkedAccounts } = useLinkedAccounts()
   const { mutate } = useLinkGoogle()
-  console.log({ linkedAccounts })
   return (
     <div className="my-4">
       {linkedAccounts?.some((ac) => ac.providerId === 'google') ? (

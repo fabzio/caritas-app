@@ -27,33 +27,6 @@ export default function ProfileDetailsForm() {
         <>
           <FormField
             control={form.control}
-            name="schoolId"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Institución educativa</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Seleccione una institución" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="school-1">Colegio San Juan</SelectItem>
-                    <SelectItem value="school-2">
-                      IE María Auxiliadora
-                    </SelectItem>
-                    <SelectItem value="school-3">Colegio Santa Rosa</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
             name="grade"
             render={({ field }) => (
               <FormItem>
@@ -130,6 +103,6 @@ export default function ProfileDetailsForm() {
 const gradeOptions = ['4to Secundaria', '5to Secundaria']
 
 const insuranceOptions = [
-  { label: 'SIS', value: 'SIS' },
+  { label: 'SIS', value: 'public' },
   { label: 'Particular', value: 'private' },
 ]

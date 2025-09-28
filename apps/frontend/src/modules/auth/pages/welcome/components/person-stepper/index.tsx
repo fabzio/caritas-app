@@ -15,7 +15,6 @@ export default function WelcomePersonStepper() {
     defaultValues: {
       profiles: [],
       grade: undefined,
-      schoolId: undefined,
     },
   })
   const handleSubmit = form.handleSubmit(() => {
@@ -27,7 +26,7 @@ export default function WelcomePersonStepper() {
         schoolId?: string
         grade?: string
         guardianEmail?: string
-        insuranceType?: 'SIS' | 'private'
+        insuranceType?: 'none' | 'public' | 'private'
       }
       mutate({
         profiles: full.profiles,

@@ -1,6 +1,6 @@
 import Elysia from 'elysia'
-import region from './regions'
 import setup from './setup'
+import { welcome } from './welcome'
 
 const authModule = new Elysia({
   name: 'auth',
@@ -8,6 +8,6 @@ const authModule = new Elysia({
   tags: ['Auth'],
 })
   .use(setup)
-  .use(region)
+  .use(welcome)
 
 export default authModule

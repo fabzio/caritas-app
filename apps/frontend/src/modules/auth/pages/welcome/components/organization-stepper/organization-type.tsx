@@ -28,24 +28,24 @@ export default function OrganizationTypeForm() {
                   onValueChange={field.onChange}
                   defaultValue={field.value}
                 >
-                  {organizationType.map((type) => (
-                    <FormItem key={type.name}>
+                  {organizationType.map((orgType) => (
+                    <FormItem key={orgType.name}>
                       <FormControl>
                         <Label className="hover:bg-accent/50 flex gap-3 rounded-lg border p-3 has-[[aria-checked=true]]:border-primary items-center">
                           <RadioGroupItem
-                            value={type.name}
-                            id={type.name}
+                            value={orgType.type}
+                            id={orgType.name}
                             defaultChecked
                           />
                           <div>
-                            <type.icon size={24} />
+                            <orgType.icon size={24} />
                           </div>
                           <div className="grid gap-1.5 font-normal">
                             <p className="text-sm leading-none font-medium">
-                              {type.name}
+                              {orgType.name}
                             </p>
                             <p className="text-muted-foreground text-sm">
-                              {type.description}
+                              {orgType.description}
                             </p>
                           </div>
                         </Label>
@@ -66,18 +66,21 @@ export default function OrganizationTypeForm() {
 const organizationType = [
   {
     name: 'Aliado de Salud',
+    type: 'health',
     description:
       'Organizaciones que apoyan en campañas de salud y educación sanitaria',
     icon: Cross,
   },
   {
     name: 'Aliado de Educación',
+    type: 'education',
     description:
       'Instituciones dedicadas a programas educativos y desarrollo académico',
     icon: GraduationCap,
   },
   {
     name: 'Parroquia/Beneficiario',
+    type: 'beneficiary',
     description:
       'Comunidades parroquiales y beneficiarios directos de los programas',
     icon: Church,

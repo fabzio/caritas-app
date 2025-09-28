@@ -15,14 +15,25 @@ import { organization, user } from './auth'
 
 export const healthSchema = pgSchema('health')
 
+export const patientInfo = healthSchema.table('patient_info', {
+  userId: varchar('user_id', { length: 32 })
+    .primaryKey()
+    .notNull()
+    .references(() => user.id, { onDelete: 'cascade' }),
+  insuranceType: varchar('insurance_type', {
+    length: 20,
+    enum: ['none', 'public', 'private'],
+  }).notNull(),
+})
+
 export const activity = healthSchema.table('activity', {
   id: integer().primaryKey().generatedByDefaultAsIdentity(),
-  name: varchar().notNull(),
+  name: varchar('name', { length: 100 }).notNull(),
   date: date().notNull(),
   duration: interval().notNull(),
   createdAt: timestamp().defaultNow().notNull(),
   updatedAt: timestamp().defaultNow().notNull(),
-  spaceId: text()
+  spaceId: varchar('space_id', { length: 32 })
     .notNull()
     .references(() => organization.id, { onDelete: 'cascade' }),
   statusId: integer()
@@ -31,7 +42,7 @@ export const activity = healthSchema.table('activity', {
   typeId: integer()
     .notNull()
     .references(() => activityType.id, { onDelete: 'restrict' }),
-  userId: varchar()
+  userId: varchar('user_id', { length: 32 })
     .notNull()
     .references(() => user.id, { onDelete: 'set default' }),
   state: boolean().default(true).notNull(),
@@ -65,7 +76,7 @@ export const activityAllied = healthSchema.table(
     activityId: integer()
       .notNull()
       .references(() => activity.id, { onDelete: 'cascade' }),
-    alliedId: text()
+    alliedId: varchar('allied_id', { length: 32 })
       .notNull()
       .references(() => organization.id, { onDelete: 'cascade' }),
   },
@@ -74,17 +85,17 @@ export const activityAllied = healthSchema.table(
 
 export const activityStatus = healthSchema.table('activity_status', {
   id: integer().primaryKey().generatedByDefaultAsIdentity(),
-  name: varchar().notNull(),
+  name: varchar('name', { length: 50 }).notNull(),
 })
 export const activityType = healthSchema.table('activity_type', {
   id: integer().primaryKey().generatedByDefaultAsIdentity(),
-  name: varchar().notNull(),
+  name: varchar('name', { length: 50 }).notNull(),
 })
 
 export const activityUser = healthSchema.table(
   'activity_user',
   {
-    userId: text()
+    userId: varchar('user_id', { length: 32 })
       .notNull()
       .references(() => user.id, { onDelete: 'cascade' }),
     activityId: integer()
@@ -104,13 +115,13 @@ export const atention = healthSchema.table(
     activityId: integer()
       .notNull()
       .references(() => activity.id, { onDelete: 'cascade' }),
-    userId: varchar()
+    userId: varchar('user_id', { length: 32 })
       .notNull()
       .references(() => user.id, { onDelete: 'cascade' }),
     specialityId: integer().references(() => speciality.id, {
       onDelete: 'set null',
     }),
-    registeredBy: varchar()
+    registeredBy: varchar('registered_by', { length: 32 })
       .notNull()
       .references(() => user.id, { onDelete: 'cascade' }),
   },
@@ -129,7 +140,7 @@ export const atention = healthSchema.table(
 export const organizationSpeciality = healthSchema.table(
   'organization_speciality',
   {
-    organizationId: text()
+    organizationId: varchar('organization_id', { length: 32 })
       .notNull()
       .references(() => organization.id, { onDelete: 'cascade' }),
     specialityId: integer()
@@ -143,5 +154,5 @@ export const organizationSpeciality = healthSchema.table(
 
 export const speciality = healthSchema.table('speciality', {
   id: integer().primaryKey().generatedByDefaultAsIdentity(),
-  name: varchar().notNull(),
+  name: varchar('name', { length: 100 }).notNull(),
 })

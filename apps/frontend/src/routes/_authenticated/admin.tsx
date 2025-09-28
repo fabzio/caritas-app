@@ -7,7 +7,6 @@ export const Route = createFileRoute('/_authenticated/admin')({
       queryKey: [QueryKeys.SESSION],
       queryFn: () => authClient.getSession(),
     })
-
     if (error) {
       throw redirect({
         to: '/auth/login',
