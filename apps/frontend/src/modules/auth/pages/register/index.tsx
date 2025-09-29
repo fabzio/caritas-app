@@ -39,6 +39,7 @@ import { cn } from '@workspace/ui/lib/utils'
 import { format } from 'date-fns'
 import { CalendarIcon, Check, ChevronsUpDown, Loader2 } from 'lucide-react'
 import { useForm } from 'react-hook-form'
+import { env } from '@/env'
 import { useRegions } from '@/hooks/use-regions'
 import PasswordStrengthBar from '@/shared/components/password-strength-bar'
 import TurnstileWidget from '@/shared/components/turnsile-widget'
@@ -77,7 +78,7 @@ export default function Register() {
         <div className="flex flex-col items-center gap-2 text-center col-span-2">
           <h1 className="text-2xl font-bold">Le damos la bienvenida</h1>
           <p className="text-muted-foreground text-sm text-balance">
-            Regístrese para continuar a <b> Cáritas Lima 365</b>
+            Regístrese para continuar a <b> {env.VITE_APP_TITLE}</b>
           </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

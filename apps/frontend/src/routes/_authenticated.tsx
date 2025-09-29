@@ -9,6 +9,7 @@ export const Route = createFileRoute('/_authenticated')({
       queryFn: () => authClient.getSession(),
       staleTime: Infinity,
     })
+
     if (!data)
       throw redirect({
         to: '/auth/login',

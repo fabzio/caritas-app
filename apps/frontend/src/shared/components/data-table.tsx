@@ -133,15 +133,13 @@ export default function DataTable<T>({
               {page === '...' ? (
                 <PaginationEllipsis />
               ) : (
-                <PaginationItem>
-                  <Button
-                    variant={+page === currentPage + 1 ? 'outline' : 'ghost'}
-                    size="icon"
-                    onClick={() => table.setPageIndex(+page)}
-                  >
-                    {page}
-                  </Button>
-                </PaginationItem>
+                <Button
+                  variant={+page === currentPage + 1 ? 'outline' : 'ghost'}
+                  size="icon"
+                  onClick={() => table.setPageIndex(+page)}
+                >
+                  {page}
+                </Button>
               )}
             </PaginationItem>
           ))}

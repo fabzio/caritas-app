@@ -17,6 +17,11 @@ import PasswordStrengthBar from '@/shared/components/password-strength-bar'
 export default function ChangePassword() {
   const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
+    defaultValues: {
+      currentPassword: '',
+      newPassword: '',
+      confirmNewPassword: '',
+    },
   })
   const { mutate } = useChangePassword()
   const onSubmit = form.handleSubmit((data) =>

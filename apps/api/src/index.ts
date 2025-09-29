@@ -5,6 +5,7 @@ import { PostgresError } from './db/errors'
 import env from './env'
 import { auth, OpenAPI } from './lib/auth'
 import authModule from './modules/auth'
+import common from './modules/common'
 import healthModule from './modules/health'
 
 const main = async () => {
@@ -32,6 +33,7 @@ const main = async () => {
       }
     })
     .mount(auth.handler)
+    .use(common)
     .use(authModule)
     .use(healthModule)
     .listen(env.PORT)

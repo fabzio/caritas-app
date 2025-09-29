@@ -3,9 +3,8 @@ import { isFirstUser, setFirstUserAsAdmin } from './service'
 
 const setup = new Elysia({
   name: 'setup',
-  prefix: '/setup',
 }).post(
-  '',
+  '/setup',
   async ({ body: { id } }) => {
     const isFirst = await isFirstUser()
     if (isFirst) {

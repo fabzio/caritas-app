@@ -1,5 +1,8 @@
 export const QueryKeys = {
   SESSION: 'session',
+  ACCESS: 'access',
+  ORGANIZATIONS: 'organizations',
+  TEAMS: 'teams',
   SETTINGS: {
     ACCOUNTS: 'settings-accounts',
     PASSKEYS: 'settings-passkeys',

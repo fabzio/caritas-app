@@ -92,7 +92,7 @@ function NavUser({ user }: Readonly<Props>) {
             </DropdownMenuLabel>
             <DropdownMenuGroup>
               <DropdownMenuItem asChild>
-                <Link to="/settings">
+                <Link to="/user/settings">
                   <Settings />
                   Configuración
                 </Link>

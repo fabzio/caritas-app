@@ -16,12 +16,12 @@ export const authSchema = pgSchema('auth')
 export const user = authSchema.table(
   'user',
   {
-    id: text('id').primaryKey(),
-    name: text('name').notNull(),
-    surname: text('surname').notNull(),
-    email: text('email').notNull().unique(),
+    id: varchar('id', { length: 32 }).primaryKey(),
+    name: varchar('name', { length: 100 }).notNull(),
+    surname: varchar('surname', { length: 100 }).notNull(),
+    email: varchar('email', { length: 254 }).notNull().unique(),
     emailVerified: boolean('email_verified').default(false).notNull(),
-    image: text('image'),
+    image: varchar('image', { length: 500 }),
     createdAt: timestamp('created_at')
       .$defaultFn(() => new Date())
       .notNull(),
@@ -29,15 +29,15 @@ export const user = authSchema.table(
       .$defaultFn(() => new Date())
       .$onUpdate(() => new Date())
       .notNull(),
-    role: text('role'),
+    role: varchar('role', { length: 50 }),
     banned: boolean('banned').default(false),
     banReason: text('ban_reason'),
     isAnonymous: boolean('is_anonymous'),
     banExpires: timestamp('ban_expires', {
       mode: 'date',
     }),
-    documentType: text('document_type'),
-    documentNumber: text('document_number').notNull(),
+    documentType: varchar('document_type', { length: 20 }),
+    documentNumber: varchar('document_number', { length: 20 }).notNull(),
     sex: char({ enum: ['F', 'M'] }).notNull(),
     birthDate: date('birth_date').notNull(),
     phone: varchar('phone', { length: 15 }).notNull(),
@@ -54,30 +54,30 @@ export const user = authSchema.table(
 )
 
 export const session = authSchema.table('session', {
-  id: text('id').primaryKey(),
+  id: varchar('id', { length: 32 }).primaryKey(),
   expiresAt: timestamp('expires_at').notNull(),
-  token: text('token').notNull().unique(),
+  token: varchar('token', { length: 255 }).notNull().unique(),
   createdAt: timestamp('created_at')
     .$defaultFn(() => new Date())
     .notNull(),
   updatedAt: timestamp('updated_at')
     .$onUpdate(() => new Date())
     .notNull(),
-  ipAddress: text('ip_address'),
-  userAgent: text('user_agent'),
-  userId: text('user_id')
+  ipAddress: varchar('ip_address', { length: 45 }),
+  userAgent: varchar('user_agent', { length: 500 }),
+  userId: varchar('user_id', { length: 32 })
     .notNull()
     .references(() => user.id, { onDelete: 'cascade' }),
-  activeOrganizationId: text('active_organization_id'),
-  activeTeamId: text('active_team_id'),
-  impersonatedBy: text('impersonated_by'),
+  activeOrganizationId: varchar('active_organization_id', { length: 32 }),
+  activeTeamId: varchar('active_team_id', { length: 32 }),
+  impersonatedBy: varchar('impersonated_by', { length: 32 }),
 })
 
 export const account = authSchema.table('account', {
-  id: text('id').primaryKey(),
-  accountId: text('account_id').notNull(),
-  providerId: text('provider_id').notNull(),
-  userId: text('user_id')
+  id: varchar('id', { length: 32 }).primaryKey(),
+  accountId: varchar('account_id', { length: 100 }).notNull(),
+  providerId: varchar('provider_id', { length: 50 }).notNull(),
+  userId: varchar('user_id', { length: 32 })
     .notNull()
     .references(() => user.id, { onDelete: 'cascade' }),
   accessToken: text('access_token'),
@@ -85,8 +85,8 @@ export const account = authSchema.table('account', {
   idToken: text('id_token'),
   accessTokenExpiresAt: timestamp('access_token_expires_at'),
   refreshTokenExpiresAt: timestamp('refresh_token_expires_at'),
-  scope: text('scope'),
-  password: text('password'),
+  scope: varchar('scope', { length: 500 }),
+  password: varchar('password', { length: 255 }),
   createdAt: timestamp('created_at')
     .$defaultFn(() => new Date())
     .notNull(),
@@ -96,9 +96,9 @@ export const account = authSchema.table('account', {
 })
 
 export const verification = authSchema.table('verification', {
-  id: text('id').primaryKey(),
-  identifier: text('identifier').notNull(),
-  value: text('value').notNull(),
+  id: varchar('id', { length: 32 }).primaryKey(),
+  identifier: varchar('identifier', { length: 100 }).notNull(),
+  value: varchar('value', { length: 255 }).notNull(),
   expiresAt: timestamp('expires_at').notNull(),
   createdAt: timestamp('created_at')
     .$defaultFn(() => new Date())
@@ -110,41 +110,42 @@ export const verification = authSchema.table('verification', {
 })
 
 export const organization = authSchema.table('organization', {
-  id: text('id').primaryKey(),
-  name: text('name').notNull(),
-  slug: text('slug').unique(),
-  logo: text('logo'),
+  id: varchar('id', { length: 32 }).primaryKey(),
+  name: varchar('name', { length: 100 }).notNull(),
+  slug: varchar('slug', { length: 100 }).unique(),
+  logo: varchar('logo', { length: 500 }),
   createdAt: timestamp('created_at').notNull(),
   updatedAt: timestamp('updated_at').$onUpdate(() => new Date()),
   metadata: text('metadata'),
-  type: text('type', {
-    enum: ['caritas', 'edu', 'health', 'other'],
+  type: varchar('type', {
+    length: 20,
+    enum: ['caritas', 'education', 'health', 'beneficiary'],
   }).notNull(),
 })
 
 export const passkey = authSchema.table('passkey', {
-  id: text('id').primaryKey(),
-  name: text('name'),
+  id: varchar('id', { length: 32 }).primaryKey(),
+  name: varchar('name', { length: 100 }),
   publicKey: text('public_key').notNull(),
-  userId: text('user_id')
+  userId: varchar('user_id', { length: 32 })
     .notNull()
     .references(() => user.id, { onDelete: 'cascade' }),
-  credentialID: text('credential_id').notNull(),
+  credentialID: varchar('credential_id', { length: 255 }).notNull(),
   counter: integer('counter').notNull(),
-  deviceType: text('device_type').notNull(),
+  deviceType: varchar('device_type', { length: 50 }).notNull(),
   backedUp: boolean('backed_up').notNull(),
-  transports: text('transports'),
+  transports: varchar('transports', { length: 255 }),
   createdAt: timestamp('created_at'),
-  aaguid: text('aaguid'),
+  aaguid: varchar('aaguid', { length: 36 }),
 })
 
 export const organizationRole = authSchema.table('organization_role', {
-  id: text('id').primaryKey(),
-  organizationId: text('organization_id')
+  id: varchar('id', { length: 32 }).primaryKey(),
+  organizationId: varchar('organization_id', { length: 32 })
     .notNull()
     .references(() => organization.id, { onDelete: 'cascade' }),
-  role: text('role').notNull(),
-  permission: text('permission').notNull(),
+  role: varchar('role', { length: 50 }).notNull(),
+  permission: varchar('permission', { length: 100 }).notNull(),
   createdAt: timestamp('created_at')
     .$defaultFn(() => new Date())
     .notNull(),
@@ -152,9 +153,9 @@ export const organizationRole = authSchema.table('organization_role', {
 })
 
 export const team = authSchema.table('team', {
-  id: text('id').primaryKey(),
-  name: text('name').notNull(),
-  organizationId: text('organization_id')
+  id: varchar('id', { length: 32 }).primaryKey(),
+  name: varchar('name', { length: 100 }).notNull(),
+  organizationId: varchar('organization_id', { length: 32 })
     .notNull()
     .references(() => organization.id, { onDelete: 'cascade' }),
   createdAt: timestamp('created_at').notNull(),
@@ -162,39 +163,39 @@ export const team = authSchema.table('team', {
 })
 
 export const teamMember = authSchema.table('team_member', {
-  id: text('id').primaryKey(),
-  teamId: text('team_id')
+  id: varchar('id', { length: 32 }).primaryKey(),
+  teamId: varchar('team_id', { length: 32 })
     .notNull()
     .references(() => team.id, { onDelete: 'cascade' }),
-  userId: text('user_id')
+  userId: varchar('user_id', { length: 32 })
     .notNull()
     .references(() => user.id, { onDelete: 'cascade' }),
   createdAt: timestamp('created_at'),
 })
 
 export const member = authSchema.table('member', {
-  id: text('id').primaryKey(),
-  organizationId: text('organization_id')
+  id: varchar('id', { length: 32 }).primaryKey(),
+  organizationId: varchar('organization_id', { length: 32 })
     .notNull()
     .references(() => organization.id, { onDelete: 'cascade' }),
-  userId: text('user_id')
+  userId: varchar('user_id', { length: 32 })
     .notNull()
     .references(() => user.id, { onDelete: 'cascade' }),
-  role: text('role').default('member').notNull(),
+  role: varchar('role', { length: 50 }).default('member').notNull(),
   createdAt: timestamp('created_at').notNull(),
 })
 
 export const invitation = authSchema.table('invitation', {
-  id: text('id').primaryKey(),
-  organizationId: text('organization_id')
+  id: varchar('id', { length: 32 }).primaryKey(),
+  organizationId: varchar('organization_id', { length: 32 })
     .notNull()
     .references(() => organization.id, { onDelete: 'cascade' }),
-  email: text('email').notNull(),
-  role: text('role'),
-  teamId: text('team_id'),
-  status: text('status').default('pending').notNull(),
+  email: varchar('email', { length: 254 }).notNull(),
+  role: varchar('role', { length: 50 }),
+  teamId: varchar('team_id', { length: 32 }),
+  status: varchar('status', { length: 20 }).default('pending').notNull(),
   expiresAt: timestamp('expires_at').notNull(),
-  inviterId: text('inviter_id')
+  inviterId: varchar('inviter_id', { length: 32 })
     .notNull()
     .references(() => user.id, { onDelete: 'cascade' }),
 })

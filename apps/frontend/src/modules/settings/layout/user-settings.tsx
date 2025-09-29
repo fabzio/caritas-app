@@ -6,11 +6,11 @@ import {
 } from '@workspace/ui/components/avatar'
 import type { PropsWithChildren } from 'react'
 import { useSession } from '@/hooks/use-session'
-import type { ValidRoutes } from '../types/valid-routes'
-import getShortname from '../utils/get-shortname'
+import type { ValidRoutes } from '@/shared/types/valid-routes'
+import getShortname from '@/shared/utils/get-shortname'
 
 type Props = PropsWithChildren
-export default function SettingsLayout({ children }: Readonly<Props>) {
+export default function UserSettingsLayout({ children }: Readonly<Props>) {
   const { data } = useSession()
   return (
     <article className="flex flex-col flex-1 px-4">
@@ -66,11 +66,11 @@ const subRoutes: {
   label: string
 }[] = [
   {
-    path: '/settings',
+    path: '/user/settings',
     label: 'Perfil',
   },
   {
-    path: '/settings/authentication',
+    path: '/user/settings/authentication',
     label: 'Autenticación',
   },
 ]

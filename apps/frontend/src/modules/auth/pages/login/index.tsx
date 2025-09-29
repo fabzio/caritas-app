@@ -14,10 +14,11 @@ import { Input } from '@workspace/ui/components/input'
 import { KeyRound, Loader2 } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
+import { env } from '@/env'
 import { useLogin } from '@/modules/auth/pages/login/hooks/use-login'
+import GoogleButton from '@/shared/components/google-button'
 import TurnstileWidget from '@/shared/components/turnsile-widget'
 import type { ValidRoutes } from '@/shared/types/valid-routes'
-import GoogleButton from '../../components/google-button'
 import { useGoogle } from './hooks/use-google'
 import { usePasskey } from './hooks/use-passkey'
 
@@ -35,8 +36,9 @@ export default function FormLogin() {
   })
 
   const handleSubmit = form.handleSubmit((data) => {
-    console.log(data)
-    mutate(data)
+    const token = data.token
+    if (!token) return
+    mutate({ ...data, token })
   })
   const { mutate: googleLogin } = useGoogle()
   const { mutate: passkeyLogin, isPending: isPasskeyPending } = usePasskey()
@@ -46,7 +48,7 @@ export default function FormLogin() {
         <div className="flex flex-col items-center gap-2 text-center">
           <h1 className="text-2xl font-bold">Le damos la bienvenida</h1>
           <p className="text-muted-foreground text-sm text-balance">
-            Inicie sesión para continuar a <b> Cáritas Lima 365</b>
+            Inicie sesión para continuar a <b> {env.VITE_APP_TITLE}</b>
           </p>
         </div>
         <FormField
@@ -105,7 +107,10 @@ export default function FormLogin() {
             </FormItem>
           )}
         />
-        <TurnstileWidget onSuccess={(token) => form.setValue('token', token)} />
+        <TurnstileWidget
+          onSuccess={(token) => form.setValue('token', token)}
+          onExpire={() => form.setValue('token', undefined)}
+        />
         {form.formState.errors.token && (
           <p className="text-sm text-red-600">
             {form.formState.errors.token.message}
@@ -144,10 +149,15 @@ export default function FormLogin() {
   )
 }
 
-const schema = z.object({
-  email: z.string().min(2).max(100),
-  password: z.string().min(6).max(100),
-  rememberMe: z.boolean(),
-  token: z.string('Completa el captcha'),
-})
+const schema = z
+  .object({
+    email: z.string().min(2).max(100),
+    password: z.string().min(6).max(100),
+    rememberMe: z.boolean(),
+    token: z.string('Completa el captcha').optional(),
+  })
+  .refine((data) => !!data.token, {
+    message: 'Completa el captcha',
+    path: ['token'],
+  })
 type FormSchema = z.infer<typeof schema>

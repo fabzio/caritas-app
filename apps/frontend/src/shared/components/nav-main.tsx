@@ -1,4 +1,5 @@
-import { Link } from '@tanstack/react-router'
+import { useQuery } from '@tanstack/react-query'
+import { Link, useNavigate } from '@tanstack/react-router'
 import {
   Collapsible,
   CollapsibleContent,
@@ -13,17 +14,76 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
+  SidebarSeparator,
 } from '@workspace/ui/components/sidebar'
-import { ChevronRight } from 'lucide-react'
+import { Building2, ChevronRight } from 'lucide-react'
+import { toast } from 'sonner'
+import { useSession } from '@/hooks/use-session'
+import authClient from '@/lib/authClient'
+import { QueryKeys } from '../constants/query-keys'
 import type { NavItem } from '../types/nav-main'
+import {
+  type OrganizationType,
+  redirectByProperties,
+} from '../utils/redirect-by-properties'
 
 type Props = {
   items: NavItem[]
 }
 
+const organizationTypes: OrganizationType[] = [
+  'caritas',
+  'health',
+  'education',
+  'beneficiary',
+]
+
+const isOrganizationType = (value: string): value is OrganizationType =>
+  organizationTypes.includes(value as OrganizationType)
+
 function NavMain({ items }: Readonly<Props>) {
+  const navigate = useNavigate()
+  const { data: sessionData } = useSession()
+  const { data: orgs, isLoading } = useQuery({
+    queryKey: [QueryKeys.ORGANIZATIONS],
+    queryFn: async () => {
+      const { data, error } = await authClient.organization.list()
+      if (error) throw error
+      return data
+    },
+  })
   const groupLabel =
     items.find((item) => item.groupLabel)?.groupLabel || 'Navegación'
+
+  const handleChangeOrganization = async (
+    newOrg: NonNullable<typeof orgs>[number],
+  ) => {
+    if (!newOrg) return
+    const organizationType = isOrganizationType(newOrg.type)
+      ? newOrg.type
+      : null
+
+    if (organizationType === 'caritas') {
+      const { data: teams, error } = await authClient.organization.listTeams()
+      if (error) {
+        toast.error(error.message)
+        return
+      }
+      const route = redirectByProperties({
+        role: sessionData?.user.role ?? null,
+        organizationType,
+        teams,
+      })
+      navigate({ to: route })
+      return
+    }
+
+    const route = redirectByProperties({
+      role: sessionData?.user.role ?? null,
+      organizationType,
+    })
+    navigate({ to: route })
+  }
 
   return (
     <SidebarGroup>
@@ -81,6 +141,39 @@ function NavMain({ items }: Readonly<Props>) {
             </SidebarMenuItem>
           )
         })}
+        {!isLoading && orgs && orgs.length > 0 && (
+          <>
+            <SidebarSeparator />
+            <Collapsible
+              key="organizations"
+              asChild
+              className="group/collapsible"
+            >
+              <SidebarMenuItem>
+                <CollapsibleTrigger asChild>
+                  <SidebarMenuButton tooltip="Mis Organizaciones">
+                    <Building2 />
+                    <span>Mis Organizaciones</span>
+                    <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                  </SidebarMenuButton>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <SidebarMenuSub>
+                    {orgs.map((org) => (
+                      <SidebarMenuSubItem key={org.id}>
+                        <SidebarMenuSubButton
+                          onClick={() => handleChangeOrganization(org)}
+                        >
+                          <span>{org.name}</span>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                    ))}
+                  </SidebarMenuSub>
+                </CollapsibleContent>
+              </SidebarMenuItem>
+            </Collapsible>
+          </>
+        )}
       </SidebarMenu>
     </SidebarGroup>
   )

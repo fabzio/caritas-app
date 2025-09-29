@@ -1,11 +1,11 @@
 import { Turnstile } from '@marsidev/react-turnstile'
+import type { ComponentProps } from 'react'
 import { env } from '@/env'
 import { useTheme } from './theme-provider'
 
-type Props = {
-  onSuccess?: (token: string) => void
-}
-export default function TurnstileWidget({ onSuccess }: Readonly<Props>) {
+type Props = Omit<ComponentProps<typeof Turnstile>, 'siteKey' | 'options'>
+
+export default function TurnstileWidget(props: Readonly<Props>) {
   const { theme } = useTheme()
   return (
     <Turnstile
@@ -15,7 +15,7 @@ export default function TurnstileWidget({ onSuccess }: Readonly<Props>) {
         theme: theme === 'system' ? 'auto' : theme,
         language: 'es',
       }}
-      onSuccess={onSuccess}
+      {...props}
     />
   )
 }

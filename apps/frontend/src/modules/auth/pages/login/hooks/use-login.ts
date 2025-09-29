@@ -1,4 +1,5 @@
 import { useMutation } from '@tanstack/react-query'
+import { toast } from 'sonner'
 import authClient from '@/lib/authClient'
 import type { ValidRoutes } from '@/shared/types/valid-routes'
 
@@ -16,6 +17,12 @@ export const useLogin = (redirectPath: ValidRoutes) => {
         rememberMe: params.rememberMe,
         callbackURL: redirectPath,
         fetchOptions: {
+          onSuccess: () => {
+            toast.success('Inicio de sesión exitoso')
+          },
+          onError: (error) => {
+            toast.error(error.error.message)
+          },
           headers: {
             'x-captcha-response': params.token,
           },
