@@ -58,4 +58,6 @@ export const seed = async () => {
   console.info(`🌱 Seeded ${districts.length} districts`)
 }
 
-seed().catch(console.error)
+if (import.meta.main) {
+  seed().catch(console.error)
+}
