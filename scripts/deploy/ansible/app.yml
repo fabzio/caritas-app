@@ -1,0 +1,33 @@
+- name: Depliegue de aplicación con Docker
+  hosts: vps
+  become: true
+  vars:
+    app_src_path: "{{ app_src_path | default('../app') }}"
+
+  tasks:
+    - name: Crear carpeta destino para el proyecto
+      ansible.builtin.file:
+        path: /home/{{ ansible_user }}/app/caritas
+        state: directory
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        mode: '0755'
+
+    - name: Copiar archivos del compose de la aplicación
+      ansible.builtin.copy:
+        src: "{{ app_src_path }}/"
+        dest: /home/{{ ansible_user }}/app/caritas
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        mode: '0644'
+
+    - name: Autenticar con GitHub Container Registry
+      community.docker.docker_login:
+        registry_url: ghcr.io
+        username: "{{ github_username }}"
+        password: "{{ github_token }}"
+
+    - name: Levantar stack con docker compose
+      community.docker.docker_compose_v2:
+        project_src: /home/{{ ansible_user }}/app/caritas/
+        state: present
