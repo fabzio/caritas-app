@@ -1,3 +1,4 @@
+import { Link } from '@tanstack/react-router'
 import { Button } from '@workspace/ui/components/button'
 import { PlusCircle } from 'lucide-react'
 import { useIsMobile } from '@/hooks/use-mobile'
@@ -12,10 +13,12 @@ export default function ScholarshipPage() {
       </div>
       <div>
         <div className="w-full flex justify-end ">
-          <Button className="w-full max-w-xs" size={isMobile ? 'sm' : 'lg'}>
-            <PlusCircle />
-            Crear nueva beca
-          </Button>
+          <Link to="/education/scholarship/create">
+            <Button className="w-full max-w-xs" size={isMobile ? 'sm' : 'lg'}>
+              <PlusCircle />
+              Registrar nueva beca
+            </Button>
+          </Link>
         </div>
         {/* Aquí puedes agregar la tabla o lista de becas en formato desktop y mobile(priori) */}
       </div>
