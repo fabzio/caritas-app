@@ -6,13 +6,15 @@ import { useUserTable } from '../hooks/use-table'
 type Props = {
   rowSelection: Record<string, boolean>
   setRowSelection: OnChangeFn<Record<string, boolean>>
+  search: string
 }
 export default function UserTable({
   rowSelection,
   setRowSelection,
+  search,
 }: Readonly<Props>) {
   const { data, columns, paginationState, sortingState, setFilters } =
-    useUserTable()
+    useUserTable(search)
   return (
     <DataTable
       data={data.users}
