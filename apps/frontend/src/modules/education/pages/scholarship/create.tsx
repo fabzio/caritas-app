@@ -34,6 +34,9 @@ import { Separator } from '@workspace/ui/components/separator'
 import { format } from 'date-fns'
 import { CalendarIcon } from 'lucide-react'
 import { useForm } from 'react-hook-form'
+import { useSession } from '@/hooks/use-session'
+import useGetOrganization from '../../hooks/use-get-organization'
+import usePostScholarship from '../../hooks/use-post-scholarship'
 import {
   type FormScholarShipSchema,
   formScholarShipSchema,
@@ -43,17 +46,24 @@ export default function CreateScholarship() {
     resolver: zodResolver(formScholarShipSchema),
     defaultValues: {
       name: '',
-      organizationName: undefined,
       description: '',
       requirements: '',
-      vacanties: 1,
-      startOfDate: undefined,
-      endOfDate: undefined,
+      vacancies: 1,
+      startDate: undefined,
+      endDate: undefined,
       organizationId: undefined,
       type: undefined,
     },
   })
   const today = new Date()
+  const { data: organizations, isLoading } = useGetOrganization()
+  const { mutate, isPending } = usePostScholarship()
+  const { data: user } = useSession()
+  const handleSubmit = form.handleSubmit((data) => {
+    if (!user) return
+    const params = { ...data, createdBy: user.user.id, active: true }
+    mutate(params)
+  })
 
   return (
     <div className="flex flex-1 flex-col gap-6 p-4">
@@ -77,7 +87,7 @@ export default function CreateScholarship() {
             </CardHeader>
             <CardContent>
               <Form {...form}>
-                <div className="flex flex-col gap-4">
+                <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
                   <FormField
                     control={form.control}
                     name="name"
@@ -102,14 +112,12 @@ export default function CreateScholarship() {
                         >
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder="Seleccione la organización" />
+                              <SelectValue placeholder="Seleccione el tipo de beca" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="modular">Modular</SelectItem>
-                            <SelectItem value="studiesPlan">
-                              Plan de estudios
-                            </SelectItem>
+                            <SelectItem value="ML">Modular</SelectItem>
+                            <SelectItem value="PL">Plan de estudios</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -128,12 +136,18 @@ export default function CreateScholarship() {
                         >
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder="Selecciona el tipo de beca" />
+                              <SelectValue placeholder="Seleccione la organización" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="ORG1">Organización 1</SelectItem>
-                            <SelectItem value="ORG2">Organización 2</SelectItem>
+                            {isLoading && (
+                              <SelectItem value="#">Cargando...</SelectItem>
+                            )}
+                            {organizations?.map((org) => (
+                              <SelectItem key={org.id} value={String(org.id)}>
+                                {org.name}
+                              </SelectItem>
+                            ))}
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -166,19 +180,28 @@ export default function CreateScholarship() {
                   />
                   <FormField
                     control={form.control}
-                    name="vacanties"
+                    name="vacancies"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Vacantes Disponibles</FormLabel>
                         <FormControl>
-                          <Input {...field} type="number" />
+                          <Input
+                            {...field}
+                            type="number"
+                            onChange={(e) => {
+                              const value = e.target.value
+                              const number =
+                                value === '' ? undefined : parseInt(value, 10)
+                              field.onChange(number)
+                            }}
+                          />
                         </FormControl>
                       </FormItem>
                     )}
                   />
                   <FormField
                     control={form.control}
-                    name="startOfDate"
+                    name="startDate"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Fecha de Inicio </FormLabel>
@@ -202,7 +225,7 @@ export default function CreateScholarship() {
                               onSelect={field.onChange}
                               disabled={{
                                 before: today,
-                                after: form.getValues('endOfDate'),
+                                after: form.getValues('endDate'),
                               }}
                             />
                           </PopoverContent>
@@ -212,7 +235,7 @@ export default function CreateScholarship() {
                   />
                   <FormField
                     control={form.control}
-                    name="endOfDate"
+                    name="endDate"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Fecha de fin</FormLabel>
@@ -243,9 +266,11 @@ export default function CreateScholarship() {
                   />
                   <CardFooter className="flex justify-end gap-4 ">
                     <Button variant="outline">Cancelar</Button>
-                    <Button variant="default">Registrar</Button>
+                    <Button variant="default" type="submit">
+                      Registrar
+                    </Button>
                   </CardFooter>
-                </div>
+                </form>
               </Form>
             </CardContent>
           </Card>

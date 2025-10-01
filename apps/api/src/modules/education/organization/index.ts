@@ -6,11 +6,13 @@ import { getOrganizationMajors } from './service'
 const organization = new Elysia({
   name: 'organization',
   prefix: '/organization',
-}).get('', getOrganizationMajors, {
-  auth: true,
-  response: {
-    200: OrganizationMayorModel.getOrganizationMajors,
-    401: t.Literal('Unauthorized'),
-  },
 })
+  .use(betterAuth)
+  .get('', getOrganizationMajors, {
+    auth: true,
+    response: {
+      200: OrganizationMayorModel.getOrganizationMajors,
+      401: t.Literal('Unauthorized'),
+    },
+  })
 export default organization
