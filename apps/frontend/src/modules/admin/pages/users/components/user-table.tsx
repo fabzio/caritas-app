@@ -6,18 +6,16 @@ import { useUserTable } from '../hooks/use-table'
 type Props = {
   rowSelection: Record<string, boolean>
   setRowSelection: OnChangeFn<Record<string, boolean>>
-  search: string
 }
 export default function UserTable({
   rowSelection,
   setRowSelection,
-  search,
 }: Readonly<Props>) {
   const { data, columns, paginationState, sortingState, setFilters } =
-    useUserTable(search)
+    useUserTable()
   return (
     <DataTable
-      data={data.users}
+      data={data?.users || []}
       columns={columns}
       pagination={paginationState}
       sorting={sortingState}
@@ -36,8 +34,8 @@ export default function UserTable({
               : pagination,
           )
         },
-        rowCount: data.total,
-        pageCount: Math.ceil(data.total / paginationState.pageSize || 1),
+        rowCount: data?.total || 0,
+        pageCount: Math.ceil(data?.total / paginationState.pageSize || 1),
       }}
       setRowSelection={setRowSelection}
       rowSelection={rowSelection}

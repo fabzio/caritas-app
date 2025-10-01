@@ -8,16 +8,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@workspace/ui/components/dialog'
-import { Input } from '@workspace/ui/components/input'
 import { UserPlus } from 'lucide-react'
 import { useState } from 'react'
 import ActionsButton from './components/actions-button'
+import SearchUserInput from './components/search-user-input'
 import UserTable from './components/user-table'
 import { useRemoveUser } from './hooks/use-remove-user'
 
 export default function User() {
   const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({})
-  const [searchTerm, setSearchTerm] = useState('')
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const { mutateAsync: removeUser, isPending } = useRemoveUser()
   const selectedRows = Object.keys(rowSelection)
@@ -38,13 +37,7 @@ export default function User() {
   return (
     <div className="w-full p-4">
       <div className="flex justify-between items-center">
-        <div className="w-1/3">
-          <Input
-            placeholder="Buscar por nombre o documento..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
+        <SearchUserInput />
         <div className="flex items-center gap-2">
           <ActionsButton
             onDeleteClick={() => setIsDeleteModalOpen(true)}
@@ -60,7 +53,6 @@ export default function User() {
         <UserTable
           rowSelection={rowSelection}
           setRowSelection={setRowSelection}
-          search={searchTerm}
         />
       </div>
       <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>

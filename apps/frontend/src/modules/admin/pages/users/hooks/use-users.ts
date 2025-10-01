@@ -1,14 +1,25 @@
-import { useSuspenseQuery } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import authClient from '@/lib/authClient'
 import { QueryKeys } from '@/shared/constants/query-keys'
+import type { Filters } from '@/shared/types/filters'
 
-export const useUsers = ({ currentPage = 1, pageSize = 10, search = '' }) => {
-  return useSuspenseQuery({
-    queryKey: [QueryKeys.ADMIN.USERS, search],
+type UseUsersParams = {
+  currentPage?: number
+  pageSize?: number
+  filters?: Filters
+}
+
+export const useUsers = ({
+  currentPage = 1,
+  pageSize = 10,
+  filters,
+}: UseUsersParams) => {
+  return useQuery({
+    queryKey: [QueryKeys.ADMIN.USERS, filters],
     queryFn: async () => {
       const { data, error } = await authClient.admin.listUsers({
         query: {
-          searchValue: search,
+          searchValue: filters?.q || '',
           searchField: 'name',
           searchOperation: 'contains',
           limit: pageSize,

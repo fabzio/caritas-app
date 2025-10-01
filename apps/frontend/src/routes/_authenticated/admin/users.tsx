@@ -7,7 +7,7 @@ import type { Filters } from '@/shared/types/filters'
 export const Route = createFileRoute('/_authenticated/admin/users')({
   loader: ({ context: { queryClient } }) =>
     queryClient.ensureQueryData({
-      queryKey: [QueryKeys.ADMIN.USERS],
+      queryKey: [QueryKeys.ADMIN.USERS, []],
       queryFn: async () => {
         const { data, error } = await authClient.admin.listUsers({
           query: {

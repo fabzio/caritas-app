@@ -32,6 +32,7 @@
     "packages/*"
   ],
   "dependencies": {
-    "@types/minimatch": "6.0.0"
+    "@types/minimatch": "6.0.0",
+    "debounce": "^2.2.0"
   }
 }

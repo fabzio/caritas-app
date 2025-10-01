@@ -4,12 +4,12 @@ import { sortByToState } from '@/shared/utils/sort-by-to-state'
 import { userTableColumns } from '../components/columns'
 import { useUsers } from './use-users'
 
-export const useUserTable = (search: string = '') => {
+export const useUserTable = () => {
   const { filters, setFilters } = useFilters('/_authenticated/admin/users')
   const { data } = useUsers({
     currentPage: filters.pageIndex,
     pageSize: filters.pageSize,
-    search: search,
+    filters: filters,
   })
 
   const sortingState = sortByToState(filters.sortBy)
