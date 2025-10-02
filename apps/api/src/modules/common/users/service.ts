@@ -1,6 +1,6 @@
+import db from '@api/db'
+import { user } from '@api/db/schemas/auth'
 import { asc, desc, ilike, or } from 'drizzle-orm'
-import db from '@/db'
-import { user } from '@/db/schemas/auth'
 import type { UserModel } from './model'
 
 export async function getUsers(

@@ -1,7 +1,7 @@
+import authClient from '@frontend/lib/authClient'
+import { QueryKeys } from '@frontend/shared/constants/query-keys'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import authClient from '@/lib/authClient'
-import { QueryKeys } from '@/shared/constants/query-keys'
 
 interface RemoveUserProps {
   userId: string
