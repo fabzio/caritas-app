@@ -1,3 +1,4 @@
+import { env } from '@frontend/env.ts'
 import type { Auth } from 'api'
 import {
   adminClient,
@@ -10,7 +11,6 @@ import {
   passkeyClient,
 } from 'better-auth/client/plugins'
 import { createAuthClient } from 'better-auth/react'
-import { env } from '@/env.ts'
 
 const authClient = createAuthClient({
   baseURL: `${env.VITE_API_URL}/api/v1/auth`,

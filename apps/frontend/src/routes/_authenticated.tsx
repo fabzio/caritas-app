@@ -1,6 +1,6 @@
+import { QueryKeys } from '@frontend/shared/constants/query-keys'
+import MainLayout from '@frontend/shared/layouts/main-layout'
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
-import { QueryKeys } from '@/shared/constants/query-keys'
-import MainLayout from '@/shared/layouts/main-layout'
 
 export const Route = createFileRoute('/_authenticated')({
   beforeLoad: async ({ context: { authClient, queryClient }, location }) => {

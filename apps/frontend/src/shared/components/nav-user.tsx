@@ -1,3 +1,4 @@
+import authClient from '@frontend/lib/authClient'
 import { Link, useNavigate } from '@tanstack/react-router'
 import {
   Avatar,
@@ -20,7 +21,6 @@ import {
   useSidebar,
 } from '@workspace/ui/components/sidebar.tsx'
 import { ChevronsUpDown, LogOut, Settings } from 'lucide-react'
-import authClient from '@/lib/authClient'
 
 type Props = {
   user: {

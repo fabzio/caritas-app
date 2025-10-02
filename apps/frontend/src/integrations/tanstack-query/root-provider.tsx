@@ -1,5 +1,5 @@
+import authClient from '@frontend/lib/authClient.ts'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import authClient from '@/lib/authClient.ts'
 
 export function getContext() {
   const queryClient = new QueryClient()

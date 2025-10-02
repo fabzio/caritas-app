@@ -1,5 +1,5 @@
+import type { NavItem } from '@frontend/shared/types/nav-main'
 import { Layout } from 'lucide-react'
-import type { NavItem } from '@/shared/types/nav-main'
 
 const adminNavItems: NavItem[] = [
   {

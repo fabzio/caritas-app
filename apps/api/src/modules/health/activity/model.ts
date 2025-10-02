@@ -1,6 +1,6 @@
+import { activity } from '@api/db/schemas/health'
 import { createInsertSchema, createSelectSchema } from 'drizzle-typebox'
 import { t } from 'elysia'
-import { activity } from '@/db/schemas/health'
 
 export namespace ActivityModel {
   const _getActivities = createSelectSchema(activity)

@@ -1,6 +1,6 @@
+import authClient from '@frontend/lib/authClient'
 import { useMutation } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
-import authClient from '@/lib/authClient'
 
 export const useCreateOrganization = () => {
   const navigate = useNavigate()
