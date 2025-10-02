@@ -1,3 +1,4 @@
+import { useRegions } from '@frontend/hooks/use-regions'
 import { formUserSchema } from '@frontend/shared/models/user'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Separator } from '@radix-ui/react-dropdown-menu'
@@ -5,6 +6,14 @@ import { Popover } from '@radix-ui/react-popover'
 import { SelectValue } from '@radix-ui/react-select'
 import { Button } from '@workspace/ui/components/button'
 import { Calendar } from '@workspace/ui/components/calendar'
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@workspace/ui/components/command'
 import {
   Dialog,
   DialogClose,
@@ -36,7 +45,13 @@ import {
 import { cn } from '@workspace/ui/lib/utils'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
-import { CalendarIcon, UserPlus } from 'lucide-react'
+import {
+  CalendarIcon,
+  Check,
+  ChevronsUpDown,
+  Loader2,
+  UserPlus,
+} from 'lucide-react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -148,6 +163,7 @@ interface FormViewProps {
   onChangeToTableView: () => void
 }
 function FormView(props: FormViewProps) {
+  const { data: regions, isLoading: regionsLoading } = useRegions()
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -376,21 +392,62 @@ function FormView(props: FormViewProps) {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Región</FormLabel>
-                    <Select
-                      onValueChange={(value) => field.onChange(Number(value))}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecciona una región" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {/* TODO: CHANGE FOR API CALL */}
-                        <SelectItem value="1">Lima</SelectItem>
-                        <SelectItem value="2">Arequipa</SelectItem>
-                        <SelectItem value="3">Cusco</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant="outline"
+                            className={cn(
+                              'w-full justify-between',
+                              !field.value && 'text-muted-foreground',
+                            )}
+                          >
+                            {field.value
+                              ? regions?.find((r) => r.id === field.value)?.name
+                              : 'Selecciona una región'}
+                            <ChevronsUpDown className="opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-full p-0">
+                        <Command>
+                          <CommandInput
+                            placeholder="Buscar región"
+                            className="h-9"
+                          />
+                          <CommandList>
+                            <CommandEmpty>
+                              No se encontraron regiones.
+                            </CommandEmpty>
+                            <CommandGroup>
+                              {regionsLoading ? (
+                                <Loader2 className="animate-spin w-4 mx-auto" />
+                              ) : (
+                                regions?.map((region) => (
+                                  <CommandItem
+                                    value={region.name}
+                                    key={region.id}
+                                    onSelect={() => {
+                                      form.setValue('regionId', region.id)
+                                    }}
+                                  >
+                                    {region.name}
+                                    <Check
+                                      className={cn(
+                                        'ml-auto',
+                                        region.id === field.value
+                                          ? 'opacity-100'
+                                          : 'opacity-0',
+                                      )}
+                                    />
+                                  </CommandItem>
+                                ))
+                              )}
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
                     <FormMessage />
                   </FormItem>
                 )}
