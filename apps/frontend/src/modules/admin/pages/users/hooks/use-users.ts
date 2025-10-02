@@ -20,7 +20,7 @@ export const useUsers = ({
       const { data, error } = await rpc.users.get({
         query: {
           q: filters?.q || '',
-          page: currentPage - 1 || 0,
+          page: Math.max(0, (currentPage || 1) - 1),
           limit: pageSize,
           sortBy: filters?.sortBy || 'name.asc',
         },
@@ -32,4 +32,5 @@ export const useUsers = ({
   })
 }
 
-export type User = NonNullable<ReturnType<typeof useUsers>['data']>[number]
+export type UsersResponse = NonNullable<ReturnType<typeof useUsers>['data']>
+export type User = UsersResponse['data'][number]

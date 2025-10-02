@@ -22,6 +22,14 @@ export namespace UserModel {
     phone: t.String(),
     regionId: t.Integer(),
   })
+  export const getUsersResponse = t.Object({
+    data: t.Array(_getUsers),
+    total: t.Integer(),
+    page: t.Integer(),
+    limit: t.Integer(),
+    totalPages: t.Integer(),
+  })
+  export type GetUsersResponse = typeof getUsersResponse.static
   export const getUsers = t.Array(_getUsers)
   export type GetUsers = typeof getUsers.static
   export const listUsersQuery = t.Object({

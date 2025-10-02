@@ -45,6 +45,7 @@ import SearchUserInput from './components/search-user-input'
 import UserTable from './components/user-table'
 import { useCreateUser } from './hooks/use-create-user'
 import { useRemoveUser } from './hooks/use-remove-user'
+import { useUserTable } from './hooks/use-table'
 
 interface TableViewProps {
   onChangeToFormView: () => void
@@ -53,16 +54,30 @@ function TableView(props: TableViewProps) {
   const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({})
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const { mutateAsync: removeUser, isPending } = useRemoveUser()
+  const {
+    data: users,
+    pagination,
+    columns,
+    paginationState,
+    sortingState,
+    setFilters,
+  } = useUserTable()
+
   const selectedRows = Object.keys(rowSelection)
     .filter((key) => rowSelection[key])
     .map((key) => Number.parseInt(key, 10))
+
+  const selectedUsers = selectedRows
+    .map((rowIndex) => users?.[rowIndex])
+    .filter((user): user is NonNullable<typeof user> => Boolean(user))
+
   const resetSelectedRows = () => setRowSelection({})
 
-  const userCount = selectedRows.length
+  const userCount = selectedUsers.length
 
   const handleDelete = async () => {
     await Promise.all(
-      selectedRows.map((rowId) => removeUser({ userId: rowId.toString() })),
+      selectedUsers.map((user) => removeUser({ userId: user.id })),
     )
     setIsDeleteModalOpen(false)
     resetSelectedRows()
@@ -87,6 +102,12 @@ function TableView(props: TableViewProps) {
         <UserTable
           rowSelection={rowSelection}
           setRowSelection={setRowSelection}
+          data={users || []}
+          columns={columns}
+          paginationState={paginationState}
+          sortingState={sortingState}
+          setFilters={setFilters}
+          pagination={pagination}
         />
       </div>
       <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>

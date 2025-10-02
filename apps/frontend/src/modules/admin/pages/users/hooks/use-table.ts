@@ -6,7 +6,7 @@ import { useUsers } from './use-users'
 
 export const useUserTable = () => {
   const { filters, setFilters } = useFilters('/_authenticated/admin/users')
-  const { data } = useUsers({
+  const { data: response } = useUsers({
     currentPage: filters.pageIndex,
     pageSize: filters.pageSize,
     filters: filters,
@@ -21,7 +21,15 @@ export const useUserTable = () => {
   const columns = useMemo(() => userTableColumns, [])
 
   return {
-    data,
+    data: response?.data,
+    pagination: response
+      ? {
+          total: response.total,
+          totalPages: response.totalPages,
+          currentPage: response.page,
+          pageSize: response.limit,
+        }
+      : undefined,
     setFilters,
     columns,
     sortingState,

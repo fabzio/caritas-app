@@ -6,7 +6,7 @@ const users = new Elysia({ prefix: '/users' })
   .get('', ({ query }) => getUsers(query), {
     query: UserModel.listUsersQuery,
     response: {
-      200: UserModel.getUsers,
+      200: UserModel.getUsersResponse,
     },
   })
   .post('', ({ body }) => createUser(body), {
