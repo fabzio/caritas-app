@@ -15,7 +15,7 @@ export default function UserTable({
     useUserTable()
   return (
     <DataTable
-      data={data?.users || []}
+      data={data || []}
       columns={columns}
       pagination={paginationState}
       sorting={sortingState}
@@ -34,8 +34,8 @@ export default function UserTable({
               : pagination,
           )
         },
-        rowCount: data?.total || 0,
-        pageCount: Math.ceil(data?.total / paginationState.pageSize || 1),
+        rowCount: data?.length || 0,
+        pageCount: Math.ceil(data?.length || 0 / paginationState.pageSize || 1),
       }}
       setRowSelection={setRowSelection}
       rowSelection={rowSelection}

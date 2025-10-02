@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import authClient from '@/lib/authClient'
+import rpc from '@/lib/rpc'
 import { QueryKeys } from '@/shared/constants/query-keys'
 import type { Filters } from '@/shared/types/filters'
 
@@ -17,18 +17,19 @@ export const useUsers = ({
   return useQuery({
     queryKey: [QueryKeys.ADMIN.USERS, filters],
     queryFn: async () => {
-      const { data, error } = await authClient.admin.listUsers({
+      const { data, error } = await rpc.users.get({
         query: {
-          searchValue: filters?.q || '',
-          searchField: 'name',
-          searchOperation: 'contains',
+          q: filters?.q || '',
+          page: currentPage - 1 || 0,
           limit: pageSize,
-          offset: (currentPage - 1) * pageSize || 0,
+          sortBy: filters?.sortBy || 'name.asc',
         },
       })
+      console.log(data)
       if (error) throw error
       return data
     },
   })
 }
-export type User = ReturnType<typeof useUsers>['data']['users'][number]
+
+export type User = NonNullable<ReturnType<typeof useUsers>['data']>[number]
