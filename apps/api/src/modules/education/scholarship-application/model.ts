@@ -15,6 +15,14 @@ export namespace ScholarshipApplicationModel {
   export type CreateScholarshipApplication =
     typeof createScholarshipApplication.static
 
+  export const acceptScholarshipApplication = t.Object({
+    id: t.Number(),
+    userId: t.String(),
+    comments: t.Optional(t.String()),
+  })
+  export type AcceptScholarshipApplication =
+    typeof acceptScholarshipApplication.static
+
   const _getScholarshipApplications = createSelectSchema(scholarshipApplication)
   export const getScholarshipApplication = t.Array(
     t.Object({
@@ -37,6 +45,7 @@ export namespace ScholarshipApplicationModel {
     typeof getScholarshipApplication.static
 
   export class DuplicateApplicationError extends PostgresError {
+    name: string
     constructor() {
       super('Student has already applied to this scholarship')
       this.name = 'DuplicateApplicationError'

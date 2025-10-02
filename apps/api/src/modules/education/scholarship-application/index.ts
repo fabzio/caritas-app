@@ -1,6 +1,7 @@
 import Elysia, { t } from 'elysia'
 import { ScholarshipApplicationModel } from './model'
 import {
+  acceptScholarshipApplication,
   createScholarshipApplication,
   getScholarshipApplications,
 } from './service'
@@ -26,5 +27,32 @@ const scholarshipApplication = new Elysia({
       401: t.Literal('Unauthorized'),
     },
   })
+  .patch(
+    '/:id/accept',
+    (context) => {
+      type AcceptContext = {
+        params: { id: string }
+        body: { comments?: string }
+        session?: { userId?: string }
+        user?: { id?: string }
+      }
+      const ctx = context as unknown as AcceptContext
+      const args: ScholarshipApplicationModel.AcceptScholarshipApplication = {
+        id: Number(ctx.params.id),
+        userId: ctx.session?.userId ?? ctx.user?.id ?? '',
+        comments: ctx.body?.comments,
+      }
+      return acceptScholarshipApplication(args)
+    },
+    {
+      auth: true,
+      response: {
+        200: t.Number({
+          description: 'ID of the accepted scholarship application',
+        }),
+        401: t.Literal('Unauthorized'),
+      },
+    },
+  )
 
 export default scholarshipApplication
