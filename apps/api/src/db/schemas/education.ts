@@ -63,7 +63,7 @@ export const organizationLocation = educationSchema.table(
 )
 
 export const organizationOpportunity = educationSchema.table('opportunity', {
-  id: varchar('id', { length: 32 }).primaryKey(),
+  id: integer().primaryKey().generatedByDefaultAsIdentity(),
   title: varchar('title', { length: 200 }).notNull(),
   organizationId: varchar('organization_id', { length: 32 })
     .notNull()
@@ -85,7 +85,7 @@ export const organizationOpportunity = educationSchema.table('opportunity', {
 })
 
 export const scholarship = educationSchema.table('scholarship', {
-  id: varchar('id', { length: 32 }).primaryKey(),
+  id: integer().primaryKey().generatedByDefaultAsIdentity(),
   name: varchar('name', { length: 100 }).notNull(),
   organizationId: varchar('organization_id', { length: 32 })
     .notNull()
@@ -96,6 +96,10 @@ export const scholarship = educationSchema.table('scholarship', {
   description: text().notNull(),
   requirements: text().notNull(),
   createdAt: timestamp().defaultNow().notNull(),
+  type: varchar('type', {
+    length: 2,
+    enum: ['ML', 'PL'], // ML: Modular, PL: Plan de estudios
+  }).notNull(),
   updatedAt: timestamp()
     .defaultNow()
     .notNull()
@@ -109,7 +113,7 @@ export const scholarship = educationSchema.table('scholarship', {
 export const scholarshipApplication = educationSchema.table(
   'scholarship_application',
   {
-    id: integer().primaryKey().generatedByDefaultAsIdentity().primaryKey(),
+    id: integer().primaryKey().generatedByDefaultAsIdentity(),
     scholarshipId: integer()
       .notNull()
       .references(() => scholarship.id, { onDelete: 'cascade' }),
@@ -135,8 +139,8 @@ export const scholarshipApplication = educationSchema.table(
 export const scholarshipStudentReport = educationSchema.table(
   'scholarship_student_report',
   {
-    id: varchar('id', { length: 32 }).primaryKey(),
-    scholarshipId: varchar('scholarship_id', { length: 32 })
+    id: integer().primaryKey().generatedByDefaultAsIdentity(),
+    scholarshipId: integer()
       .notNull()
       .references(() => scholarship.id, { onDelete: 'cascade' }),
     userId: varchar('user_id', { length: 32 })
@@ -178,7 +182,7 @@ export const reportReason = educationSchema.table('report_reason', {
 export const scholarshipMajor = educationSchema.table(
   'scholarship_major',
   {
-    scholarshipId: varchar('scholarship_id', { length: 32 })
+    scholarshipId: integer()
       .notNull()
       .references(() => scholarship.id, { onDelete: 'cascade' }),
     majorId: integer()
