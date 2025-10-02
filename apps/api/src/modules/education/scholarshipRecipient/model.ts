@@ -7,6 +7,7 @@ export namespace ScholarshipRecipientModel {
       surname: t.String(),
       documentType: t.Nullable(t.String()),
       documentNumber: t.String(),
+      region: t.String(),
       status: t.String(),
       scholarshipName: t.String(),
       organizationName: t.String(),

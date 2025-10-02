@@ -5,10 +5,12 @@ import {
   CardHeader,
   CardTitle,
 } from '@workspace/ui/components/card'
+import { Input } from '@workspace/ui/components/input'
+import { SearchIcon } from 'lucide-react'
 import { useState } from 'react'
 import RecipientsTable from './components/recipients-table'
 
-export default function Scholarship() {
+export default function ScholarshipRecipients() {
   const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({})
 
   return (
@@ -21,7 +23,15 @@ export default function Scholarship() {
               Aquí podrás visualizar a todos los alumnos becados.
             </CardDescription>
           </CardHeader>
-          <CardContent className="px-0">
+          <div className="px-10">
+            <SearchIcon className="absolute ml-3 mt-2.5 h-5 w-5" />
+            <Input
+              placeholder="Buscar becado por nombre o nro. de documento..."
+              className="w-1/3 pl-10"
+              inputMode="search"
+            />
+          </div>
+          <CardContent className="px-10">
             <RecipientsTable
               rowSelection={rowSelection}
               setRowSelection={setRowSelection}

@@ -1,8 +1,12 @@
 import { asc, desc, eq, ilike, or } from 'drizzle-orm'
 import db from '@/db'
 import { PostgresError } from '@/db/errors'
-import { organization, user } from '@/db/schemas/auth'
-import { scholarship, scholarshipApplication } from '@/db/schemas/education'
+import { organization, region, user } from '@/db/schemas/auth'
+import {
+  organizationLocation,
+  scholarship,
+  scholarshipApplication,
+} from '@/db/schemas/education'
 import type { ScholarshipRecipientModel } from './model'
 
 export async function getRecipients(
@@ -21,6 +25,7 @@ export async function getRecipients(
       surname: user.surname,
       documentType: user.documentType,
       documentNumber: user.documentNumber,
+      region: region.name,
       status: scholarshipApplication.status,
       scholarshipName: scholarship.name,
       organizationName: organization.name,
@@ -46,6 +51,11 @@ export async function getRecipients(
         eq(scholarshipApplication.scholarshipId, scholarship.id),
       )
       .innerJoin(organization, eq(scholarship.organizationId, organization.id))
+      .innerJoin(
+        organizationLocation,
+        eq(organizationLocation.organizationId, organization.id),
+      )
+      .innerJoin(region, eq(region.id, organizationLocation.regionId))
       .where(where)
       .offset(page * limit)
       .limit(limit)

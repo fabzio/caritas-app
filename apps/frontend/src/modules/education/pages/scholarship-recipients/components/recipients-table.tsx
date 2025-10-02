@@ -35,7 +35,10 @@ export default function RecipientsTable({
           )
         },
         rowCount: data?.length || 0,
-        pageCount: Math.ceil(data?.length || 0 / paginationState.pageSize || 1),
+        pageCount: Math.max(
+          1,
+          Math.ceil((data?.length || 0) / paginationState.pageSize),
+        ),
       }}
       setRowSelection={setRowSelection}
       rowSelection={rowSelection}

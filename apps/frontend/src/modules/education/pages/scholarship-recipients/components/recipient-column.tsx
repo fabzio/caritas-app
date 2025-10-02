@@ -93,4 +93,17 @@ export const scholarshipRecipientTableColumns: ColumnDef<ScholarshipRecipient>[]
       ),
       cell: ({ row }) => row.original.organizationName,
     },
+    {
+      accessorKey: 'organization',
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+        >
+          Región
+          <ArrowUpDown />
+        </Button>
+      ),
+      cell: ({ row }) => row.original.region,
+    },
   ]
