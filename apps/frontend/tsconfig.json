@@ -24,7 +24,8 @@
     "noUncheckedSideEffectImports": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"],
+      "@api/*": ["../api/src/*"],
+      "@frontend/*": ["./src/*"],
       "@workspace/ui/*": ["../../packages/ui/src/*"]
     }
   }

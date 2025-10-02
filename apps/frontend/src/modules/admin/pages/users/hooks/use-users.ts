@@ -1,6 +1,6 @@
+import authClient from '@frontend/lib/authClient'
+import { QueryKeys } from '@frontend/shared/constants/query-keys'
 import { useSuspenseQuery } from '@tanstack/react-query'
-import authClient from '@/lib/authClient'
-import { QueryKeys } from '@/shared/constants/query-keys'
 
 export const useUsers = ({ currentPage = 1, pageSize = 10 }) => {
   return useSuspenseQuery({

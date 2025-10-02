@@ -1,4 +1,4 @@
-import { createInfrastructureErrorFactory } from '@/utils/error-factory'
+import { createInfrastructureErrorFactory } from '@api/utils/error-factory'
 
 export const PostgresError = createInfrastructureErrorFactory(
   'PostgressError',

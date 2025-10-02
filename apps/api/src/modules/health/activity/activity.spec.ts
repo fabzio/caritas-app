@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test'
+import { auth } from '@api/lib/auth'
 import { treaty } from '@elysiajs/eden'
-import { auth } from '@/lib/auth'
 import activity from '.'
 
 const api = treaty(activity)

@@ -1,6 +1,6 @@
+import { useFilters } from '@frontend/hooks/use-filters'
+import { sortByToState } from '@frontend/shared/utils/sort-by-to-state'
 import { useMemo } from 'react'
-import { useFilters } from '@/hooks/use-filters'
-import { sortByToState } from '@/shared/utils/sort-by-to-state'
 import { userTableColumns } from '../components/columns'
 import { useUsers } from './use-users'
 
