@@ -31,4 +31,27 @@ export namespace UserModel {
     sortBy: t.Optional(t.String()), // ej: "name.asc"
   })
   export type ListUsersQuery = typeof listUsersQuery.static
+  export const createUserBody = t.Object({
+    name: t.String(),
+    surname: t.String(),
+    email: t.String(),
+    emailVerified: t.Boolean(),
+    image: t.Nullable(t.String()),
+    createdAt: t.Date(),
+    updatedAt: t.Date(),
+    role: t.Nullable(t.String()),
+    banned: t.Nullable(t.Boolean()),
+    banReason: t.Nullable(t.String()),
+    isAnonymous: t.Nullable(t.Boolean()),
+    banExpires: t.Nullable(t.Date()),
+    documentType: t.String(),
+    documentNumber: t.String(),
+    sex: t.Union([t.Literal('F'), t.Literal('M')]),
+    birthDate: t.String(),
+    phone: t.String(),
+    regionId: t.Integer(),
+  })
+  export type CreateUserBody = typeof createUserBody.static
+  export const createUserResponse = t.String()
+  export type CreateUserResponse = typeof createUserResponse.static
 }

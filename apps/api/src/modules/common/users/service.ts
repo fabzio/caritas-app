@@ -1,6 +1,6 @@
 import db from '@api/db'
 import { user } from '@api/db/schemas/auth'
-import { asc, desc, ilike, or } from 'drizzle-orm'
+import { asc, desc, eq, ilike, or } from 'drizzle-orm'
 import type { UserModel } from './model'
 
 export async function getUsers(
@@ -41,4 +41,39 @@ export async function getUsers(
     .orderBy(orderExpr)
 
   return rows
+}
+
+export async function createUser(
+  body: UserModel.CreateUserBody,
+): Promise<UserModel.CreateUserResponse> {
+  const currDate = new Date()
+
+  body.createdAt = currDate
+  body.updatedAt = currDate
+
+  const { id } = (
+    await db
+      .insert(user)
+      .values({ ...body })
+      .returning({ id: user.id })
+  )[0]
+
+  return id
+}
+
+export async function updateUser(
+  body: UserModel.CreateUserBody,
+  query: { id: string },
+): Promise<string> {
+  body.updatedAt = new Date()
+
+  const res = (
+    await db
+      .update(user)
+      .set({ ...body })
+      .where(eq(user.id, query.id))
+      .returning()
+  )[0]
+
+  return res.id
 }
