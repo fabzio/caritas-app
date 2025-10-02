@@ -109,8 +109,8 @@ export const scholarship = educationSchema.table('scholarship', {
 export const scholarshipApplication = educationSchema.table(
   'scholarship_application',
   {
-    id: varchar('id', { length: 32 }).primaryKey(),
-    scholarshipId: varchar('scholarship_id', { length: 32 })
+    id: integer().primaryKey().generatedByDefaultAsIdentity().primaryKey(),
+    scholarshipId: integer()
       .notNull()
       .references(() => scholarship.id, { onDelete: 'cascade' }),
     userId: varchar('user_id', { length: 32 })

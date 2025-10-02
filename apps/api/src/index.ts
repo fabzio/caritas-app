@@ -6,6 +6,7 @@ import env from './env'
 import { auth, OpenAPI } from './lib/auth'
 import authModule from './modules/auth'
 import common from './modules/common'
+import educationModule from './modules/education'
 import healthModule from './modules/health'
 
 const main = async () => {
@@ -36,6 +37,7 @@ const main = async () => {
     .use(common)
     .use(authModule)
     .use(healthModule)
+    .use(educationModule)
     .listen(env.PORT)
 }
 const app = main()
