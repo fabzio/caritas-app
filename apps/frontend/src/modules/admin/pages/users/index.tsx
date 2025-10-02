@@ -39,6 +39,7 @@ import { es } from 'date-fns/locale'
 import { CalendarIcon, UserPlus } from 'lucide-react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import type { z } from 'zod'
 import ActionsButton from './components/actions-button'
 import SearchUserInput from './components/search-user-input'
@@ -164,7 +165,7 @@ function FormView(props: FormViewProps) {
 
   const { mutate } = useCreateUser({
     onSuccess: () => {
-      alert('Usuario creado correctamente')
+      toast.success('Creado el usuario exitosamente')
       props.onChangeToTableView()
     },
   })
@@ -328,6 +329,7 @@ function FormView(props: FormViewProps) {
                       </PopoverTrigger>
                       <PopoverContent className="w-auto p-0" align="start">
                         <Calendar
+                          captionLayout="dropdown"
                           mode="single"
                           selected={field.value}
                           onSelect={field.onChange}
