@@ -1,9 +1,9 @@
+import authClient from '@frontend/lib/authClient'
+import rpc from '@frontend/lib/rpc'
 import { useMutation } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { APIError } from 'better-auth/api'
 import { toast } from 'sonner'
-import authClient from '@/lib/authClient'
-import rpc from '@/lib/rpc'
 
 export const useRegister = () => {
   const navigate = useNavigate({ from: '/auth/register' })

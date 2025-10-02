@@ -1,4 +1,4 @@
-import db from '@/db'
+import db from '@api/db'
 import { region } from './schemas/auth'
 
 const districts = [

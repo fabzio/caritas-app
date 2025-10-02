@@ -1,6 +1,6 @@
+import { env } from '@frontend/env'
 import { Turnstile } from '@marsidev/react-turnstile'
 import type { ComponentProps } from 'react'
-import { env } from '@/env'
 import { useTheme } from './theme-provider'
 
 type Props = Omit<ComponentProps<typeof Turnstile>, 'siteKey' | 'options'>

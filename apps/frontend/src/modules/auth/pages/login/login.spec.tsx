@@ -7,15 +7,15 @@ import FormLogin from './index'
 const mutate = vi.fn()
 let isPending = false
 
-vi.mock('@/modules/auth/pages/login/hooks/use-login', () => ({
+vi.mock('@frontend/modules/auth/pages/login/hooks/use-login', () => ({
   useLogin: (_redirect: string) => ({ mutate, isPending }),
 }))
 
-vi.mock('@/modules/auth/pages/login/hooks/use-google', () => ({
+vi.mock('@frontend/modules/auth/pages/login/hooks/use-google', () => ({
   useGoogle: () => ({ mutate, isPending }),
 }))
 
-vi.mock('@/modules/auth/pages/login/hooks/use-passkey', () => ({
+vi.mock('@frontend/modules/auth/pages/login/hooks/use-passkey', () => ({
   usePasskey: () => ({ mutate, isPending }),
 }))
 

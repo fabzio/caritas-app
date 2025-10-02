@@ -1,3 +1,4 @@
+import DataTable from '@frontend/shared/components/data-table'
 import type {
   ColumnDef,
   PaginationOptions,
@@ -8,7 +9,6 @@ import { Button } from '@workspace/ui/components/button'
 import { Checkbox } from '@workspace/ui/components/checkbox'
 import { ArrowUpDown } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
-import DataTable from '@/shared/components/data-table'
 import type { useOrganization } from '../hooks/use-organization'
 
 type Organization = NonNullable<ReturnType<typeof useOrganization>['data']>

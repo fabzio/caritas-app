@@ -1,4 +1,4 @@
-import db from '@/db'
+import db from '@api/db'
 import type { RegionModel } from './model'
 
 export const getRegions = async (): Promise<RegionModel.GetRegions> => {

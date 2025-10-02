@@ -1,3 +1,3 @@
-import type { FileRoutesByTo } from '@/routeTree.gen'
+import type { FileRoutesByTo } from '@frontend/routeTree.gen'
 
 export type ValidRoutes = keyof FileRoutesByTo
