@@ -1,3 +1,5 @@
+import { useSession } from '@frontend/hooks/use-session'
+import { formUserSchema } from '@frontend/shared/models/user'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '@workspace/ui/components/button'
 import {
@@ -11,8 +13,6 @@ import {
 import { Input } from '@workspace/ui/components/input'
 import { Separator } from '@workspace/ui/components/separator'
 import { useForm } from 'react-hook-form'
-import { useSession } from '@/hooks/use-session'
-import { formUserSchema } from '@/shared/models/user'
 
 export default function Profile() {
   const { data } = useSession()

@@ -1,3 +1,5 @@
+import { useSession } from '@frontend/hooks/use-session'
+import adminNavItems from '@frontend/modules/admin/layout/nav-items'
 import { Separator } from '@workspace/ui/components/separator'
 import {
   SidebarInset,
@@ -5,8 +7,6 @@ import {
   SidebarTrigger,
 } from '@workspace/ui/components/sidebar'
 import type { PropsWithChildren } from 'react'
-import { useSession } from '@/hooks/use-session'
-import adminNavItems from '@/modules/admin/layout/nav-items'
 import AppSidebar from '../components/app-sidebar'
 import ModeToggle from '../components/mode-toggle'
 import NavMain from '../components/nav-main'

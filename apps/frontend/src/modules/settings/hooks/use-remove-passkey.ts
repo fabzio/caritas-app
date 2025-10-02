@@ -1,8 +1,8 @@
+import { useQueryStore } from '@frontend/hooks/use-query-store'
+import authClient from '@frontend/lib/authClient'
+import { QueryKeys } from '@frontend/shared/constants/query-keys'
 import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { useQueryStore } from '@/hooks/use-query-store'
-import authClient from '@/lib/authClient'
-import { QueryKeys } from '@/shared/constants/query-keys'
 
 export const useRemovePasskey = () => {
   const { data, setData, cancelQuery, invalidateQuery } = useQueryStore<{

@@ -1,6 +1,6 @@
+import Dashboard from '@frontend/modules/admin/pages/dashboard'
+import { QueryKeys } from '@frontend/shared/constants/query-keys'
 import { createFileRoute } from '@tanstack/react-router'
-import Dashboard from '@/modules/admin/pages/dashboard'
-import { QueryKeys } from '@/shared/constants/query-keys'
 
 export const Route = createFileRoute('/_authenticated/admin/')({
   loader: async ({ context: { authClient, queryClient } }) => {

@@ -1,6 +1,6 @@
+import DataTable from '@frontend/shared/components/data-table'
+import { stateToSortBy } from '@frontend/shared/utils/sort-by-to-state'
 import type { OnChangeFn } from '@tanstack/react-table'
-import DataTable from '@/shared/components/data-table'
-import { stateToSortBy } from '@/shared/utils/sort-by-to-state'
 import { useUserTable } from '../hooks/use-table'
 
 type Props = {

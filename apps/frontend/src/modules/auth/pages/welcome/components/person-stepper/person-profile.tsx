@@ -1,3 +1,4 @@
+import { env } from '@frontend/env'
 import { Checkbox } from '@workspace/ui/components/checkbox'
 import {
   Form,
@@ -9,7 +10,6 @@ import {
 import { Label } from '@workspace/ui/components/label'
 import { HeartHandshake, School } from 'lucide-react'
 import { useFormContext } from 'react-hook-form'
-import { env } from '@/env'
 import type { PersonForm } from '../../models/person'
 
 export default function PersonProfileForm() {

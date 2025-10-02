@@ -1,5 +1,5 @@
+import { auth } from '@api/lib/auth'
 import Elysia from 'elysia'
-import { auth } from '@/lib/auth'
 
 const betterAuth = new Elysia({ name: 'better-auth' }).macro({
   auth: {

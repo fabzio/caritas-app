@@ -1,5 +1,5 @@
+import rpc from '@frontend/lib/rpc'
 import { useQuery } from '@tanstack/react-query'
-import rpc from '@/lib/rpc'
 
 export const useRegions = () => {
   return useQuery({

@@ -1,6 +1,6 @@
-import db from '@/db'
-import { studentInfo } from '@/db/schemas/education'
-import { patientInfo } from '@/db/schemas/health'
+import db from '@api/db'
+import { studentInfo } from '@api/db/schemas/education'
+import { patientInfo } from '@api/db/schemas/health'
 import type { WelcomeModel } from './model'
 
 export const addAditionalInfo = async (params: WelcomeModel.UserWelcome) => {

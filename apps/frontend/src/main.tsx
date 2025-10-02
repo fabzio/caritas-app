@@ -8,10 +8,10 @@ import * as TanStackQueryProvider from './integrations/tanstack-query/root-provi
 import { routeTree } from './routeTree.gen.ts'
 
 import './styles.css'
+import { ThemeProvider } from '@frontend/shared/components/theme-provider.tsx'
 import { setDefaultOptions } from 'date-fns'
 import { es } from 'date-fns/locale'
 import { config, locales } from 'zod'
-import { ThemeProvider } from '@/shared/components/theme-provider.tsx'
 import reportWebVitals from './reportWebVitals.ts'
 
 setDefaultOptions({

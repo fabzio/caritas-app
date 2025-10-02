@@ -1,6 +1,6 @@
-import db from '@/db'
-import { PostgresError } from '@/db/errors'
-import { activity } from '@/db/schemas/health'
+import db from '@api/db'
+import { PostgresError } from '@api/db/errors'
+import { activity } from '@api/db/schemas/health'
 import type { ActivityModel } from './model'
 
 export const createActivity = async (args: ActivityModel.CreateActivity) => {

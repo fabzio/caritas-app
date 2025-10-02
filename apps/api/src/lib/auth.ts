@@ -1,4 +1,9 @@
 /** biome-ignore-all lint/suspicious/noExplicitAny: openapi types */
+
+import { ac } from '@api/auth/permisions'
+import db from '@api/db'
+import * as schema from '@api/db/schemas/auth'
+import env from '@api/env'
 import { betterAuth } from 'better-auth'
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
 import {
@@ -12,10 +17,6 @@ import {
 } from 'better-auth/plugins'
 import { passkey } from 'better-auth/plugins/passkey'
 import { localization } from 'better-auth-localization'
-import { ac } from '@/auth/permisions'
-import db from '@/db'
-import * as schema from '@/db/schemas/auth'
-import env from '@/env'
 import transporter from '../mail'
 
 export const auth = betterAuth({

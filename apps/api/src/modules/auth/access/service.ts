@@ -1,8 +1,8 @@
+import db from '@api/db'
+import { user } from '@api/db/schemas/auth'
+import { studentInfo } from '@api/db/schemas/education'
+import { patientInfo } from '@api/db/schemas/health'
 import { eq } from 'drizzle-orm'
-import db from '@/db'
-import { user } from '@/db/schemas/auth'
-import { studentInfo } from '@/db/schemas/education'
-import { patientInfo } from '@/db/schemas/health'
 
 export const getOrganizationType = async (orgId: string) =>
   await db.query.organization.findMany({
