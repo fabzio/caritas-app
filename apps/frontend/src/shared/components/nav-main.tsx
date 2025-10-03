@@ -16,7 +16,7 @@ import {
   SidebarMenuSubItem,
   SidebarSeparator,
 } from '@workspace/ui/components/sidebar'
-import { Building2, ChevronRight } from 'lucide-react'
+import { Building2, ChevronRight, Cross } from 'lucide-react'
 import { toast } from 'sonner'
 import { useSession } from '@/hooks/use-session'
 import authClient from '@/lib/authClient'
@@ -172,6 +172,15 @@ function NavMain({ items }: Readonly<Props>) {
                 </CollapsibleContent>
               </SidebarMenuItem>
             </Collapsible>
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                tooltip="Gestionar aliados"
+                onClick={() => navigate({ to: '/admin/organizations' })}
+              >
+                <Cross />
+                <span>Gestionar aliados</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
           </>
         )}
       </SidebarMenu>

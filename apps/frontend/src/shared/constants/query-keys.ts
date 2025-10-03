@@ -9,6 +9,7 @@ export const QueryKeys = {
   },
   ADMIN: {
     ORGANIZATION: 'admin-organization',
+    HEALTH_ORGANIZATION: 'admin-health-organization',
     USERS: 'admin-members',
     PERMISSIONS: 'admin-permissions',
   },

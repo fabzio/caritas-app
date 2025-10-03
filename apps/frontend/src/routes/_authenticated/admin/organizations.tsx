@@ -1,4 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
+import ViewOrganizations from '@/modules/health/pages/allies/view'
 import { QueryKeys } from '@/shared/constants/query-keys'
 
 export const Route = createFileRoute('/_authenticated/admin/organizations')({
@@ -13,9 +14,5 @@ export const Route = createFileRoute('/_authenticated/admin/organizations')({
       },
     })
   },
-  component: RouteComponent,
+  component: ViewOrganizations,
 })
-
-function RouteComponent() {
-  return <div>Hello "/_authenticated/admin/organizations"!</div>
-}
