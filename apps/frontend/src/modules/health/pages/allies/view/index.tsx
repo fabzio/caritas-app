@@ -1,3 +1,5 @@
+import { Button } from '@workspace/ui/components/button'
+import { Card, CardContent, CardHeader } from '@workspace/ui/components/card'
 import { useOrganization } from '../../../../admin/pages/dashboard/hooks/use-organization'
 import AlliesTable from '../components/allies-table'
 import { useHealthOrganization } from '../hooks/use-health-organization'
@@ -10,7 +12,14 @@ export default function ViewOrganizations() {
         <h1 className="text-2xl font-semibold text-foreground">Aliados</h1>
       </div>
       <div className="w-full flex gap-8">
-        <AlliesTable allies={data} />
+        <Card className="max-w-lg shadow-lg">
+          <CardHeader>
+            <Button>Registrar aliado</Button>
+          </CardHeader>
+          <CardContent className="px-1">
+            <AlliesTable allies={data} />
+          </CardContent>
+        </Card>
       </div>
     </div>
   )
