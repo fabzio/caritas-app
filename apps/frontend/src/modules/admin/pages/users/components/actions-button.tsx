@@ -12,7 +12,16 @@ import {
 } from '@workspace/ui/components/dropdown-menu'
 import { ChevronDown } from 'lucide-react'
 
-export default function ActionsButton() {
+type Props = {
+  onDeleteClick: () => void
+  selectedCount: number
+}
+
+export default function ActionsButton({
+  onDeleteClick,
+  selectedCount,
+}: Readonly<Props>) {
+  const isDisabled = selectedCount === 0
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -24,7 +33,9 @@ export default function ActionsButton() {
       <DropdownMenuContent>
         <DropdownMenuLabel>Acciones</DropdownMenuLabel>
         <DropdownMenuGroup>
-          <DropdownMenuItem>Eliminar</DropdownMenuItem>
+          <DropdownMenuItem onClick={onDeleteClick} disabled={isDisabled}>
+            Eliminar
+          </DropdownMenuItem>
           <DropdownMenuSub>
             <DropdownMenuSubTrigger>Exportar</DropdownMenuSubTrigger>
             <DropdownMenuSubContent>
