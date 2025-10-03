@@ -1,6 +1,7 @@
 import { openapi } from '@elysiajs/openapi'
 import Elysia from 'elysia'
 import logixlysia from 'logixlysia'
+import { educationMember, healthMember } from './auth/permisions'
 import { PostgresError } from './db/errors'
 import env from './env'
 import { auth, OpenAPI } from './lib/auth'
@@ -47,3 +48,7 @@ if (env.NODE_ENV !== 'production') {
 }
 export type Auth = typeof auth
 export type App = Awaited<typeof app>
+export const roles = {
+  healthMember,
+  educationMember,
+}
