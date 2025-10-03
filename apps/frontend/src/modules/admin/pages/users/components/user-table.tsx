@@ -6,7 +6,7 @@ import type {
   PaginationState,
   SortingState,
 } from '@tanstack/react-table'
-import type { User } from '../hooks/use-users'
+import type { User } from '../hooks/use-list-users'
 
 type Props = {
   rowSelection: Record<string, boolean>

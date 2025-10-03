@@ -1,11 +1,11 @@
 import Elysia from 'elysia'
 import region from './regions'
-import user from './users'
+import users from './users'
 
 const common = new Elysia({
   name: 'common',
 })
   .use(region)
-  .use(user)
+  .use(users)
 
 export default common

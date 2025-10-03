@@ -1,19 +1,19 @@
-import rpc from '@frontend/lib/rpc'
+import authClient from '@frontend/lib/authClient'
 import { QueryKeys } from '@frontend/shared/constants/query-keys'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-type CreateUserProps = Parameters<typeof rpc.users.post>[0]
+type CreateUserProps = Parameters<typeof authClient.admin.createUser>[0]
 
-interface useCreateUserProps {
+interface UseCreateUserProps {
   onSuccess: () => void
 }
-export const useCreateUser = ({ onSuccess }: useCreateUserProps) => {
+export const useCreateUser = ({ onSuccess }: UseCreateUserProps) => {
   const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: async (props: CreateUserProps) => {
-      const { data, error } = await rpc.users.post({ ...props })
+      const { data, error } = await authClient.admin.createUser(props)
       if (error) throw error
       return data
     },

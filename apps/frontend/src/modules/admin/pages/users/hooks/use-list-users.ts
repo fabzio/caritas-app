@@ -9,7 +9,7 @@ type UseUsersParams = {
   filters?: Filters
 }
 
-export const useUsers = ({
+export const useListUsers = ({
   currentPage = 1,
   pageSize = 10,
   filters,
@@ -25,12 +25,11 @@ export const useUsers = ({
           sortBy: filters?.sortBy || 'name.asc',
         },
       })
-      console.log(data)
       if (error) throw error
       return data
     },
   })
 }
 
-export type UsersResponse = NonNullable<ReturnType<typeof useUsers>['data']>
+export type UsersResponse = NonNullable<ReturnType<typeof useListUsers>['data']>
 export type User = UsersResponse['data'][number]

@@ -10,16 +10,13 @@ import {
   uniqueIndex,
   varchar,
 } from 'drizzle-orm/pg-core'
-import { nanoid } from 'nanoid'
 
 export const authSchema = pgSchema('auth')
 
 export const user = authSchema.table(
   'user',
   {
-    id: varchar('id', { length: 32 })
-      .primaryKey()
-      .$defaultFn(() => nanoid(32)),
+    id: varchar('id', { length: 32 }).primaryKey(),
     name: varchar('name', { length: 100 }).notNull(),
     surname: varchar('surname', { length: 100 }).notNull(),
     email: varchar('email', { length: 254 }).notNull().unique(),

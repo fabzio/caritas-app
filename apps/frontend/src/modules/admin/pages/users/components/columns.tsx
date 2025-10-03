@@ -2,7 +2,7 @@ import type { ColumnDef } from '@tanstack/react-table'
 import { Button } from '@workspace/ui/components/button'
 import { Checkbox } from '@workspace/ui/components/checkbox'
 import { ArrowUpDown } from 'lucide-react'
-import type { User } from '../hooks/use-users'
+import type { User } from '../hooks/use-list-users'
 
 export const userTableColumns: ColumnDef<User>[] = [
   {
