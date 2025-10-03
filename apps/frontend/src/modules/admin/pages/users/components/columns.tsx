@@ -2,7 +2,7 @@ import type { ColumnDef } from '@tanstack/react-table'
 import { Button } from '@workspace/ui/components/button'
 import { Checkbox } from '@workspace/ui/components/checkbox'
 import { ArrowUpDown } from 'lucide-react'
-import type { User } from '../hooks/use-list-users'
+import type { User } from '../hooks/use-users'
 
 export const userTableColumns: ColumnDef<User>[] = [
   {
@@ -26,20 +26,6 @@ export const userTableColumns: ColumnDef<User>[] = [
     ),
   },
   {
-    accessorKey: 'document',
-    header: ({ column }) => (
-      <Button
-        variant="ghost"
-        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-      >
-        Documento
-        <ArrowUpDown />
-      </Button>
-    ),
-    cell: ({ row }) =>
-      `${row.original.documentType} - ${row.original.documentNumber}`,
-  },
-  {
     accessorKey: 'user',
     header: ({ column }) => (
       <Button
@@ -50,7 +36,7 @@ export const userTableColumns: ColumnDef<User>[] = [
         <ArrowUpDown />
       </Button>
     ),
-    cell: ({ row }) => `${row.original.name} ${row.original.surname}`,
+    cell: ({ row }) => row.original.name,
   },
   {
     accessorKey: 'user',
@@ -64,5 +50,18 @@ export const userTableColumns: ColumnDef<User>[] = [
       </Button>
     ),
     cell: ({ row }) => row.original.email,
+  },
+  {
+    accessorKey: 'role',
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+      >
+        Rol
+        <ArrowUpDown />
+      </Button>
+    ),
+    cell: ({ row }) => row.original.role,
   },
 ]
