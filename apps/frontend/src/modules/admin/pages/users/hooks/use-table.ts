@@ -2,14 +2,13 @@ import { useFilters } from '@frontend/hooks/use-filters'
 import { sortByToState } from '@frontend/shared/utils/sort-by-to-state'
 import { useMemo } from 'react'
 import { userTableColumns } from '../components/columns'
-import { useListUsers } from './use-list-users'
+import { useUsers } from './use-users'
 
 export const useUserTable = () => {
   const { filters, setFilters } = useFilters('/_authenticated/admin/users')
-  const { data: response } = useListUsers({
+  const { data } = useUsers({
     currentPage: filters.pageIndex,
     pageSize: filters.pageSize,
-    filters: filters,
   })
 
   const sortingState = sortByToState(filters.sortBy)
@@ -21,15 +20,7 @@ export const useUserTable = () => {
   const columns = useMemo(() => userTableColumns, [])
 
   return {
-    data: response?.data,
-    pagination: response
-      ? {
-          total: response.total,
-          totalPages: response.totalPages,
-          currentPage: response.page,
-          pageSize: response.limit,
-        }
-      : undefined,
+    data,
     setFilters,
     columns,
     sortingState,
