@@ -46,6 +46,7 @@ export const user = authSchema.table(
       .references(() => region.id, {
         onDelete: 'cascade',
       }),
+    active: boolean('active').default(true).notNull(),
   },
   (table) => [
     uniqueIndex('user_document_number_idx').on(table.documentNumber),

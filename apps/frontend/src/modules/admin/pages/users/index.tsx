@@ -59,6 +59,7 @@ import type { z } from 'zod'
 import ActionsButton from './components/actions-button'
 import SearchUserInput from './components/search-user-input'
 import UserTable from './components/user-table'
+import { useBanUser } from './hooks/use-ban-user'
 import { useCreateUser } from './hooks/use-create-user'
 import { useRemoveUser } from './hooks/use-remove-user'
 import { useUserTable } from './hooks/use-table'
@@ -66,10 +67,12 @@ import { useUserTable } from './hooks/use-table'
 interface TableViewProps {
   onChangeToFormView: () => void
 }
-function TableView(props: TableViewProps) {
+function TableView(props: Readonly<TableViewProps>) {
   const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({})
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
-  const { mutateAsync: removeUser, isPending } = useRemoveUser()
+  const { mutateAsync: removeUser, isPending: removeUserIsPending } =
+    useRemoveUser()
+  const { mutateAsync: banUser, isPending: banUserIsPending } = useBanUser()
   const {
     data: users,
     pagination,
@@ -92,9 +95,42 @@ function TableView(props: TableViewProps) {
   const userCount = selectedUsers.length
 
   const handleDelete = async () => {
-    await Promise.all(
-      selectedUsers.map((user) => removeUser({ userId: user.id })),
-    )
+    //TODO: Validation for same user deletion
+    const allUserPromises = selectedUsers.flatMap((user) => [
+      removeUser({ userId: user.id }),
+      banUser({ userId: user.id, banReason: 'User deleted by admin' }),
+    ])
+
+    const results = await Promise.allSettled(allUserPromises)
+
+    let totalSuccessful = 0
+
+    for (let i = 0; i < selectedUsers.length; i++) {
+      const removeResult = results[i * 2]
+      const banResult = results[i * 2 + 1]
+
+      if (
+        removeResult.status === 'fulfilled' &&
+        banResult.status === 'fulfilled'
+      ) {
+        totalSuccessful++
+      }
+    }
+
+    const totalFailed = selectedUsers.length - totalSuccessful
+
+    if (totalSuccessful > 0) {
+      toast.success(
+        `${totalSuccessful} de ${selectedUsers.length} usuario(s) eliminados correctamente.`,
+      )
+    }
+
+    if (totalFailed > 0) {
+      toast.error(
+        `Atención: Falló el procesamiento de ${totalFailed} usuario(s).`,
+      )
+    }
+
     setIsDeleteModalOpen(false)
     resetSelectedRows()
   }
@@ -144,7 +180,11 @@ function TableView(props: TableViewProps) {
               </Button>
             </DialogClose>
 
-            <Button type="button" onClick={handleDelete} disabled={isPending}>
+            <Button
+              type="button"
+              onClick={handleDelete}
+              disabled={removeUserIsPending || banUserIsPending}
+            >
               Aceptar
             </Button>
           </DialogFooter>
@@ -162,7 +202,7 @@ const formSchema = formUserSchema.omit({
 interface FormViewProps {
   onChangeToTableView: () => void
 }
-function FormView(props: FormViewProps) {
+function FormView(props: Readonly<FormViewProps>) {
   const { data: regions, isLoading: regionsLoading } = useRegions()
   const form = useForm({
     resolver: zodResolver(formSchema),
