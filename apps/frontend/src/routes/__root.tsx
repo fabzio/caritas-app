@@ -1,3 +1,5 @@
+import { env } from '@frontend/env'
+import type authClient from '@frontend/lib/authClient.ts'
 import { TanStackDevtools } from '@tanstack/react-devtools'
 import type { QueryClient } from '@tanstack/react-query'
 import {
@@ -7,8 +9,6 @@ import {
 } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { Toaster } from '@workspace/ui/components/sonner'
-import { env } from '@/env'
-import type authClient from '@/lib/authClient.ts'
 import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
 
 export interface MyRouterContext {

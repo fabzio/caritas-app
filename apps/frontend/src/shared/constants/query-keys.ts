@@ -10,7 +10,6 @@ export const QueryKeys = {
   ADMIN: {
     ORGANIZATION: 'admin-organization',
     USERS: 'admin-members',
-    PERMISSIONS: 'admin-permissions',
   },
   EDUCATION: {
     SCHOLARSHIP_RECIPIENTS: 'education-scholarship-recipients',

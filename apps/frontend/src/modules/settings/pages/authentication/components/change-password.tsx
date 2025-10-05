@@ -1,3 +1,5 @@
+import { useChangePassword } from '@frontend/modules/settings/hooks/use-change-password'
+import PasswordStrengthBar from '@frontend/shared/components/password-strength-bar'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '@workspace/ui/components/button'
 import {
@@ -11,8 +13,6 @@ import {
 import { Input } from '@workspace/ui/components/input'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
-import { useChangePassword } from '@/modules/settings/hooks/use-change-password'
-import PasswordStrengthBar from '@/shared/components/password-strength-bar'
 
 export default function ChangePassword() {
   const form = useForm<FormSchema>({

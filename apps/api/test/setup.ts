@@ -1,8 +1,8 @@
 import { beforeAll } from 'bun:test'
+import db, { schema } from '@api/db'
+import { seed } from '@api/db/seed'
+import { auth } from '@api/lib/auth'
 import { pushSchema } from 'drizzle-kit/api'
-import db, { schema } from '@/db'
-import { seed } from '@/db/seed'
-import { auth } from '@/lib/auth'
 
 beforeAll(async () => {
   // biome-ignore lint/suspicious/noExplicitAny: for testing only

@@ -1,7 +1,7 @@
+import env from '@api/env'
 import { drizzle as drizzleBun } from 'drizzle-orm/bun-sql'
 import { drizzle as drizzleLite } from 'drizzle-orm/pglite'
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js'
-import env from '@/env'
 import * as authSchema from './schemas/auth'
 import * as educationSchema from './schemas/education'
 import * as healthSchema from './schemas/health'

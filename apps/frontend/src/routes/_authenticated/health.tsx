@@ -1,5 +1,5 @@
+import { QueryKeys } from '@frontend/shared/constants/query-keys'
 import { createFileRoute, redirect } from '@tanstack/react-router'
-import { QueryKeys } from '@/shared/constants/query-keys'
 
 export const Route = createFileRoute('/_authenticated/health')({
   beforeLoad: async ({ context: { authClient, queryClient } }) => {

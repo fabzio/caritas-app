@@ -1,3 +1,4 @@
+import { useTheme } from '@frontend/shared/components/theme-provider.tsx'
 import { Button } from '@workspace/ui/components/button.tsx'
 import {
   DropdownMenu,
@@ -6,7 +7,6 @@ import {
   DropdownMenuTrigger,
 } from '@workspace/ui/components/dropdown-menu.tsx'
 import { Moon, Sun } from 'lucide-react'
-import { useTheme } from '@/shared/components/theme-provider.tsx'
 
 function ModeToggle() {
   const { setTheme } = useTheme()
