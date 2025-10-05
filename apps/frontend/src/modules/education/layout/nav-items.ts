@@ -8,6 +8,12 @@ const adminNavItems: NavItem[] = [
     icon: Layout,
     groupLabel: 'Administración',
   },
+  {
+    title: 'Becas',
+    url: '/education/scholarship',
+    icon: Layout,
+    groupLabel: 'Administración',
+  },
 ]
 
 export default adminNavItems

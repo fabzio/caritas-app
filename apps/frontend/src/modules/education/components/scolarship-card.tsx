@@ -10,7 +10,7 @@ import {
 } from '@workspace/ui/components/card'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
-import { CalendarDays, MapPin } from 'lucide-react'
+import { CalendarDays, MapPin, Pencil, Trash } from 'lucide-react'
 
 type ScolarshipCardProps = {
   scholarship: {
@@ -72,7 +72,7 @@ export function ScholarshipCard({ scholarship }: ScolarshipCardProps) {
         </div>
       </CardContent>
 
-      <CardFooter>
+      <CardFooter className="gap-2">
         <Link
           to="/education/scholarship/$id"
           params={{ id: String(scholarship.id) }}
@@ -82,6 +82,20 @@ export function ScholarshipCard({ scholarship }: ScolarshipCardProps) {
             Ver detalles
           </Button>
         </Link>
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => {}} // falta implementar
+        >
+          <Pencil className="h-4 w-4" />
+        </Button>
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => {}} // falta implementar
+        >
+          <Trash className="h-4 w-4" />
+        </Button>
       </CardFooter>
     </Card>
   )
