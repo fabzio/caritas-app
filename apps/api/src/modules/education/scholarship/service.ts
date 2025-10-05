@@ -2,6 +2,7 @@ import db from '@/db'
 import { PostgresError } from '@/db/errors'
 import { scholarship } from '@/db/schemas/education'
 import type { ScholarshipModel } from './model'
+
 export const createScholarship = async (
   args: ScholarshipModel.CreateScholarship,
 ) => {
