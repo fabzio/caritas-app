@@ -20,18 +20,18 @@ export const useScholarshipRecipients = ({
       const { data, error } = await rpc.education.scholarshipRecipients.get({
         query: {
           q: filters?.q || '',
-          page: currentPage - 1 || 0,
+          page: Math.max(0, (currentPage || 1) - 1),
           limit: pageSize,
           sortBy: filters?.sortBy || 'name.asc',
         },
       })
-      console.log(data)
       if (error) throw error
       return data
     },
   })
 }
 
-export type ScholarshipRecipient = NonNullable<
+export type RecipientResponse = NonNullable<
   ReturnType<typeof useScholarshipRecipients>['data']
->[number]
+>
+export type Recipient = RecipientResponse['data'][number]

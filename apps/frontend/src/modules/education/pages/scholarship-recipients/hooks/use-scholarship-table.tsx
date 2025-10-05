@@ -23,7 +23,15 @@ export const useScholarshipRecipientTable = () => {
   const columns = useMemo(() => scholarshipRecipientTableColumns, [])
 
   return {
-    data,
+    data: data?.data,
+    pagination: data
+      ? {
+          total: data.total,
+          totalPages: data.totalPages,
+          currentPage: data.page,
+          pageSize: data.limit,
+        }
+      : undefined,
     setFilters,
     columns,
     sortingState,

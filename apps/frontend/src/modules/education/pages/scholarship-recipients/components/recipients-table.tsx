@@ -1,6 +1,7 @@
 import type { OnChangeFn } from '@tanstack/react-table'
 import DataTable from '@/shared/components/data-table'
 import { stateToSortBy } from '@/shared/utils/sort-by-to-state'
+import type { Recipient } from '../hooks/use-scholarship'
 import { useScholarshipRecipientTable } from '../hooks/use-scholarship-table'
 
 type Props = {
@@ -11,10 +12,16 @@ export default function RecipientsTable({
   rowSelection,
   setRowSelection,
 }: Readonly<Props>) {
-  const { data, columns, paginationState, sortingState, setFilters } =
-    useScholarshipRecipientTable()
+  const {
+    data,
+    pagination,
+    columns,
+    paginationState,
+    sortingState,
+    setFilters,
+  } = useScholarshipRecipientTable()
   return (
-    <DataTable
+    <DataTable<Recipient>
       data={data || []}
       columns={columns}
       pagination={paginationState}
@@ -34,11 +41,8 @@ export default function RecipientsTable({
               : pagination,
           )
         },
-        rowCount: data?.length || 0,
-        pageCount: Math.max(
-          1,
-          Math.ceil((data?.length || 0) / paginationState.pageSize),
-        ),
+        rowCount: pagination?.total || 0,
+        pageCount: pagination?.totalPages || 0,
       }}
       setRowSelection={setRowSelection}
       rowSelection={rowSelection}

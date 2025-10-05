@@ -7,7 +7,7 @@ const scholarshipRecipients = new Elysia({
 }).get('', ({ query }) => getRecipients(query), {
   query: ScholarshipRecipientModel.listRecipientsQuery,
   response: {
-    200: ScholarshipRecipientModel.listScholarshipRecipients,
+    200: ScholarshipRecipientModel.getlistScholarshipRecipientsResponse,
   },
 })
 

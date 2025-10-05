@@ -1,4 +1,4 @@
-import { asc, desc, eq, ilike, or } from 'drizzle-orm'
+import { asc, count, desc, eq, ilike, or, sql } from 'drizzle-orm'
 import db from '@/db'
 import { PostgresError } from '@/db/errors'
 import { organization, region, user } from '@/db/schemas/auth'
@@ -14,6 +14,7 @@ export async function getRecipients(
 ): Promise<ScholarshipRecipientModel.GetRecipients> {
   try {
     const { q = '', page = 0, limit = 10, sortBy = 'name.asc' } = params
+    const searchQuery = q.replace(/\s+/g, ' ').trim()
 
     const [sortFieldRaw, sortOrderRaw] = (sortBy ?? 'name.asc').split('.', 2)
     const sortField = (sortFieldRaw ?? 'name').trim()
@@ -31,17 +32,34 @@ export async function getRecipients(
       organizationName: organization.name,
     } as const
 
+    console.log({ page, limit })
+
     const column = columns[sortField as keyof typeof columns] ?? user.name
     const orderExpr = sortOrder === 'desc' ? desc(column) : asc(column)
 
-    const where = q
+    const where = searchQuery
       ? or(
-          ilike(user.name, `%${q}%`),
-          ilike(user.surname, `%${q}%`),
-          ilike(user.documentNumber, `%${q}%`),
-          ilike(scholarship.name, `%${q}%`),
+          ilike(user.name, `%${searchQuery}%`),
+          ilike(user.surname, `%${searchQuery}%`),
+          ilike(
+            sql`(${user.name} || ' ' || ${user.surname})`,
+            `%${searchQuery}%`,
+          ),
+          ilike(user.documentType, `%${searchQuery}%`),
+          ilike(user.documentNumber, `%${searchQuery}%`),
+          ilike(scholarship.name, `%${searchQuery}%`),
+          ilike(organization.name, `%${searchQuery}%`),
+          ilike(region.name, `%${searchQuery}%`),
         )
       : undefined
+
+    // Pagination
+    const [{ total }] = await db
+      .select({ total: count() })
+      .from(user)
+      .where(where)
+
+    const totalPages = Math.ceil(total / limit)
 
     const rows = await db
       .select(columns)
@@ -62,7 +80,13 @@ export async function getRecipients(
       .limit(limit)
       .orderBy(orderExpr)
 
-    return rows
+    return {
+      data: rows,
+      total,
+      page,
+      limit,
+      totalPages,
+    }
   } catch (e) {
     if (e instanceof Error) throw new PostgresError(e.message)
     throw e
