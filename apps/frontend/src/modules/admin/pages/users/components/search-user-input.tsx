@@ -12,7 +12,6 @@ export default function SearchUserInput() {
     <Input
       type="search"
       placeholder="Buscar por nombre o documento..."
-      className="w-full md:w-2/4"
       onChange={onChangeFilter}
     />
   )

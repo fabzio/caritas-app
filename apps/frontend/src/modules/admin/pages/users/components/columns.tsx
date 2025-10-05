@@ -53,16 +53,20 @@ export const userTableColumns: ColumnDef<User>[] = [
     cell: ({ row }) => `${row.original.name} ${row.original.surname}`,
   },
   {
-    accessorKey: 'user',
+    accessorKey: 'role',
     header: ({ column }) => (
       <Button
         variant="ghost"
         onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
       >
-        Email
+        Rol
         <ArrowUpDown />
       </Button>
     ),
-    cell: ({ row }) => row.original.email,
+    cell: ({ row }) => row.original.role || 'Sin rol',
+    enableSorting: false,
+    meta: {
+      filterVariant: 'select',
+    },
   },
 ]

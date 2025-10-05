@@ -52,11 +52,12 @@ import {
   Loader2,
   UserPlus,
 } from 'lucide-react'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import type { z } from 'zod'
 import ActionsButton from './components/actions-button'
+import RoleFilter from './components/role-filter'
 import SearchUserInput from './components/search-user-input'
 import UserTable from './components/user-table'
 import { useBanUser } from './hooks/use-ban-user'
@@ -70,6 +71,7 @@ interface TableViewProps {
 function TableView(props: Readonly<TableViewProps>) {
   const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({})
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const [roleFilter, setRoleFilter] = useState<string>('all')
   const { mutateAsync: removeUser, isPending: removeUserIsPending } =
     useRemoveUser()
   const { mutateAsync: banUser, isPending: banUserIsPending } = useBanUser()
@@ -82,12 +84,25 @@ function TableView(props: Readonly<TableViewProps>) {
     setFilters,
   } = useUserTable()
 
+  const uniqueRoles = useMemo(() => {
+    if (!users) return []
+    const roles = users
+      .map((user) => user.role)
+      .filter((role): role is string => role !== null && role !== undefined)
+    return Array.from(new Set(roles)).sort()
+  }, [users])
+
+  const filteredUsers = useMemo(() => {
+    if (!users || roleFilter === 'all') return users
+    return users.filter((user) => user.role === roleFilter)
+  }, [users, roleFilter])
+
   const selectedRows = Object.keys(rowSelection)
     .filter((key) => rowSelection[key])
     .map((key) => Number.parseInt(key, 10))
 
   const selectedUsers = selectedRows
-    .map((rowIndex) => users?.[rowIndex])
+    .map((rowIndex) => filteredUsers?.[rowIndex])
     .filter((user): user is NonNullable<typeof user> => Boolean(user))
 
   const resetSelectedRows = () => setRowSelection({})
@@ -137,8 +152,19 @@ function TableView(props: Readonly<TableViewProps>) {
 
   return (
     <div className="w-full p-4">
-      <div className="flex justify-between items-center">
-        <SearchUserInput />
+      <div className="flex justify-between items-center gap-2">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 w-full">
+          <div className="flex-1 w-full">
+            <SearchUserInput />
+          </div>
+          <div className="sm:w-auto w-full">
+            <RoleFilter
+              value={roleFilter}
+              onValueChange={setRoleFilter}
+              roles={uniqueRoles}
+            />
+          </div>
+        </div>
         <div className="flex items-center gap-2">
           <ActionsButton
             onDeleteClick={() => setIsDeleteModalOpen(true)}
@@ -154,7 +180,7 @@ function TableView(props: Readonly<TableViewProps>) {
         <UserTable
           rowSelection={rowSelection}
           setRowSelection={setRowSelection}
-          data={users || []}
+          data={filteredUsers || []}
           columns={columns}
           paginationState={paginationState}
           sortingState={sortingState}
