@@ -3,7 +3,9 @@ import { createSelectSchema } from 'drizzle-typebox'
 import { t } from 'elysia'
 
 export namespace UserModel {
-  const _getUsers = createSelectSchema(user)
+  const _getUsers = createSelectSchema(user, {
+    birthDate: t.Date(),
+  })
   export const getUsersResponse = t.Object({
     data: t.Array(_getUsers),
     total: t.Integer(),

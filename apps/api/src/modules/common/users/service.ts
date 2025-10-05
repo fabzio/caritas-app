@@ -1,6 +1,6 @@
 import db from '@api/db'
 import { user } from '@api/db/schemas/auth'
-import { asc, count, desc, ilike, or } from 'drizzle-orm'
+import { and, asc, count, desc, eq, ilike, or } from 'drizzle-orm'
 import type { UserModel } from './model'
 
 export async function getUsers(
@@ -24,13 +24,17 @@ export async function getUsers(
   const column = columns[sortField as keyof typeof columns] ?? user.name
   const orderExpr = sortOrder === 'desc' ? desc(column) : asc(column)
 
-  const where = q
+  const searchCondition = q
     ? or(
         ilike(user.name, `%${q}%`),
         ilike(user.surname, `%${q}%`),
         ilike(user.documentNumber, `%${q}%`),
       )
     : undefined
+
+  const activeCondition = eq(user.active, true)
+
+  const where = and(activeCondition, searchCondition)
 
   // Get total count
   const [{ total }] = await db
@@ -50,7 +54,10 @@ export async function getUsers(
   const totalPages = Math.ceil(total / limit)
 
   return {
-    data: rows,
+    data: rows.map((row) => ({
+      ...row,
+      birthDate: new Date(row.birthDate),
+    })),
     total,
     page,
     limit,
