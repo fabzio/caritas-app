@@ -1,4 +1,5 @@
 import Elysia, { t } from 'elysia'
+import betterAuth from '@/modules/auth'
 import { ScholarshipModel } from './model'
 import { createScholarship, getScholarships } from './service'
 
@@ -6,7 +7,9 @@ const scholarship = new Elysia({
   name: 'scholarship',
   prefix: '/scholarship',
 })
+  .use(betterAuth)
   .get('', getScholarships, {
+    // listado de becas
     auth: true,
     response: {
       200: ScholarshipModel.getScholarship,
