@@ -25,6 +25,7 @@ export default function ActionsButton() {
         <DropdownMenuLabel>Acciones</DropdownMenuLabel>
         <DropdownMenuGroup>
           <DropdownMenuItem>Eliminar</DropdownMenuItem>
+          <DropdownMenuItem>Editar</DropdownMenuItem>
           <DropdownMenuSub>
             <DropdownMenuSubTrigger>Exportar</DropdownMenuSubTrigger>
             <DropdownMenuSubContent>

@@ -3,7 +3,12 @@ import { formUserSchema } from '@frontend/shared/models/user'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Separator } from '@radix-ui/react-dropdown-menu'
 import { SelectValue } from '@radix-ui/react-select'
-import { Link, useNavigate } from '@tanstack/react-router'
+import {
+  getRouteApi,
+  Link,
+  useNavigate,
+  useSearch,
+} from '@tanstack/react-router'
 import { Button } from '@workspace/ui/components/button'
 import { Calendar } from '@workspace/ui/components/calendar'
 import {
@@ -42,6 +47,18 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import type { z } from 'zod'
 import { useCreateUser } from '../hooks/use-create-user'
+import { useUpdateUser } from '../hooks/use-update-user'
+
+const dependantText = {
+  mainTitle: {
+    new: 'Crear nuevo usuario',
+    edit: 'Editar un usuario',
+  },
+  submit: {
+    new: 'Crear Usuario',
+    edit: 'Guardar Cambios',
+  },
+}
 
 const formSchema = formUserSchema.omit({
   password: true,
@@ -49,24 +66,46 @@ const formSchema = formUserSchema.omit({
 })
 
 export default function FormView() {
+  const viewType = useSearch({
+    from: '/_authenticated/admin/users/form',
+    select: (search) => search.type,
+  })
+  const loaderData = getRouteApi(
+    '/_authenticated/admin/users/form',
+  ).useLoaderData()
+
   const { data: regions, isLoading: regionsLoading } = useRegions()
   const navigate = useNavigate()
   const form = useForm({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      name: '',
-      surname: '',
-      email: '',
-      phone: '',
-      documentType: 'DNI',
-      documentNumber: '',
-      birthDate: undefined,
-      sex: undefined,
-      regionId: undefined,
-    },
+    defaultValues:
+      viewType === 'edit'
+        ? {
+            name: loaderData?.name,
+            surname: loaderData?.surname,
+            email: loaderData?.email,
+            phone: loaderData?.phone,
+            documentType:
+              (loaderData?.documentType as 'DNI' | 'CE' | 'PAS') ?? 'DNI',
+            documentNumber: loaderData?.documentNumber,
+            birthDate: loaderData?.birthDate,
+            sex: loaderData?.sex,
+            regionId: loaderData?.regionId,
+          }
+        : {
+            name: '',
+            surname: '',
+            email: '',
+            phone: '',
+            documentType: 'DNI',
+            documentNumber: '',
+            birthDate: undefined,
+            sex: undefined,
+            regionId: undefined,
+          },
   })
 
-  const { mutate } = useCreateUser({
+  const { mutate: createUser } = useCreateUser({
     onSuccess: () => {
       toast.success('Creado el usuario exitosamente')
       navigate({
@@ -75,28 +114,57 @@ export default function FormView() {
     },
   })
 
+  const { mutate: updateUser } = useUpdateUser({
+    onSuccess: () => {
+      toast.success('Modificado el usuario exitosamente')
+      navigate({
+        to: '/admin/users',
+      })
+    },
+  })
+
   function onSubmit(values: z.infer<typeof formSchema>) {
-    mutate({
-      email: values.email,
-      name: values.name,
-      role: 'user',
-      password: '',
-      data: {
-        surname: values.surname,
-        documentType: values.documentType,
-        documentNumber: values.documentNumber,
-        sex: values.sex,
-        birthDate: values.birthDate,
-        phone: values.phone,
-        regionId: values.regionId,
-      },
-    })
+    if (viewType === 'edit' && loaderData?.id)
+      updateUser({
+        userId: loaderData.id,
+        data: {
+          email: values.email,
+          name: values.name,
+          role: loaderData.role,
+          password: '',
+          surname: values.surname,
+          documentType: values.documentType,
+          documentNumber: values.documentNumber,
+          sex: values.sex,
+          birthDate: values.birthDate,
+          phone: values.phone,
+          regionId: values.regionId,
+        },
+      })
+    else
+      createUser({
+        email: values.email,
+        name: values.name,
+        role: 'user',
+        password: '',
+        data: {
+          surname: values.surname,
+          documentType: values.documentType,
+          documentNumber: values.documentNumber,
+          sex: values.sex,
+          birthDate: values.birthDate,
+          phone: values.phone,
+          regionId: values.regionId,
+        },
+      })
   }
 
   return (
     <div className="w-full p-4">
       <div className="mt-4 w-full md:w-3/5 mx-auto">
-        <h1 className="text-2xl font-medium">Crear nuevo usuario</h1>
+        <h1 className="text-2xl font-medium">
+          {dependantText.mainTitle[viewType]}
+        </h1>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -349,7 +417,7 @@ export default function FormView() {
 
             <div className="w-full flex gap-2 justify-center">
               <Button type="submit" className="mt-4">
-                Guardar Cambios
+                {dependantText.submit[viewType]}
               </Button>
               <Link to="/admin/users">
                 <Button variant="outline" className="mt-4">

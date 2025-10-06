@@ -64,3 +64,15 @@ export async function getUsers(
     totalPages,
   }
 }
+
+export async function getSingleUser({
+  query: { id },
+}: {
+  query: UserModel.GetSingleUserQuery
+}): Promise<UserModel.GetSingleUserResponse> {
+  const data = await db.select().from(user).where(eq(user.id, id))
+  return {
+    ...data[0],
+    birthDate: new Date(data[0].birthDate),
+  }
+}

@@ -23,4 +23,11 @@ export namespace UserModel {
     sortBy: t.Optional(t.String()), // ej: "name.asc"
   })
   export type ListUsersQuery = typeof listUsersQuery.static
+
+  export const getSingleUserResponse = _getUsers
+  export type GetSingleUserResponse = typeof getSingleUserResponse.static
+  export const getSingleUserQuery = t.Object({
+    id: t.String(),
+  })
+  export type GetSingleUserQuery = typeof getSingleUserQuery.static
 }

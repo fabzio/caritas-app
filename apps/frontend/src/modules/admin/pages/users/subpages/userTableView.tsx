@@ -113,7 +113,7 @@ export default function TableView() {
         </div>
         <div className="flex items-center gap-2">
           <ActionsButton />
-          <Link to={'/admin/users/form'}>
+          <Link to={'/admin/users/form'} search={{ type: 'new' }}>
             <Button>
               <UserPlus />
               Nuevo usuario
