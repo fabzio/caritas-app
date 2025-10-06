@@ -1,11 +1,12 @@
 services:
   nginx-proxy:
-    image: nginx:alpine
+    image: jwilder/nginx-proxy
     container_name: nginx-proxy
     ports:
       - "80:80"
       - "443:443"
     volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
       - conf:/etc/nginx/conf.d
       - vhost:/etc/nginx/vhost.d
       - html:/usr/share/nginx/html

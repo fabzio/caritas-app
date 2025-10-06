@@ -1,7 +1,7 @@
+import caritaslima from '@frontend/assets/img/login/cover.webp'
 import ModeToggle from '@frontend/shared/components/mode-toggle'
 import { Badge } from '@workspace/ui/components/badge'
 import type { PropsWithChildren } from 'react'
-import caritaslima from '@/assets/img/login/cover.webp'
 
 export default function AuthLayout({ children }: Readonly<PropsWithChildren>) {
   return (

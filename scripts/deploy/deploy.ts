@@ -12,7 +12,7 @@ import {
 import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { parse as parseDotenv } from 'dotenv'
-import { execa } from 'execa'
+import execa from 'execa'
 import kleur from 'kleur'
 import ora from 'ora'
 import prompts from 'prompts'
@@ -93,9 +93,9 @@ const ascii = kleur.bold().magenta(
 )
 
 const toEnvContent = (entries: Record<string, string>) =>
-  Object.entries(entries)
+  `${Object.entries(entries)
     .map(([key, value]) => `${key}=${formatEnvValue(value)}`)
-    .join('\n') + '\n'
+    .join('\n')}\n`
 
 const formatEnvValue = (value: string) => {
   if (value === '') {

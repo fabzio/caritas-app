@@ -1,13 +1,11 @@
 - name: Configuración de servidor con Docker
   hosts: vps
   become: true
-  vars:
-    base_src_path: "{{ base_src_path | default('../base') }}"
 
   roles:
     - role: geerlingguy.docker
       vars:
-        docker_install_compose_plugin: true
+        docker_install_compose_plugin: true   # asegura que tengas docker compose v2
 
   tasks:
     - name: Crear carpeta destino para el proyecto
@@ -20,12 +18,12 @@
 
     - name: Copiar archivos del compose base
       ansible.builtin.copy:
-        src: "{{ base_src_path }}/"
+        src: ./base/
         dest: /home/{{ ansible_user }}/app/base/
         owner: "{{ ansible_user }}"
         group: "{{ ansible_user }}"
         mode: '0644'
-
+    
     - name: Crear red docker 'nginx-proxy' si no existe
       community.docker.docker_network:
         name: nginx-proxy
