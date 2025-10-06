@@ -5,7 +5,7 @@ import { userTableColumns } from '../components/columns'
 import { useUsers } from './use-users'
 
 export const useUserTable = () => {
-  const { filters, setFilters } = useFilters('/_authenticated/admin/users')
+  const { filters, setFilters } = useFilters('/_authenticated/admin/users/')
   const { data } = useUsers({
     currentPage: filters.pageIndex,
     pageSize: filters.pageSize,

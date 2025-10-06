@@ -3,7 +3,7 @@ import { Input } from '@workspace/ui/components/input'
 import debounce from 'debounce'
 
 export default function SearchUserInput() {
-  const { setFilters } = useFilters('/_authenticated/admin/users')
+  const { setFilters } = useFilters('/_authenticated/admin/users/')
   const onChangeFilter = debounce((e: React.ChangeEvent<HTMLInputElement>) => {
     setFilters({ q: e.target.value })
   }, 300)
