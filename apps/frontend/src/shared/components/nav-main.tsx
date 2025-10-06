@@ -65,6 +65,10 @@ function NavMain({ items }: Readonly<Props>) {
 
     if (organizationType === 'caritas') {
       const { data: teams, error } = await authClient.organization.listTeams()
+      const filteredTeams =
+        teams?.filter(
+          (team) => team?.id === sessionData?.session.activeTeamId,
+        ) ?? []
       if (error) {
         toast.error(error.message)
         return
@@ -72,7 +76,7 @@ function NavMain({ items }: Readonly<Props>) {
       const route = redirectByProperties({
         role: sessionData?.user.role ?? null,
         organizationType,
-        teams,
+        teams: filteredTeams,
       })
       navigate({ to: route })
       return

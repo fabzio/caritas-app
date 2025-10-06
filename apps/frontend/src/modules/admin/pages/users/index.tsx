@@ -2,7 +2,6 @@ import { useRegions } from '@frontend/hooks/use-regions'
 import { formUserSchema } from '@frontend/shared/models/user'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Separator } from '@radix-ui/react-dropdown-menu'
-import { Popover } from '@radix-ui/react-popover'
 import { SelectValue } from '@radix-ui/react-select'
 import { Button } from '@workspace/ui/components/button'
 import { Calendar } from '@workspace/ui/components/calendar'
@@ -33,6 +32,7 @@ import {
 } from '@workspace/ui/components/form'
 import { Input } from '@workspace/ui/components/input'
 import {
+  Popover,
   PopoverContent,
   PopoverTrigger,
 } from '@workspace/ui/components/popover'
@@ -75,14 +75,8 @@ function TableView(props: Readonly<TableViewProps>) {
   const { mutateAsync: removeUser, isPending: removeUserIsPending } =
     useRemoveUser()
   const { mutateAsync: banUser, isPending: banUserIsPending } = useBanUser()
-  const {
-    data: users,
-    pagination,
-    columns,
-    paginationState,
-    sortingState,
-    setFilters,
-  } = useUserTable()
+  const { data } = useUserTable()
+  const { users } = data
 
   const uniqueRoles = useMemo(() => {
     if (!users) return []
@@ -166,10 +160,7 @@ function TableView(props: Readonly<TableViewProps>) {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <ActionsButton
-            onDeleteClick={() => setIsDeleteModalOpen(true)}
-            selectedCount={userCount}
-          />
+          <ActionsButton />
           <Button onClick={props.onChangeToFormView}>
             <UserPlus />
             Nuevo usuario
@@ -180,12 +171,6 @@ function TableView(props: Readonly<TableViewProps>) {
         <UserTable
           rowSelection={rowSelection}
           setRowSelection={setRowSelection}
-          data={filteredUsers || []}
-          columns={columns}
-          paginationState={paginationState}
-          sortingState={sortingState}
-          setFilters={setFilters}
-          pagination={pagination}
         />
       </div>
       <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
@@ -255,7 +240,7 @@ function FormView(props: Readonly<FormViewProps>) {
   function onSubmit(values: z.infer<typeof formSchema>) {
     mutate({
       ...values,
-      birthDate: values.birthDate.toISOString(),
+      birthDate: values.birthDate,
       banExpires: null,
       banReason: null,
       banned: null,
@@ -263,7 +248,7 @@ function FormView(props: Readonly<FormViewProps>) {
       createdAt: new Date(),
       updatedAt: new Date(),
       isAnonymous: null,
-      role: null,
+      role: 'user',
       image: null,
     })
   }
