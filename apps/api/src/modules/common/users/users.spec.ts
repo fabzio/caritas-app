@@ -8,31 +8,29 @@ const api = treaty(users)
 describe('Common Users Module', () => {
   it('returns a list of users', async () => {
     const unique = `${Date.now()}${Math.floor(Math.random() * 1_000)}`
-    const email = `user+${unique}@example.com`
-    const documentNumber = unique.padEnd(8, '0').slice(0, 8)
-    const phone = `+51${unique.slice(-9).padStart(9, '0')}`
+    const email = `welcome+${unique}@example.com`
+    const documentNumber = unique.padEnd(12, '0').slice(0, 12)
+    const phone = `+51${unique.slice(-8).padStart(8, '0')}`
 
-    auth.api.createUser({
+    await auth.api.createUser({
       body: {
+        name: 'Another User',
         email,
-        name: 'New User',
-        password: 'secret-password',
+        password: 'password',
         role: 'user',
         data: {
-          surname: 'Example',
           documentType: 'DNI',
           documentNumber,
+          surname: 'User',
           sex: 'M',
-          birthDate: new Date(2000, 8, 3),
-          regionId: 1,
+          birthDate: '1992-02-02',
           phone,
+          regionId: 1,
         },
       },
     })
 
-    const response = await api.users.get({
-      query: {},
-    })
+    const response = await api.users.get()
 
     expect(response.status).toBe(200)
     expect(response.data?.data).toBeInstanceOf(Array)
@@ -49,24 +47,6 @@ describe('Common Users Module', () => {
     const email = `user+${unique}@example.com`
     const documentNumber = unique.padEnd(8, '0').slice(0, 8)
     const phone = `+51${unique.slice(-9).padStart(9, '0')}`
-
-    auth.api.createUser({
-      body: {
-        email,
-        name: 'New User',
-        password: 'secret-password',
-        role: 'user',
-        data: {
-          surname: 'Example',
-          documentType: 'DNI',
-          documentNumber,
-          sex: 'M',
-          birthDate: new Date(2000, 8, 3),
-          regionId: 1,
-          phone,
-        },
-      },
-    })
 
     const {
       user: { id },
@@ -88,9 +68,7 @@ describe('Common Users Module', () => {
       },
     })
 
-    const response = await api.users({ id }).get({
-      query: {},
-    })
+    const response = await api.users({ id }).get()
 
     expect(response.status).toBe(200)
     expect(response.data?.id).toBe(id)
