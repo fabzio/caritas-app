@@ -1,3 +1,4 @@
+import betterAuth from '@api/modules/auth/middleware'
 import Elysia, { t } from 'elysia'
 import { ScholarshipModel } from './model'
 import { createScholarship, getScholarships } from './service'
@@ -6,6 +7,7 @@ const scholarship = new Elysia({
   name: 'scholarship',
   prefix: '/scholarship',
 })
+  .use(betterAuth)
   .get('', getScholarships, {
     auth: true,
     response: {

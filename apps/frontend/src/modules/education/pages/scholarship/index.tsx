@@ -1,7 +1,7 @@
+import { useIsMobile } from '@frontend/hooks/use-mobile'
 import { Link } from '@tanstack/react-router'
 import { Button } from '@workspace/ui/components/button'
 import { PlusCircle } from 'lucide-react'
-import { useIsMobile } from '@/hooks/use-mobile'
 export default function ScholarshipPage() {
   const isMobile = useIsMobile()
   return (

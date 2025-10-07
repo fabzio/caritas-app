@@ -1,6 +1,6 @@
+import rpc from '@frontend/lib/rpc'
 import { useMutation } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
-import rpc from '@/lib/rpc'
 
 const usePostScholarship = () => {
   const navigate = useNavigate({ from: '/education/scholarship/create' })
@@ -9,17 +9,21 @@ const usePostScholarship = () => {
       name: string
       description: string
       requirements: string
-      vacancies: number | null
+      vacancies: number
       startDate: Date
       endDate: Date
       organizationId: string
-      type: string
-      active: boolean
+      type: 'ML' | 'PL'
+      active?: boolean
       createdBy: string
       createdAt?: Date
       updatedAt?: Date
     }) => {
-      const res = await rpc.education.scholarship.post(params)
+      const res = await rpc.education.scholarship.post({
+        ...params,
+        endDate: params.endDate.toISOString(),
+        startDate: params.startDate.toISOString(),
+      })
       if (res.error) throw res.error
       return res.data
     },

@@ -2,22 +2,23 @@ import { z } from 'zod'
 
 export const formScholarShipSchema = z
   .object({
-    name: z.string().nonempty('El nombre es obligatorio'),
-    description: z.string().nonempty('La descripción es obligatoria'),
+    name: z.string().nonempty('Ingrese el nombre de la beca'),
+    description: z.string().nonempty('Ingrese una descripción de la beca'),
     requirements: z.string(),
-    vacancies: z.number().nullable(),
     startDate: z.date({ message: 'La fecha de inicio es obligatoria' }),
     endDate: z.date({ message: 'La fecha de fin es obligatoria' }),
-    type: z.enum(['ML', 'PL'], { message: 'El tipo de beca es obligatorio' }),
-    organizationId: z.string(),
+    type: z.enum(['ML', 'PL'], { message: 'Escoja el tipo de beca' }),
+    organizationId: z.string({ message: 'La fecha de fin es obligatoria' }),
+    vacancies: z
+      .number({ error: 'Debe ingresar un número' })
+      .min(1, { message: 'Las vacantes deben ser al menos 1' })
+      .refine((v) => v !== undefined, {
+        message: 'Las vacantes son obligatorias',
+      }), //como funciona esto gal
   })
   .refine((data) => data.startDate < data.endDate, {
     message: 'La fecha de inicio debe ser anterior a la fecha de fin',
     path: ['endDate'],
-  })
-  .refine((data) => data.organizationId !== '#', {
-    message: 'Debe seleccionar una organización',
-    path: ['organizationId'],
   })
 
 export type FormScholarShipSchema = z.infer<typeof formScholarShipSchema>

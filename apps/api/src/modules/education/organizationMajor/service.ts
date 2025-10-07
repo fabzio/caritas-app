@@ -1,12 +1,11 @@
 import db from '@api/db'
 import { PostgresError } from '@api/db/errors'
-import type { OrganizationModel } from './model'
+import type { OrganizationMayorModel } from './model'
 
-export const getOrganization =
-  async (): Promise<OrganizationModel.GetOrganization> => {
+export const getOrganizationMajors =
+  async (): Promise<OrganizationMayorModel.GetOrganizationMajors> => {
     try {
-      return await db.query.organization.findMany({
-        where: (org, { eq }) => eq(org.type, 'education'),
+      return await db.query.organizationMajor.findMany({
         columns: {
           createdAt: false,
           updatedAt: false,
