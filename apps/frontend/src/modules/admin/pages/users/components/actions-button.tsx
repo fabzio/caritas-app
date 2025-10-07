@@ -14,14 +14,15 @@ import { ChevronDown } from 'lucide-react'
 
 type Props = {
   onDeleteClick: () => void
+  onEditClick: () => void
   selectedCount: number
 }
 
 export default function ActionsButton({
   onDeleteClick,
+  onEditClick,
   selectedCount,
 }: Readonly<Props>) {
-  const isDisabled = selectedCount === 0
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -33,10 +34,18 @@ export default function ActionsButton({
       <DropdownMenuContent>
         <DropdownMenuLabel>Acciones</DropdownMenuLabel>
         <DropdownMenuGroup>
-          <DropdownMenuItem onClick={onDeleteClick} disabled={isDisabled}>
+          <DropdownMenuItem
+            onClick={onDeleteClick}
+            disabled={selectedCount === 0}
+          >
             Eliminar
           </DropdownMenuItem>
-          <DropdownMenuItem>Editar</DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={onEditClick}
+            disabled={selectedCount !== 1}
+          >
+            Editar
+          </DropdownMenuItem>
           <DropdownMenuSub>
             <DropdownMenuSubTrigger>Exportar</DropdownMenuSubTrigger>
             <DropdownMenuSubContent>

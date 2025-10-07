@@ -1,4 +1,4 @@
-import { Link } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
 import { Button } from '@workspace/ui/components/button'
 import {
   Dialog,
@@ -102,6 +102,8 @@ export default function TableView() {
     resetSelectedRows()
   }
 
+  const navigate = useNavigate()
+
   return (
     <div className="w-full p-4">
       <div className="flex justify-between items-center gap-2">
@@ -120,6 +122,12 @@ export default function TableView() {
         <div className="flex items-center gap-2">
           <ActionsButton
             onDeleteClick={() => setIsDeleteModalOpen(true)}
+            onEditClick={() =>
+              navigate({
+                to: '/admin/users/form',
+                search: { type: 'edit', id: selectedUsers[0].id },
+              })
+            }
             selectedCount={userCount}
           />
           <Link to={'/admin/users/form'} search={{ type: 'new' }}>
