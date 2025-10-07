@@ -1,6 +1,6 @@
 /** biome-ignore-all lint/suspicious/noExplicitAny: openapi types */
 
-import { ac } from '@api/auth/permisions'
+import { ac, educationMember, healthMember } from '@api/auth/permisions'
 import db from '@api/db'
 import * as schema from '@api/db/schemas/auth'
 import env from '@api/env'
@@ -108,6 +108,10 @@ export const auth = betterAuth({
     passkey(),
     organization({
       ac,
+      roles: {
+        healthMember,
+        educationMember,
+      },
       dynamicAccessControl: {
         enabled: true,
       },

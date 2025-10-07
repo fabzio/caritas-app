@@ -79,7 +79,6 @@ export const redirectByProperties = (
   input: RedirectInput = {},
 ): ValidRoutes => {
   if (input.hasOrganizations === false) return '/user'
-
   const organizationRoute = getRouteFromOrganization(input)
   if (organizationRoute) return organizationRoute
 

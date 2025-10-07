@@ -12,7 +12,6 @@ export const QueryKeys = {
   ADMIN: {
     ORGANIZATION: 'admin-organization',
     USERS: 'admin-members',
-    PERMISSIONS: 'admin-permissions',
   },
 } as const
 
