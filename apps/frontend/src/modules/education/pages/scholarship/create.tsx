@@ -32,7 +32,7 @@ import {
 } from '@workspace/ui/components/select'
 import { Separator } from '@workspace/ui/components/separator'
 import { format } from 'date-fns'
-import { CalendarIcon } from 'lucide-react'
+import { CalendarIcon, Loader2 } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { useSession } from '@/hooks/use-session'
 import useGetOrganization from '../../hooks/use-get-organization'
@@ -48,7 +48,7 @@ export default function CreateScholarship() {
       name: '',
       description: '',
       requirements: '',
-      vacancies: 1,
+      vacancies: null,
       startDate: undefined,
       endDate: undefined,
       organizationId: undefined,
@@ -60,7 +60,7 @@ export default function CreateScholarship() {
   const { mutate, isPending } = usePostScholarship()
   const { data: user } = useSession()
   const handleSubmit = form.handleSubmit((data) => {
-    if (!user) return
+    if (!user || form.getValues('vacancies') == null) return
     const params = { ...data, createdBy: user.user.id, active: true }
     mutate(params)
   })
@@ -97,6 +97,7 @@ export default function CreateScholarship() {
                         <FormControl>
                           <Input {...field} />
                         </FormControl>
+                        <FormMessage />
                       </FormItem>
                     )}
                   />
@@ -141,7 +142,9 @@ export default function CreateScholarship() {
                           </FormControl>
                           <SelectContent>
                             {isLoading && (
-                              <SelectItem value="#">Cargando...</SelectItem>
+                              <SelectItem value="#" disabled>
+                                Cargando...
+                              </SelectItem>
                             )}
                             {organizations?.map((org) => (
                               <SelectItem key={org.id} value={String(org.id)}>
@@ -163,6 +166,7 @@ export default function CreateScholarship() {
                         <FormControl>
                           <Input {...field} />
                         </FormControl>
+                        <FormMessage />
                       </FormItem>
                     )}
                   />
@@ -175,6 +179,7 @@ export default function CreateScholarship() {
                         <FormControl>
                           <Input {...field} />
                         </FormControl>
+                        <FormMessage />
                       </FormItem>
                     )}
                   />
@@ -188,6 +193,7 @@ export default function CreateScholarship() {
                           <Input
                             {...field}
                             type="number"
+                            value={field.value ?? ''}
                             onChange={(e) => {
                               const value = e.target.value
                               const number =
@@ -196,6 +202,7 @@ export default function CreateScholarship() {
                             }}
                           />
                         </FormControl>
+                        <FormMessage />
                       </FormItem>
                     )}
                   />
@@ -230,6 +237,7 @@ export default function CreateScholarship() {
                             />
                           </PopoverContent>
                         </Popover>
+                        <FormMessage />
                       </FormItem>
                     )}
                   />
@@ -261,13 +269,22 @@ export default function CreateScholarship() {
                             />
                           </PopoverContent>
                         </Popover>
+                        <FormMessage />
                       </FormItem>
                     )}
                   />
                   <CardFooter className="flex justify-end gap-4 ">
                     <Button variant="outline">Cancelar</Button>
-                    <Button variant="default" type="submit">
-                      Registrar
+                    <Button
+                      className="mt-2 col-span-2"
+                      type="submit"
+                      disabled={isPending}
+                    >
+                      {isPending ? (
+                        <Loader2 className="animate-spin w-2" />
+                      ) : (
+                        'Registrar'
+                      )}
                     </Button>
                   </CardFooter>
                 </form>

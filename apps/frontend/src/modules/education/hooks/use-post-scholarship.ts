@@ -1,13 +1,15 @@
 import { useMutation } from '@tanstack/react-query'
+import { useNavigate } from '@tanstack/react-router'
 import rpc from '@/lib/rpc'
 
 const usePostScholarship = () => {
+  const navigate = useNavigate({ from: '/education/scholarship/create' })
   return useMutation({
     mutationFn: async (params: {
       name: string
       description: string
       requirements: string
-      vacancies: number
+      vacancies: number | null
       startDate: Date
       endDate: Date
       organizationId: string
@@ -17,7 +19,6 @@ const usePostScholarship = () => {
       createdAt?: Date
       updatedAt?: Date
     }) => {
-      console.log(params)
       const res = await rpc.education.scholarship.post(params)
       if (res.error) throw res.error
       return res.data
@@ -26,7 +27,7 @@ const usePostScholarship = () => {
       console.error(error)
     },
     onSuccess: (data) => {
-      console.log(data)
+      navigate({ to: '/education/scholarship' })
     },
   })
 }
