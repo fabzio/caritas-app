@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'bun:test'
+import db from '@api/db'
+import { auth } from '@api/lib/auth'
 import { treaty } from '@elysiajs/eden'
-import db from '@/db'
-import { auth } from '@/lib/auth'
 import { welcome } from '.'
 
 const api = treaty(welcome)

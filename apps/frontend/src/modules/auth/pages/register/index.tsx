@@ -1,3 +1,11 @@
+import { env } from '@frontend/env'
+import { useRegions } from '@frontend/hooks/use-regions'
+import PasswordStrengthBar from '@frontend/shared/components/password-strength-bar'
+import TurnstileWidget from '@frontend/shared/components/turnsile-widget'
+import {
+  type FormUserSchema,
+  formUserSchema,
+} from '@frontend/shared/models/user'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Link } from '@tanstack/react-router'
 import { Button } from '@workspace/ui/components/button'
@@ -39,11 +47,6 @@ import { cn } from '@workspace/ui/lib/utils'
 import { format } from 'date-fns'
 import { CalendarIcon, Check, ChevronsUpDown, Loader2 } from 'lucide-react'
 import { useForm } from 'react-hook-form'
-import { env } from '@/env'
-import { useRegions } from '@/hooks/use-regions'
-import PasswordStrengthBar from '@/shared/components/password-strength-bar'
-import TurnstileWidget from '@/shared/components/turnsile-widget'
-import { type FormUserSchema, formUserSchema } from '@/shared/models/user'
 import { useRegister } from './hooks/use-register'
 
 export default function Register() {

@@ -1,3 +1,5 @@
+import { useSession } from '@frontend/hooks/use-session'
+import authClient from '@frontend/lib/authClient'
 import { useQuery } from '@tanstack/react-query'
 import { Link, useNavigate } from '@tanstack/react-router'
 import {
@@ -18,8 +20,6 @@ import {
 } from '@workspace/ui/components/sidebar'
 import { Building2, ChevronRight, Cross } from 'lucide-react'
 import { toast } from 'sonner'
-import { useSession } from '@/hooks/use-session'
-import authClient from '@/lib/authClient'
 import { QueryKeys } from '../constants/query-keys'
 import type { NavItem } from '../types/nav-main'
 import {
@@ -65,6 +65,10 @@ function NavMain({ items }: Readonly<Props>) {
 
     if (organizationType === 'caritas') {
       const { data: teams, error } = await authClient.organization.listTeams()
+      const filteredTeams =
+        teams?.filter(
+          (team) => team?.id === sessionData?.session.activeTeamId,
+        ) ?? []
       if (error) {
         toast.error(error.message)
         return
@@ -72,7 +76,7 @@ function NavMain({ items }: Readonly<Props>) {
       const route = redirectByProperties({
         role: sessionData?.user.role ?? null,
         organizationType,
-        teams,
+        teams: filteredTeams,
       })
       navigate({ to: route })
       return

@@ -1,7 +1,7 @@
+import { useSession } from '@frontend/hooks/use-session'
+import rpc from '@frontend/lib/rpc'
 import { useMutation } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
-import { useSession } from '@/hooks/use-session'
-import rpc from '@/lib/rpc'
 import type { PatientForm, PersonForm, StudentForm } from '../models/person'
 
 type ProfileMutationPayload = PersonForm &

@@ -1,4 +1,10 @@
 /** biome-ignore-all lint/suspicious/noExplicitAny: openapi types */
+
+import { ac, educationMember, healthMember } from '@api/auth/permisions'
+import db from '@api/db'
+import * as schema from '@api/db/schemas/auth'
+import valkey from '@api/db/valkey'
+import env from '@api/env'
 import { betterAuth } from 'better-auth'
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
 import {
@@ -12,10 +18,6 @@ import {
 } from 'better-auth/plugins'
 import { passkey } from 'better-auth/plugins/passkey'
 import { localization } from 'better-auth-localization'
-import { ac } from '@/auth/permisions'
-import db from '@/db'
-import * as schema from '@/db/schemas/auth'
-import env from '@/env'
 import transporter from '../mail'
 
 export const auth = betterAuth({
@@ -23,6 +25,18 @@ export const auth = betterAuth({
     provider: 'pg',
     schema,
   }),
+  secondaryStorage: {
+    get: async (key) => {
+      return await valkey.get(key)
+    },
+    set: async (key, value, ttl) => {
+      await valkey.set(key, value)
+      if (ttl) await valkey.expire?.(key, ttl)
+    },
+    delete: async (key) => {
+      await valkey.del(key)
+    },
+  },
   databaseHooks: {
     session: {
       create: {
@@ -107,6 +121,10 @@ export const auth = betterAuth({
     passkey(),
     organization({
       ac,
+      roles: {
+        healthMember,
+        educationMember,
+      },
       dynamicAccessControl: {
         enabled: true,
       },
@@ -134,7 +152,7 @@ export const auth = betterAuth({
     }),
     captcha({
       provider: 'cloudflare-turnstile',
-      secretKey: env.CLOUDFARE_TURNSTILE_SECRET_KEY,
+      secretKey: env.CLOUDFLARE_TURNSTILE_SECRET_KEY,
     }),
     emailOTP({
       sendVerificationOTP: async ({ type, otp, email }) => {

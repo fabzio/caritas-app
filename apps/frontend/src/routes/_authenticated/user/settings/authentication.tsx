@@ -1,6 +1,6 @@
+import Authentication from '@frontend/modules/settings/pages/authentication'
+import { QueryKeys } from '@frontend/shared/constants/query-keys'
 import { createFileRoute } from '@tanstack/react-router'
-import Authentication from '@/modules/settings/pages/authentication'
-import { QueryKeys } from '@/shared/constants/query-keys'
 
 export const Route = createFileRoute(
   '/_authenticated/user/settings/authentication',

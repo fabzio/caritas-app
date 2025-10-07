@@ -1,5 +1,5 @@
+import authClient from '@frontend/lib/authClient'
 import { useMutation } from '@tanstack/react-query'
-import authClient from '@/lib/authClient'
 
 export const useGoogle = () => {
   return useMutation({
