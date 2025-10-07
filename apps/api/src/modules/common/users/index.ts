@@ -1,4 +1,4 @@
-import betterAuth from '@api/modules/auth/middleware'
+// import betterAuth from '@api/modules/auth/middleware'
 import Elysia from 'elysia'
 import { UserModel } from './model'
 import { getSingleUser, getUsers } from './service'
@@ -6,7 +6,7 @@ import { getSingleUser, getUsers } from './service'
 const user = new Elysia({
   prefix: '/users',
 })
-  .use(betterAuth)
+  // .use(betterAuth)
   .get('/', ({ query }) => getUsers(query), {
     query: UserModel.listUsersQuery,
     response: {
