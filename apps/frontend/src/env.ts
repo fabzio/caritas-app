@@ -21,7 +21,7 @@ export const env = createEnv({
       .default(
         '381831022349-oc421cd5jg888jnlces6lvnkmq0brkp3.apps.googleusercontent.com',
       ),
-    VITE_CLOUDFARE_TURNSTILE_SITE_KEY: z
+    VITE_CLOUDFLARE_TURNSTILE_SITE_KEY: z
       .string()
       .default('0x4AAAAAAB3NCsVLdXRV7O1H'),
   },

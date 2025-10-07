@@ -632,7 +632,7 @@ chore: cambios en build, etc
 ```
 ## Problemas Comunes
 - **Error al levantar Docker**: Si la ejecutar `bun dev` en la raíz del proyecto da error al levantar la base de datos, prueba cambiando `docker compose` por `docker-compose` en el archivo `apps/db/package.json`
-- **Error de variables de entorno**: Las variables de entorno para el cliente de google y cloudfare están definidas, las claves que usen servicios personales (como el correo) deben ser reemplazadas por las de tu cuenta revísa cómo [aquí](https://support.google.com/accounts/answer/185833?hl=es)
+- **Error de variables de entorno**: Las variables de entorno para el cliente de google y cloudflare están definidas, las claves que usen servicios personales (como el correo) deben ser reemplazadas por las de tu cuenta revísa cómo [aquí](https://support.google.com/accounts/answer/185833?hl=es)
 - Si usas un **cliente gráfico de Git** (como GitHub Desktop) y tienes problemas con los hooks de Husky, intenta hacer commits desde la terminal, por ahí mostrará errores más claros
 
 ## Consejos
