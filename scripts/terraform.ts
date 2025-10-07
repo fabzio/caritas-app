@@ -79,7 +79,7 @@ type EnvValues = {
   googleClientSecret: string
   googleSmtpUser: string
   googleSmtpAppPassword: string
-  cloudfareTurnstileSecretKey: string
+  cloudflareTurnstileSecretKey: string
 }
 
 type InstallConfig = {
@@ -356,8 +356,8 @@ async function collectEnvConfig(
     'GOOGLE_SMTP_APP_PASSWORD',
     '',
   )
-  const cloudfareTurnstileSecretKey = await helpers.ask(
-    'CLOUDFARE_TURNSTILE_SECRET_KEY',
+  const cloudflareTurnstileSecretKey = await helpers.ask(
+    'CLOUDFLARE_TURNSTILE_SECRET_KEY',
     '',
   )
   const valkeyHost = await helpers.askRequired(
@@ -394,7 +394,7 @@ async function collectEnvConfig(
       googleClientSecret,
       googleSmtpUser,
       googleSmtpAppPassword,
-      cloudfareTurnstileSecretKey,
+      cloudflareTurnstileSecretKey,
     },
   }
 }
@@ -417,7 +417,7 @@ function serializeEnv(env: EnvValues): string {
     ['GOOGLE_CLIENT_SECRET', env.googleClientSecret],
     ['GOOGLE_SMTP_USER', env.googleSmtpUser],
     ['GOOGLE_SMTP_APP_PASSWORD', env.googleSmtpAppPassword],
-    ['CLOUDFARE_TURNSTILE_SECRET_KEY', env.cloudfareTurnstileSecretKey],
+    ['CLOUDFLARE_TURNSTILE_SECRET_KEY', env.cloudflareTurnstileSecretKey],
   ]
   return entries
     .map(([key, value]) => `${key}=${value}`)

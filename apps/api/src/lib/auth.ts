@@ -152,7 +152,7 @@ export const auth = betterAuth({
     }),
     captcha({
       provider: 'cloudflare-turnstile',
-      secretKey: env.CLOUDFARE_TURNSTILE_SECRET_KEY,
+      secretKey: env.CLOUDFLARE_TURNSTILE_SECRET_KEY,
     }),
     emailOTP({
       sendVerificationOTP: async ({ type, otp, email }) => {
