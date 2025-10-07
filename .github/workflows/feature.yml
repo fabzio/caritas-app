@@ -1,17 +1,13 @@
 name: Ejecutar pruebas en feature y hotfix
 
 on:
-  pull_request:
-    branches:
-      - develop
   push:
     branches:
-      - 'feature/*'
-      - 'hotfix/*'
+      - "feature/*"
+      - "hotfix/*"
 
 jobs:
   test:
-    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -19,26 +15,8 @@ jobs:
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
-          bun-version: '1.2.22'
+          bun-version: "1.2.22"
       - name: Instalar dependencias
         run: bun ci
       - name: Ejecutar tests
         run: bun run test
-
-  build:
-    name: Build image
-    if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-      - name: Set up Bun
-        uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: '1.2.22'
-      - name: Install dependencies
-        run: bun ci
-      - name: Set up Docker
-        uses: docker/setup-buildx-action@v3
-      - name: Build Docker image
-        run: docker build -t ghcr.io/${{ github.repository_owner }}/caritas:pr-${{ github.event.pull_request.number }} -f ./apps/frontend/Dockerfile .

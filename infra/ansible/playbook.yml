@@ -2,10 +2,6 @@
   hosts: vps
   become: true
 
-  roles:
-    - role: geerlingguy.docker
-      vars:
-        docker_install_compose_plugin: true   # asegura que tengas docker compose v2
   tasks:
     - name: Instalar Dockploy
       shell: curl -sSL https://dokploy.com/install.sh | sh
