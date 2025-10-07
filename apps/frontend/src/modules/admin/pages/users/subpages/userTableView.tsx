@@ -1,3 +1,4 @@
+import { Link } from '@tanstack/react-router'
 import { Button } from '@workspace/ui/components/button'
 import {
   Dialog,
@@ -19,10 +20,7 @@ import { useBanUser } from '../hooks/use-ban-user'
 import { useRemoveUser } from '../hooks/use-remove-user'
 import { useUserTable } from '../hooks/use-table'
 
-interface TableViewProps {
-  onChangeToFormView: () => void
-}
-export default function TableView(props: Readonly<TableViewProps>) {
+export default function TableView() {
   const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({})
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [roleFilter, setRoleFilter] = useState<string>('all')
@@ -124,10 +122,12 @@ export default function TableView(props: Readonly<TableViewProps>) {
             onDeleteClick={() => setIsDeleteModalOpen(true)}
             selectedCount={userCount}
           />
-          <Button onClick={props.onChangeToFormView}>
-            <UserPlus />
-            Nuevo usuario
-          </Button>
+          <Link to={'/admin/users/form'} search={{ type: 'new' }}>
+            <Button>
+              <UserPlus />
+              Nuevo usuario
+            </Button>
+          </Link>
         </div>
       </div>
       <div className="mt-4">
