@@ -1,0 +1,7 @@
+- name: Configuración de servidor con Docker
+  hosts: vps
+  become: true
+
+  tasks:
+    - name: Instalar Dockploy
+      shell: curl -sSL https://dokploy.com/install.sh | sh
