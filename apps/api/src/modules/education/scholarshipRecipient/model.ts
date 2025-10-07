@@ -27,4 +27,13 @@ export namespace ScholarshipRecipientModel {
     sortBy: t.Optional(t.String()),
   })
   export type ListRecipientsQuery = typeof listRecipientsQuery.static
+
+  export const createScholarshipRecipient = t.Object({
+    scholarshipId: t.Number(),
+    userId: t.String(),
+    reviewedBy: t.String(),
+    comments: t.Optional(t.String()),
+  })
+  export type CreateScholarshipRecipient =
+    typeof createScholarshipRecipient.static
 }

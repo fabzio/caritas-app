@@ -9,6 +9,66 @@ import {
 } from '@/db/schemas/education'
 import type { ScholarshipRecipientModel } from './model'
 
+export async function createScholarshipRecipient(
+  data: ScholarshipRecipientModel.CreateScholarshipRecipient,
+): Promise<number> {
+  try {
+    const userExists = await db.query.user.findFirst({
+      where: (users, { eq }) => eq(users.id, data.userId),
+      columns: { id: true },
+    })
+
+    if (!userExists) {
+      throw new Error(`User with id ${data.userId} not found`)
+    }
+
+    const scholarshipExists = await db.query.scholarship.findFirst({
+      where: (scholarships, { eq }) => eq(scholarships.id, data.scholarshipId),
+      columns: { id: true },
+    })
+
+    if (!scholarshipExists) {
+      throw new Error(`Scholarship with id ${data.scholarshipId} not found`)
+    }
+
+    const existingApplication = await db.query.scholarshipApplication.findFirst(
+      {
+        where: (application, { eq, and }) =>
+          and(
+            eq(application.userId, data.userId),
+            eq(application.scholarshipId, data.scholarshipId),
+          ),
+        columns: { id: true, status: true },
+      },
+    )
+
+    if (existingApplication) {
+      throw new Error(
+        `User already has an application for this scholarship with status: ${existingApplication.status}`,
+      )
+    }
+
+    const [{ id }] = await db.transaction(async (tx) => {
+      return await tx
+        .insert(scholarshipApplication)
+        .values({
+          scholarshipId: data.scholarshipId,
+          userId: data.userId,
+          applicationDate: new Date(),
+          status: 'accepted',
+          reviewedBy: data.reviewedBy,
+          reviewDate: new Date(),
+          comments: data.comments ?? null,
+        })
+        .returning({ id: scholarshipApplication.id })
+    })
+    return id
+  } catch (e) {
+    if (e instanceof Error) throw new PostgresError(e.message)
+    throw e
+  }
+}
+
 export async function getRecipients(
   params: ScholarshipRecipientModel.ListRecipientsQuery,
 ): Promise<ScholarshipRecipientModel.GetRecipients> {
