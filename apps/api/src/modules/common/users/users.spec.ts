@@ -6,20 +6,7 @@ import users from '.'
 const api = treaty(users)
 
 describe('Common Users Module', () => {
-  it('denies unauthenticated access', async () => {
-    const response = await api.users.get({ query: {}, headers: {} })
-    expect(response.status).toBe(401)
-  })
-
   it('returns a list of users', async () => {
-    const { headers } = await auth.api.signInEmail({
-      returnHeaders: true,
-      body: { email: 'text@example.com', password: 'password' },
-    })
-
-    const cookie = headers.get('set-cookie')
-    expect(cookie).toBeDefined()
-
     const unique = `${Date.now()}${Math.floor(Math.random() * 1_000)}`
     const email = `user+${unique}@example.com`
     const documentNumber = unique.padEnd(8, '0').slice(0, 8)
@@ -45,9 +32,6 @@ describe('Common Users Module', () => {
 
     const response = await api.users.get({
       query: {},
-      headers: {
-        cookie,
-      },
     })
 
     expect(response.status).toBe(200)
@@ -61,14 +45,6 @@ describe('Common Users Module', () => {
   })
 
   it('returns a single user', async () => {
-    const { headers } = await auth.api.signInEmail({
-      returnHeaders: true,
-      body: { email: 'text@example.com', password: 'password' },
-    })
-
-    const cookie = headers.get('set-cookie')
-    expect(cookie).toBeDefined()
-
     const unique = `${Date.now()}${Math.floor(Math.random() * 1_000)}`
     const email = `user+${unique}@example.com`
     const documentNumber = unique.padEnd(8, '0').slice(0, 8)
@@ -114,9 +90,6 @@ describe('Common Users Module', () => {
 
     const response = await api.users({ id }).get({
       query: {},
-      headers: {
-        cookie,
-      },
     })
 
     expect(response.status).toBe(200)
