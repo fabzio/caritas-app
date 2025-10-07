@@ -66,9 +66,9 @@ export async function getUsers(
 }
 
 export async function getSingleUser({
-  query: { id },
+  params: { id },
 }: {
-  query: UserModel.GetSingleUserQuery
+  params: UserModel.GetSingleUserQuery
 }): Promise<UserModel.GetSingleUserResponse> {
   const data = await db.select().from(user).where(eq(user.id, id))
   return {

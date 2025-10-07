@@ -12,7 +12,7 @@ export const Route = createFileRoute('/_authenticated/admin/users/form')({
     return await queryClient.ensureQueryData({
       queryKey: [QueryKeys.ADMIN.USERS],
       queryFn: async () => {
-        const { data, error } = await rpc.users.get({ query: { id: '123' } })
+        const { data, error } = await rpc.users({ id }).get()
         if (error) throw error
         return data || undefined
       },

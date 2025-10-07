@@ -6,7 +6,7 @@ export const useSingleUser = (id: string) => {
   return useSuspenseQuery({
     queryKey: [QueryKeys.ADMIN.USERS, id],
     queryFn: async () => {
-      const { data, error } = await rpc.users.get({ query: { id } })
+      const { data, error } = await rpc.users({ id }).get()
       if (error) throw error
       return data
     },

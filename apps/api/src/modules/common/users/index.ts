@@ -15,7 +15,7 @@ const user = new Elysia({
   })
   .get('/:id', getSingleUser, {
     auth: true,
-    query: UserModel.getSingleUserQuery,
+    params: UserModel.getSingleUserQuery,
     response: {
       200: UserModel.getSingleUserResponse,
     },
