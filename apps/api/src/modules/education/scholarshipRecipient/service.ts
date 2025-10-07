@@ -1,12 +1,12 @@
-import { asc, count, desc, eq, ilike, or, sql } from 'drizzle-orm'
-import db from '@/db'
-import { PostgresError } from '@/db/errors'
-import { organization, region, user } from '@/db/schemas/auth'
+import db from '@api/db'
+import { PostgresError } from '@api/db/errors'
+import { organization, region, user } from '@api/db/schemas/auth'
 import {
   organizationLocation,
   scholarship,
   scholarshipApplication,
-} from '@/db/schemas/education'
+} from '@api/db/schemas/education'
+import { asc, count, desc, eq, ilike, or, sql } from 'drizzle-orm'
 import type { ScholarshipRecipientModel } from './model'
 
 export async function getRecipients(
@@ -15,6 +15,7 @@ export async function getRecipients(
   try {
     const { q = '', page = 0, limit = 10, sortBy = 'name.asc' } = params
     const searchQuery = q.replace(/\s+/g, ' ').trim()
+    console.log(page)
 
     const [sortFieldRaw, sortOrderRaw] = (sortBy ?? 'name.asc').split('.', 2)
     const sortField = (sortFieldRaw ?? 'name').trim()
@@ -31,8 +32,6 @@ export async function getRecipients(
       scholarshipName: scholarship.name,
       organizationName: organization.name,
     } as const
-
-    console.log({ page, limit })
 
     const column = columns[sortField as keyof typeof columns] ?? user.name
     const orderExpr = sortOrder === 'desc' ? desc(column) : asc(column)
@@ -56,7 +55,18 @@ export async function getRecipients(
     // Pagination
     const [{ total }] = await db
       .select({ total: count() })
-      .from(user)
+      .from(scholarshipApplication)
+      .innerJoin(user, eq(scholarshipApplication.userId, user.id))
+      .innerJoin(
+        scholarship,
+        eq(scholarshipApplication.scholarshipId, scholarship.id),
+      )
+      .innerJoin(organization, eq(scholarship.organizationId, organization.id))
+      .innerJoin(
+        organizationLocation,
+        eq(organizationLocation.organizationId, organization.id),
+      )
+      .innerJoin(region, eq(region.id, organizationLocation.regionId))
       .where(where)
 
     const totalPages = Math.ceil(total / limit)

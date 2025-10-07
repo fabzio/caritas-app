@@ -1,6 +1,6 @@
+import { useFilters } from '@frontend/hooks/use-filters'
 import { Input } from '@workspace/ui/components/input'
 import { SearchIcon } from 'lucide-react'
-import { useFilters } from '@/hooks/use-filters'
 
 export default function SearchRecipients() {
   const { setFilters } = useFilters('/_authenticated/education/recipients')

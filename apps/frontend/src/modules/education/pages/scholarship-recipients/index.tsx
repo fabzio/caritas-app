@@ -8,9 +8,19 @@ import {
 import { useState } from 'react'
 import RecipientsTable from './components/recipients-table'
 import SearchRecipients from './components/search-recipients'
+import { useScholarshipRecipientTable } from './hooks/use-scholarship-table'
 
 export default function ScholarshipRecipients() {
   const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({})
+
+  const {
+    data: recipients,
+    pagination,
+    columns,
+    paginationState,
+    sortingState,
+    setFilters,
+  } = useScholarshipRecipientTable()
 
   return (
     <div className="flex flex-1 flex-col gap-6 p-4">
@@ -29,6 +39,12 @@ export default function ScholarshipRecipients() {
             <RecipientsTable
               rowSelection={rowSelection}
               setRowSelection={setRowSelection}
+              data={recipients || []}
+              columns={columns}
+              paginationState={paginationState}
+              sortingState={sortingState}
+              setFilters={setFilters}
+              pagination={pagination}
             />
           </CardContent>
         </Card>

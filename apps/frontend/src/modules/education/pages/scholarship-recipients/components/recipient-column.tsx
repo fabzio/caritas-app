@@ -72,7 +72,7 @@ export const scholarshipRecipientTableColumns: ColumnDef<Recipient>[] = [
     cell: ({ row }) => row.original.organizationName,
   },
   {
-    accessorKey: 'organization',
+    accessorKey: 'region',
     header: ({ column }) => (
       <Button
         variant="ghost"
