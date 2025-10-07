@@ -1,95 +1,53 @@
-import type { ColumnDef, SortingState } from '@tanstack/react-table'
+import type { SortingState } from '@tanstack/react-table'
 import { Badge } from '@workspace/ui/components/badge'
-import { Checkbox } from '@workspace/ui/components/checkbox'
 import { Input } from '@workspace/ui/components/input'
+import { Skeleton } from '@workspace/ui/components/skeleton'
 import { SearchIcon } from 'lucide-react'
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import DataTable from '../../../shared/components/data-table'
+import { useAcceptSelected } from '../hooks/use-accept-selected'
+import { useGetApplicants } from '../hooks/use-get-applicant'
 import ActionsButton from './actions-button'
-
-export type Applicant = {
-  id: number
-  name: string
-  email: string
-  status: 'approved' | 'pending' | 'rejected'
-  applicationDate: string
-}
+import { applicantsTableColumns } from './applicants-table-columns'
 
 type Props = {
-  applicants: Applicant[]
+  scholarshipId: number
 }
 
-export default function ApplicantsTable({ applicants }: Props) {
+export default function ApplicantsTable({ scholarshipId }: Readonly<Props>) {
   const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({})
   const [pagination, setPagination] = useState({ pageIndex: 1, pageSize: 10 })
   const [sorting, setSorting] = useState<SortingState>([])
   const [searchTerm, setSearchTerm] = useState('')
 
-  const columns: ColumnDef<Applicant>[] = [
-    {
-      id: 'select',
-      header: ({ table }) => (
-        <Checkbox
-          checked={
-            table.getIsAllPageRowsSelected() ||
-            (table.getIsSomePageRowsSelected() && 'indeterminate')
-          }
-          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        />
-      ),
-      cell: ({ row }) => (
-        <Checkbox
-          checked={row.getIsSelected()}
-          onCheckedChange={(value) => row.toggleSelected(!!value)}
-        />
-      ),
-      enableSorting: false,
-      enableHiding: false,
-    },
-    {
-      accessorKey: 'name',
-      header: 'Postulante',
-      cell: ({ row }) => (
-        <span className="font-medium">{row.getValue('name')}</span>
-      ),
-    },
-    {
-      accessorKey: 'email',
-      header: 'Email',
-    },
-    {
-      accessorKey: 'applicationDate',
-      header: 'Fecha de Postulación',
-      cell: ({ row }) =>
-        new Date(row.getValue('applicationDate')).toLocaleDateString(),
-    },
-    {
-      accessorKey: 'status',
-      header: 'Estado',
-      cell: ({ row }) => {
-        const status = row.getValue('status') as string
-        const getStatusBadge = () => {
-          switch (status) {
-            case 'approved':
-              return <Badge variant="default">Aprobado</Badge>
-            case 'pending':
-              return <Badge variant="secondary">En revisión</Badge>
-            case 'rejected':
-              return <Badge variant="destructive">Rechazado</Badge>
-            default:
-              return <Badge variant="secondary">Desconocido</Badge>
-          }
-        }
-        return getStatusBadge()
-      },
-    },
-  ]
+  const { data: applicants, isLoading } = useGetApplicants(scholarshipId)
+
+  const handleSuccess = useCallback(() => {
+    setRowSelection({})
+  }, [])
+
+  const { handleAcceptSelected, isLoading: isAccepting } = useAcceptSelected({
+    scholarshipId,
+    applicants,
+    rowSelection,
+    onSuccess: handleSuccess,
+  })
+
+  if (isLoading) {
+    return (
+      <div className="space-y-4">
+        <Skeleton className="h-8 w-48" />
+        <Skeleton className="h-10 w-full" />
+        <Skeleton className="h-[400px] w-full" />
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="font-medium text-lg">Lista de Postulantes</h3>
-        <Badge variant="secondary">{applicants.length} postulantes</Badge>
+        <Badge variant="secondary">{applicants?.length ?? 0} postulantes</Badge>
       </div>
 
       <div className="flex items-center gap-4">
@@ -104,20 +62,19 @@ export default function ApplicantsTable({ applicants }: Props) {
         </div>
         <ActionsButton
           selectedCount={Object.keys(rowSelection).length}
-          onDeleteClick={() => {
-            console.log('Aceptar seleccionados:', Object.keys(rowSelection))
-          }}
+          onAcceptClick={handleAcceptSelected}
+          loading={isAccepting}
         />
       </div>
 
       <DataTable
-        data={applicants}
-        columns={columns}
+        data={applicants ?? []}
+        columns={applicantsTableColumns}
         pagination={pagination}
         paginationOptions={{
           onPaginationChange: setPagination,
-          rowCount: applicants.length,
-          pageCount: Math.ceil(applicants.length / pagination.pageSize),
+          rowCount: applicants?.length ?? 0,
+          pageCount: Math.ceil((applicants?.length ?? 0) / pagination.pageSize),
         }}
         sorting={sorting}
         onSortingChange={setSorting}

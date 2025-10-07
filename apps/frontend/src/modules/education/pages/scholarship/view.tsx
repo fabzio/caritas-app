@@ -1,12 +1,7 @@
+import { useNavigate, useParams } from '@tanstack/react-router'
 import { Badge } from '@workspace/ui/components/badge'
 import { Button } from '@workspace/ui/components/button'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@workspace/ui/components/card'
+import { Card, CardContent } from '@workspace/ui/components/card'
 import { Separator } from '@workspace/ui/components/separator'
 import {
   Tabs,
@@ -14,52 +9,19 @@ import {
   TabsList,
   TabsTrigger,
 } from '@workspace/ui/components/tabs'
-import { FileTextIcon, GraduationCapIcon } from 'lucide-react'
-import ApplicantsTable, {
-  type Applicant,
-} from '../../components/applicants-table'
+import { ArrowLeftIcon, FileTextIcon, GraduationCapIcon } from 'lucide-react'
+import { useState } from 'react'
+import ApplicantsTable from '../../components/applicants-table'
 import ScholarshipGeneralInfo from '../../components/scholarship-general-info'
 
 export default function ViewScholarship() {
-  const mockApplicants: Applicant[] = [
-    {
-      id: 1,
-      name: 'Ana García',
-      email: 'ana.garcia@example.com',
-      status: 'approved',
-      applicationDate: '2024-01-15',
-    },
-    {
-      id: 2,
-      name: 'Carlos López',
-      email: 'carlos.lopez@example.com',
-      status: 'pending',
-      applicationDate: '2024-01-16',
-    },
-    {
-      id: 3,
-      name: 'María Rodriguez',
-      email: 'maria.rodriguez@example.com',
-      status: 'approved',
-      applicationDate: '2024-01-17',
-    },
-    {
-      id: 4,
-      name: 'Pedro Martínez',
-      email: 'pedro.martinez@example.com',
-      status: 'rejected',
-      applicationDate: '2024-01-18',
-    },
-    {
-      id: 5,
-      name: 'Laura Sánchez',
-      email: 'laura.sanchez@example.com',
-      status: 'approved',
-      applicationDate: '2024-01-19',
-    },
-  ]
+  const { scholarshipId } = useParams({ strict: false })
+  const navigate = useNavigate()
+  const [activeTab, setActiveTab] = useState('general')
 
   const mockScholarship = {
+    name: 'Beca de Excelencia Académica 2025',
+    active: true,
     type: 'Plan de estudios',
     organization: 'Organización ejemplo',
     vacancies: 10,
@@ -74,59 +36,60 @@ export default function ViewScholarship() {
   return (
     <div className="flex flex-1 flex-col gap-6 p-4">
       <div className="flex flex-col gap-1">
-        <h1 className="text-2xl font-semibold text-foreground">
-          Detalles de la Beca
-        </h1>
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-semibold text-foreground">
+            {mockScholarship.name}
+          </h1>
+          <Badge variant={mockScholarship.active ? 'default' : 'secondary'}>
+            {mockScholarship.active ? 'Activa' : 'Inactiva'}
+          </Badge>
+        </div>
         <Separator />
       </div>
 
-      <div className="flex justify-center">
-        <Card className="w-full lg:w-3/4">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="text-xl">Nombre de la Beca</CardTitle>
-                <CardDescription>
-                  Beca activa desde {new Date().toLocaleDateString()}
-                </CardDescription>
-              </div>
-              <Badge variant="default">Activa</Badge>
-            </div>
-          </CardHeader>
+      <Tabs
+        value={activeTab}
+        onValueChange={setActiveTab}
+        className="flex flex-1 flex-col gap-4"
+      >
+        <TabsList className="w-fit">
+          <TabsTrigger value="general" className="flex items-center gap-2">
+            <FileTextIcon className="h-4 w-4" />
+            Información General
+          </TabsTrigger>
+          <TabsTrigger value="applicants" className="flex items-center gap-2">
+            <GraduationCapIcon className="h-4 w-4" />
+            Postulantes
+          </TabsTrigger>
+        </TabsList>
 
-          <CardContent>
-            <Tabs defaultValue="general" className="w-full">
-              <TabsList className="mb-6">
-                <TabsTrigger
-                  value="general"
-                  className="flex items-center gap-2"
-                >
-                  <FileTextIcon className="h-4 w-4" />
-                  Información General
-                </TabsTrigger>
-                <TabsTrigger
-                  value="applicants"
-                  className="flex items-center gap-2"
-                >
-                  <GraduationCapIcon className="h-4 w-4" />
-                  Postulantes
-                </TabsTrigger>
-              </TabsList>
+        <TabsContent value="general" className="mt-0">
+          <Card>
+            <CardContent className="px-6">
+              <ScholarshipGeneralInfo scholarship={mockScholarship} />
+            </CardContent>
+          </Card>
+        </TabsContent>
 
-              <TabsContent value="general" className="space-y-6">
-                <ScholarshipGeneralInfo scholarship={mockScholarship} />
-              </TabsContent>
+        <TabsContent value="applicants" className="mt-0">
+          <Card>
+            <CardContent className="px-6">
+              <ApplicantsTable
+                scholarshipId={Number.parseInt(scholarshipId ?? '1')}
+              />
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
 
-              <TabsContent value="applicants" className="space-y-6">
-                <ApplicantsTable applicants={mockApplicants} />
-              </TabsContent>
-            </Tabs>
-
-            <div className="flex justify-end gap-3 pt-6">
-              <Button variant="outline">Volver</Button>
-            </div>
-          </CardContent>
-        </Card>
+      <div className="flex justify-start">
+        <Button
+          variant="outline"
+          onClick={() => navigate({ to: '/education/scholarship' })}
+        >
+          <ArrowLeftIcon className="h-4 w-4 mr-2" />
+          Volver a Becas
+        </Button>
       </div>
     </div>
   )

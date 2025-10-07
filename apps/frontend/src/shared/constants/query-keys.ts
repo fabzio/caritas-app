@@ -3,6 +3,7 @@ export const QueryKeys = {
   ACCESS: 'access',
   ORGANIZATIONS: 'organizations',
   SCHOLARSHIP: 'scholarships',
+  SCHOLARSHIP_APPLICATION: 'scholarship-applications',
   TEAMS: 'teams',
   SETTINGS: {
     ACCOUNTS: 'settings-accounts',

@@ -16,7 +16,7 @@ export namespace ScholarshipApplicationModel {
     typeof createScholarshipApplication.static
 
   export const acceptScholarshipApplication = t.Object({
-    id: t.Number(),
+    scholarship_id: t.Number(),
     userId: t.String(),
     comments: t.Optional(t.String()),
   })
@@ -43,6 +43,34 @@ export namespace ScholarshipApplicationModel {
 
   export type GetScholarshipApplication =
     typeof getScholarshipApplication.static
+
+  export const getApplicantsByScholarshipId = t.Array(
+    t.Object({
+      id: t.Number(),
+      userName: t.String(),
+      userEmail: t.String(),
+      applicationDate: t.String(),
+      status: t.Enum({
+        pending: 'pending',
+        accepted: 'accepted',
+        rejected: 'rejected',
+      }),
+    }),
+  )
+
+  export type GetApplicantsByScholarshipId =
+    typeof getApplicantsByScholarshipId.static
+
+  export const acceptApplicationsBatch = t.Object({
+    ids: t.Array(t.Number()),
+    comments: t.Optional(t.String()),
+  })
+  export type AcceptApplicationsBatch = typeof acceptApplicationsBatch.static
+
+  export const acceptAllByScholarship = t.Object({
+    comments: t.Optional(t.String()),
+  })
+  export type AcceptAllByScholarship = typeof acceptAllByScholarship.static
 
   export class DuplicateApplicationError extends PostgresError {
     name: string
