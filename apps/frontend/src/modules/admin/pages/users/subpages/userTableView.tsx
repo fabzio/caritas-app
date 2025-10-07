@@ -1,4 +1,3 @@
-import { Link } from '@tanstack/react-router'
 import { Button } from '@workspace/ui/components/button'
 import {
   Dialog,
@@ -20,15 +19,24 @@ import { useBanUser } from '../hooks/use-ban-user'
 import { useRemoveUser } from '../hooks/use-remove-user'
 import { useUserTable } from '../hooks/use-table'
 
-export default function TableView() {
+interface TableViewProps {
+  onChangeToFormView: () => void
+}
+export default function TableView(props: Readonly<TableViewProps>) {
   const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({})
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [roleFilter, setRoleFilter] = useState<string>('all')
   const { mutateAsync: removeUser, isPending: removeUserIsPending } =
     useRemoveUser()
   const { mutateAsync: banUser, isPending: banUserIsPending } = useBanUser()
-  const { data } = useUserTable()
-  const { users } = data
+  const {
+    data: users,
+    pagination,
+    columns,
+    paginationState,
+    sortingState,
+    setFilters,
+  } = useUserTable()
 
   const uniqueRoles = useMemo(() => {
     if (!users) return []
@@ -112,19 +120,26 @@ export default function TableView() {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <ActionsButton />
-          <Link to={'/admin/users/form'} search={{ type: 'new' }}>
-            <Button>
-              <UserPlus />
-              Nuevo usuario
-            </Button>
-          </Link>
+          <ActionsButton
+            onDeleteClick={() => setIsDeleteModalOpen(true)}
+            selectedCount={userCount}
+          />
+          <Button onClick={props.onChangeToFormView}>
+            <UserPlus />
+            Nuevo usuario
+          </Button>
         </div>
       </div>
       <div className="mt-4">
         <UserTable
           rowSelection={rowSelection}
           setRowSelection={setRowSelection}
+          data={filteredUsers || []}
+          columns={columns}
+          paginationState={paginationState}
+          sortingState={sortingState}
+          setFilters={setFilters}
+          pagination={pagination}
         />
       </div>
       <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
