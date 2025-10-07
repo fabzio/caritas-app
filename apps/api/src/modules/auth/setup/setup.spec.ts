@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'bun:test'
+import db, { schema } from '@api/db'
+import { auth } from '@api/lib/auth'
 import { treaty } from '@elysiajs/eden'
 import { eq } from 'drizzle-orm'
-import db, { schema } from '@/db'
-import { auth } from '@/lib/auth'
 import setup from '.'
 
 const api = treaty(setup)

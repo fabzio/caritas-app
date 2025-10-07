@@ -1,5 +1,5 @@
+import ForgotPassword from '@frontend/modules/auth/pages/forgot-password'
 import { createFileRoute } from '@tanstack/react-router'
-import ForgotPassword from '@/modules/auth/pages/forgot-password'
 
 export const Route = createFileRoute('/auth/forgot-password')({
   validateSearch: () =>

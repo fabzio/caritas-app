@@ -1,9 +1,11 @@
+import { env } from '@frontend/env'
+import authClient from '@frontend/lib/authClient'
+import rpc from '@frontend/lib/rpc'
+import { DEFAULT_TEAMS } from '@frontend/shared/constants/default-teams'
 import { useMutation } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { APIError } from 'better-auth/api'
 import { toast } from 'sonner'
-import authClient from '@/lib/authClient'
-import rpc from '@/lib/rpc'
 
 export const useRegister = () => {
   const navigate = useNavigate({ from: '/auth/register' })
@@ -92,12 +94,12 @@ type AddTeamMemberInput = Parameters<
 >[0]
 type UserId = AddTeamMemberInput['userId']
 
-const defaultTeams = ['Administración', 'Educación', 'Salud'] as const
+const defaultTeams = [DEFAULT_TEAMS.EDUCATION, DEFAULT_TEAMS.HEALTH]
 
 const createOrganization = async (): Promise<OrganizationData> => {
   const { data, error } = await authClient.organization.create({
-    name: 'Cáritas Lima',
-    slug: 'caritas-lima',
+    name: env.VITE_ORG_NAME,
+    slug: env.VITE_ORG_NAME.split(' ').join('-').toLowerCase(),
     type: 'caritas',
   })
   if (error) throw error

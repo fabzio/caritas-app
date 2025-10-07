@@ -1,8 +1,8 @@
+import rpc from '@frontend/lib/rpc'
+import { QueryKeys } from '@frontend/shared/constants/query-keys'
+import type { AccessMatrix } from '@frontend/shared/types/access'
+import { redirectByProperties } from '@frontend/shared/utils/redirect-by-properties'
 import { createFileRoute, redirect } from '@tanstack/react-router'
-import rpc from '@/lib/rpc'
-import { QueryKeys } from '@/shared/constants/query-keys'
-import type { AccessMatrix } from '@/shared/types/access'
-import { redirectByProperties } from '@/shared/utils/redirect-by-properties'
 
 export const Route = createFileRoute('/')({
   beforeLoad: async ({ context: { queryClient, authClient } }) => {

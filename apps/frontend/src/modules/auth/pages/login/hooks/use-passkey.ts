@@ -1,8 +1,8 @@
+import authClient from '@frontend/lib/authClient'
 import { useMutation } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { useEffect } from 'react'
 import { toast } from 'sonner'
-import authClient from '@/lib/authClient'
 
 export const usePasskey = () => {
   const navigate = useNavigate()

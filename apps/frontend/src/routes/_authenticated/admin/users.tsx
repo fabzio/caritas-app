@@ -1,8 +1,8 @@
+import authClient from '@frontend/lib/authClient'
+import User from '@frontend/modules/admin/pages/users'
+import { QueryKeys } from '@frontend/shared/constants/query-keys'
+import type { Filters } from '@frontend/shared/types/filters'
 import { createFileRoute } from '@tanstack/react-router'
-import authClient from '@/lib/authClient'
-import User from '@/modules/admin/pages/users'
-import { QueryKeys } from '@/shared/constants/query-keys'
-import type { Filters } from '@/shared/types/filters'
 
 export const Route = createFileRoute('/_authenticated/admin/users')({
   loader: ({ context: { queryClient } }) =>

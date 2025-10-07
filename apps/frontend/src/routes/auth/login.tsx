@@ -1,5 +1,5 @@
+import Login from '@frontend/modules/auth/pages/login'
 import { createFileRoute, redirect } from '@tanstack/react-router'
-import Login from '@/modules/auth/pages/login'
 
 export const Route = createFileRoute('/auth/login')({
   validateSearch: (search) => ({

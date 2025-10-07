@@ -1,7 +1,7 @@
+import rpc from '@frontend/lib/rpc'
+import { QueryKeys } from '@frontend/shared/constants/query-keys'
+import type { AccessMatrix } from '@frontend/shared/types/access'
 import { useQuery } from '@tanstack/react-query'
-import rpc from '@/lib/rpc'
-import { QueryKeys } from '@/shared/constants/query-keys'
-import type { AccessMatrix } from '@/shared/types/access'
 
 export const useAccess = () => {
   const { isLoading, data } = useQuery<AccessMatrix>({

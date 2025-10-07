@@ -1,6 +1,6 @@
-import { useLinkGoogle } from '@/modules/settings/hooks/use-link-google'
-import { useLinkedAccounts } from '@/modules/settings/hooks/use-linked-accounts'
-import GoogleButton from '@/shared/components/google-button'
+import { useLinkGoogle } from '@frontend/modules/settings/hooks/use-link-google'
+import { useLinkedAccounts } from '@frontend/modules/settings/hooks/use-linked-accounts'
+import GoogleButton from '@frontend/shared/components/google-button'
 
 export default function LinkedAccounts() {
   const { data: linkedAccounts } = useLinkedAccounts()
