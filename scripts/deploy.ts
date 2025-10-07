@@ -1,11 +1,9 @@
 #!/usr/bin/env bun
 
-import { exec } from 'node:child_process'
+import type { ChildProcess } from 'node:child_process'
+import { spawn } from 'node:child_process'
 import { stdin as input, stdout as output } from 'node:process'
 import { createInterface } from 'node:readline/promises'
-import { promisify } from 'node:util'
-
-const execAsync = promisify(exec)
 
 type DeployConfig = {
   awsRegion: string
@@ -25,23 +23,50 @@ type DeployConfig = {
   runApply: boolean
 }
 
+const dim = '\u001b[2m'
+const reset = '\u001b[0m'
+
+function attachLogs(child: ChildProcess): void {
+  child.stdout?.on('data', (chunk) => {
+    const text = chunk.toString()
+    if (!text) return
+    process.stdout.write(`${dim}${text}${reset}`)
+  })
+  child.stderr?.on('data', (chunk) => {
+    const text = chunk.toString()
+    if (!text) return
+    process.stderr.write(`${dim}${text}${reset}`)
+  })
+}
+
 async function runCommand(
   command: string,
   cwd?: string,
   extraEnv: Record<string, string> = {},
 ): Promise<void> {
-  try {
-    console.log(`Running: ${command}`)
-    const { stdout, stderr } = await execAsync(command, {
+  console.log(`Running: ${command}`)
+  await new Promise<void>((resolve, reject) => {
+    const child = spawn(command, {
       cwd,
       env: { ...process.env, ...extraEnv },
+      shell: true,
+      stdio: ['inherit', 'pipe', 'pipe'],
     })
-    if (stdout) console.log(stdout)
-    if (stderr) console.error(stderr)
-  } catch (error) {
-    console.error(`Error running command: ${command}`, error)
-    throw error
-  }
+    attachLogs(child)
+    child.on('error', (error) => {
+      console.error(`Error running command: ${command}`, error)
+      reject(error)
+    })
+    child.on('close', (code) => {
+      if (code === 0) {
+        resolve()
+        return
+      }
+      const error = new Error(`Command failed with exit code ${code ?? -1}`)
+      console.error(`Error running command: ${command}`, error)
+      reject(error)
+    })
+  })
 }
 
 function parseNumberish(value: string, fallback: number): number {

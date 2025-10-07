@@ -39,3 +39,24 @@ output "db_password" {
   value     = random_password.db.result
   sensitive = true
 }
+
+output "valkey_endpoint" {
+  value = aws_elasticache_serverless_cache.valkey.endpoint
+}
+
+output "valkey_password" {
+  value     = random_password.valkey_user.result
+  sensitive = true
+}
+
+output "valkey_user" {
+  value = aws_elasticache_user.caritas.user_name
+}
+
+output "valkey_port" {
+  value = 6379
+}
+
+output "valkey_identifier" {
+  value = aws_elasticache_serverless_cache.valkey.name
+}

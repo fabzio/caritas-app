@@ -2,7 +2,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 4.16"
+      version = "~> 5.73"
     }
   }
 
@@ -22,6 +22,10 @@ data "aws_subnets" "default" {
     name   = "vpc-id"
     values = [data.aws_vpc.default.id]
   }
+}
+
+locals {
+  valkey_subnet_ids = length(data.aws_subnets.default.ids) > 3 ? slice(data.aws_subnets.default.ids, 0, 3) : data.aws_subnets.default.ids
 }
 
 resource "tls_private_key" "caritas" {
@@ -144,6 +148,12 @@ resource "random_password" "db" {
   override_special = "!#$%&*"
 }
 
+resource "random_password" "valkey_user" {
+  length           = 32
+  special          = true
+  override_special = "!#$%&*"
+}
+
 resource "aws_db_instance" "postgres" {
   identifier              = "caritas-postgres"
   allocated_storage       = var.db_allocated_storage
@@ -161,5 +171,71 @@ resource "aws_db_instance" "postgres" {
   deletion_protection     = false
   apply_immediately       = true
   backup_retention_period = 1
- auto_minor_version_upgrade = true
+  auto_minor_version_upgrade = true
+}
+
+resource "aws_security_group" "valkey" {
+  name        = "caritas-valkey-sg"
+  description = "Security group for the Valkey cache"
+  vpc_id      = data.aws_vpc.default.id
+
+  ingress {
+    from_port       = 6379
+    to_port         = 6379
+    protocol        = "tcp"
+    security_groups = [aws_security_group.app.id]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "caritas-valkey-sg"
+  }
+}
+
+resource "aws_elasticache_subnet_group" "valkey" {
+  name       = "caritas-valkey-subnets"
+  subnet_ids = local.valkey_subnet_ids
+}
+
+resource "aws_elasticache_user" "caritas" {
+  user_id              = "caritas-valkey"
+  user_name            = "caritas-valkey"
+  engine               = "valkey"
+  access_string        = "on ~* +@all"
+  passwords            = [random_password.valkey_user.result]
+  no_password_required = false
+}
+
+resource "aws_elasticache_user_group" "caritas" {
+  engine        = "valkey"
+  user_group_id = "caritas-valkey-group"
+  user_ids      = [aws_elasticache_user.caritas.user_id]
+
+  tags = {
+    Name = "caritas-valkey-user-group"
+  }
+}
+
+resource "aws_elasticache_serverless_cache" "valkey" {
+  name               = "caritas-valkey"
+  description        = "Valkey serverless cache for Caritas app"
+  engine             = "valkey"
+  subnet_ids         = local.valkey_subnet_ids
+  security_group_ids = [aws_security_group.valkey.id]
+  user_group_id      = aws_elasticache_user_group.caritas.user_group_id
+
+  depends_on = [aws_elasticache_user_group.caritas]
+
+  lifecycle {
+    precondition {
+      condition     = length(local.valkey_subnet_ids) >= 2
+      error_message = "Valkey serverless cache requires at least two subnets"
+    }
+  }
 }

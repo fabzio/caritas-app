@@ -8,7 +8,8 @@
     "lint": "biome check . --write",
     "check-types": "turbo run check-types",
     "prepare": "husky",
-    "setup": "bun run scripts/develop.ts"
+    "setup": "bun run scripts/develop.ts",
+    "terraform": "bun run scripts/deploy.ts"
   },
   "lint-staged": {
     "*": "bun lint"
