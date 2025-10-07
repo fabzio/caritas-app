@@ -26,7 +26,7 @@
     "drizzle-zod": "0.8.3",
     "elysia": "1.4.7",
     "logixlysia": "5.2.0",
-    "nodemailer": "7.0.6",
+    "nodemailer": "7.0.7",
     "pg": "8.16.3"
   },
   "devDependencies": {
