@@ -1,3 +1,4 @@
+import authClient from '@frontend/lib/authClient'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { Button } from '@workspace/ui/components/button'
 import {
@@ -41,7 +42,7 @@ export default function TableView() {
     const roles = users
       .map((user) => user.role)
       .filter((role): role is string => role !== null && role !== undefined)
-    return Array.from(new Set(roles)).sort()
+    return Array.from(new Set(roles)).sort((a, b) => a.localeCompare(b, 'es'))
   }, [users])
 
   const filteredUsers = useMemo(() => {
@@ -62,7 +63,19 @@ export default function TableView() {
   const userCount = selectedUsers.length
 
   const handleDelete = async () => {
-    //TODO: Validation for same user deletion
+    const { data: session } = await authClient.getSession()
+
+    const currentUserId = session?.user?.id
+
+    const isDeletingSelf =
+      currentUserId && selectedUsers.some((user) => user.id === currentUserId)
+
+    if (isDeletingSelf) {
+      toast.error('No puedes eliminar tu propia cuenta.')
+      setIsDeleteModalOpen(false)
+      return
+    }
+
     const allUserPromises = selectedUsers.flatMap((user) => [
       removeUser({ userId: user.id }),
       banUser({ userId: user.id, banReason: 'User deleted by admin' }),

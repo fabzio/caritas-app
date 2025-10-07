@@ -45,15 +45,23 @@ export default function UserTable({
           typeof updateOrValue === 'function'
             ? updateOrValue(sortingState)
             : updateOrValue
+        setRowSelection({})
         return setFilters({ sortBy: stateToSortBy(newSortingState) })
       }}
       paginationOptions={{
         onPaginationChange: (pagination) => {
-          setFilters(
+          const currentState = {
+            pageIndex: paginationState.pageIndex - 1,
+            pageSize: paginationState.pageSize,
+          }
+          const newPaginationState =
             typeof pagination === 'function'
-              ? pagination(paginationState)
-              : pagination,
-          )
+              ? pagination(currentState)
+              : pagination
+          setFilters({
+            pageIndex: newPaginationState.pageIndex + 1,
+            pageSize: newPaginationState.pageSize,
+          })
         },
         rowCount: pagination?.total || 0,
         pageCount: pagination?.totalPages || 1,
