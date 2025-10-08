@@ -13,13 +13,13 @@ import {
 import { UserPlus } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
-import ActionsButton from '../components/actions-button'
-import RoleFilter from '../components/role-filter'
-import SearchUserInput from '../components/search-user-input'
-import UserTable from '../components/user-table'
-import { useBanUser } from '../hooks/use-ban-user'
-import { useRemoveUser } from '../hooks/use-remove-user'
-import { useUserTable } from '../hooks/use-table'
+import ActionsButton from './components/actions-button'
+import RoleFilter from './components/role-filter'
+import SearchUserInput from './components/search-user-input'
+import UserTable from './components/user-table'
+import { useBanUser } from './hooks/use-ban-user'
+import { useRemoveUser } from './hooks/use-remove-user'
+import { useUserTable } from './hooks/use-table'
 
 export default function TableView() {
   const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({})
@@ -138,12 +138,12 @@ export default function TableView() {
             onEditClick={() =>
               navigate({
                 to: '/admin/users/form',
-                search: { type: 'edit', id: selectedUsers[0].id },
+                search: { id: selectedUsers[0].id, type: 'edit' },
               })
             }
             selectedCount={userCount}
           />
-          <Link to={'/admin/users/form'} search={{ type: 'new' }}>
+          <Link to="/admin/users/form" search={{ type: 'new' }}>
             <Button>
               <UserPlus />
               Nuevo usuario

@@ -1,3 +1,4 @@
+import { Link } from '@tanstack/react-router'
 import type { ColumnDef } from '@tanstack/react-table'
 import { Button } from '@workspace/ui/components/button'
 import { Checkbox } from '@workspace/ui/components/checkbox'
@@ -36,8 +37,16 @@ export const userTableColumns: ColumnDef<User>[] = [
         <ArrowUpDown />
       </Button>
     ),
-    cell: ({ row }) =>
-      `${row.original.documentType} - ${row.original.documentNumber}`,
+    cell: ({ row }) => (
+      <Button asChild variant="link">
+        <Link
+          to="/admin/users/form"
+          search={{ type: 'edit', id: row.original.id }}
+        >
+          {`${row.original.documentType} - ${row.original.documentNumber}`}
+        </Link>
+      </Button>
+    ),
   },
   {
     accessorKey: 'user',

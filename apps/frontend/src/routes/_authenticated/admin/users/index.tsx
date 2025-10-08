@@ -1,24 +1,29 @@
-import authClient from '@frontend/lib/authClient'
-import UserTableView from '@frontend/modules/admin/pages/users/subpages/userTableView'
+import rpc from '@frontend/lib/rpc'
+import TableView from '@frontend/modules/admin/pages/users'
 import { QueryKeys } from '@frontend/shared/constants/query-keys'
 import type { Filters } from '@frontend/shared/types/filters'
 import { createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/_authenticated/admin/users/')({
-  loader: ({ context: { queryClient } }) =>
-    queryClient.ensureQueryData({
+  loader: async ({ context: { queryClient, authClient } }) => {
+    const { data } = await authClient.getSession()
+    if (!data) return
+    const {
+      session: { activeOrganizationId },
+    } = data
+    return await queryClient.ensureQueryData({
       queryKey: [QueryKeys.ADMIN.USERS],
       queryFn: async () => {
-        const { data, error } = await authClient.admin.listUsers({
+        const { data, error } = await rpc.admin.users.get({
           query: {
-            limit: 10,
-            offset: 0,
+            organizationId: activeOrganizationId || '',
           },
         })
         if (error) throw error
         return data || { members: [], total: 0 }
       },
-    }),
+    })
+  },
   validateSearch: () => ({}) as Filters,
-  component: UserTableView,
+  component: TableView,
 })

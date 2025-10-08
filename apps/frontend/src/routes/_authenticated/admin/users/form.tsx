@@ -1,5 +1,5 @@
 import rpc from '@frontend/lib/rpc'
-import UserFormView from '@frontend/modules/admin/pages/users/subpages/userFormView'
+import FormView from '@frontend/modules/admin/pages/users/pages/create-user'
 import { QueryKeys } from '@frontend/shared/constants/query-keys'
 import { createFileRoute } from '@tanstack/react-router'
 import { z } from 'zod'
@@ -12,7 +12,7 @@ export const Route = createFileRoute('/_authenticated/admin/users/form')({
     return await queryClient.ensureQueryData({
       queryKey: [QueryKeys.ADMIN.USERS, id],
       queryFn: async () => {
-        const { data, error } = await rpc.users({ id }).get()
+        const { data, error } = await rpc.admin.users({ id }).get()
         if (error) throw error
         return data || undefined
       },
@@ -22,5 +22,5 @@ export const Route = createFileRoute('/_authenticated/admin/users/form')({
     id: z.optional(z.string()),
     type: z.enum(['new', 'edit']),
   }),
-  component: UserFormView,
+  component: FormView,
 })

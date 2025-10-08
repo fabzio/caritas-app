@@ -17,6 +17,7 @@ export namespace UserModel {
   export const getUsers = t.Array(_getUsers)
   export type GetUsers = typeof getUsers.static
   export const listUsersQuery = t.Object({
+    organizationId: t.String(),
     q: t.Optional(t.String()),
     page: t.Optional(t.Integer({ minimum: 0 })),
     limit: t.Optional(t.Integer({ minimum: 1, maximum: 100 })),
@@ -24,10 +25,27 @@ export namespace UserModel {
   })
   export type ListUsersQuery = typeof listUsersQuery.static
 
-  export const getSingleUserResponse = _getUsers
+  export const getSingleUserResponse = t.Composite([
+    _getUsers,
+    t.Object({
+      teams: t.Array(
+        t.Object({
+          id: t.String(),
+          name: t.String(),
+        }),
+      ),
+    }),
+  ])
   export type GetSingleUserResponse = typeof getSingleUserResponse.static
   export const getSingleUserQuery = t.Object({
     id: t.String(),
   })
   export type GetSingleUserQuery = typeof getSingleUserQuery.static
+
+  export const createUser = t.Object({
+    userId: t.String(),
+    teamId: t.String(),
+    organizationId: t.String(),
+  })
+  export type CreateUser = typeof createUser.static
 }

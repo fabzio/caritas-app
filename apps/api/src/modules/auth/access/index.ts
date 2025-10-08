@@ -1,21 +1,25 @@
+import { auth } from '@api/lib/auth'
 import Elysia from 'elysia'
 import betterAuth from '../middleware'
 import { getOrganizationType, getTeam, getUserRole } from './service'
 
 const access = new Elysia({}).use(betterAuth).get(
   '/access',
-  async ({ user, session }) => {
+  async ({ session, request: { headers } }) => {
     const orgsType = await getOrganizationType(
       session.activeOrganizationId ?? '',
     )
     const teamType = await getTeam(session.activeTeamId ?? '')
+    const { role } = await auth.api.getActiveMemberRole({
+      headers,
+    })
 
     const { isPatient, isStudent } = await getUserRole(session.userId)
     const isHealthOrg = orgsType.some((org) => org.type === 'health')
     return {
       admin:
-        user.role?.includes('admin') ||
-        teamType.some((team) => team.name === 'Administración'),
+        orgsType.some((org) => org.type === 'caritas') &&
+        ['owner', 'admin'].includes(role),
       health: {
         admin: teamType.some((team) => team.name === 'Salud'),
         organization: isHealthOrg,

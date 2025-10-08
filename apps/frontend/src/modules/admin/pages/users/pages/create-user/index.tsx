@@ -1,14 +1,8 @@
 import { useRegions } from '@frontend/hooks/use-regions'
 import { formUserSchema } from '@frontend/shared/models/user'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Separator } from '@radix-ui/react-dropdown-menu'
 import { SelectValue } from '@radix-ui/react-select'
-import {
-  getRouteApi,
-  Link,
-  useNavigate,
-  useSearch,
-} from '@tanstack/react-router'
+import { getRouteApi, Link, useSearch } from '@tanstack/react-router'
 import { Button } from '@workspace/ui/components/button'
 import { Calendar } from '@workspace/ui/components/calendar'
 import {
@@ -44,26 +38,10 @@ import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
 import { CalendarIcon, Check, ChevronsUpDown, Loader2 } from 'lucide-react'
 import { useForm } from 'react-hook-form'
-import { toast } from 'sonner'
-import type { z } from 'zod'
-import { useCreateUser } from '../hooks/use-create-user'
-import { useUpdateUser } from '../hooks/use-update-user'
-
-const dependantText = {
-  mainTitle: {
-    new: 'Crear nuevo usuario',
-    edit: 'Editar un usuario',
-  },
-  submit: {
-    new: 'Crear Usuario',
-    edit: 'Guardar Cambios',
-  },
-}
-
-const formSchema = formUserSchema.omit({
-  password: true,
-  confirmPassword: true,
-})
+import z from 'zod'
+import { useCreateUser } from './hooks/use-create-user'
+import { useListTeams } from './hooks/use-list-teams'
+import { useUpdateUser } from './hooks/use-update-user'
 
 export default function FormView() {
   const viewType = useSearch({
@@ -75,7 +53,7 @@ export default function FormView() {
   ).useLoaderData()
 
   const { data: regions, isLoading: regionsLoading } = useRegions()
-  const navigate = useNavigate()
+  const { data: teams, isLoading: teamsLoading } = useListTeams()
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues:
@@ -91,6 +69,7 @@ export default function FormView() {
             birthDate: loaderData?.birthDate,
             sex: loaderData?.sex,
             regionId: loaderData?.regionId,
+            teamId: loaderData?.teams[0]?.id,
           }
         : {
             name: '',
@@ -102,26 +81,13 @@ export default function FormView() {
             birthDate: undefined,
             sex: undefined,
             regionId: undefined,
+            teamId: undefined,
           },
   })
 
-  const { mutate: createUser } = useCreateUser({
-    onSuccess: () => {
-      toast.success('Creado el usuario exitosamente')
-      navigate({
-        to: '/admin/users',
-      })
-    },
-  })
+  const { mutate: createUser } = useCreateUser()
 
-  const { mutate: updateUser } = useUpdateUser({
-    onSuccess: () => {
-      toast.success('Modificado el usuario exitosamente')
-      navigate({
-        to: '/admin/users',
-      })
-    },
-  })
+  const { mutate: updateUser } = useUpdateUser()
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     if (viewType === 'edit' && loaderData?.id)
@@ -140,13 +106,15 @@ export default function FormView() {
           phone: values.phone,
           regionId: values.regionId,
         },
+        teamId:
+          loaderData.teams[0]?.id !== values.teamId ? values.teamId : undefined,
       })
     else
       createUser({
         email: values.email,
         name: values.name,
         role: 'user',
-        password: '',
+        password: 'default',
         data: {
           surname: values.surname,
           documentType: values.documentType,
@@ -156,6 +124,7 @@ export default function FormView() {
           phone: values.phone,
           regionId: values.regionId,
         },
+        teamId: values.teamId,
       })
   }
 
@@ -411,9 +380,73 @@ export default function FormView() {
                   </FormItem>
                 )}
               />
+              <FormField
+                control={form.control}
+                name="teamId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Equipo</FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant="outline"
+                            className={cn(
+                              'w-full justify-between',
+                              !field.value && 'text-muted-foreground',
+                            )}
+                          >
+                            {field.value
+                              ? teams?.find((r) => r.id === field.value)?.name
+                              : 'Selecciona un equipo'}
+                            <ChevronsUpDown className="opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-full p-0">
+                        <Command>
+                          <CommandInput
+                            placeholder="Buscar región"
+                            className="h-9"
+                          />
+                          <CommandList>
+                            <CommandEmpty>
+                              No se encontraron regiones.
+                            </CommandEmpty>
+                            <CommandGroup>
+                              {teamsLoading ? (
+                                <Loader2 className="animate-spin w-4 mx-auto" />
+                              ) : (
+                                teams?.map((team) => (
+                                  <CommandItem
+                                    value={team.name}
+                                    key={team.id}
+                                    onSelect={() => {
+                                      form.setValue('teamId', team.id)
+                                    }}
+                                  >
+                                    {team.name}
+                                    <Check
+                                      className={cn(
+                                        'ml-auto',
+                                        team.id === field.value
+                                          ? 'opacity-100'
+                                          : 'opacity-0',
+                                      )}
+                                    />
+                                  </CommandItem>
+                                ))
+                              )}
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
-
-            <Separator />
 
             <div className="w-full flex gap-2 justify-center">
               <Button type="submit" className="mt-4">
@@ -431,3 +464,23 @@ export default function FormView() {
     </div>
   )
 }
+
+const dependantText = {
+  mainTitle: {
+    new: 'Crear nuevo usuario',
+    edit: 'Editar un usuario',
+  },
+  submit: {
+    new: 'Crear Usuario',
+    edit: 'Guardar Cambios',
+  },
+}
+
+const formSchema = formUserSchema
+  .omit({
+    password: true,
+    confirmPassword: true,
+  })
+  .extend({
+    teamId: z.string(),
+  })

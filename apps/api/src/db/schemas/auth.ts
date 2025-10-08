@@ -1,3 +1,4 @@
+import { relations } from 'drizzle-orm'
 import {
   type AnyPgColumn,
   boolean,
@@ -54,6 +55,11 @@ export const user = authSchema.table(
   ],
 )
 
+export const userRelations = relations(user, ({ many }) => ({
+  teams: many(teamMember),
+  organizations: many(member),
+}))
+
 export const session = authSchema.table('session', {
   id: varchar('id', { length: 32 }).primaryKey(),
   expiresAt: timestamp('expires_at').notNull(),
@@ -99,7 +105,7 @@ export const account = authSchema.table('account', {
 export const verification = authSchema.table('verification', {
   id: varchar('id', { length: 32 }).primaryKey(),
   identifier: varchar('identifier', { length: 100 }).notNull(),
-  value: varchar('value', { length: 255 }).notNull(),
+  value: text().notNull(),
   expiresAt: timestamp('expires_at').notNull(),
   createdAt: timestamp('created_at')
     .$defaultFn(() => new Date())
@@ -123,6 +129,11 @@ export const organization = authSchema.table('organization', {
     enum: ['caritas', 'education', 'health', 'beneficiary'],
   }).notNull(),
 })
+
+export const organizationRelations = relations(organization, ({ many }) => ({
+  members: many(member),
+  teams: many(team),
+}))
 
 export const passkey = authSchema.table('passkey', {
   id: varchar('id', { length: 32 }).primaryKey(),
@@ -163,6 +174,14 @@ export const team = authSchema.table('team', {
   updatedAt: timestamp('updated_at').$onUpdate(() => new Date()),
 })
 
+export const teamRelations = relations(team, ({ many, one }) => ({
+  members: many(teamMember),
+  organization: one(organization, {
+    fields: [team.organizationId],
+    references: [organization.id],
+  }),
+}))
+
 export const teamMember = authSchema.table('team_member', {
   id: varchar('id', { length: 32 }).primaryKey(),
   teamId: varchar('team_id', { length: 32 })
@@ -173,6 +192,17 @@ export const teamMember = authSchema.table('team_member', {
     .references(() => user.id, { onDelete: 'cascade' }),
   createdAt: timestamp('created_at'),
 })
+
+export const teamMemberRelations = relations(teamMember, ({ one }) => ({
+  team: one(team, {
+    fields: [teamMember.teamId],
+    references: [team.id],
+  }),
+  user: one(user, {
+    fields: [teamMember.userId],
+    references: [user.id],
+  }),
+}))
 
 export const member = authSchema.table('member', {
   id: varchar('id', { length: 32 }).primaryKey(),
@@ -185,6 +215,17 @@ export const member = authSchema.table('member', {
   role: varchar('role', { length: 50 }).default('member').notNull(),
   createdAt: timestamp('created_at').notNull(),
 })
+
+export const memberRelations = relations(member, ({ one }) => ({
+  user: one(user, {
+    fields: [member.userId],
+    references: [user.id],
+  }),
+  organization: one(organization, {
+    fields: [member.organizationId],
+    references: [organization.id],
+  }),
+}))
 
 export const invitation = authSchema.table('invitation', {
   id: varchar('id', { length: 32 }).primaryKey(),
