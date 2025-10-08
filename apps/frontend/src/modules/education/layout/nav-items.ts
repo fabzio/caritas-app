@@ -14,6 +14,12 @@ const educationNavItems: NavItem[] = [
     icon: GraduationCap,
     groupLabel: 'Educación',
   },
+  {
+    title: 'Becados',
+    url: '/education/recipients',
+    icon: GraduationCap,
+    groupLabel: 'Educación',
+  },
 ]
 
 export default educationNavItems

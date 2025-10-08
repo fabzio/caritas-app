@@ -56,7 +56,7 @@ export const useRegister = () => {
         )
       }
     },
-    onSuccess: async ({ user }, { password }) => {
+    onSuccess: async ({ user }) => {
       toast.success('Usuario registrado correctamente')
       const setupResponse = await rpc.auth.setup.post({ id: user.id })
       if (setupResponse.status === 500) {
