@@ -13,7 +13,7 @@ export namespace ActivityModel {
   export const listActivitySchema = t.Object({
     id: t.Integer(),
     name: t.String(),
-    date: t.String(), // O el tipo de fecha que Drizzle maneje (podría ser String o Date)
+    date: t.Date(),
     duration: t.String(), // Los intervalos suelen mapearse a string
     state: t.Boolean(),
     // Nuevos campos de los JOINS

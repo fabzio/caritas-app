@@ -25,7 +25,7 @@ const activityTableColumns: ColumnDef<Activity>[] = [
   },
   {
     // Columna 2: Duración de la actividad
-    accessorKey: 'name', // Debe coincidir con el campo de la API para ordenar (e.g., 'duracion')
+    accessorKey: 'duration', // Debe coincidir con el campo de la API para ordenar (e.g., 'duracion')
     header: ({ column }) => (
       <Button
         variant="ghost"
@@ -35,17 +35,31 @@ const activityTableColumns: ColumnDef<Activity>[] = [
         <ArrowUpDown className="ml-2 h-4 w-4" />
       </Button>
     ),
-    cell: ({ row }) => row.original.duration,
+    cell: ({ row }) => `${row.original.duration} h`,
   },
   {
-    // Columna 3: Tipo de Actividad
-    accessorKey: 'spaceName', // Asume que este campo existe en el modelo
+    // Columna 2: Duración de la actividad
+    accessorKey: 'type', // Debe coincidir con el campo de la API para ordenar (e.g., 'duracion')
     header: ({ column }) => (
       <Button
         variant="ghost"
         onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
       >
         Tipo
+        <ArrowUpDown className="ml-2 h-4 w-4" />
+      </Button>
+    ),
+    cell: ({ row }) => row.original.typeName,
+  },
+  {
+    // Columna 3: Organización de Actividad
+    accessorKey: 'spaceName', // Asume que este campo existe en el modelo
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+      >
+        Organización
         <ArrowUpDown className="ml-2 h-4 w-4" />
       </Button>
     ),
@@ -66,7 +80,20 @@ const activityTableColumns: ColumnDef<Activity>[] = [
     // Formatea la fecha para mejor visualización (asume que 'date' es un string ISO)
     cell: ({ row }) => new Date(row.original.date).toLocaleDateString(),
   },
-  // Aquí podrías añadir más columnas como 'responsibleUser', 'status', etc.
+  {
+    // Columna 5: Organización de Actividad
+    accessorKey: 'state', // Asume que este campo existe en el modelo
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+      >
+        Estado
+        <ArrowUpDown className="ml-2 h-4 w-4" />
+      </Button>
+    ),
+    cell: ({ row }) => row.original.statusName,
+  },
 ]
 
 /**
