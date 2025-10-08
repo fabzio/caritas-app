@@ -8,11 +8,16 @@ const scholarship = new Elysia({
   prefix: '/scholarship',
 })
   .use(betterAuth)
-  .get('', getScholarships, {
-    // listado de becas
+  .get('', ({ query }) => getScholarships(query), {
+    // listado de becas con filtrado por nombre
     auth: true,
+    query: t.Object({
+      name: t.Optional(t.String()),
+      page: t.Optional(t.Numeric({ minimum: 1, default: 1 })),
+      pageSize: t.Optional(t.Numeric({ minimum: 1, maximum: 20, default: 10 })),
+    }),
     response: {
-      200: ScholarshipModel.getScholarship,
+      200: ScholarshipModel.paginated, // con el esquema de paginación
       401: t.Literal('Unauthorized'),
     },
   })

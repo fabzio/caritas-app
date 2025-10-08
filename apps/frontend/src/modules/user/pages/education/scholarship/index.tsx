@@ -1,24 +1,36 @@
-import { useIsMobile } from '@frontend/hooks/use-mobile'
 import { Button } from '@workspace/ui/components/button'
-// import { Link } from '@tanstack/react-router'
 import { Card, CardContent } from '@workspace/ui/components/card'
 import { Input } from '@workspace/ui/components/input'
+// import { Link } from '@tanstack/react-router'
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from '@workspace/ui/components/pagination'
 import { Skeleton } from '@workspace/ui/components/skeleton'
 import { Filter, Search } from 'lucide-react'
+import { useState } from 'react'
 import { ScholarshipCard } from '../../../components/scolarship-card'
 import useGetScholarship from '../../../hooks/use-get-scholarship'
-
 export default function ScholarshipPage() {
-  const isMobile = useIsMobile()
-  const { data: scholarships, isLoading, isError } = useGetScholarship()
-  console.log(scholarships)
-  const displayScholarships = scholarships
+  const [nameFilter, setNameFilter] = useState('')
+  const [currentPage, setCurrentPage] = useState(1)
+  const pageSize = 3
+  const { data, isLoading, isError } = useGetScholarship(
+    nameFilter,
+    currentPage,
+    pageSize,
+  )
+  const scholarships = data?.data
 
   return (
     <div className="flex flex-1 flex-col gap-6 p-4">
       <div className="flex flex-col gap-1">
         <h1 className="text-2xl font-semibold text-foreground">
-          Modalidad Plan de Estudios
+          Becas Disponibles
         </h1>
         <p className="text-muted-foreground text-sm mt-2">
           Aquí podrás visualizar las becas a las que puedes postular. Seleccione
@@ -32,6 +44,8 @@ export default function ScholarshipPage() {
             type="search"
             placeholder="Buscar becas ..."
             className="pl-9"
+            value={nameFilter}
+            onChange={(e) => setNameFilter(e.target.value)}
           />
         </div>
         <Button variant="default" className="gap-2">
@@ -62,27 +76,71 @@ export default function ScholarshipPage() {
           </Card>
         )}
         {/* en caso no hayan becas */}
-        {!isLoading &&
-          displayScholarships &&
-          displayScholarships.length === 0 && (
-            <Card>
-              <CardContent className="pt-6 text-center">
-                <p>No hay becas registradas aún.</p>
-              </CardContent>
-            </Card>
-          )}
-        {!isLoading &&
-          displayScholarships &&
-          displayScholarships.length > 0 && (
+        {!isLoading && scholarships && scholarships.length === 0 && (
+          <Card>
+            <CardContent className="pt-6 text-center">
+              <p>No hay becas registradas aún.</p>
+            </CardContent>
+          </Card>
+        )}
+        {!isLoading && scholarships && scholarships.length > 0 && (
+          <>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {displayScholarships.map((scholarship) => (
+              {scholarships.map((scholarship) => (
                 <ScholarshipCard
                   key={scholarship.id}
                   scholarship={scholarship}
                 />
               ))}
             </div>
-          )}
+            {data && data.pageCount > 1 && (
+              <div className="mt-6">
+                <Pagination>
+                  <PaginationContent>
+                    <PaginationItem>
+                      <PaginationPrevious
+                        onClick={() =>
+                          setCurrentPage((p) => Math.max(1, p - 1))
+                        }
+                        className={
+                          currentPage === 1
+                            ? 'pointer-events-none opacity-50'
+                            : 'cursor-pointer'
+                        }
+                      />
+                    </PaginationItem>
+                    {Array.from(
+                      { length: data.pageCount },
+                      (_, i) => i + 1,
+                    ).map((page) => (
+                      <PaginationItem key={page}>
+                        <PaginationLink
+                          onClick={() => setCurrentPage(page)}
+                          isActive={currentPage === page}
+                          className="cursor-pointer"
+                        >
+                          {page}
+                        </PaginationLink>
+                      </PaginationItem>
+                    ))}
+                    <PaginationItem>
+                      <PaginationNext
+                        onClick={() =>
+                          setCurrentPage((p) => Math.min(data.pageCount, p + 1))
+                        }
+                        className={
+                          !data.hasNext
+                            ? 'pointer-events-none opacity-50'
+                            : 'cursor-pointer'
+                        }
+                      />
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
+              </div>
+            )}
+          </>
+        )}
       </div>
     </div>
   )

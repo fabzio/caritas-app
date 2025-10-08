@@ -25,6 +25,8 @@ type ScholarshipCardProps = {
   }
 }
 
+// falta corregir el query para que devuelva info de la organización
+
 export function ScholarshipCard({ scholarship }: ScholarshipCardProps) {
   return (
     <Card className="flex flex-col hover:shadow-md transition-shadow">
