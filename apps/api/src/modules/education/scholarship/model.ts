@@ -10,7 +10,20 @@ export namespace ScholarshipModel {
 
   // get
   const _select = createSelectSchema(scholarship)
-  export const item = t.Omit(_select, ['createdAt', 'updatedAt'])
+  const baseItem = t.Omit(_select, ['createdAt', 'updatedAt'])
+
+  // la beca con el nombre de la organización
+  export const item = t.Intersect([
+    baseItem,
+    t.Object({
+      organization: t.Optional(
+        t.Object({
+          id: t.String(),
+          name: t.String(),
+        }),
+      ),
+    }),
+  ])
   export type Item = typeof item.static
 
   // lista paginada

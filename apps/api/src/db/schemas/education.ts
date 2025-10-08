@@ -210,3 +210,10 @@ export const scholarshipApplicationRelations = relations(
     }),
   }),
 )
+
+export const scholarshipRelations = relations(scholarship, ({ one }) => ({
+  organization: one(organization, {
+    fields: [scholarship.organizationId],
+    references: [organization.id],
+  }),
+}))

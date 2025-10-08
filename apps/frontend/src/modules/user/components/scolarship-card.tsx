@@ -1,28 +1,20 @@
 // import { Link } from '@tanstack/react-router'
 import { Badge } from '@workspace/ui/components/badge'
-import { Button } from '@workspace/ui/components/button'
+// import { Button } from '@workspace/ui/components/button'
 import {
   Card,
   CardContent,
-  CardFooter,
+  // CardFooter,
   CardHeader,
   CardTitle,
 } from '@workspace/ui/components/card'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
 import { CalendarDays, MapPin } from 'lucide-react'
+import type { Scholarship } from '../hooks/use-get-scholarship'
 
 type ScholarshipCardProps = {
-  scholarship: {
-    name: string
-    description: string
-    requirements: string
-    startDate: string
-    endDate: string
-    type: 'ML' | 'PL'
-    organizationId: string
-    vacancies: number
-  }
+  scholarship: Scholarship
 }
 
 // falta corregir el query para que devuelva info de la organización
@@ -71,18 +63,19 @@ export function ScholarshipCard({ scholarship }: ScholarshipCardProps) {
           </span>
         </div>
       </CardContent>
-
+      {/* falta implementar con información de la organización
       <CardFooter className="gap-2">
         {/* <Link
           to="/user/scholarship/$id"
           params={{ id: String(scholarship.id) }}
           className="w-full"
-        > */}
+        > 
         <Button variant="outline" className="w-full">
           Ver detalles
         </Button>
-        {/* </Link> */}
+        </Link> 
       </CardFooter>
+      */}
     </Card>
   )
 }

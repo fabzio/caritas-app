@@ -33,7 +33,7 @@ export default function ScholarshipPage() {
           Becas Disponibles
         </h1>
         <p className="text-muted-foreground text-sm mt-2">
-          Aquí podrás visualizar las becas a las que puedes postular. Seleccione
+          Aquí podrá visualizar las becas a las que puede postular. Seleccione
           para más detalles.
         </p>
       </div>

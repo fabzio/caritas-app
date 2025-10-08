@@ -32,7 +32,7 @@ export const getScholarships = async ({
   pageSize = 10,
 }: GetParams): Promise<ScholarshipModel.Paginated> => {
   try {
-    // acepta filtrado por nombre
+    // con filtrado por nombre
     const where = name ? ilike(scholarship.name, `%${name}%`) : undefined
     const offset = (page - 1) * pageSize
 
@@ -56,12 +56,18 @@ export const getScholarships = async ({
         createdAt: false,
         updatedAt: false,
       },
+      with: {
+        // con el nombre de la organización
+        organization: {
+          columns: { id: true, name: true },
+        },
+      },
       limit: pageSize,
       offset,
       // esto puede servir para futuro filtrado y ordenamiento
       // orderBy: (s, { desc }) => [desc(s.createdAt)],
     })
-    // para que las fechas vayan como string
+    // fechas como string
     const data = rows.map((r) => ({
       ...r,
       startDate: r.startDate.toString(),
