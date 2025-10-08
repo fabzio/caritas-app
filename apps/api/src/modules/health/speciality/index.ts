@@ -1,3 +1,4 @@
+import betterAuth from '@api/modules/auth'
 import Elysia, { t } from 'elysia'
 import { SpecialityModel } from './model'
 import { createSpeciality, getSpecialities } from './service'
@@ -6,6 +7,7 @@ const speciality = new Elysia({
   name: 'speciality',
   prefix: '/speciality',
 })
+  .use(betterAuth)
   .get('', getSpecialities, {
     auth: true,
     response: {
