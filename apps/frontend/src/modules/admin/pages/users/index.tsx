@@ -6,10 +6,10 @@ import UserTable from './components/user-table'
 
 export default function User() {
   const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({})
-  const selectedRows = Object.keys(rowSelection)
+  const _selectedRows = Object.keys(rowSelection)
     .filter((key) => rowSelection[key])
     .map((key) => Number.parseInt(key, 10))
-  const resetSelectedRows = () => setRowSelection({})
+  const _resetSelectedRows = () => setRowSelection({})
   return (
     <div className="w-full p-4">
       <div className="flex justify-end items-center">

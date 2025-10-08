@@ -1,17 +1,17 @@
+import betterAuth from '@api/modules/auth/middleware'
 import Elysia, { t } from 'elysia'
-import betterAuth from '@/modules/auth/middleware'
-import { OrganizationMayorModel } from './model'
-import { getOrganizationMajors } from './service'
+import { OrganizationModel } from './model'
+import { getOrganization } from './service'
 
 const organization = new Elysia({
   name: 'organization',
   prefix: '/organization',
 })
   .use(betterAuth)
-  .get('', getOrganizationMajors, {
+  .get('', getOrganization, {
     auth: true,
     response: {
-      200: OrganizationMayorModel.getOrganizationMajors,
+      200: OrganizationModel.getOrganization,
       401: t.Literal('Unauthorized'),
     },
   })

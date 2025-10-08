@@ -14,7 +14,7 @@ import { CalendarDays, MapPin, Pencil, Trash } from 'lucide-react'
 
 type ScolarshipCardProps = {
   scholarship: {
-    id: number
+    id: string
     name: string
     vacancies: number
     startDate: string
@@ -23,7 +23,7 @@ type ScolarshipCardProps = {
       name: string
       address?: string
     }
-    type: string
+    type?: string
   }
 }
 

@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/suspicious/noExplicitAny: for better auth openapi types */
 import { openapi } from '@elysiajs/openapi'
 import Elysia from 'elysia'
 import logixlysia from 'logixlysia'

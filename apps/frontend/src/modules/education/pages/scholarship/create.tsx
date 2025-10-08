@@ -1,4 +1,6 @@
+import { useSession } from '@frontend/hooks/use-session'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Link } from '@tanstack/react-router'
 import { Button } from '@workspace/ui/components/button'
 import { Calendar } from '@workspace/ui/components/calendar'
 import {
@@ -31,10 +33,10 @@ import {
   SelectValue,
 } from '@workspace/ui/components/select'
 import { Separator } from '@workspace/ui/components/separator'
+import { Textarea } from '@workspace/ui/components/textarea'
 import { format } from 'date-fns'
-import { CalendarIcon } from 'lucide-react'
+import { CalendarIcon, Loader2 } from 'lucide-react'
 import { useForm } from 'react-hook-form'
-import { useSession } from '@/hooks/use-session'
 import useGetOrganization from '../../hooks/use-get-organization'
 import usePostScholarship from '../../hooks/use-post-scholarship'
 import {
@@ -48,7 +50,7 @@ export default function CreateScholarship() {
       name: '',
       description: '',
       requirements: '',
-      vacancies: 1,
+      vacancies: undefined,
       startDate: undefined,
       endDate: undefined,
       organizationId: undefined,
@@ -60,7 +62,7 @@ export default function CreateScholarship() {
   const { mutate, isPending } = usePostScholarship()
   const { data: user } = useSession()
   const handleSubmit = form.handleSubmit((data) => {
-    if (!user) return
+    if (!user || form.getValues('vacancies') == null) return
     const params = { ...data, createdBy: user.user.id, active: true }
     mutate(params)
   })
@@ -97,6 +99,7 @@ export default function CreateScholarship() {
                         <FormControl>
                           <Input {...field} />
                         </FormControl>
+                        <FormMessage />
                       </FormItem>
                     )}
                   />
@@ -111,7 +114,7 @@ export default function CreateScholarship() {
                           defaultValue={field.value}
                         >
                           <FormControl>
-                            <SelectTrigger>
+                            <SelectTrigger className="w-full">
                               <SelectValue placeholder="Seleccione el tipo de beca" />
                             </SelectTrigger>
                           </FormControl>
@@ -135,13 +138,15 @@ export default function CreateScholarship() {
                           defaultValue={field.value}
                         >
                           <FormControl>
-                            <SelectTrigger>
+                            <SelectTrigger className="w-full">
                               <SelectValue placeholder="Seleccione la organización" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
                             {isLoading && (
-                              <SelectItem value="#">Cargando...</SelectItem>
+                              <SelectItem value="#" disabled>
+                                Cargando...
+                              </SelectItem>
                             )}
                             {organizations?.map((org) => (
                               <SelectItem key={org.id} value={String(org.id)}>
@@ -161,8 +166,9 @@ export default function CreateScholarship() {
                       <FormItem>
                         <FormLabel>Descripción</FormLabel>
                         <FormControl>
-                          <Input {...field} />
+                          <Textarea rows={4} {...field} />
                         </FormControl>
+                        <FormMessage />
                       </FormItem>
                     )}
                   />
@@ -173,8 +179,9 @@ export default function CreateScholarship() {
                       <FormItem>
                         <FormLabel>Requisitos</FormLabel>
                         <FormControl>
-                          <Input {...field} />
+                          <Textarea rows={4} {...field} />
                         </FormControl>
+                        <FormMessage />
                       </FormItem>
                     )}
                   />
@@ -196,6 +203,7 @@ export default function CreateScholarship() {
                             }}
                           />
                         </FormControl>
+                        <FormMessage />
                       </FormItem>
                     )}
                   />
@@ -225,11 +233,11 @@ export default function CreateScholarship() {
                               onSelect={field.onChange}
                               disabled={{
                                 before: today,
-                                after: form.getValues('endDate'),
                               }}
                             />
                           </PopoverContent>
                         </Popover>
+                        <FormMessage />
                       </FormItem>
                     )}
                   />
@@ -257,17 +265,25 @@ export default function CreateScholarship() {
                               mode="single"
                               selected={field.value}
                               onSelect={field.onChange}
-                              disabled={{ before: today }}
                             />
                           </PopoverContent>
                         </Popover>
+                        <FormMessage />
                       </FormItem>
                     )}
                   />
-                  <CardFooter className="flex justify-end gap-4 ">
-                    <Button variant="outline">Cancelar</Button>
-                    <Button variant="default" type="submit">
-                      Registrar
+                  <CardFooter className="flex justify-end gap-4 align-center ">
+                    <Link to="/education/scholarship">
+                      <Button variant="outline" type="button">
+                        Cancelar
+                      </Button>
+                    </Link>
+                    <Button type="submit" disabled={isPending}>
+                      {isPending ? (
+                        <Loader2 className="animate-spin w-2" />
+                      ) : (
+                        'Registrar'
+                      )}
                     </Button>
                   </CardFooter>
                 </form>

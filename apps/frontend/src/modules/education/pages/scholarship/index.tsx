@@ -1,9 +1,9 @@
+import { useIsMobile } from '@frontend/hooks/use-mobile'
 import { Link } from '@tanstack/react-router'
 import { Button } from '@workspace/ui/components/button'
 import { Card, CardContent } from '@workspace/ui/components/card'
 import { Skeleton } from '@workspace/ui/components/skeleton'
 import { PlusCircle } from 'lucide-react'
-import { useIsMobile } from '@/hooks/use-mobile'
 import { ScholarshipCard } from '../../components/scolarship-card'
 import useGetScholarship from '../../hooks/use-get-scholarship'
 

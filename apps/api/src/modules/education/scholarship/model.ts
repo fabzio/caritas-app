@@ -1,6 +1,6 @@
+import { scholarship } from '@api/db/schemas/education'
 import { createInsertSchema, createSelectSchema } from 'drizzle-typebox'
 import { t } from 'elysia'
-import { scholarship } from '@/db/schemas/education'
 
 export namespace ScholarshipModel {
   const _createScholarship = createInsertSchema(scholarship)
