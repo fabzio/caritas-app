@@ -21,12 +21,18 @@ export const createScholarship = async (
 export const getScholarships =
   async (): Promise<ScholarshipModel.GetScholarShip> => {
     try {
-      const response = await db.query.scholarship.findMany({
+      const rows = await db.query.scholarship.findMany({
         columns: {
           createdAt: false,
           updatedAt: false,
         },
       })
+      // para que las fechas vayan como string
+      const response = rows.map((r) => ({
+        ...r,
+        startDate: r.startDate.toString(),
+        endDate: r.endDate.toString(),
+      }))
       return response
     } catch (e) {
       if (e instanceof Error) throw new PostgresError(e.message)

@@ -1,5 +1,5 @@
+import betterAuth from '@api/modules/auth'
 import Elysia, { t } from 'elysia'
-import betterAuth from '@/modules/auth'
 import { ScholarshipModel } from './model'
 import { createScholarship, getScholarships } from './service'
 

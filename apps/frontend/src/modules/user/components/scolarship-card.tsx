@@ -1,4 +1,4 @@
-import { Link } from '@tanstack/react-router'
+// import { Link } from '@tanstack/react-router'
 import { Badge } from '@workspace/ui/components/badge'
 import { Button } from '@workspace/ui/components/button'
 import {
@@ -10,24 +10,22 @@ import {
 } from '@workspace/ui/components/card'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
-import { CalendarDays, MapPin, Pencil, Trash } from 'lucide-react'
+import { CalendarDays, MapPin } from 'lucide-react'
 
-type ScolarshipCardProps = {
+type ScholarshipCardProps = {
   scholarship: {
-    id: string
     name: string
-    vacancies: number
+    description: string
+    requirements: string
     startDate: string
     endDate: string
-    organization?: {
-      name: string
-      address?: string
-    }
-    type?: string
+    type: 'ML' | 'PL'
+    organizationId: string
+    vacancies: number
   }
 }
 
-export function ScholarshipCard({ scholarship }: ScolarshipCardProps) {
+export function ScholarshipCard({ scholarship }: ScholarshipCardProps) {
   return (
     <Card className="flex flex-col hover:shadow-md transition-shadow">
       <CardHeader>
@@ -73,29 +71,15 @@ export function ScholarshipCard({ scholarship }: ScolarshipCardProps) {
       </CardContent>
 
       <CardFooter className="gap-2">
-        <Link
-          to="/education/scholarship/$id"
+        {/* <Link
+          to="/user/scholarship/$id"
           params={{ id: String(scholarship.id) }}
           className="w-full"
-        >
-          <Button variant="outline" className="w-full">
-            Ver detalles
-          </Button>
-        </Link>
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={() => {}} // falta implementar
-        >
-          <Pencil className="h-4 w-4" />
+        > */}
+        <Button variant="outline" className="w-full">
+          Ver detalles
         </Button>
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={() => {}} // falta implementar
-        >
-          <Trash className="h-4 w-4" />
-        </Button>
+        {/* </Link> */}
       </CardFooter>
     </Card>
   )

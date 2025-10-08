@@ -38,6 +38,7 @@ import { Route as AuthenticatedUserSettingsIndexRouteImport } from './routes/_au
 import { Route as AuthenticatedEducationScholarshipIndexRouteImport } from './routes/_authenticated/education/scholarship/index'
 import { Route as AuthenticatedUserSettingsAuthenticationRouteImport } from './routes/_authenticated/user/settings/authentication'
 import { Route as AuthenticatedEducationScholarshipCreateRouteImport } from './routes/_authenticated/education/scholarship/create'
+import { Route as AuthenticatedUserEducationScholarshipIndexRouteImport } from './routes/_authenticated/user/education/scholarship/index'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
@@ -197,6 +198,12 @@ const AuthenticatedEducationScholarshipCreateRoute =
     path: '/scholarship/create',
     getParentRoute: () => AuthenticatedEducationRoute,
   } as any)
+const AuthenticatedUserEducationScholarshipIndexRoute =
+  AuthenticatedUserEducationScholarshipIndexRouteImport.update({
+    id: '/user/education/scholarship/',
+    path: '/user/education/scholarship/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -227,6 +234,7 @@ export interface FileRoutesByFullPath {
   '/user/settings/authentication': typeof AuthenticatedUserSettingsAuthenticationRoute
   '/education/scholarship': typeof AuthenticatedEducationScholarshipIndexRoute
   '/user/settings/': typeof AuthenticatedUserSettingsIndexRoute
+  '/user/education/scholarship': typeof AuthenticatedUserEducationScholarshipIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -250,6 +258,7 @@ export interface FileRoutesByTo {
   '/user/settings/authentication': typeof AuthenticatedUserSettingsAuthenticationRoute
   '/education/scholarship': typeof AuthenticatedEducationScholarshipIndexRoute
   '/user/settings': typeof AuthenticatedUserSettingsIndexRoute
+  '/user/education/scholarship': typeof AuthenticatedUserEducationScholarshipIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -282,6 +291,7 @@ export interface FileRoutesById {
   '/_authenticated/user/settings/authentication': typeof AuthenticatedUserSettingsAuthenticationRoute
   '/_authenticated/education/scholarship/': typeof AuthenticatedEducationScholarshipIndexRoute
   '/_authenticated/user/settings/': typeof AuthenticatedUserSettingsIndexRoute
+  '/_authenticated/user/education/scholarship/': typeof AuthenticatedUserEducationScholarshipIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -314,6 +324,7 @@ export interface FileRouteTypes {
     | '/user/settings/authentication'
     | '/education/scholarship'
     | '/user/settings/'
+    | '/user/education/scholarship'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -337,6 +348,7 @@ export interface FileRouteTypes {
     | '/user/settings/authentication'
     | '/education/scholarship'
     | '/user/settings'
+    | '/user/education/scholarship'
   id:
     | '__root__'
     | '/'
@@ -368,6 +380,7 @@ export interface FileRouteTypes {
     | '/_authenticated/user/settings/authentication'
     | '/_authenticated/education/scholarship/'
     | '/_authenticated/user/settings/'
+    | '/_authenticated/user/education/scholarship/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -581,6 +594,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedEducationScholarshipCreateRouteImport
       parentRoute: typeof AuthenticatedEducationRoute
     }
+    '/_authenticated/user/education/scholarship/': {
+      id: '/_authenticated/user/education/scholarship/'
+      path: '/user/education/scholarship'
+      fullPath: '/user/education/scholarship'
+      preLoaderRoute: typeof AuthenticatedUserEducationScholarshipIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
@@ -686,6 +706,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedUserOrganizationsRoute: typeof AuthenticatedUserOrganizationsRoute
   AuthenticatedUserSettingsRoute: typeof AuthenticatedUserSettingsRouteWithChildren
   AuthenticatedUserIndexRoute: typeof AuthenticatedUserIndexRoute
+  AuthenticatedUserEducationScholarshipIndexRoute: typeof AuthenticatedUserEducationScholarshipIndexRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
@@ -697,6 +718,8 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedUserOrganizationsRoute: AuthenticatedUserOrganizationsRoute,
   AuthenticatedUserSettingsRoute: AuthenticatedUserSettingsRouteWithChildren,
   AuthenticatedUserIndexRoute: AuthenticatedUserIndexRoute,
+  AuthenticatedUserEducationScholarshipIndexRoute:
+    AuthenticatedUserEducationScholarshipIndexRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(

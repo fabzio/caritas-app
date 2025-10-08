@@ -4,54 +4,13 @@ import { Button } from '@workspace/ui/components/button'
 import { Card, CardContent } from '@workspace/ui/components/card'
 import { Skeleton } from '@workspace/ui/components/skeleton'
 import { PlusCircle } from 'lucide-react'
-import { ScholarshipCard } from '../../components/scolarship-card'
 import useGetScholarship from '../../hooks/use-get-scholarship'
-
-// just to test the ui
-const DUMMY_SCHOLARSHIPS = [
-  {
-    id: '1',
-    name: 'Beca de Excelencia Académica',
-    description: 'Beca destinada a estudiantes con alto rendimiento académico.',
-    vacancies: 500,
-    startDate: '2025-01-01',
-    endDate: '2025-12-31',
-    createdAt: '2024-10-01',
-  },
-  {
-    id: '2',
-    name: 'Beca de Apoyo Económico',
-    description: 'Apoyo para familias de escasos recursos.',
-    vacancies: 250,
-    startDate: '2025-02-01',
-    endDate: '2025-11-30',
-    createdAt: '2024-09-15',
-  },
-  {
-    id: '3',
-    name: 'Beca de Educación Superior',
-    description: 'Beca para estudiantes universitarios destacados.',
-    vacancies: 750,
-    startDate: '2025-03-01',
-    endDate: '2025-12-15',
-    createdAt: '2024-08-20',
-  },
-  {
-    id: '4',
-    name: 'Beca Deportiva',
-    description: 'Para estudiantes atletas con talento.',
-    vacancies: 0,
-    startDate: '2024-01-01',
-    endDate: '2024-12-31',
-    createdAt: '2024-01-05',
-  },
-]
 
 export default function ScholarshipPage() {
   const isMobile = useIsMobile()
   const { data: scholarships, isLoading, isError } = useGetScholarship()
-
-  const displayScholarships = DUMMY_SCHOLARSHIPS
+  console.log(scholarships)
+  // const displayScholarships = scholarships
 
   return (
     <div className="flex flex-1 flex-col gap-6 p-4">
@@ -90,28 +49,6 @@ export default function ScholarshipPage() {
             </CardContent>
           </Card>
         )}
-        {/* en caso no hayan becas */}
-        {!isLoading &&
-          displayScholarships &&
-          displayScholarships.length === 0 && (
-            <Card>
-              <CardContent className="pt-6 text-center">
-                <p>No hay becas registradas aún.</p>
-              </CardContent>
-            </Card>
-          )}
-        {!isLoading &&
-          displayScholarships &&
-          displayScholarships.length > 0 && (
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {displayScholarships.map((scholarship) => (
-                <ScholarshipCard
-                  key={scholarship.id}
-                  scholarship={scholarship}
-                />
-              ))}
-            </div>
-          )}
       </div>
     </div>
   )
