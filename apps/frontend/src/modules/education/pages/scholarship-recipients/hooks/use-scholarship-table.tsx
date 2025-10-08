@@ -6,7 +6,7 @@ import { useScholarshipRecipients } from './use-scholarship'
 
 export const useScholarshipRecipientTable = () => {
   const { filters, setFilters } = useFilters(
-    '/_authenticated/education/recipients',
+    '/_authenticated/education/recipients/',
   )
   const { data } = useScholarshipRecipients({
     currentPage: filters.pageIndex,

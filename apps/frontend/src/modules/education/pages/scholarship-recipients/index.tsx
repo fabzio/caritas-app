@@ -29,7 +29,7 @@ export default function ScholarshipRecipients() {
           </CardHeader>
           <div className="px-10 flex gap-4 items-center justify-between">
             <SearchRecipients />
-            <Link to="/education/scholarship-recipients/create">
+            <Link to="/education/recipients/create">
               <Button
                 className="whitespace-nowrap"
                 size={isMobile ? 'sm' : 'lg'}

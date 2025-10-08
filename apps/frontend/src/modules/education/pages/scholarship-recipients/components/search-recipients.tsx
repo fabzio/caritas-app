@@ -3,7 +3,7 @@ import { SearchIcon } from 'lucide-react'
 import { useFilters } from '@/hooks/use-filters'
 
 export default function SearchRecipients() {
-  const { setFilters } = useFilters('/_authenticated/education/recipients')
+  const { setFilters } = useFilters('/_authenticated/education/recipients/')
   const onChangeFilter = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFilters({ q: e.target.value })
   }
