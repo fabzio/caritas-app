@@ -1,6 +1,6 @@
-import db from '@/db'
-import { PostgresError } from '@/db/errors'
-import { organization } from '@/db/schemas/auth'
+import db from '@api/db'
+import { PostgresError } from '@api/db/errors'
+import { organization } from '@api/db/schemas/auth'
 import type { HealthOrganizationModel } from './model'
 
 export const createHealthOrganization = async (

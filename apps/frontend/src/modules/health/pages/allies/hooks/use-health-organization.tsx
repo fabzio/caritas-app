@@ -1,6 +1,6 @@
+import rpc from '@frontend/lib/rpc'
+import { QueryKeys } from '@frontend/shared/constants/query-keys'
 import { useSuspenseQuery } from '@tanstack/react-query'
-import rpc from '@/lib/rpc'
-import { QueryKeys } from '@/shared/constants/query-keys'
 
 export const useHealthOrganization = () => {
   return useSuspenseQuery({

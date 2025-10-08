@@ -1,5 +1,5 @@
+import betterAuth from '@api/modules/auth/middleware'
 import Elysia, { t } from 'elysia'
-import betterAuth from '@/modules/auth/middleware'
 import { HealthOrganizationModel } from './model'
 import { createHealthOrganization, getHealthOrganizations } from './service'
 
