@@ -1,8 +1,9 @@
+import { Link } from '@tanstack/react-router'
 import type { ColumnDef } from '@tanstack/react-table'
 import { Button } from '@workspace/ui/components/button'
 import { Checkbox } from '@workspace/ui/components/checkbox'
 import { ArrowUpDown } from 'lucide-react'
-import type { User } from '../hooks/use-users'
+import type { User } from '../hooks/use-list-users'
 
 export const userTableColumns: ColumnDef<User>[] = [
   {
@@ -26,6 +27,28 @@ export const userTableColumns: ColumnDef<User>[] = [
     ),
   },
   {
+    accessorKey: 'document',
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+      >
+        Documento
+        <ArrowUpDown />
+      </Button>
+    ),
+    cell: ({ row }) => (
+      <Button asChild variant="link">
+        <Link
+          to="/admin/users/form"
+          search={{ type: 'edit', id: row.original.id }}
+        >
+          {`${row.original.documentType} - ${row.original.documentNumber}`}
+        </Link>
+      </Button>
+    ),
+  },
+  {
     accessorKey: 'user',
     header: ({ column }) => (
       <Button
@@ -36,20 +59,7 @@ export const userTableColumns: ColumnDef<User>[] = [
         <ArrowUpDown />
       </Button>
     ),
-    cell: ({ row }) => row.original.name,
-  },
-  {
-    accessorKey: 'user',
-    header: ({ column }) => (
-      <Button
-        variant="ghost"
-        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-      >
-        Email
-        <ArrowUpDown />
-      </Button>
-    ),
-    cell: ({ row }) => row.original.email,
+    cell: ({ row }) => `${row.original.name} ${row.original.surname}`,
   },
   {
     accessorKey: 'role',
@@ -62,6 +72,10 @@ export const userTableColumns: ColumnDef<User>[] = [
         <ArrowUpDown />
       </Button>
     ),
-    cell: ({ row }) => row.original.role,
+    cell: ({ row }) => row.original.role || 'Sin rol',
+    enableSorting: false,
+    meta: {
+      filterVariant: 'select',
+    },
   },
 ]

@@ -6,6 +6,7 @@ import { educationMember, healthMember } from './auth/permisions'
 import { PostgresError } from './db/errors'
 import env from './env'
 import { auth, OpenAPI } from './lib/auth'
+import adminModule from './modules/admin'
 import authModule from './modules/auth'
 import common from './modules/common'
 import educationModule from './modules/education'
@@ -38,6 +39,7 @@ const main = async () => {
     .mount(auth.handler)
     .use(common)
     .use(authModule)
+    .use(adminModule)
     .use(healthModule)
     .use(educationModule)
     .listen(env.PORT)

@@ -1,5 +1,3 @@
-import { useSession } from '@frontend/hooks/use-session'
-import adminNavItems from '@frontend/modules/admin/layout/nav-items'
 import { Separator } from '@workspace/ui/components/separator'
 import {
   SidebarInset,
@@ -10,17 +8,20 @@ import type { PropsWithChildren } from 'react'
 import AppSidebar from '../components/app-sidebar'
 import ModeToggle from '../components/mode-toggle'
 import NavMain from '../components/nav-main'
+import type { NavItem } from '../types/nav-main'
 
-type Props = PropsWithChildren
+type Props = PropsWithChildren<{
+  navItems?: NavItem[]
+}>
 
-export default function MainLayout({ children }: Readonly<Props>) {
-  const { data } = useSession()
+export default function MainLayout({
+  children,
+  navItems = [],
+}: Readonly<Props>) {
   return (
     <SidebarProvider>
       <AppSidebar>
-        <NavMain
-          items={data?.user.role?.includes('admin') ? adminNavItems : []}
-        />
+        <NavMain items={navItems} />
       </AppSidebar>
       <SidebarInset>
         <article className="w-full">
