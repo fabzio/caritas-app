@@ -6,7 +6,7 @@ import type { UserModel } from './model'
 export async function getUsers(
   params: UserModel.ListUsersQuery,
 ): Promise<UserModel.GetUsersResponse> {
-  const { q = '', page = 0, limit = 10, sortBy = 'name.asc' } = params
+  const { q = '', role, page = 0, limit = 10, sortBy = 'name.asc' } = params
 
   const [sortFieldRaw, sortOrderRaw] = (sortBy ?? 'name.asc').split('.', 2)
   const sortField = (sortFieldRaw ?? 'name').trim()
@@ -32,9 +32,15 @@ export async function getUsers(
       )
     : undefined
 
+  const roleCondition = role && role !== 'all' ? eq(user.role, role) : undefined
   const activeCondition = eq(user.active, true)
   const memberOrgCondition = eq(member.organizationId, params.organizationId)
-  const where = and(activeCondition, searchCondition, memberOrgCondition)
+  const where = and(
+    activeCondition,
+    searchCondition,
+    roleCondition,
+    memberOrgCondition,
+  )
 
   // Get total count
   const [{ total }] = await db
