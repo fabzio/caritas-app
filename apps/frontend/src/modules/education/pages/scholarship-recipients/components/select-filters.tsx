@@ -11,6 +11,7 @@ interface SelectFiltersProps {
   onValueChange: (value: string) => void
   valueList: string[]
   item: string
+  placeholder?: string
 }
 
 export default function SelectFilters({
@@ -18,6 +19,7 @@ export default function SelectFilters({
   onValueChange,
   valueList,
   item,
+  placeholder,
 }: Readonly<SelectFiltersProps>) {
   return (
     <Select value={value} onValueChange={onValueChange}>
@@ -25,7 +27,7 @@ export default function SelectFilters({
         <SelectValue placeholder={`Filtrar por ${item}`} />
       </SelectTrigger>
       <SelectContent>
-        <SelectItem value="all">{`Todos lo/as ${item}`}</SelectItem>
+        <SelectItem value="all">{`${placeholder}`}</SelectItem>
         {valueList.map((valueItem) => (
           <SelectItem key={valueItem} value={valueItem}>
             {valueItem}

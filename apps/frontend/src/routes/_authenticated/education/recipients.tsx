@@ -4,6 +4,13 @@ import { QueryKeys } from '@frontend/shared/constants/query-keys'
 import type { Filters } from '@frontend/shared/types/filters'
 import { createFileRoute } from '@tanstack/react-router'
 
+export type RecipientFilters = Filters & {
+  selectFilters?: {
+    scholarshipName?: string
+    regionNames?: string
+  }
+}
+
 export const Route = createFileRoute('/_authenticated/education/recipients')({
   loader: ({ context: { queryClient } }) =>
     queryClient.ensureQueryData({
@@ -19,6 +26,6 @@ export const Route = createFileRoute('/_authenticated/education/recipients')({
         return data || { members: [], total: 0 }
       },
     }),
-  validateSearch: () => ({}) as Filters,
+  validateSearch: () => ({}) as RecipientFilters,
   component: ScholarshipRecipients,
 })

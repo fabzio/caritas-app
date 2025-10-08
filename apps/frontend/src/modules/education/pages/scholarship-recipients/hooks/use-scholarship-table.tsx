@@ -36,5 +36,6 @@ export const useScholarshipRecipientTable = () => {
     columns,
     sortingState,
     paginationState,
+    filters,
   }
 }

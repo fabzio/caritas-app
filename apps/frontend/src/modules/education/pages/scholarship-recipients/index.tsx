@@ -5,11 +5,12 @@ import {
   CardHeader,
   CardTitle,
 } from '@workspace/ui/components/card'
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import RecipientsTable from './components/recipients-table'
 import SearchRecipients from './components/search-recipients'
 import SelectFilters from './components/select-filters'
 import { useScholarshipRecipientTable } from './hooks/use-scholarship-table'
+import { useSelectNames } from './hooks/use-select-names'
 
 export default function ScholarshipRecipients() {
   const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({})
@@ -21,46 +22,39 @@ export default function ScholarshipRecipients() {
     paginationState,
     sortingState,
     setFilters,
+    filters,
   } = useScholarshipRecipientTable()
 
-  const [scholarshipFilter, setScholarshipFilter] = useState<string>('all')
+  const { data: selectNames } = useSelectNames()
+  const scholarshipNames = selectNames?.scholarshipNames ?? []
+  const regionNames = selectNames?.regionNames ?? []
 
-  const uniqueScholarships = useMemo(() => {
-    if (!recipients) return []
-    const scholarships = recipients
-      .map((recipient) => recipient.scholarshipName)
-      .filter(
-        (scholarship): scholarship is string =>
-          scholarship !== null && scholarship !== undefined,
-      )
-    return Array.from(new Set(scholarships)).sort((a, b) =>
-      a.localeCompare(b, 'es'),
-    )
-  }, [recipients])
-
-  const [regionFilter, setRegionFilter] = useState<string>('all')
-
-  const uniqueRegions = useMemo(() => {
-    if (!recipients) return []
-    const regions = recipients
-      .map((recipient) => recipient.region)
-      .filter(
-        (region): region is string => region !== null && region !== undefined,
-      )
-    return Array.from(new Set(regions)).sort((a, b) => a.localeCompare(b, 'es'))
-  }, [recipients])
-
-  const filteredRecipients = useMemo(() => {
-    if (!recipients) return recipients
-    return recipients.filter((recipient) => {
-      const scholarshipMatch =
-        scholarshipFilter === 'all' ||
-        recipient.scholarshipName === scholarshipFilter
-      const regionMatch =
-        regionFilter === 'all' || recipient.region === regionFilter
-      return scholarshipMatch && regionMatch
+  const scholarshipFilter = filters.selectFilters?.scholarshipName || 'all'
+  const handleScholarshipFilterChange = (newScholarshipName: string) => {
+    setRowSelection({})
+    setFilters({
+      selectFilters: {
+        ...filters.selectFilters,
+        scholarshipName:
+          newScholarshipName === 'all' ? undefined : newScholarshipName,
+        regionNames: filters.selectFilters?.regionNames,
+      },
+      pageIndex: 1,
     })
-  }, [recipients, scholarshipFilter, regionFilter])
+  }
+
+  const regionFilter = filters.selectFilters?.regionNames || 'all'
+  const handleRegionFilterChange = (newRegionName: string) => {
+    setRowSelection({})
+    setFilters({
+      selectFilters: {
+        ...filters.selectFilters,
+        regionNames: newRegionName === 'all' ? undefined : newRegionName,
+        scholarshipName: filters.selectFilters?.scholarshipName,
+      },
+      pageIndex: 1,
+    })
+  }
 
   return (
     <div className="flex flex-1 flex-col gap-6 p-4">
@@ -79,15 +73,17 @@ export default function ScholarshipRecipients() {
             <div className="flex flex-row gap-4 px-10">
               <SelectFilters
                 value={regionFilter}
-                onValueChange={setRegionFilter}
-                valueList={uniqueRegions}
-                item="regiones"
+                onValueChange={handleRegionFilterChange}
+                valueList={regionNames}
+                item="región"
+                placeholder="Todas las regiones"
               />
               <SelectFilters
                 value={scholarshipFilter}
-                onValueChange={setScholarshipFilter}
-                valueList={uniqueScholarships}
-                item="becas"
+                onValueChange={handleScholarshipFilterChange}
+                valueList={scholarshipNames}
+                placeholder="Todas las becas"
+                item="beca"
               />
             </div>
           </div>
@@ -95,7 +91,7 @@ export default function ScholarshipRecipients() {
             <RecipientsTable
               rowSelection={rowSelection}
               setRowSelection={setRowSelection}
-              data={filteredRecipients || []}
+              data={recipients || []}
               columns={columns}
               paginationState={paginationState}
               sortingState={sortingState}
