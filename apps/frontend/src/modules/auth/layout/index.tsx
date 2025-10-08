@@ -1,4 +1,4 @@
-import caritaslima from '@frontend/assets/img/login/caritaslima.webp'
+import caritaslima from '@frontend/assets/img/login/cover.webp'
 import ModeToggle from '@frontend/shared/components/mode-toggle'
 import { Badge } from '@workspace/ui/components/badge'
 import type { PropsWithChildren } from 'react'

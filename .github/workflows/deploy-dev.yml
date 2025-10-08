@@ -1,9 +1,9 @@
-name: Deploy application packages
+name: Deploy dev application packages
 
 on:
   push:
     branches:
-      - main
+      - develop
 
 permissions:
   packages: write
@@ -32,11 +32,14 @@ jobs:
             frontend:
               - 'apps/frontend/**'
               - 'packages/**'
+
   test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
 
       - name: Set up Bun
         uses: oven-sh/setup-bun@v2
@@ -48,6 +51,12 @@ jobs:
 
       - name: Run tests
         run: bun run test
+
+      - name: Scan with SonarQube
+        uses: SonarSource/sonarqube-scan-action@v6
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
   build-api:
     needs: [changes, test]
     if: needs.changes.outputs.api == 'true'
@@ -76,11 +85,10 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build Docker API image
-        run: docker build -t ghcr.io/${{ github.repository_owner }}/caritas-api:latest -f ./apps/api/Dockerfile .
+        run: docker build -t ghcr.io/${{ github.repository_owner }}/caritas-api:dev  -f ./apps/api/Dockerfile .
 
-      - name: Push Docker API image
-        run: docker push ghcr.io/${{ github.repository_owner }}/caritas-api:latest
-
+      - name: Push Docker API image :dev
+        run: docker push ghcr.io/${{ github.repository_owner }}/caritas-api:dev
   build-frontend:
     needs: [changes, test]
     if: needs.changes.outputs.frontend == 'true'
@@ -109,7 +117,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build Docker Frontend image
-        run: docker build -t ghcr.io/${{ github.repository_owner }}/caritas-frontend:latest -f ./apps/frontend/Dockerfile --build-arg VITE_API_URL=${{ vars.HOST }} --build-arg VITE_GOOGLE_CLIENT_ID=${{ vars.GOOGLE_CLIENT_ID }} .
+        run: docker build -t ghcr.io/${{ github.repository_owner }}/caritas-frontend:dev --build-arg VITE_API_URL=${{ vars.DEV_HOST }} --build-arg VITE_GOOGLE_CLIENT_ID=${{ vars.GOOGLE_CLIENT_ID }} -f ./apps/frontend/Dockerfile .
 
-      - name: Push Docker Frontend image
-        run: docker push ghcr.io/${{ github.repository_owner }}/caritas-frontend:latest
+      - name: Push Docker Frontend image :dev
+        run: docker push ghcr.io/${{ github.repository_owner }}/caritas-frontend:dev
