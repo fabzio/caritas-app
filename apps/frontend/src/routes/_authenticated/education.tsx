@@ -1,5 +1,8 @@
+import educationNavItems from '@frontend/modules/education/layout/nav-items'
+import { DEFAULT_TEAMS } from '@frontend/shared/constants/default-teams'
 import { QueryKeys } from '@frontend/shared/constants/query-keys'
-import { createFileRoute, redirect } from '@tanstack/react-router'
+import MainLayout from '@frontend/shared/layouts/main-layout'
+import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/_authenticated/education')({
   beforeLoad: async ({ context: { authClient, queryClient } }) => {
@@ -11,7 +14,9 @@ export const Route = createFileRoute('/_authenticated/education')({
         return data
       },
     })
-    const haveEducationTeam = teams.filter((org) => org.name === 'Educación')
+    const haveEducationTeam = teams.filter(
+      (org) => org.name === DEFAULT_TEAMS.EDUCATION,
+    )
     if (!haveEducationTeam?.length)
       throw redirect({
         to: '/user',
@@ -25,4 +30,9 @@ export const Route = createFileRoute('/_authenticated/education')({
       }),
     ])
   },
+  component: () => (
+    <MainLayout navItems={educationNavItems}>
+      <Outlet />
+    </MainLayout>
+  ),
 })

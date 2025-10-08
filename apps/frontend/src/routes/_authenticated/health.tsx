@@ -1,5 +1,8 @@
+import healthNavItems from '@frontend/modules/health/layout/nav-items'
+import { DEFAULT_TEAMS } from '@frontend/shared/constants/default-teams'
 import { QueryKeys } from '@frontend/shared/constants/query-keys'
-import { createFileRoute, redirect } from '@tanstack/react-router'
+import MainLayout from '@frontend/shared/layouts/main-layout'
+import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/_authenticated/health')({
   beforeLoad: async ({ context: { authClient, queryClient } }) => {
@@ -11,7 +14,9 @@ export const Route = createFileRoute('/_authenticated/health')({
         return data
       },
     })
-    const haveHealthTeam = teams.filter((org) => org.name === 'Salud')
+    const haveHealthTeam = teams.filter(
+      (org) => org.name === DEFAULT_TEAMS.HEALTH,
+    )
     if (!haveHealthTeam?.length)
       throw redirect({
         to: '/user',
@@ -25,4 +30,9 @@ export const Route = createFileRoute('/_authenticated/health')({
       }),
     ])
   },
+  component: () => (
+    <MainLayout navItems={healthNavItems}>
+      <Outlet />
+    </MainLayout>
+  ),
 })

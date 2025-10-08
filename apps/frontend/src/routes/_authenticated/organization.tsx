@@ -1,5 +1,7 @@
+import organizationNavItems from '@frontend/modules/organization/layout/nav-items'
 import { QueryKeys } from '@frontend/shared/constants/query-keys'
-import { createFileRoute, redirect } from '@tanstack/react-router'
+import MainLayout from '@frontend/shared/layouts/main-layout'
+import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/_authenticated/organization')({
   beforeLoad: async ({ context: { authClient, queryClient } }) => {
@@ -22,4 +24,9 @@ export const Route = createFileRoute('/_authenticated/organization')({
       organizationId: haveAlliedOrg?.[0]?.id,
     })
   },
+  component: () => (
+    <MainLayout navItems={organizationNavItems}>
+      <Outlet />
+    </MainLayout>
+  ),
 })
