@@ -1,8 +1,8 @@
+import { useAddPasskey } from '@frontend/modules/settings/hooks/use-add-passkey'
+import { useListPasskeys } from '@frontend/modules/settings/hooks/use-list-passkeys'
+import { useRemovePasskey } from '@frontend/modules/settings/hooks/use-remove-passkey'
 import { Button } from '@workspace/ui/components/button'
 import { Trash } from 'lucide-react'
-import { useAddPasskey } from '@/modules/settings/hooks/use-add-passkey'
-import { useListPasskeys } from '@/modules/settings/hooks/use-list-passkeys'
-import { useRemovePasskey } from '@/modules/settings/hooks/use-remove-passkey'
 
 export default function Passkeys() {
   const { data: passkeys } = useListPasskeys()

@@ -1,3 +1,6 @@
+import { useSession } from '@frontend/hooks/use-session'
+import type { ValidRoutes } from '@frontend/shared/types/valid-routes'
+import getShortname from '@frontend/shared/utils/get-shortname'
 import { Link } from '@tanstack/react-router'
 import {
   Avatar,
@@ -5,9 +8,6 @@ import {
   AvatarImage,
 } from '@workspace/ui/components/avatar'
 import type { PropsWithChildren } from 'react'
-import { useSession } from '@/hooks/use-session'
-import type { ValidRoutes } from '@/shared/types/valid-routes'
-import getShortname from '@/shared/utils/get-shortname'
 
 type Props = PropsWithChildren
 export default function UserSettingsLayout({ children }: Readonly<Props>) {

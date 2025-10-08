@@ -1,3 +1,7 @@
+import { useAccess } from '@frontend/hooks/use-access'
+import { useSession } from '@frontend/hooks/use-session'
+import NavUser from '@frontend/shared/components/nav-user.tsx'
+import PlatformSwitcher from '@frontend/shared/components/platform-switcher.tsx'
 import {
   Sidebar,
   SidebarContent,
@@ -14,10 +18,6 @@ import {
   UserStar,
 } from 'lucide-react'
 import type { PropsWithChildren } from 'react'
-import { useAccess } from '@/hooks/use-access'
-import { useSession } from '@/hooks/use-session'
-import NavUser from '@/shared/components/nav-user.tsx'
-import PlatformSwitcher from '@/shared/components/platform-switcher.tsx'
 import type { ValidRoutes } from '../types/valid-routes'
 import getShortname from '../utils/get-shortname'
 

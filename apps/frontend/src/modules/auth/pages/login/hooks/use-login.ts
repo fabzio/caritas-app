@@ -1,7 +1,7 @@
+import authClient from '@frontend/lib/authClient'
+import type { ValidRoutes } from '@frontend/shared/types/valid-routes'
 import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import authClient from '@/lib/authClient'
-import type { ValidRoutes } from '@/shared/types/valid-routes'
 
 export const useLogin = (redirectPath: ValidRoutes) => {
   return useMutation({

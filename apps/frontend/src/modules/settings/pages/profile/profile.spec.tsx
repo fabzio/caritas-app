@@ -4,7 +4,7 @@ import Profile from './index'
 
 const useSessionMock = vi.fn()
 
-vi.mock('@/hooks/use-session', () => ({
+vi.mock('@frontend/hooks/use-session', () => ({
   useSession: () => useSessionMock(),
 }))
 

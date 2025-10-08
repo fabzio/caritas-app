@@ -1,8 +1,8 @@
+import db from '@api/db'
+import { PostgresError } from '@api/db/errors'
+import { user } from '@api/db/schemas/auth'
+import { auth } from '@api/lib/auth'
 import { count, eq } from 'drizzle-orm'
-import db from '@/db'
-import { PostgresError } from '@/db/errors'
-import { user } from '@/db/schemas/auth'
-import { auth } from '@/lib/auth'
 
 export const isFirstUser = async () => {
   try {
