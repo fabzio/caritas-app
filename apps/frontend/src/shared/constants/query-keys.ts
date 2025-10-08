@@ -2,6 +2,7 @@ export const QueryKeys = {
   SESSION: 'session',
   ACCESS: 'access',
   ORGANIZATIONS: 'organizations',
+  SPECIALITY: 'speciality',
   TEAMS: 'teams',
   SETTINGS: {
     ACCOUNTS: 'settings-accounts',
