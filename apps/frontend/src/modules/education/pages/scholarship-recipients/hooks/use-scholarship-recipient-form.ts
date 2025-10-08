@@ -2,15 +2,10 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { toast } from 'sonner'
 import { z } from 'zod'
-import type { Beneficiary } from './use-beneficiary-search'
-
-const DUMMY_SCHOLARSHIPS = [
-  { id: 1, name: 'Beca de Investigación' },
-  { id: 2, name: 'Beca de Excelencia Académica' },
-  { id: 3, name: 'Beca de Apoyo Social' },
-]
+import useGetScholarship from '../../../hooks/use-get-scholarship'
+import usePostScholarshipApplication from '../../../hooks/use-post-scholarship-application'
+import type { Beneficiary } from './use-get-beneficiaries'
 
 const formSchema = z.object({
   beneficiaryId: z.string().min(1, 'Debe seleccionar un beneficiario'),
@@ -23,6 +18,18 @@ export function useScholarshipRecipientForm() {
   const [selectedBeneficiary, setSelectedBeneficiary] =
     useState<Beneficiary | null>(null)
   const navigate = useNavigate()
+
+  const { data: scholarshipsData, isLoading: isLoadingScholarships } =
+    useGetScholarship('', 1, 20)
+
+  const { mutateAsync: createScholarshipRecipient, isPending } =
+    usePostScholarshipApplication()
+
+  const scholarships =
+    scholarshipsData?.data?.map((s: { id: number; name: string }) => ({
+      id: s.id,
+      name: s.name,
+    })) || []
 
   const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
@@ -42,20 +49,17 @@ export function useScholarshipRecipientForm() {
     form.setValue('beneficiaryId', '')
   }
 
-  const handleSubmit = form.handleSubmit((data) => {
+  const handleSubmit = form.handleSubmit(async (data) => {
     if (!selectedBeneficiary) return
 
-    const selectedScholarship = DUMMY_SCHOLARSHIPS.find(
-      (s) => s.id === Number(data.scholarshipId),
-    )
-
-    toast.success(
-      `Beneficiario "${selectedBeneficiary.name}" agregado a "${selectedScholarship?.name}"`,
-    )
-
-    setTimeout(() => {
-      navigate({ to: '/education/scholarship' })
-    }, 1000)
+    try {
+      await createScholarshipRecipient({
+        scholarshipId: Number(data.scholarshipId),
+        userId: selectedBeneficiary.id,
+      })
+    } catch (error) {
+      console.error('Error creating scholarship recipient:', error)
+    }
   })
 
   const handleCancel = () => {
@@ -65,7 +69,9 @@ export function useScholarshipRecipientForm() {
   return {
     form,
     selectedBeneficiary,
-    scholarships: DUMMY_SCHOLARSHIPS,
+    scholarships,
+    isLoadingScholarships,
+    isPending,
     handleSelectBeneficiary,
     handleClearBeneficiary,
     handleSubmit,

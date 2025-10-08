@@ -23,6 +23,8 @@ export default function ScholarshipRecipientForm() {
     form,
     selectedBeneficiary,
     scholarships,
+    isLoadingScholarships,
+    isPending,
     handleSelectBeneficiary,
     handleClearBeneficiary,
     handleSubmit,
@@ -72,21 +74,30 @@ export default function ScholarshipRecipientForm() {
                 <Select
                   onValueChange={field.onChange}
                   defaultValue={field.value}
+                  disabled={isLoadingScholarships}
                 >
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue placeholder="Seleccione la beca" />
+                      <SelectValue
+                        placeholder={
+                          isLoadingScholarships
+                            ? 'Cargando becas...'
+                            : 'Seleccione la beca'
+                        }
+                      />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    {scholarships.map((scholarship) => (
-                      <SelectItem
-                        key={scholarship.id}
-                        value={String(scholarship.id)}
-                      >
-                        {scholarship.name}
-                      </SelectItem>
-                    ))}
+                    {scholarships.map(
+                      (scholarship: { id: number; name: string }) => (
+                        <SelectItem
+                          key={scholarship.id}
+                          value={String(scholarship.id)}
+                        >
+                          {scholarship.name}
+                        </SelectItem>
+                      ),
+                    )}
                   </SelectContent>
                 </Select>
                 <FormMessage />
@@ -101,11 +112,11 @@ export default function ScholarshipRecipientForm() {
           </Button>
           <Button
             type="submit"
-            disabled={!selectedBeneficiary}
+            disabled={!selectedBeneficiary || isPending}
             className="flex items-center gap-2"
           >
             <UserPlus className="h-4 w-4" />
-            Agregar Becado
+            {isPending ? 'Agregando...' : 'Agregar Becado'}
           </Button>
         </div>
       </form>

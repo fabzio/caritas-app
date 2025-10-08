@@ -2,7 +2,12 @@ import { auth } from '@api/lib/auth'
 import betterAuth from '@api/modules/auth/middleware'
 import Elysia, { status, t } from 'elysia'
 import { UserModel } from './model'
-import { getSingleUser, getTeamName, getUsers } from './service'
+import {
+  getBeneficiaries,
+  getSingleUser,
+  getTeamName,
+  getUsers,
+} from './service'
 
 const user = new Elysia({
   prefix: '/users',
@@ -13,6 +18,12 @@ const user = new Elysia({
     query: UserModel.listUsersQuery,
     response: {
       200: UserModel.getUsersResponse,
+    },
+  })
+  .get('/beneficiaries', () => getBeneficiaries(), {
+    auth: true,
+    response: {
+      200: UserModel.getBeneficiariesResponse,
     },
   })
   .get(

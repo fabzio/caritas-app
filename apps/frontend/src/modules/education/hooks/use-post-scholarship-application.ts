@@ -1,8 +1,8 @@
+import rpc from '@frontend/lib/rpc'
+import { QueryKeys } from '@frontend/shared/constants/query-keys'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { toast } from 'sonner'
-import rpc from '@/lib/rpc'
-import { QueryKeys } from '@/shared/constants/query-keys'
 
 type CreateScholarshipApplicationParams = {
   scholarshipId: number
@@ -22,11 +22,11 @@ export default function usePostScholarshipApplication() {
       return data
     },
     onSuccess: () => {
-      toast.success('Postulante agregado exitosamente')
+      toast.success('Becado agregado exitosamente')
       queryClient.invalidateQueries({
         queryKey: [QueryKeys.SCHOLARSHIP_APPLICATION],
       })
-      navigate({ to: '/education/scholarship' })
+      navigate({ to: '/education/recipients' })
     },
     onError: (error: Error) => {
       if (error.message.includes('already applied')) {

@@ -48,4 +48,16 @@ export namespace UserModel {
     organizationId: t.String(),
   })
   export type CreateUser = typeof createUser.static
+
+  export const beneficiaryItem = t.Object({
+    id: t.String(),
+    name: t.String(),
+    surname: t.String(),
+    documentType: t.Nullable(t.String()),
+    documentNumber: t.String(),
+    active: t.Boolean(),
+  })
+
+  export const getBeneficiariesResponse = t.Array(beneficiaryItem)
+  export type GetBeneficiariesResponse = typeof getBeneficiariesResponse.static
 }
