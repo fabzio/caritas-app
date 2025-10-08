@@ -1,77 +1,229 @@
-import { describe, expect, it } from 'bun:test'
+import { afterAll, afterEach, beforeAll, describe, expect, it } from 'bun:test'
+import db, { schema } from '@api/db'
 import { auth } from '@api/lib/auth'
 import { treaty } from '@elysiajs/eden'
+import { eq } from 'drizzle-orm'
 import users from '.'
 
+type TeamName = 'Salud' | 'Educación'
+
+type OwnerContext = {
+  cookie: string
+  organizationId: string
+  organizationSlug: string
+  teamIds: Record<TeamName, string>
+  ownerUserId: string
+}
+
 const api = treaty(users)
+const defaultTeams: TeamName[] = ['Salud', 'Educación']
+
+const buildNumericSequence = () =>
+  `${Date.now()}${Math.floor(Math.random() * 1_000_000)}`
+
+const buildDocumentNumber = (value: string, length: number) =>
+  value.padEnd(length, '0').slice(0, length)
+
+const buildPhone = (value: string) => `+51${value.slice(-9).padStart(9, '0')}`
+
+const createOwnerContext = async (): Promise<OwnerContext> => {
+  const sequence = buildNumericSequence()
+  const email = `owner+${sequence}@example.com`
+  const password = 'password'
+  const {
+    user: { id: ownerUserId },
+  } = await auth.api.createUser({
+    body: {
+      name: `Owner ${sequence}`,
+      email,
+      password,
+      role: 'admin',
+      data: {
+        documentType: 'DNI',
+        documentNumber: buildDocumentNumber(sequence, 12),
+        surname: 'Owner',
+        sex: 'M',
+        birthDate: '1990-01-01',
+        phone: buildPhone(sequence),
+        regionId: 1,
+      },
+    },
+  })
+
+  const { headers } = await auth.api.signInEmail({
+    returnHeaders: true,
+    body: {
+      email,
+      password,
+    },
+  })
+  const cookie = headers.get('set-cookie')
+  if (!cookie) throw new Error('Missing authentication cookie')
+
+  const organizationSlug = `test-organization-${sequence}`
+  const organization = await auth.api.createOrganization({
+    headers: { cookie },
+    body: {
+      name: `Test Organization ${sequence}`,
+      slug: organizationSlug,
+      type: 'caritas',
+    },
+  })
+  if (!organization) throw new Error('Failed to create test organization')
+
+  await auth.api.setActiveOrganization({
+    headers: { cookie },
+    body: {
+      organizationId: organization.id,
+      organizationSlug,
+    },
+  })
+
+  const teams = await Promise.all(
+    defaultTeams.map(async (team) => {
+      const created = await auth.api.createTeam({
+        headers: { cookie },
+        body: {
+          name: team,
+          organizationId: organization.id,
+        },
+      })
+      if (!created) throw new Error(`Failed to create test team ${team}`)
+      return [team, created.id] as const
+    }),
+  )
+
+  const teamIds = Object.fromEntries(teams) as Record<TeamName, string>
+
+  return {
+    cookie,
+    organizationId: organization.id,
+    organizationSlug,
+    teamIds,
+    ownerUserId,
+  }
+}
+
+const createMemberUser = async (label: string) => {
+  const sequence = buildNumericSequence()
+  const email = `${label}+${sequence}@example.com`
+  const {
+    user: { id },
+  } = await auth.api.createUser({
+    body: {
+      name: `${label} ${sequence}`,
+      email,
+      password: 'password',
+      role: 'user',
+      data: {
+        documentType: 'DNI',
+        documentNumber: buildDocumentNumber(sequence, 12),
+        surname: label,
+        sex: 'M',
+        birthDate: '1992-02-02',
+        phone: buildPhone(sequence),
+        regionId: 1,
+      },
+    },
+  })
+
+  return { id, email }
+}
+
+const removeUsers = async (ids: string[]) => {
+  if (ids.length === 0) return
+  await db.delete(schema.user).where(eq(schema.user.id, ids[0]))
+  if (ids.length === 1) return
+  for (let index = 1; index < ids.length; index += 1)
+    await db.delete(schema.user).where(eq(schema.user.id, ids[index]))
+}
+
+let ownerContext: OwnerContext
+const stagedUserIds: string[] = []
+
+beforeAll(async () => {
+  ownerContext = await createOwnerContext()
+})
+
+afterEach(async () => {
+  await removeUsers(stagedUserIds.splice(0))
+})
+
+afterAll(async () => {
+  await db
+    .delete(schema.organization)
+    .where(eq(schema.organization.id, ownerContext.organizationId))
+  await removeUsers([ownerContext.ownerUserId])
+})
 
 describe('Common Users Module', () => {
   it('returns a list of users', async () => {
-    const unique = `${Date.now()}${Math.floor(Math.random() * 1_000)}`
-    const email = `welcome+${unique}@example.com`
-    const documentNumber = unique.padEnd(12, '0').slice(0, 12)
-    const phone = `+51${unique.slice(-8).padStart(8, '0')}`
+    const member = await createMemberUser('member-list')
+    stagedUserIds.push(member.id)
 
-    await auth.api.createUser({
+    await auth.api.addMember({
+      headers: { cookie: ownerContext.cookie },
       body: {
-        name: 'Another User',
-        email,
-        password: 'password',
-        role: 'user',
-        data: {
-          documentType: 'DNI',
-          documentNumber,
-          surname: 'User',
-          sex: 'M',
-          birthDate: '1992-02-02',
-          phone,
-          regionId: 1,
-        },
+        userId: member.id,
+        role: 'member',
+        organizationId: ownerContext.organizationId,
       },
     })
 
-    const response = await api.users.get()
+    await auth.api.addTeamMember({
+      headers: { cookie: ownerContext.cookie },
+      body: {
+        userId: member.id,
+        teamId: ownerContext.teamIds.Salud,
+      },
+    })
+
+    const response = await api.users.get({
+      headers: { cookie: ownerContext.cookie },
+      query: {
+        organizationId: ownerContext.organizationId,
+        page: 0,
+        limit: 10,
+      },
+    })
 
     expect(response.status).toBe(200)
     expect(response.data?.data).toBeInstanceOf(Array)
-    expect(response.data?.data.length).toBeGreaterThan(0)
-
-    const userExists =
-      Array.isArray(response.data?.data) &&
-      response.data.data.some((user) => user.email === email)
-    expect(userExists).toBe(true)
+    expect(response.data?.total).toBeGreaterThan(0)
+    const data = response.data?.data ?? []
+    const emails = data.map((user) => user.email)
+    expect(emails).toContain(member.email)
   })
 
   it('returns a single user', async () => {
-    const unique = `${Date.now()}${Math.floor(Math.random() * 1_000)}`
-    const email = `user+${unique}@example.com`
-    const documentNumber = unique.padEnd(8, '0').slice(0, 8)
-    const phone = `+51${unique.slice(-9).padStart(9, '0')}`
+    const member = await createMemberUser('member-single')
+    stagedUserIds.push(member.id)
 
-    const {
-      user: { id },
-    } = await auth.api.createUser({
+    await auth.api.addMember({
+      headers: { cookie: ownerContext.cookie },
       body: {
-        email,
-        name: 'New User',
-        password: 'secret-password',
-        role: 'user',
-        data: {
-          surname: 'Example',
-          documentType: 'DNI',
-          documentNumber,
-          sex: 'M',
-          birthDate: new Date(2000, 8, 3),
-          regionId: 1,
-          phone,
-        },
+        userId: member.id,
+        role: 'member',
+        organizationId: ownerContext.organizationId,
       },
     })
 
-    const response = await api.users({ id }).get()
+    await auth.api.addTeamMember({
+      headers: { cookie: ownerContext.cookie },
+      body: {
+        userId: member.id,
+        teamId: ownerContext.teamIds.Educación,
+      },
+    })
+
+    const response = await api.users({ id: member.id }).get({
+      headers: { cookie: ownerContext.cookie },
+    })
 
     expect(response.status).toBe(200)
-    expect(response.data?.id).toBe(id)
-    expect(response.data?.email).toBe(email)
+    expect(response.data?.id).toBe(member.id)
+    expect(response.data?.email).toBe(member.email)
+    const teamNames = (response.data?.teams ?? []).map((team) => team.name)
+    expect(teamNames).toContain('Educación')
   })
 })
