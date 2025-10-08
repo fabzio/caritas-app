@@ -17,6 +17,7 @@ import { Route as AuthResetPasswordRouteImport } from './routes/auth/reset-passw
 import { Route as AuthRegisterRouteImport } from './routes/auth/register'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
 import { Route as AuthForgotPasswordRouteImport } from './routes/auth/forgot-password'
+import { Route as AuthenticatedUserRouteImport } from './routes/_authenticated/user'
 import { Route as AuthenticatedOrganizationRouteImport } from './routes/_authenticated/organization'
 import { Route as AuthenticatedHealthRouteImport } from './routes/_authenticated/health'
 import { Route as AuthenticatedEducationRouteImport } from './routes/_authenticated/education'
@@ -31,11 +32,12 @@ import { Route as AuthenticatedBeneficiaryIndexRouteImport } from './routes/_aut
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 import { Route as AuthenticatedUserSettingsRouteImport } from './routes/_authenticated/user/settings'
 import { Route as AuthenticatedUserOrganizationsRouteImport } from './routes/_authenticated/user/organizations'
-import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin/users'
 import { Route as AuthenticatedAdminPermissionsRouteImport } from './routes/_authenticated/admin/permissions'
 import { Route as AuthenticatedAdminOrganizationsRouteImport } from './routes/_authenticated/admin/organizations'
 import { Route as AuthenticatedUserSettingsIndexRouteImport } from './routes/_authenticated/user/settings/index'
+import { Route as AuthenticatedAdminUsersIndexRouteImport } from './routes/_authenticated/admin/users/index'
 import { Route as AuthenticatedUserSettingsAuthenticationRouteImport } from './routes/_authenticated/user/settings/authentication'
+import { Route as AuthenticatedAdminUsersFormRouteImport } from './routes/_authenticated/admin/users/form'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
@@ -76,6 +78,11 @@ const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
   path: '/forgot-password',
   getParentRoute: () => AuthRoute,
 } as any)
+const AuthenticatedUserRoute = AuthenticatedUserRouteImport.update({
+  id: '/user',
+  path: '/user',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedOrganizationRoute =
   AuthenticatedOrganizationRouteImport.update({
     id: '/organization',
@@ -109,9 +116,9 @@ const AuthWelcomeIndexRoute = AuthWelcomeIndexRouteImport.update({
   getParentRoute: () => AuthRoute,
 } as any)
 const AuthenticatedUserIndexRoute = AuthenticatedUserIndexRouteImport.update({
-  id: '/user/',
-  path: '/user/',
-  getParentRoute: () => AuthenticatedRoute,
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedUserRoute,
 } as any)
 const AuthenticatedOrganizationIndexRoute =
   AuthenticatedOrganizationIndexRouteImport.update({
@@ -144,21 +151,16 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
 } as any)
 const AuthenticatedUserSettingsRoute =
   AuthenticatedUserSettingsRouteImport.update({
-    id: '/user/settings',
-    path: '/user/settings',
-    getParentRoute: () => AuthenticatedRoute,
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => AuthenticatedUserRoute,
   } as any)
 const AuthenticatedUserOrganizationsRoute =
   AuthenticatedUserOrganizationsRouteImport.update({
-    id: '/user/organizations',
-    path: '/user/organizations',
-    getParentRoute: () => AuthenticatedRoute,
+    id: '/organizations',
+    path: '/organizations',
+    getParentRoute: () => AuthenticatedUserRoute,
   } as any)
-const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
-  id: '/users',
-  path: '/users',
-  getParentRoute: () => AuthenticatedAdminRoute,
-} as any)
 const AuthenticatedAdminPermissionsRoute =
   AuthenticatedAdminPermissionsRouteImport.update({
     id: '/permissions',
@@ -177,11 +179,23 @@ const AuthenticatedUserSettingsIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedUserSettingsRoute,
   } as any)
+const AuthenticatedAdminUsersIndexRoute =
+  AuthenticatedAdminUsersIndexRouteImport.update({
+    id: '/users/',
+    path: '/users/',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedUserSettingsAuthenticationRoute =
   AuthenticatedUserSettingsAuthenticationRouteImport.update({
     id: '/authentication',
     path: '/authentication',
     getParentRoute: () => AuthenticatedUserSettingsRoute,
+  } as any)
+const AuthenticatedAdminUsersFormRoute =
+  AuthenticatedAdminUsersFormRouteImport.update({
+    id: '/users/form',
+    path: '/users/form',
+    getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -192,6 +206,7 @@ export interface FileRoutesByFullPath {
   '/education': typeof AuthenticatedEducationRouteWithChildren
   '/health': typeof AuthenticatedHealthRouteWithChildren
   '/organization': typeof AuthenticatedOrganizationRouteWithChildren
+  '/user': typeof AuthenticatedUserRouteWithChildren
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
@@ -199,7 +214,6 @@ export interface FileRoutesByFullPath {
   '/auth/': typeof AuthIndexRoute
   '/admin/organizations': typeof AuthenticatedAdminOrganizationsRoute
   '/admin/permissions': typeof AuthenticatedAdminPermissionsRoute
-  '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/user/organizations': typeof AuthenticatedUserOrganizationsRoute
   '/user/settings': typeof AuthenticatedUserSettingsRouteWithChildren
   '/admin/': typeof AuthenticatedAdminIndexRoute
@@ -207,9 +221,11 @@ export interface FileRoutesByFullPath {
   '/education/': typeof AuthenticatedEducationIndexRoute
   '/health/': typeof AuthenticatedHealthIndexRoute
   '/organization/': typeof AuthenticatedOrganizationIndexRoute
-  '/user': typeof AuthenticatedUserIndexRoute
+  '/user/': typeof AuthenticatedUserIndexRoute
   '/auth/welcome': typeof AuthWelcomeIndexRoute
+  '/admin/users/form': typeof AuthenticatedAdminUsersFormRoute
   '/user/settings/authentication': typeof AuthenticatedUserSettingsAuthenticationRoute
+  '/admin/users': typeof AuthenticatedAdminUsersIndexRoute
   '/user/settings/': typeof AuthenticatedUserSettingsIndexRoute
 }
 export interface FileRoutesByTo {
@@ -221,7 +237,6 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthIndexRoute
   '/admin/organizations': typeof AuthenticatedAdminOrganizationsRoute
   '/admin/permissions': typeof AuthenticatedAdminPermissionsRoute
-  '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/user/organizations': typeof AuthenticatedUserOrganizationsRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/beneficiary': typeof AuthenticatedBeneficiaryIndexRoute
@@ -230,7 +245,9 @@ export interface FileRoutesByTo {
   '/organization': typeof AuthenticatedOrganizationIndexRoute
   '/user': typeof AuthenticatedUserIndexRoute
   '/auth/welcome': typeof AuthWelcomeIndexRoute
+  '/admin/users/form': typeof AuthenticatedAdminUsersFormRoute
   '/user/settings/authentication': typeof AuthenticatedUserSettingsAuthenticationRoute
+  '/admin/users': typeof AuthenticatedAdminUsersIndexRoute
   '/user/settings': typeof AuthenticatedUserSettingsIndexRoute
 }
 export interface FileRoutesById {
@@ -243,6 +260,7 @@ export interface FileRoutesById {
   '/_authenticated/education': typeof AuthenticatedEducationRouteWithChildren
   '/_authenticated/health': typeof AuthenticatedHealthRouteWithChildren
   '/_authenticated/organization': typeof AuthenticatedOrganizationRouteWithChildren
+  '/_authenticated/user': typeof AuthenticatedUserRouteWithChildren
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
@@ -250,7 +268,6 @@ export interface FileRoutesById {
   '/auth/': typeof AuthIndexRoute
   '/_authenticated/admin/organizations': typeof AuthenticatedAdminOrganizationsRoute
   '/_authenticated/admin/permissions': typeof AuthenticatedAdminPermissionsRoute
-  '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
   '/_authenticated/user/organizations': typeof AuthenticatedUserOrganizationsRoute
   '/_authenticated/user/settings': typeof AuthenticatedUserSettingsRouteWithChildren
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
@@ -260,7 +277,9 @@ export interface FileRoutesById {
   '/_authenticated/organization/': typeof AuthenticatedOrganizationIndexRoute
   '/_authenticated/user/': typeof AuthenticatedUserIndexRoute
   '/auth/welcome_/': typeof AuthWelcomeIndexRoute
+  '/_authenticated/admin/users/form': typeof AuthenticatedAdminUsersFormRoute
   '/_authenticated/user/settings/authentication': typeof AuthenticatedUserSettingsAuthenticationRoute
+  '/_authenticated/admin/users/': typeof AuthenticatedAdminUsersIndexRoute
   '/_authenticated/user/settings/': typeof AuthenticatedUserSettingsIndexRoute
 }
 export interface FileRouteTypes {
@@ -273,6 +292,7 @@ export interface FileRouteTypes {
     | '/education'
     | '/health'
     | '/organization'
+    | '/user'
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/register'
@@ -280,7 +300,6 @@ export interface FileRouteTypes {
     | '/auth/'
     | '/admin/organizations'
     | '/admin/permissions'
-    | '/admin/users'
     | '/user/organizations'
     | '/user/settings'
     | '/admin/'
@@ -288,9 +307,11 @@ export interface FileRouteTypes {
     | '/education/'
     | '/health/'
     | '/organization/'
-    | '/user'
+    | '/user/'
     | '/auth/welcome'
+    | '/admin/users/form'
     | '/user/settings/authentication'
+    | '/admin/users'
     | '/user/settings/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -302,7 +323,6 @@ export interface FileRouteTypes {
     | '/auth'
     | '/admin/organizations'
     | '/admin/permissions'
-    | '/admin/users'
     | '/user/organizations'
     | '/admin'
     | '/beneficiary'
@@ -311,7 +331,9 @@ export interface FileRouteTypes {
     | '/organization'
     | '/user'
     | '/auth/welcome'
+    | '/admin/users/form'
     | '/user/settings/authentication'
+    | '/admin/users'
     | '/user/settings'
   id:
     | '__root__'
@@ -323,6 +345,7 @@ export interface FileRouteTypes {
     | '/_authenticated/education'
     | '/_authenticated/health'
     | '/_authenticated/organization'
+    | '/_authenticated/user'
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/register'
@@ -330,7 +353,6 @@ export interface FileRouteTypes {
     | '/auth/'
     | '/_authenticated/admin/organizations'
     | '/_authenticated/admin/permissions'
-    | '/_authenticated/admin/users'
     | '/_authenticated/user/organizations'
     | '/_authenticated/user/settings'
     | '/_authenticated/admin/'
@@ -340,7 +362,9 @@ export interface FileRouteTypes {
     | '/_authenticated/organization/'
     | '/_authenticated/user/'
     | '/auth/welcome_/'
+    | '/_authenticated/admin/users/form'
     | '/_authenticated/user/settings/authentication'
+    | '/_authenticated/admin/users/'
     | '/_authenticated/user/settings/'
   fileRoutesById: FileRoutesById
 }
@@ -408,6 +432,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthForgotPasswordRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/_authenticated/user': {
+      id: '/_authenticated/user'
+      path: '/user'
+      fullPath: '/user'
+      preLoaderRoute: typeof AuthenticatedUserRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/organization': {
       id: '/_authenticated/organization'
       path: '/organization'
@@ -452,10 +483,10 @@ declare module '@tanstack/react-router' {
     }
     '/_authenticated/user/': {
       id: '/_authenticated/user/'
-      path: '/user'
-      fullPath: '/user'
+      path: '/'
+      fullPath: '/user/'
       preLoaderRoute: typeof AuthenticatedUserIndexRouteImport
-      parentRoute: typeof AuthenticatedRoute
+      parentRoute: typeof AuthenticatedUserRoute
     }
     '/_authenticated/organization/': {
       id: '/_authenticated/organization/'
@@ -494,24 +525,17 @@ declare module '@tanstack/react-router' {
     }
     '/_authenticated/user/settings': {
       id: '/_authenticated/user/settings'
-      path: '/user/settings'
+      path: '/settings'
       fullPath: '/user/settings'
       preLoaderRoute: typeof AuthenticatedUserSettingsRouteImport
-      parentRoute: typeof AuthenticatedRoute
+      parentRoute: typeof AuthenticatedUserRoute
     }
     '/_authenticated/user/organizations': {
       id: '/_authenticated/user/organizations'
-      path: '/user/organizations'
+      path: '/organizations'
       fullPath: '/user/organizations'
       preLoaderRoute: typeof AuthenticatedUserOrganizationsRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/admin/users': {
-      id: '/_authenticated/admin/users'
-      path: '/users'
-      fullPath: '/admin/users'
-      preLoaderRoute: typeof AuthenticatedAdminUsersRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
+      parentRoute: typeof AuthenticatedUserRoute
     }
     '/_authenticated/admin/permissions': {
       id: '/_authenticated/admin/permissions'
@@ -534,6 +558,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedUserSettingsIndexRouteImport
       parentRoute: typeof AuthenticatedUserSettingsRoute
     }
+    '/_authenticated/admin/users/': {
+      id: '/_authenticated/admin/users/'
+      path: '/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AuthenticatedAdminUsersIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/user/settings/authentication': {
       id: '/_authenticated/user/settings/authentication'
       path: '/authentication'
@@ -541,21 +572,30 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedUserSettingsAuthenticationRouteImport
       parentRoute: typeof AuthenticatedUserSettingsRoute
     }
+    '/_authenticated/admin/users/form': {
+      id: '/_authenticated/admin/users/form'
+      path: '/users/form'
+      fullPath: '/admin/users/form'
+      preLoaderRoute: typeof AuthenticatedAdminUsersFormRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
   }
 }
 
 interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminOrganizationsRoute: typeof AuthenticatedAdminOrganizationsRoute
   AuthenticatedAdminPermissionsRoute: typeof AuthenticatedAdminPermissionsRoute
-  AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
+  AuthenticatedAdminUsersFormRoute: typeof AuthenticatedAdminUsersFormRoute
+  AuthenticatedAdminUsersIndexRoute: typeof AuthenticatedAdminUsersIndexRoute
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminOrganizationsRoute: AuthenticatedAdminOrganizationsRoute,
   AuthenticatedAdminPermissionsRoute: AuthenticatedAdminPermissionsRoute,
-  AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
+  AuthenticatedAdminUsersFormRoute: AuthenticatedAdminUsersFormRoute,
+  AuthenticatedAdminUsersIndexRoute: AuthenticatedAdminUsersIndexRoute,
 }
 
 const AuthenticatedAdminRouteWithChildren =
@@ -631,15 +671,28 @@ const AuthenticatedUserSettingsRouteWithChildren =
     AuthenticatedUserSettingsRouteChildren,
   )
 
+interface AuthenticatedUserRouteChildren {
+  AuthenticatedUserOrganizationsRoute: typeof AuthenticatedUserOrganizationsRoute
+  AuthenticatedUserSettingsRoute: typeof AuthenticatedUserSettingsRouteWithChildren
+  AuthenticatedUserIndexRoute: typeof AuthenticatedUserIndexRoute
+}
+
+const AuthenticatedUserRouteChildren: AuthenticatedUserRouteChildren = {
+  AuthenticatedUserOrganizationsRoute: AuthenticatedUserOrganizationsRoute,
+  AuthenticatedUserSettingsRoute: AuthenticatedUserSettingsRouteWithChildren,
+  AuthenticatedUserIndexRoute: AuthenticatedUserIndexRoute,
+}
+
+const AuthenticatedUserRouteWithChildren =
+  AuthenticatedUserRoute._addFileChildren(AuthenticatedUserRouteChildren)
+
 interface AuthenticatedRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
   AuthenticatedBeneficiaryRoute: typeof AuthenticatedBeneficiaryRouteWithChildren
   AuthenticatedEducationRoute: typeof AuthenticatedEducationRouteWithChildren
   AuthenticatedHealthRoute: typeof AuthenticatedHealthRouteWithChildren
   AuthenticatedOrganizationRoute: typeof AuthenticatedOrganizationRouteWithChildren
-  AuthenticatedUserOrganizationsRoute: typeof AuthenticatedUserOrganizationsRoute
-  AuthenticatedUserSettingsRoute: typeof AuthenticatedUserSettingsRouteWithChildren
-  AuthenticatedUserIndexRoute: typeof AuthenticatedUserIndexRoute
+  AuthenticatedUserRoute: typeof AuthenticatedUserRouteWithChildren
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
@@ -648,9 +701,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedEducationRoute: AuthenticatedEducationRouteWithChildren,
   AuthenticatedHealthRoute: AuthenticatedHealthRouteWithChildren,
   AuthenticatedOrganizationRoute: AuthenticatedOrganizationRouteWithChildren,
-  AuthenticatedUserOrganizationsRoute: AuthenticatedUserOrganizationsRoute,
-  AuthenticatedUserSettingsRoute: AuthenticatedUserSettingsRouteWithChildren,
-  AuthenticatedUserIndexRoute: AuthenticatedUserIndexRoute,
+  AuthenticatedUserRoute: AuthenticatedUserRouteWithChildren,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(

@@ -56,7 +56,7 @@ export const useRegister = () => {
         )
       }
     },
-    onSuccess: async ({ user }) => {
+    onSuccess: async ({ user }, { password }) => {
       toast.success('Usuario registrado correctamente')
       const setupResponse = await rpc.auth.setup.post({ id: user.id })
       if (setupResponse.status === 500) {
@@ -70,8 +70,9 @@ export const useRegister = () => {
       if (!setupResponse.data) return
       try {
         await initializeOrganization(user.id)
-        toast.success('Organización inicializada correctamente')
+        await authClient.signOut()
         navigate({ to: '/admin' })
+        toast.success('Inicialización exitosa, ya puede iniciar sesión')
       } catch (organizationError) {
         console.error('Organization initialization failed:', organizationError)
         toast.error('Error al inicializar la organización, intente luego')
@@ -104,6 +105,10 @@ const createOrganization = async (): Promise<OrganizationData> => {
   })
   if (error) throw error
   if (!data) throw new Error('No se pudo crear la organización')
+  const { error: setActiveError } = await authClient.organization.setActive({
+    organizationId: data.id,
+  })
+  if (setActiveError) throw setActiveError
   return data
 }
 
@@ -132,7 +137,11 @@ const addUserToPrimaryTeam = async (teamId: TeamId, userId: UserId) => {
 }
 
 const initializeOrganization = async (userId: UserId) => {
-  const organization = await createOrganization()
-  const primaryTeamId = await createDefaultTeams(organization.id)
-  await addUserToPrimaryTeam(primaryTeamId, userId)
+  try {
+    const organization = await createOrganization()
+    const primaryTeamId = await createDefaultTeams(organization.id)
+    await addUserToPrimaryTeam(primaryTeamId, userId)
+  } catch (error) {
+    console.error('Organization initialization failed:', error)
+  }
 }

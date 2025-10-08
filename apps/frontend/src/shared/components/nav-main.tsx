@@ -43,6 +43,7 @@ const isOrganizationType = (value: string): value is OrganizationType =>
 
 function NavMain({ items }: Readonly<Props>) {
   const navigate = useNavigate()
+  const { data: memberRoleData } = authClient.useActiveMemberRole()
   const { data: sessionData } = useSession()
   const { data: orgs, isLoading } = useQuery({
     queryKey: [QueryKeys.ORGANIZATIONS],
@@ -74,7 +75,7 @@ function NavMain({ items }: Readonly<Props>) {
         return
       }
       const route = redirectByProperties({
-        role: sessionData?.user.role ?? null,
+        role: memberRoleData?.role ?? null,
         organizationType,
         teams: filteredTeams,
       })
@@ -83,7 +84,7 @@ function NavMain({ items }: Readonly<Props>) {
     }
 
     const route = redirectByProperties({
-      role: sessionData?.user.role ?? null,
+      role: memberRoleData?.role ?? null,
       organizationType,
     })
     navigate({ to: route })
