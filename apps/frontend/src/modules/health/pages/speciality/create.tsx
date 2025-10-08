@@ -15,9 +15,11 @@ import {
   FormField,
   FormItem,
   FormLabel,
+  FormMessage,
 } from '@workspace/ui/components/form'
 import { Input } from '@workspace/ui/components/input'
 import { Separator } from '@workspace/ui/components/separator'
+import { Loader2 } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import usePostSpeciality from '../../hooks/use-post-speciality'
 import {
@@ -33,7 +35,7 @@ export default function CreateSpeciality() {
     },
   })
 
-  const { mutate } = usePostSpeciality()
+  const { mutate, isPending } = usePostSpeciality()
   const { data: user } = useSession()
 
   const handleSubmit = form.handleSubmit((data) => {
@@ -46,10 +48,10 @@ export default function CreateSpeciality() {
     <div className="flex flex-1 flex-col gap-6 p-4">
       <div className="flex flex-col gap-1">
         <h1 className="text-2xl font-semibold text-foreground">
-          Registrar nueva Beca
+          Registrar Nueva Especialidad
         </h1>
         <span className="text-muted-foreground">
-          Complete la información de la beca
+          Complete la información de la especialidad
         </span>
         <Separator />
       </div>
@@ -57,10 +59,8 @@ export default function CreateSpeciality() {
         <div className=" flex justify-center ">
           <Card className="w-full lg:w-3/4">
             <CardHeader>
-              <CardTitle>Información de la Beca</CardTitle>
-              <CardDescription>
-                Complete todos los campos requeridos
-              </CardDescription>
+              <CardTitle>Información de la Especialidad</CardTitle>
+              <CardDescription>Complete el campo requerido</CardDescription>
             </CardHeader>
             <CardContent>
               <Form {...form}>
@@ -70,17 +70,26 @@ export default function CreateSpeciality() {
                     name="name"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Nombre de la Beca</FormLabel>
+                        <FormLabel>Nombre de la Especialidad</FormLabel>
                         <FormControl>
                           <Input {...field} />
                         </FormControl>
+                        <FormMessage />
                       </FormItem>
                     )}
                   />
                   <CardFooter className="flex justify-end gap-4 ">
                     <Button variant="outline">Cancelar</Button>
-                    <Button variant="default" type="submit">
-                      Registrar
+                    <Button
+                      className="mt-2 col-span-2"
+                      type="submit"
+                      disabled={isPending}
+                    >
+                      {isPending ? (
+                        <Loader2 className="animate-spin w-2" />
+                      ) : (
+                        'Registrar'
+                      )}
                     </Button>
                   </CardFooter>
                 </form>
