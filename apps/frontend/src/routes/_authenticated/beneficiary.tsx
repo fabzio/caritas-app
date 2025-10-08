@@ -1,5 +1,7 @@
+import beneficiaryNavItems from '@frontend/modules/beneficiary/layout/nav-items'
 import { QueryKeys } from '@frontend/shared/constants/query-keys'
-import { createFileRoute, redirect } from '@tanstack/react-router'
+import MainLayout from '@frontend/shared/layouts/main-layout'
+import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/_authenticated/beneficiary')({
   beforeLoad: async ({ context: { authClient, queryClient } }) => {
@@ -20,4 +22,9 @@ export const Route = createFileRoute('/_authenticated/beneficiary')({
       organizationId: haveBeneficiaryOrg?.[0]?.id,
     })
   },
+  component: () => (
+    <MainLayout navItems={beneficiaryNavItems}>
+      <Outlet />
+    </MainLayout>
+  ),
 })
