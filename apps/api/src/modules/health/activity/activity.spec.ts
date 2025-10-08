@@ -24,6 +24,6 @@ describe('Health Activity Module', () => {
       },
     })
     expect(response.status).toBe(200)
-    expect(response.data).toBeInstanceOf(Array)
+    expect(response.data?.data).toBeInstanceOf(Array)
   })
 })
