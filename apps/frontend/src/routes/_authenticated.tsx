@@ -1,5 +1,4 @@
 import { QueryKeys } from '@frontend/shared/constants/query-keys'
-import MainLayout from '@frontend/shared/layouts/main-layout'
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/_authenticated')({
@@ -9,7 +8,6 @@ export const Route = createFileRoute('/_authenticated')({
       queryFn: () => authClient.getSession(),
       staleTime: Infinity,
     })
-
     if (!data)
       throw redirect({
         to: '/auth/login',
@@ -18,9 +16,5 @@ export const Route = createFileRoute('/_authenticated')({
         },
       })
   },
-  component: () => (
-    <MainLayout>
-      <Outlet />
-    </MainLayout>
-  ),
+  component: () => <Outlet />,
 })

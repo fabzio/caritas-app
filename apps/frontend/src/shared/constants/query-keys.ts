@@ -8,6 +8,7 @@ export const QueryKeys = {
     PASSKEYS: 'settings-passkeys',
   },
   ADMIN: {
+    ORGS_ROLE: 'admin-org-role',
     ORGANIZATION: 'admin-organization',
     USERS: 'admin-members',
   },
