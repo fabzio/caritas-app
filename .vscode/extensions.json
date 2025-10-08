@@ -11,6 +11,7 @@
     "naumovs.color-highlight",
     "github.copilot",
     "sonarsource.sonarlint-vscode",
-    "pkief.material-icon-theme"
+    "pkief.material-icon-theme",
+    "cweijan.vscode-postgresql-client2"
   ]
 }

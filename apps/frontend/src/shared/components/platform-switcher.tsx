@@ -32,6 +32,7 @@ function PlatformSwitcher({ platforms }: Readonly<Props>) {
     setSelectedPlatform(platform)
     navigate({ to: platform.path })
   }
+  if (!platforms.length) return null
   return (
     <SidebarMenu>
       <SidebarMenuItem>

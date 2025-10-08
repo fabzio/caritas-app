@@ -59,7 +59,6 @@ export const createFirstOrganization = async (id: string) => {
     })
     return orgId
   } catch (error) {
-    console.log(error)
     if (error instanceof Error) throw new PostgresError(error.message)
     throw error
   }
