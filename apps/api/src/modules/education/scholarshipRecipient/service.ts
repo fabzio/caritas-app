@@ -46,9 +46,6 @@ export async function getRecipients(
           ),
           ilike(user.documentType, `%${searchQuery}%`),
           ilike(user.documentNumber, `%${searchQuery}%`),
-          ilike(scholarship.name, `%${searchQuery}%`),
-          ilike(organization.name, `%${searchQuery}%`),
-          ilike(region.name, `%${searchQuery}%`),
         )
       : undefined
 
