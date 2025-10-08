@@ -10,6 +10,11 @@ const speciality = new Elysia({
   .use(betterAuth)
   .get('', getSpecialities, {
     auth: true,
+    query: t.Object({
+      search: t.Optional(
+        t.String({ description: 'Filtro de búsqueda por nombre' }),
+      ),
+    }),
     response: {
       200: SpecialityModel.getSpecialities,
       401: t.Literal('Unauthorized'),
