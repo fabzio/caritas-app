@@ -1,5 +1,6 @@
 import { useSession } from '@frontend/hooks/use-session'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Link } from '@tanstack/react-router'
 import { Button } from '@workspace/ui/components/button'
 import {
   Card,
@@ -21,11 +22,11 @@ import { Input } from '@workspace/ui/components/input'
 import { Separator } from '@workspace/ui/components/separator'
 import { Loader2 } from 'lucide-react'
 import { useForm } from 'react-hook-form'
-import usePostSpeciality from '../../hooks/use-post-speciality'
+import usePostSpeciality from './hooks/use-post-speciality'
 import {
   type FormSpecialitySchema,
   formSpecialitySchema,
-} from '../../models/speciality'
+} from './models/speciality'
 
 export default function CreateSpeciality() {
   const form = useForm<FormSpecialitySchema>({
@@ -79,7 +80,11 @@ export default function CreateSpeciality() {
                     )}
                   />
                   <CardFooter className="flex justify-end gap-4 ">
-                    <Button variant="outline">Cancelar</Button>
+                    <Link to="/health/speciality">
+                      <Button className="mt-2" variant="outline">
+                        Cancelar
+                      </Button>
+                    </Link>
                     <Button
                       className="mt-2 col-span-2"
                       type="submit"
