@@ -1,3 +1,4 @@
+import { relations } from 'drizzle-orm'
 import {
   boolean,
   date,
@@ -190,4 +191,22 @@ export const scholarshipMajor = educationSchema.table(
       .references(() => organizationMajor.id, { onDelete: 'cascade' }),
   },
   (table) => [primaryKey({ columns: [table.scholarshipId, table.majorId] })],
+)
+
+export const scholarshipApplicationRelations = relations(
+  scholarshipApplication,
+  ({ one }) => ({
+    user: one(user, {
+      fields: [scholarshipApplication.userId],
+      references: [user.id],
+    }),
+    scholarship: one(scholarship, {
+      fields: [scholarshipApplication.scholarshipId],
+      references: [scholarship.id],
+    }),
+    reviewer: one(user, {
+      fields: [scholarshipApplication.reviewedBy],
+      references: [user.id],
+    }),
+  }),
 )
