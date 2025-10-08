@@ -136,7 +136,7 @@ export default function DataTable<T>({
                 <Button
                   variant={+page === currentPage + 1 ? 'outline' : 'ghost'}
                   size="icon"
-                  onClick={() => table.setPageIndex(+page)}
+                  onClick={() => table.setPageIndex(+page - 1)}
                 >
                   {page}
                 </Button>

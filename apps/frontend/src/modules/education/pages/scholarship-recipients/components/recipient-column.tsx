@@ -56,7 +56,11 @@ export const scholarshipRecipientTableColumns: ColumnDef<Recipient>[] = [
         <ArrowUpDown />
       </Button>
     ),
-    cell: ({ row }) => row.original.scholarshipName,
+    cell: ({ row }) => row.original.scholarshipName || 'Sin beca asignada', //No deberia ocurrir
+    enableSorting: false,
+    meta: {
+      filterVariant: 'select',
+    },
   },
   {
     accessorKey: 'organization',
