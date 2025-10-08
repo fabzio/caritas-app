@@ -35,13 +35,13 @@ import { Route as AuthenticatedUserOrganizationsRouteImport } from './routes/_au
 import { Route as AuthenticatedAdminPermissionsRouteImport } from './routes/_authenticated/admin/permissions'
 import { Route as AuthenticatedAdminOrganizationsRouteImport } from './routes/_authenticated/admin/organizations'
 import { Route as AuthenticatedUserSettingsIndexRouteImport } from './routes/_authenticated/user/settings/index'
-import { Route as AuthenticatedAdminUsersIndexRouteImport } from './routes/_authenticated/admin/users/index'
 import { Route as AuthenticatedEducationScholarshipIndexRouteImport } from './routes/_authenticated/education/scholarship/index'
 import { Route as AuthenticatedEducationRecipientsIndexRouteImport } from './routes/_authenticated/education/recipients/index'
+import { Route as AuthenticatedAdminUsersIndexRouteImport } from './routes/_authenticated/admin/users/index'
 import { Route as AuthenticatedUserSettingsAuthenticationRouteImport } from './routes/_authenticated/user/settings/authentication'
-import { Route as AuthenticatedAdminUsersFormRouteImport } from './routes/_authenticated/admin/users/form'
 import { Route as AuthenticatedEducationScholarshipCreateRouteImport } from './routes/_authenticated/education/scholarship/create'
 import { Route as AuthenticatedEducationRecipientsCreateRouteImport } from './routes/_authenticated/education/recipients/create'
+import { Route as AuthenticatedAdminUsersFormRouteImport } from './routes/_authenticated/admin/users/form'
 import { Route as AuthenticatedUserEducationScholarshipIndexRouteImport } from './routes/_authenticated/user/education/scholarship/index'
 import { Route as AuthenticatedEducationScholarshipScholarshipIdViewRouteImport } from './routes/_authenticated/education/scholarship/$scholarshipId/view'
 
@@ -185,12 +185,6 @@ const AuthenticatedUserSettingsIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedUserSettingsRoute,
   } as any)
-const AuthenticatedAdminUsersIndexRoute =
-  AuthenticatedAdminUsersIndexRouteImport.update({
-    id: '/users/',
-    path: '/users/',
-    getParentRoute: () => AuthenticatedAdminRoute,
-  } as any)
 const AuthenticatedEducationScholarshipIndexRoute =
   AuthenticatedEducationScholarshipIndexRouteImport.update({
     id: '/scholarship/',
@@ -203,17 +197,17 @@ const AuthenticatedEducationRecipientsIndexRoute =
     path: '/recipients/',
     getParentRoute: () => AuthenticatedEducationRoute,
   } as any)
+const AuthenticatedAdminUsersIndexRoute =
+  AuthenticatedAdminUsersIndexRouteImport.update({
+    id: '/users/',
+    path: '/users/',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedUserSettingsAuthenticationRoute =
   AuthenticatedUserSettingsAuthenticationRouteImport.update({
     id: '/authentication',
     path: '/authentication',
     getParentRoute: () => AuthenticatedUserSettingsRoute,
-  } as any)
-const AuthenticatedAdminUsersFormRoute =
-  AuthenticatedAdminUsersFormRouteImport.update({
-    id: '/users/form',
-    path: '/users/form',
-    getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
 const AuthenticatedEducationScholarshipCreateRoute =
   AuthenticatedEducationScholarshipCreateRouteImport.update({
@@ -227,11 +221,17 @@ const AuthenticatedEducationRecipientsCreateRoute =
     path: '/recipients/create',
     getParentRoute: () => AuthenticatedEducationRoute,
   } as any)
+const AuthenticatedAdminUsersFormRoute =
+  AuthenticatedAdminUsersFormRouteImport.update({
+    id: '/users/form',
+    path: '/users/form',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedUserEducationScholarshipIndexRoute =
   AuthenticatedUserEducationScholarshipIndexRouteImport.update({
-    id: '/user/education/scholarship/',
-    path: '/user/education/scholarship/',
-    getParentRoute: () => AuthenticatedRoute,
+    id: '/education/scholarship/',
+    path: '/education/scholarship/',
+    getParentRoute: () => AuthenticatedUserRoute,
   } as any)
 const AuthenticatedEducationScholarshipScholarshipIdViewRoute =
   AuthenticatedEducationScholarshipScholarshipIdViewRouteImport.update({
@@ -636,13 +636,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedUserSettingsIndexRouteImport
       parentRoute: typeof AuthenticatedUserSettingsRoute
     }
-    '/_authenticated/admin/users/': {
-      id: '/_authenticated/admin/users/'
-      path: '/users'
-      fullPath: '/admin/users'
-      preLoaderRoute: typeof AuthenticatedAdminUsersIndexRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
-    }
     '/_authenticated/education/scholarship/': {
       id: '/_authenticated/education/scholarship/'
       path: '/scholarship'
@@ -657,19 +650,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedEducationRecipientsIndexRouteImport
       parentRoute: typeof AuthenticatedEducationRoute
     }
+    '/_authenticated/admin/users/': {
+      id: '/_authenticated/admin/users/'
+      path: '/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AuthenticatedAdminUsersIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/user/settings/authentication': {
       id: '/_authenticated/user/settings/authentication'
       path: '/authentication'
       fullPath: '/user/settings/authentication'
       preLoaderRoute: typeof AuthenticatedUserSettingsAuthenticationRouteImport
       parentRoute: typeof AuthenticatedUserSettingsRoute
-    }
-    '/_authenticated/admin/users/form': {
-      id: '/_authenticated/admin/users/form'
-      path: '/users/form'
-      fullPath: '/admin/users/form'
-      preLoaderRoute: typeof AuthenticatedAdminUsersFormRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
     }
     '/_authenticated/education/scholarship/create': {
       id: '/_authenticated/education/scholarship/create'
@@ -685,12 +678,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedEducationRecipientsCreateRouteImport
       parentRoute: typeof AuthenticatedEducationRoute
     }
+    '/_authenticated/admin/users/form': {
+      id: '/_authenticated/admin/users/form'
+      path: '/users/form'
+      fullPath: '/admin/users/form'
+      preLoaderRoute: typeof AuthenticatedAdminUsersFormRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/user/education/scholarship/': {
       id: '/_authenticated/user/education/scholarship/'
-      path: '/user/education/scholarship'
+      path: '/education/scholarship'
       fullPath: '/user/education/scholarship'
       preLoaderRoute: typeof AuthenticatedUserEducationScholarshipIndexRouteImport
-      parentRoute: typeof AuthenticatedRoute
+      parentRoute: typeof AuthenticatedUserRoute
     }
     '/_authenticated/education/scholarship/$scholarshipId/view': {
       id: '/_authenticated/education/scholarship/$scholarshipId/view'
@@ -810,12 +810,15 @@ interface AuthenticatedUserRouteChildren {
   AuthenticatedUserOrganizationsRoute: typeof AuthenticatedUserOrganizationsRoute
   AuthenticatedUserSettingsRoute: typeof AuthenticatedUserSettingsRouteWithChildren
   AuthenticatedUserIndexRoute: typeof AuthenticatedUserIndexRoute
+  AuthenticatedUserEducationScholarshipIndexRoute: typeof AuthenticatedUserEducationScholarshipIndexRoute
 }
 
 const AuthenticatedUserRouteChildren: AuthenticatedUserRouteChildren = {
   AuthenticatedUserOrganizationsRoute: AuthenticatedUserOrganizationsRoute,
   AuthenticatedUserSettingsRoute: AuthenticatedUserSettingsRouteWithChildren,
   AuthenticatedUserIndexRoute: AuthenticatedUserIndexRoute,
+  AuthenticatedUserEducationScholarshipIndexRoute:
+    AuthenticatedUserEducationScholarshipIndexRoute,
 }
 
 const AuthenticatedUserRouteWithChildren =
@@ -828,10 +831,6 @@ interface AuthenticatedRouteChildren {
   AuthenticatedHealthRoute: typeof AuthenticatedHealthRouteWithChildren
   AuthenticatedOrganizationRoute: typeof AuthenticatedOrganizationRouteWithChildren
   AuthenticatedUserRoute: typeof AuthenticatedUserRouteWithChildren
-  AuthenticatedUserOrganizationsRoute: typeof AuthenticatedUserOrganizationsRoute
-  AuthenticatedUserSettingsRoute: typeof AuthenticatedUserSettingsRouteWithChildren
-  AuthenticatedUserIndexRoute: typeof AuthenticatedUserIndexRoute
-  AuthenticatedUserEducationScholarshipIndexRoute: typeof AuthenticatedUserEducationScholarshipIndexRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
@@ -841,11 +840,6 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedHealthRoute: AuthenticatedHealthRouteWithChildren,
   AuthenticatedOrganizationRoute: AuthenticatedOrganizationRouteWithChildren,
   AuthenticatedUserRoute: AuthenticatedUserRouteWithChildren,
-  AuthenticatedUserOrganizationsRoute: AuthenticatedUserOrganizationsRoute,
-  AuthenticatedUserSettingsRoute: AuthenticatedUserSettingsRouteWithChildren,
-  AuthenticatedUserIndexRoute: AuthenticatedUserIndexRoute,
-  AuthenticatedUserEducationScholarshipIndexRoute:
-    AuthenticatedUserEducationScholarshipIndexRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
