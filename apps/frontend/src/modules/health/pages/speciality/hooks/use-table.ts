@@ -2,8 +2,8 @@ import { useSpecialities } from '@frontend/modules/health/pages/speciality/hooks
 import { useMemo } from 'react'
 import { specialityTableColumns } from '../components/columns'
 
-export const useSpecialityTable = () => {
-  const { data } = useSpecialities()
+export const useSpecialityTable = (search: string) => {
+  const { data } = useSpecialities(search)
   const columns = useMemo(() => specialityTableColumns, [])
 
   return {

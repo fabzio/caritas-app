@@ -5,12 +5,14 @@ import { useSpecialityTable } from '../hooks/use-table'
 type Props = {
   rowSelection: Record<string, boolean>
   setRowSelection: OnChangeFn<Record<string, boolean>>
+  search: string
 }
 export default function SpecialityTable({
   rowSelection,
   setRowSelection,
+  search,
 }: Readonly<Props>) {
-  const { data, columns } = useSpecialityTable()
+  const { data, columns } = useSpecialityTable(search)
   return (
     <DataTable
       data={data}
