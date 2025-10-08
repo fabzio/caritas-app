@@ -40,8 +40,8 @@ import { Route as AuthenticatedEducationRecipientsIndexRouteImport } from './rou
 import { Route as AuthenticatedUserSettingsAuthenticationRouteImport } from './routes/_authenticated/user/settings/authentication'
 import { Route as AuthenticatedEducationScholarshipCreateRouteImport } from './routes/_authenticated/education/scholarship/create'
 import { Route as AuthenticatedEducationRecipientsCreateRouteImport } from './routes/_authenticated/education/recipients/create'
-import { Route as AuthenticatedEducationScholarshipScholarshipIdViewRouteImport } from './routes/_authenticated/education/scholarship/$scholarshipId/view'
 import { Route as AuthenticatedUserEducationScholarshipIndexRouteImport } from './routes/_authenticated/user/education/scholarship/index'
+import { Route as AuthenticatedEducationScholarshipScholarshipIdViewRouteImport } from './routes/_authenticated/education/scholarship/$scholarshipId/view'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
@@ -213,17 +213,17 @@ const AuthenticatedEducationRecipientsCreateRoute =
     path: '/recipients/create',
     getParentRoute: () => AuthenticatedEducationRoute,
   } as any)
-const AuthenticatedEducationScholarshipScholarshipIdViewRoute =
-  AuthenticatedEducationScholarshipScholarshipIdViewRouteImport.update({
-    id: '/scholarship/$scholarshipId/view',
-    path: '/scholarship/$scholarshipId/view',
-    getParentRoute: () => AuthenticatedEducationRoute,
-  } as any)
 const AuthenticatedUserEducationScholarshipIndexRoute =
   AuthenticatedUserEducationScholarshipIndexRouteImport.update({
     id: '/user/education/scholarship/',
     path: '/user/education/scholarship/',
     getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedEducationScholarshipScholarshipIdViewRoute =
+  AuthenticatedEducationScholarshipScholarshipIdViewRouteImport.update({
+    id: '/scholarship/$scholarshipId/view',
+    path: '/scholarship/$scholarshipId/view',
+    getParentRoute: () => AuthenticatedEducationRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -647,19 +647,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedEducationRecipientsCreateRouteImport
       parentRoute: typeof AuthenticatedEducationRoute
     }
-    '/_authenticated/education/scholarship/$scholarshipId/view': {
-      id: '/_authenticated/education/scholarship/$scholarshipId/view'
-      path: '/scholarship/$scholarshipId/view'
-      fullPath: '/education/scholarship/$scholarshipId/view'
-      preLoaderRoute: typeof AuthenticatedEducationScholarshipScholarshipIdViewRouteImport
-      parentRoute: typeof AuthenticatedEducationRoute
-    }
     '/_authenticated/user/education/scholarship/': {
       id: '/_authenticated/user/education/scholarship/'
       path: '/user/education/scholarship'
       fullPath: '/user/education/scholarship'
       preLoaderRoute: typeof AuthenticatedUserEducationScholarshipIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/education/scholarship/$scholarshipId/view': {
+      id: '/_authenticated/education/scholarship/$scholarshipId/view'
+      path: '/scholarship/$scholarshipId/view'
+      fullPath: '/education/scholarship/$scholarshipId/view'
+      preLoaderRoute: typeof AuthenticatedEducationScholarshipScholarshipIdViewRouteImport
+      parentRoute: typeof AuthenticatedEducationRoute
     }
   }
 }
