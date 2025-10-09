@@ -1,5 +1,3 @@
-import { useSession } from '@frontend/hooks/use-session'
-import authClient from '@frontend/lib/authClient'
 import rpc from '@frontend/lib/rpc'
 import { QueryKeys } from '@frontend/shared/constants/query-keys'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -10,24 +8,26 @@ type CreateAllyProps = {
   name: string
 }
 
-export const useCreateOrganization = () => {
+export const useCreateAlly = () => {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (props: CreateAllyProps) => {
-      const { data, error } = await rpc.admin.organization.post(props)
-      if (error) throw error
-      await rpc.admin.organization.post({
+      const { data, error } = await rpc.admin.organization.post({
         name: props.name,
+        type: 'health',
+        logo: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTkP-gtKIteijyewNjDaWUPoV4LEI-sZtgRiw&s',
       })
+      if (error) throw error
+      return data
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: [QueryKeys.ADMIN.ORGANIZATION],
       })
-      toast.success('Creada organización exitosamente')
+      toast.success('Creado aliado exitosamente')
       navigate({
-        to: '/admin/allies',
+        to: '/health/allies',
       })
     },
     onError: (error: Error) => {

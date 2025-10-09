@@ -5,7 +5,7 @@ import { OrganizationsTableColumns } from '../components/columns'
 import { useListOrganizations } from './use-list-organizations'
 
 export const useOrganizationTable = () => {
-  const { filters, setFilters } = useFilters('/_authenticated/admin/allies')
+  const { filters, setFilters } = useFilters('/_authenticated/health/allies/')
   const { data: response } = useListOrganizations({
     currentPage: filters.pageIndex,
     pageSize: filters.pageSize,

@@ -1,18 +1,8 @@
 import { useCreateOrganization } from '@frontend/modules/auth/pages/welcome/hooks/use-create-organization'
-import { formUserSchema } from '@frontend/shared/models/user'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { SelectValue } from '@radix-ui/react-select'
 import { getRouteApi, Link, useSearch } from '@tanstack/react-router'
 import { Button } from '@workspace/ui/components/button'
-import { Calendar } from '@workspace/ui/components/calendar'
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from '@workspace/ui/components/command'
 import {
   Form,
   FormControl,
@@ -39,33 +29,32 @@ import { es } from 'date-fns/locale'
 import { CalendarIcon, Check, ChevronsUpDown, Loader2 } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import z from 'zod'
+import { useCreateAlly } from './hooks/use-create-ally'
 
-export default function FormView() {
+const formSchema = z.object({
+  name: z
+    .string()
+    .min(2, { message: 'El nombre debe tener al menos 2 caracteres' })
+    .max(50, { message: 'El nombre no puede tener más de 50 caracteres' }),
+})
+
+export default function AllyFormView() {
   const viewType = useSearch({
-    from: '/_authenticated/admin/users/form',
+    from: '/_authenticated/health/allies/form',
     select: (search) => search.type,
   })
-  const loaderData = getRouteApi(
-    '/_authenticated/admin/users/form',
-  ).useLoaderData()
+  // const loaderData = getRouteApi(
+  //   '/_authenticated/health/allies/form',
+  // ).useLoaderData()
 
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: '',
-      surname: '',
-      email: '',
-      phone: '',
-      documentType: 'DNI',
-      documentNumber: '',
-      birthDate: undefined,
-      sex: undefined,
-      regionId: undefined,
-      teamId: undefined,
     },
   })
 
-  const { mutate: createOrganization } = useCreateOrganization()
+  const { mutate: createOrganization } = useCreateAlly()
 
   // const { mutate: updateUser } = useUpdateUser()
 
@@ -92,7 +81,6 @@ export default function FormView() {
     // else
     createOrganization({
       name: values.name,
-      type: 'health',
     })
   }
 
@@ -112,7 +100,7 @@ export default function FormView() {
                   <FormItem>
                     <FormLabel>Nombre</FormLabel>
                     <FormControl>
-                      <Input placeholder="John" {...field} />
+                      <Input placeholder="Organización" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -123,7 +111,7 @@ export default function FormView() {
               <Button type="submit" className="mt-4">
                 {dependantText.submit[viewType]}
               </Button>
-              <Link to="/admin/users">
+              <Link to="/health/allies">
                 <Button variant="outline" className="mt-4">
                   Cancelar
                 </Button>
@@ -138,20 +126,11 @@ export default function FormView() {
 
 const dependantText = {
   mainTitle: {
-    new: 'Crear nuevo usuario',
-    edit: 'Editar un usuario',
+    new: 'Crear nuevo aliado',
+    edit: 'Editar un aliado',
   },
   submit: {
-    new: 'Crear Usuario',
+    new: 'Crear Aliado',
     edit: 'Guardar Cambios',
   },
 }
-
-const formSchema = formUserSchema
-  .omit({
-    password: true,
-    confirmPassword: true,
-  })
-  .extend({
-    teamId: z.string(),
-  })

@@ -1,7 +1,12 @@
 import betterAuth from '@api/modules/auth/middleware'
-import Elysia, { t } from 'elysia'
+import Elysia, { status, t } from 'elysia'
+
 import { OrganizationModel } from './model'
-import { createOrganization, getOrganizations } from './service'
+import {
+  createOrganization,
+  getOrganizations,
+  getSingleOrganization,
+} from './service'
 
 const organization = new Elysia({
   name: 'organization',
@@ -26,5 +31,20 @@ const organization = new Elysia({
       401: t.Literal('Unauthorized'),
     },
   })
+  .get(
+    '/:id',
+    async ({ params }) => {
+      const res = await getSingleOrganization(params)
+      if (!res) throw status(404, 'Organization not found')
+      return res
+    },
+    {
+      auth: true,
+      params: OrganizationModel.getSingleOrganizationQuery,
+      response: {
+        200: OrganizationModel.getSingleOrganizationResponse,
+      },
+    },
+  )
 
 export default organization

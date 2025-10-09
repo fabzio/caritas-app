@@ -76,8 +76,8 @@ export async function getOrganizations(
   }
 }
 
-export async function getSingleOrganization(id: string) {
-  const data = await db.query.user.findFirst({
+export async function getSingleOrganization({ id }: { id: string }) {
+  const data = await db.query.organization.findFirst({
     where: (organization, { eq }) => eq(organization.id, id),
   })
   return data ? data : null

@@ -3,7 +3,7 @@ import { Input } from '@workspace/ui/components/input'
 import debounce from 'debounce'
 
 export default function SearchOrganizationInput() {
-  const { setFilters } = useFilters('/_authenticated/admin/allies')
+  const { setFilters } = useFilters('/_authenticated/health/allies/')
   const onChangeFilter = debounce((e: React.ChangeEvent<HTMLInputElement>) => {
     setFilters({ q: e.target.value })
   }, 300)

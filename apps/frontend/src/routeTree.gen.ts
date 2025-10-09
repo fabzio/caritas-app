@@ -34,10 +34,11 @@ import { Route as AuthenticatedUserSettingsRouteImport } from './routes/_authent
 import { Route as AuthenticatedUserOrganizationsRouteImport } from './routes/_authenticated/user/organizations'
 import { Route as AuthenticatedAdminPermissionsRouteImport } from './routes/_authenticated/admin/permissions'
 import { Route as AuthenticatedAdminOrganizationsRouteImport } from './routes/_authenticated/admin/organizations'
-import { Route as AuthenticatedAdminAlliesRouteImport } from './routes/_authenticated/admin/allies/allies'
 import { Route as AuthenticatedUserSettingsIndexRouteImport } from './routes/_authenticated/user/settings/index'
+import { Route as AuthenticatedHealthAlliesIndexRouteImport } from './routes/_authenticated/health/allies/index'
 import { Route as AuthenticatedAdminUsersIndexRouteImport } from './routes/_authenticated/admin/users/index'
 import { Route as AuthenticatedUserSettingsAuthenticationRouteImport } from './routes/_authenticated/user/settings/authentication'
+import { Route as AuthenticatedHealthAlliesFormRouteImport } from './routes/_authenticated/health/allies/form'
 import { Route as AuthenticatedAdminUsersFormRouteImport } from './routes/_authenticated/admin/users/form'
 
 const AuthRoute = AuthRouteImport.update({
@@ -174,17 +175,17 @@ const AuthenticatedAdminOrganizationsRoute =
     path: '/organizations',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
-const AuthenticatedAdminAlliesRoute =
-  AuthenticatedAdminAlliesRouteImport.update({
-    id: '/allies',
-    path: '/allies',
-    getParentRoute: () => AuthenticatedAdminRoute,
-  } as any)
 const AuthenticatedUserSettingsIndexRoute =
   AuthenticatedUserSettingsIndexRouteImport.update({
     id: '/',
     path: '/',
     getParentRoute: () => AuthenticatedUserSettingsRoute,
+  } as any)
+const AuthenticatedHealthAlliesIndexRoute =
+  AuthenticatedHealthAlliesIndexRouteImport.update({
+    id: '/allies/',
+    path: '/allies/',
+    getParentRoute: () => AuthenticatedHealthRoute,
   } as any)
 const AuthenticatedAdminUsersIndexRoute =
   AuthenticatedAdminUsersIndexRouteImport.update({
@@ -197,6 +198,12 @@ const AuthenticatedUserSettingsAuthenticationRoute =
     id: '/authentication',
     path: '/authentication',
     getParentRoute: () => AuthenticatedUserSettingsRoute,
+  } as any)
+const AuthenticatedHealthAlliesFormRoute =
+  AuthenticatedHealthAlliesFormRouteImport.update({
+    id: '/allies/form',
+    path: '/allies/form',
+    getParentRoute: () => AuthenticatedHealthRoute,
   } as any)
 const AuthenticatedAdminUsersFormRoute =
   AuthenticatedAdminUsersFormRouteImport.update({
@@ -219,7 +226,6 @@ export interface FileRoutesByFullPath {
   '/auth/register': typeof AuthRegisterRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/': typeof AuthIndexRoute
-  '/admin/allies': typeof AuthenticatedAdminAlliesRoute
   '/admin/organizations': typeof AuthenticatedAdminOrganizationsRoute
   '/admin/permissions': typeof AuthenticatedAdminPermissionsRoute
   '/user/organizations': typeof AuthenticatedUserOrganizationsRoute
@@ -232,8 +238,10 @@ export interface FileRoutesByFullPath {
   '/user/': typeof AuthenticatedUserIndexRoute
   '/auth/welcome': typeof AuthWelcomeIndexRoute
   '/admin/users/form': typeof AuthenticatedAdminUsersFormRoute
+  '/health/allies/form': typeof AuthenticatedHealthAlliesFormRoute
   '/user/settings/authentication': typeof AuthenticatedUserSettingsAuthenticationRoute
   '/admin/users': typeof AuthenticatedAdminUsersIndexRoute
+  '/health/allies': typeof AuthenticatedHealthAlliesIndexRoute
   '/user/settings/': typeof AuthenticatedUserSettingsIndexRoute
 }
 export interface FileRoutesByTo {
@@ -243,7 +251,6 @@ export interface FileRoutesByTo {
   '/auth/register': typeof AuthRegisterRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth': typeof AuthIndexRoute
-  '/admin/allies': typeof AuthenticatedAdminAlliesRoute
   '/admin/organizations': typeof AuthenticatedAdminOrganizationsRoute
   '/admin/permissions': typeof AuthenticatedAdminPermissionsRoute
   '/user/organizations': typeof AuthenticatedUserOrganizationsRoute
@@ -255,8 +262,10 @@ export interface FileRoutesByTo {
   '/user': typeof AuthenticatedUserIndexRoute
   '/auth/welcome': typeof AuthWelcomeIndexRoute
   '/admin/users/form': typeof AuthenticatedAdminUsersFormRoute
+  '/health/allies/form': typeof AuthenticatedHealthAlliesFormRoute
   '/user/settings/authentication': typeof AuthenticatedUserSettingsAuthenticationRoute
   '/admin/users': typeof AuthenticatedAdminUsersIndexRoute
+  '/health/allies': typeof AuthenticatedHealthAlliesIndexRoute
   '/user/settings': typeof AuthenticatedUserSettingsIndexRoute
 }
 export interface FileRoutesById {
@@ -275,7 +284,6 @@ export interface FileRoutesById {
   '/auth/register': typeof AuthRegisterRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/': typeof AuthIndexRoute
-  '/_authenticated/admin/allies': typeof AuthenticatedAdminAlliesRoute
   '/_authenticated/admin/organizations': typeof AuthenticatedAdminOrganizationsRoute
   '/_authenticated/admin/permissions': typeof AuthenticatedAdminPermissionsRoute
   '/_authenticated/user/organizations': typeof AuthenticatedUserOrganizationsRoute
@@ -288,8 +296,10 @@ export interface FileRoutesById {
   '/_authenticated/user/': typeof AuthenticatedUserIndexRoute
   '/auth/welcome_/': typeof AuthWelcomeIndexRoute
   '/_authenticated/admin/users/form': typeof AuthenticatedAdminUsersFormRoute
+  '/_authenticated/health/allies/form': typeof AuthenticatedHealthAlliesFormRoute
   '/_authenticated/user/settings/authentication': typeof AuthenticatedUserSettingsAuthenticationRoute
   '/_authenticated/admin/users/': typeof AuthenticatedAdminUsersIndexRoute
+  '/_authenticated/health/allies/': typeof AuthenticatedHealthAlliesIndexRoute
   '/_authenticated/user/settings/': typeof AuthenticatedUserSettingsIndexRoute
 }
 export interface FileRouteTypes {
@@ -308,7 +318,6 @@ export interface FileRouteTypes {
     | '/auth/register'
     | '/auth/reset-password'
     | '/auth/'
-    | '/admin/allies'
     | '/admin/organizations'
     | '/admin/permissions'
     | '/user/organizations'
@@ -321,8 +330,10 @@ export interface FileRouteTypes {
     | '/user/'
     | '/auth/welcome'
     | '/admin/users/form'
+    | '/health/allies/form'
     | '/user/settings/authentication'
     | '/admin/users'
+    | '/health/allies'
     | '/user/settings/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -332,7 +343,6 @@ export interface FileRouteTypes {
     | '/auth/register'
     | '/auth/reset-password'
     | '/auth'
-    | '/admin/allies'
     | '/admin/organizations'
     | '/admin/permissions'
     | '/user/organizations'
@@ -344,8 +354,10 @@ export interface FileRouteTypes {
     | '/user'
     | '/auth/welcome'
     | '/admin/users/form'
+    | '/health/allies/form'
     | '/user/settings/authentication'
     | '/admin/users'
+    | '/health/allies'
     | '/user/settings'
   id:
     | '__root__'
@@ -363,7 +375,6 @@ export interface FileRouteTypes {
     | '/auth/register'
     | '/auth/reset-password'
     | '/auth/'
-    | '/_authenticated/admin/allies'
     | '/_authenticated/admin/organizations'
     | '/_authenticated/admin/permissions'
     | '/_authenticated/user/organizations'
@@ -376,8 +387,10 @@ export interface FileRouteTypes {
     | '/_authenticated/user/'
     | '/auth/welcome_/'
     | '/_authenticated/admin/users/form'
+    | '/_authenticated/health/allies/form'
     | '/_authenticated/user/settings/authentication'
     | '/_authenticated/admin/users/'
+    | '/_authenticated/health/allies/'
     | '/_authenticated/user/settings/'
   fileRoutesById: FileRoutesById
 }
@@ -564,19 +577,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminOrganizationsRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
-    '/_authenticated/admin/allies': {
-      id: '/_authenticated/admin/allies'
-      path: '/allies'
-      fullPath: '/admin/allies'
-      preLoaderRoute: typeof AuthenticatedAdminAlliesRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
-    }
     '/_authenticated/user/settings/': {
       id: '/_authenticated/user/settings/'
       path: '/'
       fullPath: '/user/settings/'
       preLoaderRoute: typeof AuthenticatedUserSettingsIndexRouteImport
       parentRoute: typeof AuthenticatedUserSettingsRoute
+    }
+    '/_authenticated/health/allies/': {
+      id: '/_authenticated/health/allies/'
+      path: '/allies'
+      fullPath: '/health/allies'
+      preLoaderRoute: typeof AuthenticatedHealthAlliesIndexRouteImport
+      parentRoute: typeof AuthenticatedHealthRoute
     }
     '/_authenticated/admin/users/': {
       id: '/_authenticated/admin/users/'
@@ -592,6 +605,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedUserSettingsAuthenticationRouteImport
       parentRoute: typeof AuthenticatedUserSettingsRoute
     }
+    '/_authenticated/health/allies/form': {
+      id: '/_authenticated/health/allies/form'
+      path: '/allies/form'
+      fullPath: '/health/allies/form'
+      preLoaderRoute: typeof AuthenticatedHealthAlliesFormRouteImport
+      parentRoute: typeof AuthenticatedHealthRoute
+    }
     '/_authenticated/admin/users/form': {
       id: '/_authenticated/admin/users/form'
       path: '/users/form'
@@ -603,7 +623,6 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedAdminRouteChildren {
-  AuthenticatedAdminAlliesRoute: typeof AuthenticatedAdminAlliesRoute
   AuthenticatedAdminOrganizationsRoute: typeof AuthenticatedAdminOrganizationsRoute
   AuthenticatedAdminPermissionsRoute: typeof AuthenticatedAdminPermissionsRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
@@ -612,7 +631,6 @@ interface AuthenticatedAdminRouteChildren {
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
-  AuthenticatedAdminAlliesRoute: AuthenticatedAdminAlliesRoute,
   AuthenticatedAdminOrganizationsRoute: AuthenticatedAdminOrganizationsRoute,
   AuthenticatedAdminPermissionsRoute: AuthenticatedAdminPermissionsRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
@@ -653,10 +671,14 @@ const AuthenticatedEducationRouteWithChildren =
 
 interface AuthenticatedHealthRouteChildren {
   AuthenticatedHealthIndexRoute: typeof AuthenticatedHealthIndexRoute
+  AuthenticatedHealthAlliesFormRoute: typeof AuthenticatedHealthAlliesFormRoute
+  AuthenticatedHealthAlliesIndexRoute: typeof AuthenticatedHealthAlliesIndexRoute
 }
 
 const AuthenticatedHealthRouteChildren: AuthenticatedHealthRouteChildren = {
   AuthenticatedHealthIndexRoute: AuthenticatedHealthIndexRoute,
+  AuthenticatedHealthAlliesFormRoute: AuthenticatedHealthAlliesFormRoute,
+  AuthenticatedHealthAlliesIndexRoute: AuthenticatedHealthAlliesIndexRoute,
 }
 
 const AuthenticatedHealthRouteWithChildren =

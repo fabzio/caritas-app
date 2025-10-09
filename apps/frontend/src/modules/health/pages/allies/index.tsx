@@ -106,12 +106,12 @@ export default function AlliesTableView() {
             }
             selectedCount={userCount}
           />
-          {/* <Link to={'/admin/allies/form'} search={{ type: 'new' }}>
+          <Link to={'/health/allies/form'} search={{ type: 'new' }}>
             <Button>
               <UserPlus />
-              Nuevo usuario
+              Nuevo aliado
             </Button>
-          </Link> */}
+          </Link>
         </div>
       </div>
       <div className="mt-4">

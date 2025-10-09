@@ -180,7 +180,7 @@ function NavMain({ items }: Readonly<Props>) {
             <SidebarMenuItem>
               <SidebarMenuButton
                 tooltip="Gestionar aliados"
-                onClick={() => navigate({ to: '/admin/organizations' })}
+                onClick={() => navigate({ to: '/health/allies' })}
               >
                 <Cross />
                 <span>Gestionar aliados</span>

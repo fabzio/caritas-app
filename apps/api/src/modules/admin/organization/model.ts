@@ -24,6 +24,7 @@ export namespace OrganizationModel {
   export const getSingleOrganizationResponse = _getOrganizations
   export type GetSingleOrganizationResponse =
     typeof getSingleOrganizationResponse.static
+
   export const getSingleOrganizationQuery = t.Object({
     id: t.String(),
   })
