@@ -1,5 +1,4 @@
-import ActionsButton from '@frontend/modules/admin/pages/users/components/actions-button'
-import { Link, useNavigate } from '@tanstack/react-router'
+import { Link } from '@tanstack/react-router'
 import { Button } from '@workspace/ui/components/button'
 import {
   Dialog,
@@ -11,7 +10,8 @@ import {
   DialogTitle,
 } from '@workspace/ui/components/dialog'
 import { UserPlus } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
+import ActionsButton from './components/actions-button'
 import OrganizationTable from './components/organization-table'
 import SearchHealthOrganizationInput from './components/search-organization-input'
 import { useOrganizationTable } from './hooks/use-organization-table'
@@ -20,7 +20,6 @@ import { useOrganizationTable } from './hooks/use-organization-table'
 export default function AlliesTableView() {
   const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({})
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
-  const [nameFilter, setNameFilter] = useState<string>('')
   // const { mutateAsync: removeUser, isPending: removeUserIsPending } =
   //   useRemoveUser()
   const {
@@ -40,44 +39,11 @@ export default function AlliesTableView() {
     .map((rowIndex) => allies?.[rowIndex])
     .filter((ally): ally is NonNullable<typeof ally> => Boolean(ally))
 
-  const resetSelectedRows = () => setRowSelection({})
-
   const userCount = selectedAllies.length
 
   const handleDelete = async () => {
-    // const { data: session } = await authClient.getSession()
-    // const allUserPromises = selectedUsers.flatMap((ally) => [
-    //   removeUser({ userId: ally.id }),
-    //   banUser({ userId: ally.id, banReason: 'User deleted by admin' }),
-    // ])
-    // const results = await Promise.allSettled(allUserPromises)
-    // let totalSuccessful = 0
-    // for (let i = 0; i < selectedUsers.length; i++) {
-    //   const removeResult = results[i * 2]
-    //   const banResult = results[i * 2 + 1]
-    //   if (
-    //     removeResult.status === 'fulfilled' &&
-    //     banResult.status === 'fulfilled'
-    //   ) {
-    //     totalSuccessful++
-    //   }
-    // }
-    // const totalFailed = selectedUsers.length - totalSuccessful
-    // if (totalSuccessful > 0) {
-    //   toast.success(
-    //     `${totalSuccessful} de ${selectedUsers.length} usuario(s) eliminados correctamente.`,
-    //   )
-    // }
-    // if (totalFailed > 0) {
-    //   toast.error(
-    //     `Atención: Falló el procesamiento de ${totalFailed} usuario(s).`,
-    //   )
-    // }
-    // setIsDeleteModalOpen(false)
-    // resetSelectedRows()
+    // TODO: implement delete ally
   }
-
-  const navigate = useNavigate()
 
   return (
     <div className="w-full p-4">

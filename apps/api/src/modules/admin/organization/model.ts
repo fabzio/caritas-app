@@ -1,5 +1,5 @@
 import { organization } from '@api/db/schemas/auth'
-import { createInsertSchema, createSelectSchema } from 'drizzle-typebox'
+import { createSelectSchema } from 'drizzle-typebox'
 import { t } from 'elysia'
 
 export namespace OrganizationModel {
