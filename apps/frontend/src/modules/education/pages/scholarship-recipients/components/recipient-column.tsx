@@ -2,7 +2,6 @@ import type { ColumnDef } from '@tanstack/react-table'
 import { Button } from '@workspace/ui/components/button'
 import { ArrowUpDown } from 'lucide-react'
 import type { Recipient } from '../hooks/use-scholarship'
-import StatusIcon from './status-icon'
 
 export const scholarshipRecipientTableColumns: ColumnDef<Recipient>[] = [
   {
@@ -33,19 +32,6 @@ export const scholarshipRecipientTableColumns: ColumnDef<Recipient>[] = [
       `${row.original.documentType} - ${row.original.documentNumber}`,
   },
   {
-    accessorKey: 'status',
-    header: ({ column }) => (
-      <Button
-        variant="ghost"
-        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-      >
-        Status
-        <ArrowUpDown />
-      </Button>
-    ),
-    cell: ({ row }) => <StatusIcon status={row.original.status} />,
-  },
-  {
     accessorKey: 'scholarship',
     header: ({ column }) => (
       <Button
@@ -56,7 +42,11 @@ export const scholarshipRecipientTableColumns: ColumnDef<Recipient>[] = [
         <ArrowUpDown />
       </Button>
     ),
-    cell: ({ row }) => row.original.scholarshipName,
+    cell: ({ row }) => row.original.scholarshipName || 'Sin beca asignada', //No deberia ocurrir
+    enableSorting: false,
+    meta: {
+      filterVariant: 'select',
+    },
   },
   {
     accessorKey: 'organization',
@@ -72,7 +62,7 @@ export const scholarshipRecipientTableColumns: ColumnDef<Recipient>[] = [
     cell: ({ row }) => row.original.organizationName,
   },
   {
-    accessorKey: 'organization',
+    accessorKey: 'region',
     header: ({ column }) => (
       <Button
         variant="ghost"

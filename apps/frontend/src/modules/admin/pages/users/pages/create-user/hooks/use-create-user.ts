@@ -7,7 +7,7 @@ import { useNavigate } from '@tanstack/react-router'
 import { toast } from 'sonner'
 
 type CreateUserProps = Parameters<typeof authClient.admin.createUser>[0] & {
-  teamId: string
+  teamIds: string[]
 }
 
 export const useCreateUser = () => {
@@ -16,12 +16,13 @@ export const useCreateUser = () => {
   const { data: user } = useSession()
   return useMutation({
     mutationFn: async (props: CreateUserProps) => {
-      const { data, error } = await authClient.admin.createUser(props)
+      const { teamIds, ...userPayload } = props
+      const { data, error } = await authClient.admin.createUser(userPayload)
       if (error) throw error
       await rpc.admin.users.post({
         organizationId: user?.session.activeOrganizationId as string,
         userId: data.user.id,
-        teamId: props.teamId,
+        teamIds,
       })
     },
     onSuccess: () => {

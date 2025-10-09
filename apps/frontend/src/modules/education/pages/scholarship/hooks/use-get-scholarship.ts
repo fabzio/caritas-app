@@ -2,9 +2,7 @@ import rpc from '@frontend/lib/rpc'
 import { QueryKeys } from '@frontend/shared/constants/query-keys'
 import { useQuery } from '@tanstack/react-query'
 
-// hook para hacer fech all de scholarships
-// tiene filtrado por nombre y paginación
-const useGetScholarship = (name?: string, page = 1, pageSize = 10) => {
+const useGetScholarship = () => {
   return useQuery({
     queryKey: [QueryKeys.SCHOLARSHIP, { name, page, pageSize }],
     queryFn: async () => {

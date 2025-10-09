@@ -11,13 +11,6 @@ export const getOrganizationType = async (orgId: string) =>
       type: true,
     },
   })
-export const getTeam = async (teamId: string) =>
-  await db.query.team.findMany({
-    where: (team, { eq }) => eq(team.id, teamId),
-    columns: {
-      name: true,
-    },
-  })
 
 export const getUserRole = async (userId: string) => {
   const [{ isPatient, isStudent }] = await db

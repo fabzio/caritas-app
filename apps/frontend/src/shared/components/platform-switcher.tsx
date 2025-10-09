@@ -1,3 +1,4 @@
+import { env } from '@frontend/env'
 import { useNavigate } from '@tanstack/react-router'
 import {
   DropdownMenu,
@@ -49,7 +50,7 @@ function PlatformSwitcher({ platforms }: Readonly<Props>) {
                 <span className="truncate font-medium">
                   {selectedPlatform.name}
                 </span>
-                <span className="truncate text-xs">Cáritas Lima</span>
+                <span className="truncate text-xs">{env.VITE_ORG_NAME}</span>
               </div>
               <ChevronsUpDown className="ml-auto" />
             </SidebarMenuButton>

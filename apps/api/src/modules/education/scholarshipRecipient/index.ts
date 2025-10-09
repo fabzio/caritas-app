@@ -1,7 +1,11 @@
 import Elysia, { t } from 'elysia'
 import betterAuth from '@/modules/auth/middleware'
 import { ScholarshipRecipientModel } from './model'
-import { createScholarshipRecipient, getRecipients } from './service'
+import {
+  createScholarshipRecipient,
+  getRecipients,
+  getSelectNamesResponse,
+} from './service'
 
 const scholarshipRecipients = new Elysia({
   prefix: '/scholarshipRecipients',
@@ -11,6 +15,11 @@ const scholarshipRecipients = new Elysia({
     query: ScholarshipRecipientModel.listRecipientsQuery,
     response: {
       200: ScholarshipRecipientModel.getlistScholarshipRecipientsResponse,
+    },
+  })
+  .get('/selectNames', () => getSelectNamesResponse(), {
+    response: {
+      200: ScholarshipRecipientModel.getSelectNamesResponse,
     },
   })
   .post(

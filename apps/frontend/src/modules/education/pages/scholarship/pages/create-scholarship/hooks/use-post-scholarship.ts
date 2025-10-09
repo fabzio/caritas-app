@@ -1,6 +1,7 @@
 import rpc from '@frontend/lib/rpc'
 import { useMutation } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
+import { toast } from 'sonner'
 
 const usePostScholarship = () => {
   const navigate = useNavigate({ from: '/education/scholarship/create' })
@@ -27,10 +28,11 @@ const usePostScholarship = () => {
       if (res.error) throw res.error
       return res.data
     },
-    onError: (error) => {
-      console.error(error)
+    onError: () => {
+      toast.error('Ocurrió un error desconocido al registrar la beca')
     },
-    onSuccess: (_data) => {
+    onSuccess: () => {
+      toast.success('Beca registrada correctamente')
       navigate({ to: '/education/scholarship' })
     },
   })

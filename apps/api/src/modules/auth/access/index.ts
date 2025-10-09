@@ -1,7 +1,7 @@
 import { auth } from '@api/lib/auth'
 import Elysia from 'elysia'
 import betterAuth from '../middleware'
-import { getOrganizationType, getTeam, getUserRole } from './service'
+import { getOrganizationType, getUserRole } from './service'
 
 const access = new Elysia({}).use(betterAuth).get(
   '/access',
@@ -9,25 +9,28 @@ const access = new Elysia({}).use(betterAuth).get(
     const orgsType = await getOrganizationType(
       session.activeOrganizationId ?? '',
     )
-    const teamType = await getTeam(session.activeTeamId ?? '')
     try {
       const { role } = await auth.api.getActiveMemberRole({
         headers,
       })
 
+      const roles = role
+        .split(',')
+        .map((r) => r.trim())
+        .filter(Boolean)
       const { isPatient, isStudent } = await getUserRole(session.userId)
       const isHealthOrg = orgsType.some((org) => org.type === 'health')
       return {
         admin:
           orgsType.some((org) => org.type === 'caritas') &&
-          ['owner', 'admin'].includes(role),
+          (roles.includes('owner') || roles.includes('admin')),
         health: {
-          admin: teamType.some((team) => team.name === 'Salud'),
+          admin: roles.includes('healthMember'),
           organization: isHealthOrg,
           user: isPatient,
         },
         education: {
-          admin: teamType.some((team) => team.name === 'Educación'),
+          admin: roles.includes('educationMember'),
           organization: orgsType.some((org) => org.type === 'education'),
           user: isStudent,
         },
@@ -39,12 +42,12 @@ const access = new Elysia({}).use(betterAuth).get(
         health: {
           admin: false,
           organization: false,
-          user: true,
+          user: false,
         },
         education: {
           admin: false,
           organization: false,
-          user: true,
+          user: false,
         },
         beneficiary: false,
       }

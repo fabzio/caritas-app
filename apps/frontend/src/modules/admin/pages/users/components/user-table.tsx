@@ -1,5 +1,5 @@
+import type { UsersFilters } from '@frontend/routes/_authenticated/admin/users'
 import DataTable from '@frontend/shared/components/data-table'
-import type { Filters } from '@frontend/shared/types/filters'
 import { stateToSortBy } from '@frontend/shared/utils/sort-by-to-state'
 import type {
   ColumnDef,
@@ -16,7 +16,7 @@ type Props = {
   columns: ColumnDef<User>[]
   paginationState: PaginationState
   sortingState: SortingState
-  setFilters: (filters: Filters) => void
+  setFilters: (filters: UsersFilters) => void
   pagination?: {
     total: number
     totalPages: number

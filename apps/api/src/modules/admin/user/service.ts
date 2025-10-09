@@ -1,12 +1,12 @@
 import db from '@api/db'
-import { member, user } from '@api/db/schemas/auth'
-import { and, asc, count, desc, eq, ilike, or } from 'drizzle-orm'
+import { member, team, teamMember, user } from '@api/db/schemas/auth'
+import { and, asc, count, desc, eq, ilike, inArray, or } from 'drizzle-orm'
 import type { UserModel } from './model'
 
 export async function getUsers(
   params: UserModel.ListUsersQuery,
 ): Promise<UserModel.GetUsersResponse> {
-  const { q = '', page = 0, limit = 10, sortBy = 'name.asc' } = params
+  const { q = '', role, page = 0, limit = 10, sortBy = 'name.asc' } = params
 
   const [sortFieldRaw, sortOrderRaw] = (sortBy ?? 'name.asc').split('.', 2)
   const sortField = (sortFieldRaw ?? 'name').trim()
@@ -32,9 +32,16 @@ export async function getUsers(
       )
     : undefined
 
+  const roleCondition =
+    role && role !== 'all' ? ilike(member.role, `%${role}%`) : undefined
   const activeCondition = eq(user.active, true)
   const memberOrgCondition = eq(member.organizationId, params.organizationId)
-  const where = and(activeCondition, searchCondition, memberOrgCondition)
+  const where = and(
+    activeCondition,
+    searchCondition,
+    roleCondition,
+    memberOrgCondition,
+  )
 
   // Get total count
   const [{ total }] = await db
@@ -45,7 +52,7 @@ export async function getUsers(
 
   // Get paginated data
   const rows = await db
-    .select()
+    .select({ user: user, role: member.role })
     .from(user)
     .innerJoin(member, eq(user.id, member.userId))
     .where(where)
@@ -53,13 +60,45 @@ export async function getUsers(
     .limit(limit)
     .orderBy(orderExpr)
 
+  const userIds = rows.map(({ user: row }) => row.id)
+
+  const allMemberships =
+    userIds.length > 0
+      ? await db
+          .select({ userId: member.userId, role: member.role })
+          .from(member)
+          .where(
+            and(
+              eq(member.organizationId, params.organizationId),
+              or(...userIds.map((id) => eq(member.userId, id))),
+            ),
+          )
+      : []
+
+  const userRolesMap = allMemberships.reduce(
+    (acc, membership) => {
+      if (!acc[membership.userId]) {
+        acc[membership.userId] = []
+      }
+      if (!acc[membership.userId].includes(membership.role)) {
+        acc[membership.userId].push(membership.role)
+      }
+      return acc
+    },
+    {} as Record<string, string[]>,
+  )
+
   const totalPages = Math.ceil(total / limit)
 
   return {
-    data: rows.map(({ user: row }) => ({
-      ...row,
-      birthDate: new Date(row.birthDate),
-    })),
+    data: rows.map(({ user: row }) => {
+      const userRoles = userRolesMap[row.id] || []
+      return {
+        ...row,
+        role: userRoles.join(',') || null,
+        birthDate: new Date(row.birthDate),
+      }
+    }),
     total,
     page,
     limit,
@@ -92,14 +131,49 @@ export async function getSingleUser(id: string) {
     : null
 }
 
-export const getTeamName = async (teamId: string) => {
-  const team = await db.query.team.findFirst({
-    where: (team, { eq }) => eq(team.id, teamId),
+export const getTeamsByIds = async (teamIds: string[]) => {
+  if (teamIds.length === 0) return []
+  const rows = await db
+    .select({
+      id: team.id,
+      name: team.name,
+    })
+    .from(team)
+    .where(inArray(team.id, teamIds))
+  return rows
+}
+
+export const getUserTeamIds = async (userId: string) => {
+  const rows = await db
+    .select({
+      teamId: teamMember.teamId,
+    })
+    .from(teamMember)
+    .where(eq(teamMember.userId, userId))
+  return rows.map((row) => row.teamId)
+}
+
+export const getUserRoles = async (userId: string, organizationId: string) => {
+  const rows = await db
+    .select({
+      role: member.role,
+    })
+    .from(member)
+    .where(
+      and(eq(member.userId, userId), eq(member.organizationId, organizationId)),
+    )
+  return rows.map((row) => row.role)
+}
+
+export const getMemberId = async (userId: string, organizationId: string) => {
+  const res = await db.query.member.findFirst({
+    where: (member, { and, eq }) =>
+      and(eq(member.userId, userId), eq(member.organizationId, organizationId)),
     columns: {
-      name: true,
+      id: true,
     },
   })
-  return team?.name ?? null
+  return res ? res.id : null
 }
 
 export async function getBeneficiaries(): Promise<UserModel.GetBeneficiariesResponse> {

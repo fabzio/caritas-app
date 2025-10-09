@@ -1,12 +1,12 @@
+import rpc from '@frontend/lib/rpc'
+import type { RecipientFilters } from '@frontend/routes/_authenticated/education/recipients'
+import { QueryKeys } from '@frontend/shared/constants/query-keys'
 import { useQuery } from '@tanstack/react-query'
-import rpc from '@/lib/rpc'
-import { QueryKeys } from '@/shared/constants/query-keys'
-import type { Filters } from '@/shared/types/filters'
 
 type UseScholarshipRecipientsParams = {
   currentPage?: number
   pageSize?: number
-  filters?: Filters
+  filters?: RecipientFilters
 }
 
 export const useScholarshipRecipients = ({
@@ -23,6 +23,10 @@ export const useScholarshipRecipients = ({
           page: Math.max(0, (currentPage || 1) - 1),
           limit: pageSize,
           sortBy: filters?.sortBy || 'name.asc',
+          selectFilters: {
+            scholarshipName: filters?.selectFilters?.scholarshipName || 'all',
+            regionNames: filters?.selectFilters?.regionNames || 'all',
+          },
         },
       })
       if (error) throw error
