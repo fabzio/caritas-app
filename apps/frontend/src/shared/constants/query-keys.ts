@@ -21,6 +21,9 @@ export const QueryKeys = {
   EDUCATION: {
     SCHOLARSHIP_RECIPIENTS: 'education-scholarship-recipients',
   },
+  HEALTH: {
+    ACTIVITIES: 'health-activities',
+  },
 } as const
 
 export type QueryKey = (typeof QueryKeys)[keyof typeof QueryKeys]
