@@ -1,0 +1,62 @@
+import { describe, expect, it } from 'vitest'
+import { formatRoles } from './format-roles'
+
+describe('formatRoles', () => {
+  it('returns "Sin rol" for empty array', () => {
+    expect(formatRoles([])).toBe('Sin rol')
+  })
+
+  it('returns "Sin rol" for null', () => {
+    expect(formatRoles(null)).toBe('Sin rol')
+  })
+
+  it('returns "Sin rol" for undefined', () => {
+    expect(formatRoles(undefined)).toBe('Sin rol')
+  })
+
+  it('formats single admin role', () => {
+    expect(formatRoles(['admin'])).toBe('Administrador')
+  })
+
+  it('formats single healthMember role', () => {
+    expect(formatRoles(['healthMember'])).toBe('Beneficiario Salud')
+  })
+
+  it('formats single educationMember role', () => {
+    expect(formatRoles(['educationMember'])).toBe('Beneficiario Educación')
+  })
+
+  it('formats both health and education members', () => {
+    expect(formatRoles(['healthMember', 'educationMember'])).toBe(
+      'Beneficiario Salud y Educación',
+    )
+  })
+
+  it('formats both education and health members in any order', () => {
+    expect(formatRoles(['educationMember', 'healthMember'])).toBe(
+      'Beneficiario Salud y Educación',
+    )
+  })
+
+  it('formats multiple different roles', () => {
+    const result = formatRoles(['admin', 'member'])
+    expect(result).toContain('Administrador')
+    expect(result).toContain('Miembro')
+  })
+
+  it('formats owner role', () => {
+    expect(formatRoles(['owner'])).toBe('Propietario')
+  })
+
+  it('formats member role', () => {
+    expect(formatRoles(['member'])).toBe('Miembro')
+  })
+
+  it('handles unknown role', () => {
+    expect(formatRoles(['unknownRole'])).toBe('unknownRole')
+  })
+
+  it('removes duplicate roles', () => {
+    expect(formatRoles(['admin', 'admin'])).toBe('Administrador')
+  })
+})

@@ -47,7 +47,13 @@ export default function TableView() {
     })
   }
 
-  const uniqueRoles = ['owner', 'educationMember', 'healthMember', 'admin']
+  const uniqueRoles = [
+    { value: 'admin', label: 'Administrador' },
+    { value: 'owner', label: 'Propietario' },
+    { value: 'healthMember', label: 'Beneficiario Salud' },
+    { value: 'educationMember', label: 'Beneficiario Educación' },
+    { value: 'member', label: 'Miembro' },
+  ]
 
   const selectedRows = Object.keys(rowSelection)
     .filter((key) => rowSelection[key])

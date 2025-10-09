@@ -4,6 +4,7 @@ import { Button } from '@workspace/ui/components/button'
 import { Checkbox } from '@workspace/ui/components/checkbox'
 import { ArrowUpDown } from 'lucide-react'
 import type { User } from '../hooks/use-list-users'
+import { formatRoles } from '../utils/format-roles'
 
 export const userTableColumns: ColumnDef<User>[] = [
   {
@@ -62,20 +63,9 @@ export const userTableColumns: ColumnDef<User>[] = [
     cell: ({ row }) => `${row.original.name} ${row.original.surname}`,
   },
   {
-    accessorKey: 'role',
-    header: ({ column }) => (
-      <Button
-        variant="ghost"
-        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-      >
-        Rol
-        <ArrowUpDown />
-      </Button>
-    ),
-    cell: ({ row }) => row.original.role || 'Sin rol',
+    accessorKey: 'roles',
+    header: () => <div>Rol</div>,
+    cell: ({ row }) => formatRoles(row.original.roles),
     enableSorting: false,
-    meta: {
-      filterVariant: 'select',
-    },
   },
 ]

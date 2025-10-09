@@ -32,14 +32,14 @@ vi.mock('./hooks/use-table', () => ({
         name: 'John',
         surname: 'Doe',
         email: 'john@example.com',
-        role: 'admin',
+        roles: ['admin'],
       },
       {
         id: 'user-2',
         name: 'Jane',
         surname: 'Smith',
         email: 'jane@example.com',
-        role: 'user',
+        roles: ['healthMember', 'educationMember'],
       },
     ],
     pagination: {
@@ -73,9 +73,10 @@ vi.mock('./components/role-filter', () => ({
       data-testid="role-filter"
       onChange={(e) => onValueChange(e.target.value)}
     >
-      <option value="all">Todos</option>
-      <option value="admin">Admin</option>
-      <option value="user">User</option>
+      <option value="all">Todos los roles</option>
+      <option value="admin">Administrador</option>
+      <option value="healthMember">Beneficiario Salud</option>
+      <option value="educationMember">Beneficiario Educación</option>
     </select>
   ),
 }))
