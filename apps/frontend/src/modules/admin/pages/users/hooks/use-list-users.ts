@@ -1,13 +1,13 @@
 import { useSession } from '@frontend/hooks/use-session'
 import rpc from '@frontend/lib/rpc'
+import type { UsersFilters } from '@frontend/routes/_authenticated/admin/users'
 import { QueryKeys } from '@frontend/shared/constants/query-keys'
-import type { Filters } from '@frontend/shared/types/filters'
 import { useQuery } from '@tanstack/react-query'
 
 type UseUsersParams = {
   currentPage?: number
   pageSize?: number
-  filters?: Filters
+  filters?: UsersFilters
 }
 
 export const useListUsers = ({
@@ -23,6 +23,7 @@ export const useListUsers = ({
         query: {
           organizationId: user?.session.activeOrganizationId || '',
           q: filters?.q || '',
+          role: filters?.role,
           page: Math.max(0, (currentPage || 1) - 1),
           limit: pageSize,
           sortBy: filters?.sortBy || 'name.asc',

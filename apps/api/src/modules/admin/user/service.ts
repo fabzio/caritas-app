@@ -6,7 +6,7 @@ import type { UserModel } from './model'
 export async function getUsers(
   params: UserModel.ListUsersQuery,
 ): Promise<UserModel.GetUsersResponse> {
-  const { q = '', page = 0, limit = 10, sortBy = 'name.asc' } = params
+  const { q = '', role, page = 0, limit = 10, sortBy = 'name.asc' } = params
 
   const [sortFieldRaw, sortOrderRaw] = (sortBy ?? 'name.asc').split('.', 2)
   const sortField = (sortFieldRaw ?? 'name').trim()
@@ -32,9 +32,16 @@ export async function getUsers(
       )
     : undefined
 
+  const roleCondition =
+    role && role !== 'all' ? eq(member.role, role) : undefined
   const activeCondition = eq(user.active, true)
   const memberOrgCondition = eq(member.organizationId, params.organizationId)
-  const where = and(activeCondition, searchCondition, memberOrgCondition)
+  const where = and(
+    activeCondition,
+    searchCondition,
+    roleCondition,
+    memberOrgCondition,
+  )
 
   // Get total count
   const [{ total }] = await db
@@ -45,7 +52,7 @@ export async function getUsers(
 
   // Get paginated data
   const rows = await db
-    .select()
+    .select({ user: user, role: member.role })
     .from(user)
     .innerJoin(member, eq(user.id, member.userId))
     .where(where)
@@ -53,13 +60,45 @@ export async function getUsers(
     .limit(limit)
     .orderBy(orderExpr)
 
+  const userIds = rows.map(({ user: row }) => row.id)
+
+  const allMemberships =
+    userIds.length > 0
+      ? await db
+          .select({ userId: member.userId, role: member.role })
+          .from(member)
+          .where(
+            and(
+              eq(member.organizationId, params.organizationId),
+              or(...userIds.map((id) => eq(member.userId, id))),
+            ),
+          )
+      : []
+
+  const userRolesMap = allMemberships.reduce(
+    (acc, membership) => {
+      if (!acc[membership.userId]) {
+        acc[membership.userId] = []
+      }
+      if (!acc[membership.userId].includes(membership.role)) {
+        acc[membership.userId].push(membership.role)
+      }
+      return acc
+    },
+    {} as Record<string, string[]>,
+  )
+
   const totalPages = Math.ceil(total / limit)
 
   return {
-    data: rows.map(({ user: row }) => ({
-      ...row,
-      birthDate: new Date(row.birthDate),
-    })),
+    data: rows.map(({ user: row }) => {
+      const userRoles = userRolesMap[row.id] || []
+      return {
+        ...row,
+        role: userRoles.join(',') || null,
+        birthDate: new Date(row.birthDate),
+      }
+    }),
     total,
     page,
     limit,

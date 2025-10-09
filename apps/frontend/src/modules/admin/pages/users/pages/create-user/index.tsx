@@ -1,7 +1,6 @@
 import { useRegions } from '@frontend/hooks/use-regions'
 import { formUserSchema } from '@frontend/shared/models/user'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { SelectValue } from '@radix-ui/react-select'
 import { getRouteApi, Link, useSearch } from '@tanstack/react-router'
 import { Button } from '@workspace/ui/components/button'
 import { Calendar } from '@workspace/ui/components/calendar'
@@ -32,6 +31,7 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
+  SelectValue,
 } from '@workspace/ui/components/select'
 import { cn } from '@workspace/ui/lib/utils'
 import { format } from 'date-fns'

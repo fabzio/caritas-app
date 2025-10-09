@@ -30,6 +30,7 @@ export const useUserTable = () => {
           pageSize: response.limit,
         }
       : undefined,
+    filters,
     setFilters,
     columns,
     sortingState,
