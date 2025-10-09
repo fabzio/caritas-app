@@ -21,7 +21,7 @@ const organization = new Elysia({
     body: OrganizationModel.createOrganization,
     response: {
       200: t.String({
-        description: 'ID of the created health organization',
+        description: 'ID of the created organization',
       }),
       401: t.Literal('Unauthorized'),
     },

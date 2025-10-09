@@ -21,7 +21,24 @@ export namespace OrganizationModel {
   })
   export type ListOrganizationsQuery = typeof listOrganizationsQuery.static
 
-  const _createOrganization = createInsertSchema(organization)
-  export const createOrganization = t.Omit(_createOrganization, ['id'])
+  export const getSingleOrganizationResponse = _getOrganizations
+  export type GetSingleOrganizationResponse =
+    typeof getSingleOrganizationResponse.static
+  export const getSingleOrganizationQuery = t.Object({
+    id: t.String(),
+  })
+  export type GetSingleOrganizationQuery =
+    typeof getSingleOrganizationQuery.static
+
+  export const createOrganization = t.Object({
+    name: t.String(),
+    type: t.Enum({
+      caritas: 'caritas',
+      education: 'education',
+      health: 'health',
+      beneficiary: 'beneficiary',
+    }),
+    logo: t.String(),
+  })
   export type CreateOrganization = typeof createOrganization.static
 }

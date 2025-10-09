@@ -9,7 +9,14 @@ export const createOrganization = async (
 ) => {
   try {
     const [{ id }] = await db.transaction(async (tx) => {
-      return await tx.insert(organization).values(args).returning({
+      const insertorg = {
+        name: args.name,
+        logo: args.logo,
+        type: args.type,
+        slug: args.name.toLowerCase().replace(' ', '-'),
+        metadata: '',
+      }
+      return await tx.insert(organization).values(insertorg).returning({
         id: organization.id,
       })
     })
@@ -67,4 +74,11 @@ export async function getOrganizations(
     limit,
     totalPages,
   }
+}
+
+export async function getSingleOrganization(id: string) {
+  const data = await db.query.user.findFirst({
+    where: (organization, { eq }) => eq(organization.id, id),
+  })
+  return data ? data : null
 }
