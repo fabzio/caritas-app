@@ -56,7 +56,7 @@ export const useRegister = () => {
         )
       }
     },
-    onSuccess: async ({ user }, { password }) => {
+    onSuccess: async ({ user }) => {
       toast.success('Usuario registrado correctamente')
       const setupResponse = await rpc.auth.setup.post({ id: user.id })
       if (setupResponse.status === 500) {
@@ -90,14 +90,14 @@ type TeamCreationResult = Awaited<
   ReturnType<typeof authClient.organization.createTeam>
 >
 type TeamId = NonNullable<TeamCreationResult['data']>['id']
-type AddTeamMemberInput = Parameters<
-  typeof authClient.organization.addTeamMember
->[0]
-type UserId = AddTeamMemberInput['userId']
 
-const defaultTeams = [DEFAULT_TEAMS.EDUCATION, DEFAULT_TEAMS.HEALTH]
+const defaultTeams = [
+  DEFAULT_TEAMS.ADMIN,
+  DEFAULT_TEAMS.EDUCATION,
+  DEFAULT_TEAMS.HEALTH,
+]
 
-const createOrganization = async (): Promise<OrganizationData> => {
+const createOrganization = async () => {
   const { data, error } = await authClient.organization.create({
     name: env.VITE_ORG_NAME,
     slug: env.VITE_ORG_NAME.split(' ').join('-').toLowerCase(),
@@ -128,7 +128,7 @@ const createDefaultTeams = async (
   return primaryTeam.id
 }
 
-const addUserToPrimaryTeam = async (teamId: TeamId, userId: UserId) => {
+const addUserToPrimaryTeam = async (teamId: TeamId, userId: string) => {
   const { error } = await authClient.organization.addTeamMember({
     teamId,
     userId,
@@ -136,9 +136,16 @@ const addUserToPrimaryTeam = async (teamId: TeamId, userId: UserId) => {
   if (error) throw error
 }
 
-const initializeOrganization = async (userId: UserId) => {
+const initializeOrganization = async (userId: string) => {
   try {
     const organization = await createOrganization()
+
+    const { error: updateError } =
+      await authClient.organization.updateMemberRole({
+        memberId: organization.members[0]?.id as string,
+        role: ['admin', 'owner'],
+      })
+    if (updateError) throw updateError
     const primaryTeamId = await createDefaultTeams(organization.id)
     await addUserToPrimaryTeam(primaryTeamId, userId)
   } catch (error) {

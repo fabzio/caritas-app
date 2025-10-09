@@ -1,6 +1,6 @@
 import db from '@api/db'
-import { member, user } from '@api/db/schemas/auth'
-import { and, asc, count, desc, eq, ilike, or } from 'drizzle-orm'
+import { member, team, teamMember, user } from '@api/db/schemas/auth'
+import { and, asc, count, desc, eq, ilike, inArray, or } from 'drizzle-orm'
 import type { UserModel } from './model'
 
 export async function getUsers(
@@ -33,7 +33,7 @@ export async function getUsers(
     : undefined
 
   const roleCondition =
-    role && role !== 'all' ? eq(member.role, role) : undefined
+    role && role !== 'all' ? ilike(member.role, `%${role}%`) : undefined
   const activeCondition = eq(user.active, true)
   const memberOrgCondition = eq(member.organizationId, params.organizationId)
   const where = and(
@@ -131,12 +131,47 @@ export async function getSingleUser(id: string) {
     : null
 }
 
-export const getTeamName = async (teamId: string) => {
-  const team = await db.query.team.findFirst({
-    where: (team, { eq }) => eq(team.id, teamId),
+export const getTeamsByIds = async (teamIds: string[]) => {
+  if (teamIds.length === 0) return []
+  const rows = await db
+    .select({
+      id: team.id,
+      name: team.name,
+    })
+    .from(team)
+    .where(inArray(team.id, teamIds))
+  return rows
+}
+
+export const getUserTeamIds = async (userId: string) => {
+  const rows = await db
+    .select({
+      teamId: teamMember.teamId,
+    })
+    .from(teamMember)
+    .where(eq(teamMember.userId, userId))
+  return rows.map((row) => row.teamId)
+}
+
+export const getUserRoles = async (userId: string, organizationId: string) => {
+  const rows = await db
+    .select({
+      role: member.role,
+    })
+    .from(member)
+    .where(
+      and(eq(member.userId, userId), eq(member.organizationId, organizationId)),
+    )
+  return rows.map((row) => row.role)
+}
+
+export const getMemberId = async (userId: string, organizationId: string) => {
+  const res = await db.query.member.findFirst({
+    where: (member, { and, eq }) =>
+      and(eq(member.userId, userId), eq(member.organizationId, organizationId)),
     columns: {
-      name: true,
+      id: true,
     },
   })
-  return team?.name ?? null
+  return res ? res.id : null
 }

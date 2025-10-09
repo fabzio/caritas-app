@@ -63,7 +63,9 @@ function NavMain({ items }: Readonly<Props>) {
     const organizationType = isOrganizationType(newOrg.type)
       ? newOrg.type
       : null
-
+    await authClient.organization.setActive({
+      organizationId: newOrg.id,
+    })
     if (organizationType === 'caritas') {
       const { data: teams, error } = await authClient.organization.listTeams()
       const filteredTeams =

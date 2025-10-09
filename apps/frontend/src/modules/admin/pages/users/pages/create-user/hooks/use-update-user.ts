@@ -6,7 +6,7 @@ import { useNavigate } from '@tanstack/react-router'
 import { toast } from 'sonner'
 
 type UpdateUserProps = Parameters<typeof authClient.admin.updateUser>[0] & {
-  teamId?: string
+  teamIds?: string[]
 }
 
 export const useUpdateUser = () => {
@@ -15,15 +15,16 @@ export const useUpdateUser = () => {
 
   return useMutation({
     mutationFn: async (props: UpdateUserProps) => {
-      const { data, error } = await authClient.admin.updateUser(props)
+      const { teamIds, ...userPayload } = props
+      const { data, error } = await authClient.admin.updateUser(userPayload)
       if (error) throw error
-      if (props.teamId)
+      if (teamIds && teamIds.length > 0)
         await rpc.admin
           .users({
             id: props.userId as string,
           })
           .patch({
-            teamId: props.teamId,
+            teamIds,
           })
       return data
     },

@@ -2,6 +2,9 @@ export const QueryKeys = {
   SESSION: 'session',
   ACCESS: 'access',
   ORGANIZATIONS: 'organizations',
+  ORGANIZATIONSEDU: 'organizationsEducation',
+  ORGANIZATIONSMAJOR: 'organizationsMajor',
+  SCHOLARSHIP: 'scholarships',
   TEAMS: 'teams',
   SETTINGS: {
     ACCOUNTS: 'settings-accounts',
@@ -12,6 +15,9 @@ export const QueryKeys = {
     ORGANIZATION: 'admin-organization',
     ALLIES: 'admin-allies',
     USERS: 'admin-members',
+  },
+  EDUCATION: {
+    SCHOLARSHIP_RECIPIENTS: 'education-scholarship-recipients',
   },
 } as const
 

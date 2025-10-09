@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { getRouteApi, Link, useSearch } from '@tanstack/react-router'
 import { Button } from '@workspace/ui/components/button'
 import { Calendar } from '@workspace/ui/components/calendar'
+import { Checkbox } from '@workspace/ui/components/checkbox'
 import {
   Command,
   CommandEmpty,
@@ -37,6 +38,7 @@ import { cn } from '@workspace/ui/lib/utils'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
 import { CalendarIcon, Check, ChevronsUpDown, Loader2 } from 'lucide-react'
+import type { ControllerRenderProps } from 'react-hook-form'
 import { useForm } from 'react-hook-form'
 import z from 'zod'
 import { useCreateUser } from './hooks/use-create-user'
@@ -54,7 +56,7 @@ export default function FormView() {
 
   const { data: regions, isLoading: regionsLoading } = useRegions()
   const { data: teams, isLoading: teamsLoading } = useListTeams()
-  const form = useForm({
+  const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues:
       viewType === 'edit'
@@ -69,7 +71,7 @@ export default function FormView() {
             birthDate: loaderData?.birthDate,
             sex: loaderData?.sex,
             regionId: loaderData?.regionId,
-            teamId: loaderData?.teams[0]?.id,
+            teamIds: loaderData?.teams?.map((team) => team.id) ?? [],
           }
         : {
             name: '',
@@ -81,7 +83,7 @@ export default function FormView() {
             birthDate: undefined,
             sex: undefined,
             regionId: undefined,
-            teamId: undefined,
+            teamIds: [],
           },
   })
 
@@ -97,7 +99,6 @@ export default function FormView() {
           email: values.email,
           name: values.name,
           role: loaderData.role,
-          password: '',
           surname: values.surname,
           documentType: values.documentType,
           documentNumber: values.documentNumber,
@@ -106,14 +107,15 @@ export default function FormView() {
           phone: values.phone,
           regionId: values.regionId,
         },
-        teamId:
-          loaderData.teams[0]?.id !== values.teamId ? values.teamId : undefined,
+        teamIds: hasTeamChanges(loaderData?.teams ?? [], values.teamIds)
+          ? values.teamIds
+          : undefined,
       })
     else
       createUser({
         email: values.email,
         name: values.name,
-        role: 'user',
+        role: 'admin',
         password: 'default',
         data: {
           surname: values.surname,
@@ -124,7 +126,7 @@ export default function FormView() {
           phone: values.phone,
           regionId: values.regionId,
         },
-        teamId: values.teamId,
+        teamIds: values.teamIds,
       })
   }
 
@@ -382,66 +384,13 @@ export default function FormView() {
               />
               <FormField
                 control={form.control}
-                name="teamId"
+                name="teamIds"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Equipo</FormLabel>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <FormControl>
-                          <Button
-                            variant="outline"
-                            className={cn(
-                              'w-full justify-between',
-                              !field.value && 'text-muted-foreground',
-                            )}
-                          >
-                            {field.value
-                              ? teams?.find((r) => r.id === field.value)?.name
-                              : 'Selecciona un equipo'}
-                            <ChevronsUpDown className="opacity-50" />
-                          </Button>
-                        </FormControl>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-full p-0">
-                        <Command>
-                          <CommandInput
-                            placeholder="Buscar región"
-                            className="h-9"
-                          />
-                          <CommandList>
-                            <CommandEmpty>
-                              No se encontraron regiones.
-                            </CommandEmpty>
-                            <CommandGroup>
-                              {teamsLoading ? (
-                                <Loader2 className="animate-spin w-4 mx-auto" />
-                              ) : (
-                                teams?.map((team) => (
-                                  <CommandItem
-                                    value={team.name}
-                                    key={team.id}
-                                    onSelect={() => {
-                                      form.setValue('teamId', team.id)
-                                    }}
-                                  >
-                                    {team.name}
-                                    <Check
-                                      className={cn(
-                                        'ml-auto',
-                                        team.id === field.value
-                                          ? 'opacity-100'
-                                          : 'opacity-0',
-                                      )}
-                                    />
-                                  </CommandItem>
-                                ))
-                              )}
-                            </CommandGroup>
-                          </CommandList>
-                        </Command>
-                      </PopoverContent>
-                    </Popover>
+                    <FormLabel>Equipos</FormLabel>
+                    <div className="flex flex-col gap-2">
+                      {renderTeamCheckboxes(field, teams, teamsLoading)}
+                    </div>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -482,5 +431,47 @@ const formSchema = formUserSchema
     confirmPassword: true,
   })
   .extend({
-    teamId: z.string(),
+    teamIds: z.array(z.string()).min(1, 'Selecciona al menos un equipo'),
   })
+
+const hasTeamChanges = (
+  originalTeams: { id: string }[],
+  currentTeamIds: string[],
+) => {
+  const originalIds = originalTeams.map((team) => team.id)
+  if (originalIds.length !== currentTeamIds.length) return true
+  const sortAlphabetically = (ids: string[]) =>
+    [...ids].sort((a, b) => a.localeCompare(b))
+  const sortedOriginal = sortAlphabetically(originalIds)
+  const sortedCurrent = sortAlphabetically(currentTeamIds)
+  return sortedOriginal.some((id, index) => id !== sortedCurrent[index])
+}
+
+const renderTeamCheckboxes = (
+  field: ControllerRenderProps<z.infer<typeof formSchema>, 'teamIds'>,
+  teamList: { id: string; name: string }[] | undefined,
+  loading: boolean,
+) => {
+  if (loading) return <Loader2 className="h-4 w-4 animate-spin" />
+  if (!teamList || teamList.length === 0)
+    return (
+      <span className="text-sm text-muted-foreground">
+        No hay equipos disponibles
+      </span>
+    )
+  return teamList.map((team) => {
+    const checked = field.value?.includes(team.id) ?? false
+    const handleChange = (next: boolean | 'indeterminate') => {
+      const current = field.value ?? []
+      if (next === true && !checked) field.onChange([...current, team.id])
+      if (next === false && checked)
+        field.onChange(current.filter((value) => value !== team.id))
+    }
+    return (
+      <div key={team.id} className="flex flex-row items-center gap-3 px-3 py-2">
+        <Checkbox checked={checked} onCheckedChange={handleChange} />
+        <span className="text-sm font-normal">{team.name}</span>
+      </div>
+    )
+  })
+}
