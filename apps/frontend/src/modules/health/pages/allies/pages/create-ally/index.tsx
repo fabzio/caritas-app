@@ -26,9 +26,6 @@ export default function AllyFormView() {
     from: '/_authenticated/health/allies/form',
     select: (search) => search.type,
   })
-  // const loaderData = getRouteApi(
-  //   '/_authenticated/health/allies/form',
-  // ).useLoaderData()
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -39,29 +36,8 @@ export default function AllyFormView() {
 
   const { mutate: createOrganization } = useCreateAlly()
 
-  // const { mutate: updateUser } = useUpdateUser()
-
   function onSubmit(values: z.infer<typeof formSchema>) {
-    // if (viewType === 'edit' && loaderData?.id)
-    // updateUser({
-    //   userId: loaderData.id,
-    //   data: {
-    //     email: values.email,
-    //     name: values.name,
-    //     role: loaderData.role,
-    //     password: '',
-    //     surname: values.surname,
-    //     documentType: values.documentType,
-    //     documentNumber: values.documentNumber,
-    //     sex: values.sex,
-    //     birthDate: values.birthDate,
-    //     phone: values.phone,
-    //     regionId: values.regionId,
-    //   },
-    //   teamId:
-    //     loaderData.teams[0]?.id !== values.teamId ? values.teamId : undefined,
-    // })
-    // else
+    // TODO: handle edit ally
     createOrganization({
       name: values.name,
     })

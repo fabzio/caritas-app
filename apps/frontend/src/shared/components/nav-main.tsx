@@ -18,7 +18,7 @@ import {
   SidebarMenuSubItem,
   SidebarSeparator,
 } from '@workspace/ui/components/sidebar'
-import { Building2, ChevronRight, Cross } from 'lucide-react'
+import { Building2, ChevronRight } from 'lucide-react'
 import { toast } from 'sonner'
 import { QueryKeys } from '../constants/query-keys'
 import type { NavItem } from '../types/nav-main'
@@ -179,15 +179,6 @@ function NavMain({ items }: Readonly<Props>) {
                 </CollapsibleContent>
               </SidebarMenuItem>
             </Collapsible>
-            <SidebarMenuItem>
-              <SidebarMenuButton
-                tooltip="Gestionar aliados"
-                onClick={() => navigate({ to: '/health/allies' })}
-              >
-                <Cross />
-                <span>Gestionar aliados</span>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
           </>
         )}
       </SidebarMenu>

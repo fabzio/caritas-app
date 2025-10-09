@@ -2,35 +2,31 @@ import betterAuth from '@api/modules/auth/middleware'
 import Elysia, { status, t } from 'elysia'
 
 import { OrganizationModel } from './model'
-import {
-  createOrganization,
-  getOrganizations,
-  getSingleOrganization,
-} from './service'
+import { getOrganizations, getSingleOrganization } from './service'
 
 const organization = new Elysia({
   name: 'organization',
   prefix: '/organization',
 })
-  // .use(betterAuth)
-  .get('', ({ query }) => getOrganizations(query), {
-    auth: true,
-    query: OrganizationModel.listOrganizationsQuery,
-    response: {
-      200: OrganizationModel.getOrganization,
-      401: t.Literal('Unauthorized'),
+  .use(betterAuth)
+  .get(
+    '/',
+    ({ query, session: { activeOrganizationId } }) => {
+      if (!activeOrganizationId) throw status(401, 'Unauthorized')
+      return getOrganizations({
+        ...query,
+        organizationId: activeOrganizationId,
+      })
     },
-  })
-  .post('', ({ body }) => createOrganization(body), {
-    auth: true,
-    body: OrganizationModel.createOrganization,
-    response: {
-      200: t.String({
-        description: 'ID of the created organization',
-      }),
-      401: t.Literal('Unauthorized'),
+    {
+      auth: true,
+      query: OrganizationModel.listOrganizationsQuery,
+      response: {
+        200: OrganizationModel.getOrganization,
+        401: t.Literal('Unauthorized'),
+      },
     },
-  })
+  )
   .get(
     '/:id',
     async ({ params }) => {
@@ -43,6 +39,7 @@ const organization = new Elysia({
       params: OrganizationModel.getSingleOrganizationQuery,
       response: {
         200: OrganizationModel.getSingleOrganizationResponse,
+        404: t.Literal('Organization not found'),
       },
     },
   )

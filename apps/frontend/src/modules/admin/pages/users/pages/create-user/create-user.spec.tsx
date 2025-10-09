@@ -17,6 +17,9 @@ const mockUpdateUser = vi.fn()
 const mockUseSearch = vi.fn()
 const mockUseLoaderData = vi.fn()
 
+vi.mock('@frontend/hooks/use-session', () => ({
+  useSession: () => ({ data: { user: { id: 'current-user-id', teams: [] } } }),
+}))
 vi.mock('./hooks/use-create-user', () => ({
   useCreateUser: () => ({ mutate: mockCreateUser }),
 }))

@@ -15,13 +15,11 @@ import ActionsButton from './components/actions-button'
 import OrganizationTable from './components/organization-table'
 import SearchHealthOrganizationInput from './components/search-organization-input'
 import { useOrganizationTable } from './hooks/use-organization-table'
-// import { useRemoveUser } from '../users/hooks/use-remove-user'
 
 export default function AlliesTableView() {
   const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({})
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
-  // const { mutateAsync: removeUser, isPending: removeUserIsPending } =
-  //   useRemoveUser()
+
   const {
     data: allies,
     pagination,
@@ -52,24 +50,11 @@ export default function AlliesTableView() {
           <div className="flex-1 w-full">
             <SearchHealthOrganizationInput />
           </div>
-          {/* <div className="sm:w-auto w-full">
-            <RoleFilter
-              value={nameFilter}
-              onValueChange={setNameFilter}
-              roles={uniqueRoles}
-            />
-          </div> */}
         </div>
         <div className="flex items-center gap-2">
           <ActionsButton
             onDeleteClick={() => setIsDeleteModalOpen(true)}
-            onEditClick={
-              () => {}
-              // navigate({
-              //   to: '/admin/allies/form',
-              //   search: { type: 'edit', id: selectedUsers[0].id },
-              // })
-            }
+            onEditClick={() => {}}
             selectedCount={userCount}
           />
           <Link to={'/health/allies/form'} search={{ type: 'new' }}>
@@ -110,11 +95,7 @@ export default function AlliesTableView() {
               </Button>
             </DialogClose>
 
-            <Button
-              type="button"
-              onClick={handleDelete}
-              // disabled={removeUserIsPending}
-            >
+            <Button type="button" onClick={handleDelete}>
               Aceptar
             </Button>
           </DialogFooter>

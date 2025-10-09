@@ -23,6 +23,7 @@ export const useListOrganizations = ({
           page: Math.max(0, (currentPage || 1) - 1),
           limit: pageSize,
           sortBy: filters?.sortBy || 'name.asc',
+          type: 'health',
         },
       })
       if (error) throw error

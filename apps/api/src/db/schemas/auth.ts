@@ -11,7 +11,6 @@ import {
   uniqueIndex,
   varchar,
 } from 'drizzle-orm/pg-core'
-import { nanoid } from 'nanoid'
 
 export const authSchema = pgSchema('auth')
 
@@ -118,9 +117,7 @@ export const verification = authSchema.table('verification', {
 })
 
 export const organization = authSchema.table('organization', {
-  id: varchar('id', { length: 32 })
-    .primaryKey()
-    .$defaultFn(() => nanoid(32)),
+  id: varchar('id', { length: 32 }).primaryKey(),
   name: varchar('name', { length: 100 }).notNull(),
   active: boolean('active')
     .notNull()

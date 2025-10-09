@@ -1,36 +1,21 @@
 import db from '@api/db'
-import { PostgresError } from '@api/db/errors'
 import { organization } from '@api/db/schemas/auth'
-import { and, asc, count, desc, eq, ilike, or } from 'drizzle-orm'
+import { and, asc, count, desc, eq, ilike, not, or } from 'drizzle-orm'
 import type { OrganizationModel } from './model'
 
-export const createOrganization = async (
-  args: OrganizationModel.CreateOrganization,
-) => {
-  try {
-    const [{ id }] = await db.transaction(async (tx) => {
-      const insertorg = {
-        name: args.name,
-        logo: args.logo,
-        type: args.type,
-        slug: args.name.toLowerCase().replace(' ', '-'),
-        metadata: '',
-      }
-      return await tx.insert(organization).values(insertorg).returning({
-        id: organization.id,
-      })
-    })
-    return id
-  } catch (error) {
-    if (error instanceof Error) throw new PostgresError(error.message)
-    throw error
-  }
-}
-
 export async function getOrganizations(
-  params: OrganizationModel.ListOrganizationsQuery,
+  params: OrganizationModel.ListOrganizationsQuery & {
+    organizationId: string
+  },
 ): Promise<OrganizationModel.GetOrganization> {
-  const { q = '', page = 0, limit = 10, sortBy = 'name.asc' } = params
+  const {
+    q = '',
+    page = 0,
+    limit = 10,
+    sortBy = 'name.asc',
+    type,
+    organizationId,
+  } = params
 
   const [sortFieldRaw, sortOrderRaw] = (sortBy ?? 'name.asc').split('.', 2)
   const sortField = (sortFieldRaw ?? 'name').trim()
@@ -46,9 +31,14 @@ export async function getOrganizations(
   const orderExpr = sortOrder === 'desc' ? desc(column) : asc(column)
 
   const searchCondition = q ? or(ilike(organization.name, `%${q}%`)) : undefined
-
   const activeCondition = eq(organization.active, true)
-  const where = and(activeCondition, searchCondition)
+  const typeCondition = type ? eq(organization.type, type) : undefined
+  const where = and(
+    activeCondition,
+    searchCondition,
+    typeCondition,
+    not(eq(organization.id, organizationId)),
+  )
 
   // Get total count
   const [{ total }] = await db
@@ -80,5 +70,5 @@ export async function getSingleOrganization({ id }: { id: string }) {
   const data = await db.query.organization.findFirst({
     where: (organization, { eq }) => eq(organization.id, id),
   })
-  return data ? data : null
+  return data ?? null
 }

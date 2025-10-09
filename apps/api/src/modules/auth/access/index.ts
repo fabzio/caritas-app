@@ -1,40 +1,39 @@
-import { auth } from '@api/lib/auth'
 import Elysia from 'elysia'
 import betterAuth from '../middleware'
-import { getOrganizationType, getUserRole } from './service'
+import { getUserOrganizationsRoles, getUserRole } from './service'
 
 const access = new Elysia({}).use(betterAuth).get(
   '/access',
-  async ({ session, request: { headers } }) => {
-    const orgsType = await getOrganizationType(
-      session.activeOrganizationId ?? '',
-    )
+  async ({ session }) => {
     try {
-      const { role } = await auth.api.getActiveMemberRole({
-        headers,
-      })
+      const orgRoles = await getUserOrganizationsRoles(session.userId)
 
-      const roles = role
-        .split(',')
-        .map((r) => r.trim())
-        .filter(Boolean)
       const { isPatient, isStudent } = await getUserRole(session.userId)
-      const isHealthOrg = orgsType.some((org) => org.type === 'health')
+      const caritasOrg = orgRoles.find(
+        (orgRol) => orgRol.organization.type === 'caritas',
+      )
       return {
-        admin:
-          orgsType.some((org) => org.type === 'caritas') &&
-          (roles.includes('owner') || roles.includes('admin')),
+        admin: caritasOrg
+          ? caritasOrg?.role.split(',').includes('admin') ||
+            caritasOrg?.role.split(',').includes('owner')
+          : false,
         health: {
-          admin: roles.includes('healthMember'),
-          organization: isHealthOrg,
+          admin: caritasOrg?.role.split(',').includes('healthMember'),
+          organization: orgRoles.some(
+            (orgRol) => orgRol.organization.type === 'health',
+          ),
           user: isPatient,
         },
         education: {
-          admin: roles.includes('educationMember'),
-          organization: orgsType.some((org) => org.type === 'education'),
+          admin: caritasOrg?.role.split(',').includes('educationMember'),
+          organization: orgRoles.some(
+            (orgRol) => orgRol.organization.type === 'education',
+          ),
           user: isStudent,
         },
-        beneficiary: orgsType.some((org) => org.type === 'beneficiary'),
+        beneficiary: orgRoles.some(
+          (orgRol) => orgRol.organization.type === 'beneficiary',
+        ),
       }
     } catch {
       return {

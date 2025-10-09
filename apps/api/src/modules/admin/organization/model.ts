@@ -15,6 +15,13 @@ export namespace OrganizationModel {
 
   export const listOrganizationsQuery = t.Object({
     q: t.Optional(t.String()),
+    type: t.Optional(
+      t.Enum({
+        education: 'education',
+        health: 'health',
+        beneficiary: 'beneficiary',
+      }),
+    ),
     page: t.Optional(t.Integer({ minimum: 0 })),
     limit: t.Optional(t.Integer({ minimum: 1, maximum: 100 })),
     sortBy: t.Optional(t.String()), // ej: "name.asc"
