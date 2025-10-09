@@ -1,3 +1,4 @@
+import { env } from '@frontend/env'
 import { useQueryStore } from '@frontend/hooks/use-query-store'
 import authClient from '@frontend/lib/authClient'
 import { QueryKeys } from '@frontend/shared/constants/query-keys'
@@ -13,13 +14,13 @@ export const useAddPasskey = () => {
   return useMutation({
     mutationFn: async () => {
       await authClient.passkey.addPasskey({
-        name: `Cáritas Lima 365 - ${ua.getOS().toString()}`,
+        name: `${env.VITE_APP_TITLE} - ${ua.getOS().toString()}`,
       })
     },
     onMutate: async () => {
       setData((prev) => [
         ...prev,
-        { name: `Cáritas Lima 365 - ${ua.getOS().toString()}` },
+        { name: `${env.VITE_APP_TITLE} - ${ua.getOS().toString()}` },
       ])
       return { data }
     },

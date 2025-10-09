@@ -31,7 +31,7 @@ const hasTeam = (teams: RedirectInput['teams'], target: string) =>
 const toRoleList = (role: RedirectInput['role']) => {
   if (!role) return []
   if (Array.isArray(role)) return role.filter(Boolean).map(String)
-  return [role]
+  return role.split(',').map((r) => r.trim())
 }
 
 const isAdmin = (input: RedirectInput) => {
