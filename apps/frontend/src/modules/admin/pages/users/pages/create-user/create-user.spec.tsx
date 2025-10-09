@@ -4,6 +4,14 @@ import type { ReactNode } from 'react'
 import { vi } from 'vitest'
 import FormView from './index'
 
+type FormValues = Record<string, unknown>
+
+let mockFormValues: FormValues = {}
+
+const setMockFormValues = (values: FormValues) => {
+  mockFormValues = values
+}
+
 const mockCreateUser = vi.fn()
 const mockUpdateUser = vi.fn()
 const mockUseSearch = vi.fn()
@@ -41,12 +49,14 @@ vi.mock('react-hook-form', () => ({
   useForm: () => ({
     control: {},
     handleSubmit:
-      (fn: (data: unknown) => void) => (e: { preventDefault: () => void }) => {
-        e.preventDefault()
-        fn({})
+      (fn: (data: unknown) => void) =>
+      (e?: { preventDefault?: () => void }) => {
+        e?.preventDefault?.()
+        fn(mockFormValues)
       },
     formState: { errors: {} },
     setValue: vi.fn(),
+    getValues: () => mockFormValues,
   }),
 }))
 
@@ -99,16 +109,24 @@ vi.mock('@workspace/ui/components/form', () => ({
   }: {
     render: (props: { field: Record<string, unknown> }) => ReactNode
     name: string
-  }) =>
-    render({
+  }) => {
+    const fieldValue = mockFormValues[name]
+    const onChange = vi.fn((value: unknown) => {
+      mockFormValues = {
+        ...mockFormValues,
+        [name]: value,
+      }
+    })
+    return render({
       field: {
-        value: '',
-        onChange: vi.fn(),
+        value: fieldValue,
+        onChange,
         onBlur: vi.fn(),
         name,
         ref: vi.fn(),
       },
-    }),
+    })
+  },
   FormItem: ({ children }: { children: ReactNode }) => <div>{children}</div>,
   FormLabel: ({
     children,
@@ -196,11 +214,40 @@ vi.mock('@workspace/ui/components/calendar', () => ({
   ),
 }))
 
+vi.mock('@workspace/ui/components/checkbox', () => ({
+  Checkbox: ({
+    checked,
+    onCheckedChange,
+  }: {
+    checked?: boolean
+    onCheckedChange: (checked: boolean) => void
+  }) => (
+    <input
+      type="checkbox"
+      checked={checked}
+      onChange={(e) => onCheckedChange(e.target.checked)}
+    />
+  ),
+}))
+
 describe('FormView - Create Mode', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mockUseSearch.mockReturnValue('new')
     mockUseLoaderData.mockReturnValue(null)
+    const birthDate = new Date('1995-05-05')
+    setMockFormValues({
+      name: 'Jane',
+      surname: 'Doe',
+      email: 'jane@example.com',
+      phone: '+51 999 888 777',
+      documentType: 'DNI',
+      documentNumber: '12345678',
+      birthDate,
+      sex: 'F',
+      regionId: 'region-1',
+      teamIds: ['team-1'],
+    })
   })
 
   it('renders form in create mode', () => {
@@ -228,7 +275,22 @@ describe('FormView - Create Mode', () => {
     await user.click(submitButton)
 
     await waitFor(() => {
-      expect(mockCreateUser).toHaveBeenCalled()
+      expect(mockCreateUser).toHaveBeenCalledWith({
+        email: 'jane@example.com',
+        name: 'Jane',
+        role: 'admin',
+        password: 'default',
+        data: {
+          surname: 'Doe',
+          documentType: 'DNI',
+          documentNumber: '12345678',
+          sex: 'F',
+          birthDate: new Date('1995-05-05'),
+          phone: '+51 999 888 777',
+          regionId: 'region-1',
+        },
+        teamIds: ['team-1'],
+      })
     })
   })
 })
@@ -250,6 +312,18 @@ describe('FormView - Edit Mode', () => {
       regionId: 'region-1',
       role: 'admin',
       teams: [{ id: 'team-1', name: 'Team A' }],
+    })
+    setMockFormValues({
+      name: 'John',
+      surname: 'Doe',
+      email: 'john@example.com',
+      phone: '987654321',
+      documentType: 'DNI',
+      documentNumber: '12345678',
+      birthDate: new Date('1990-01-01'),
+      sex: 'M',
+      regionId: 'region-1',
+      teamIds: ['team-1'],
     })
   })
 
@@ -276,7 +350,22 @@ describe('FormView - Edit Mode', () => {
     await user.click(submitButton)
 
     await waitFor(() => {
-      expect(mockUpdateUser).toHaveBeenCalled()
+      expect(mockUpdateUser).toHaveBeenCalledWith({
+        userId: 'user-1',
+        data: {
+          email: 'john@example.com',
+          name: 'John',
+          role: 'admin',
+          surname: 'Doe',
+          documentType: 'DNI',
+          documentNumber: '12345678',
+          sex: 'M',
+          birthDate: new Date('1990-01-01'),
+          phone: '987654321',
+          regionId: 'region-1',
+        },
+        teamIds: undefined,
+      })
     })
   })
 })

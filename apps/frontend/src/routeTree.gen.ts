@@ -32,7 +32,6 @@ import { Route as AuthenticatedBeneficiaryIndexRouteImport } from './routes/_aut
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 import { Route as AuthenticatedUserSettingsRouteImport } from './routes/_authenticated/user/settings'
 import { Route as AuthenticatedUserOrganizationsRouteImport } from './routes/_authenticated/user/organizations'
-import { Route as AuthenticatedAdminPermissionsRouteImport } from './routes/_authenticated/admin/permissions'
 import { Route as AuthenticatedAdminOrganizationsRouteImport } from './routes/_authenticated/admin/organizations'
 import { Route as AuthenticatedUserSettingsIndexRouteImport } from './routes/_authenticated/user/settings/index'
 import { Route as AuthenticatedAdminUsersIndexRouteImport } from './routes/_authenticated/admin/users/index'
@@ -161,12 +160,6 @@ const AuthenticatedUserOrganizationsRoute =
     path: '/organizations',
     getParentRoute: () => AuthenticatedUserRoute,
   } as any)
-const AuthenticatedAdminPermissionsRoute =
-  AuthenticatedAdminPermissionsRouteImport.update({
-    id: '/permissions',
-    path: '/permissions',
-    getParentRoute: () => AuthenticatedAdminRoute,
-  } as any)
 const AuthenticatedAdminOrganizationsRoute =
   AuthenticatedAdminOrganizationsRouteImport.update({
     id: '/organizations',
@@ -213,7 +206,6 @@ export interface FileRoutesByFullPath {
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/': typeof AuthIndexRoute
   '/admin/organizations': typeof AuthenticatedAdminOrganizationsRoute
-  '/admin/permissions': typeof AuthenticatedAdminPermissionsRoute
   '/user/organizations': typeof AuthenticatedUserOrganizationsRoute
   '/user/settings': typeof AuthenticatedUserSettingsRouteWithChildren
   '/admin/': typeof AuthenticatedAdminIndexRoute
@@ -236,7 +228,6 @@ export interface FileRoutesByTo {
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth': typeof AuthIndexRoute
   '/admin/organizations': typeof AuthenticatedAdminOrganizationsRoute
-  '/admin/permissions': typeof AuthenticatedAdminPermissionsRoute
   '/user/organizations': typeof AuthenticatedUserOrganizationsRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/beneficiary': typeof AuthenticatedBeneficiaryIndexRoute
@@ -267,7 +258,6 @@ export interface FileRoutesById {
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/': typeof AuthIndexRoute
   '/_authenticated/admin/organizations': typeof AuthenticatedAdminOrganizationsRoute
-  '/_authenticated/admin/permissions': typeof AuthenticatedAdminPermissionsRoute
   '/_authenticated/user/organizations': typeof AuthenticatedUserOrganizationsRoute
   '/_authenticated/user/settings': typeof AuthenticatedUserSettingsRouteWithChildren
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
@@ -299,7 +289,6 @@ export interface FileRouteTypes {
     | '/auth/reset-password'
     | '/auth/'
     | '/admin/organizations'
-    | '/admin/permissions'
     | '/user/organizations'
     | '/user/settings'
     | '/admin/'
@@ -322,7 +311,6 @@ export interface FileRouteTypes {
     | '/auth/reset-password'
     | '/auth'
     | '/admin/organizations'
-    | '/admin/permissions'
     | '/user/organizations'
     | '/admin'
     | '/beneficiary'
@@ -352,7 +340,6 @@ export interface FileRouteTypes {
     | '/auth/reset-password'
     | '/auth/'
     | '/_authenticated/admin/organizations'
-    | '/_authenticated/admin/permissions'
     | '/_authenticated/user/organizations'
     | '/_authenticated/user/settings'
     | '/_authenticated/admin/'
@@ -537,13 +524,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedUserOrganizationsRouteImport
       parentRoute: typeof AuthenticatedUserRoute
     }
-    '/_authenticated/admin/permissions': {
-      id: '/_authenticated/admin/permissions'
-      path: '/permissions'
-      fullPath: '/admin/permissions'
-      preLoaderRoute: typeof AuthenticatedAdminPermissionsRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
-    }
     '/_authenticated/admin/organizations': {
       id: '/_authenticated/admin/organizations'
       path: '/organizations'
@@ -584,7 +564,6 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminOrganizationsRoute: typeof AuthenticatedAdminOrganizationsRoute
-  AuthenticatedAdminPermissionsRoute: typeof AuthenticatedAdminPermissionsRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
   AuthenticatedAdminUsersFormRoute: typeof AuthenticatedAdminUsersFormRoute
   AuthenticatedAdminUsersIndexRoute: typeof AuthenticatedAdminUsersIndexRoute
@@ -592,7 +571,6 @@ interface AuthenticatedAdminRouteChildren {
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminOrganizationsRoute: AuthenticatedAdminOrganizationsRoute,
-  AuthenticatedAdminPermissionsRoute: AuthenticatedAdminPermissionsRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
   AuthenticatedAdminUsersFormRoute: AuthenticatedAdminUsersFormRoute,
   AuthenticatedAdminUsersIndexRoute: AuthenticatedAdminUsersIndexRoute,
