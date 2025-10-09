@@ -2,6 +2,9 @@ export const QueryKeys = {
   SESSION: 'session',
   ACCESS: 'access',
   ORGANIZATIONS: 'organizations',
+  ORGANIZATIONSEDU: 'organizationsEducation',
+  ORGANIZATIONSMAJOR: 'organizationsMajor',
+  SCHOLARSHIP: 'scholarships',
   TEAMS: 'teams',
   SETTINGS: {
     ACCOUNTS: 'settings-accounts',
