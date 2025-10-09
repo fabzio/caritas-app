@@ -20,6 +20,7 @@ import { defaultRoles } from 'better-auth/plugins/organization/access'
 import { passkey } from 'better-auth/plugins/passkey'
 import { localization } from 'better-auth-localization'
 import transporter from '../mail'
+import { buildVerificationOtpEmail } from '../mail/templates/verification-otp'
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
@@ -165,22 +166,12 @@ export const auth = betterAuth({
     }),
     emailOTP({
       sendVerificationOTP: async ({ type, otp, email }) => {
-        let subject = ''
-        let html = ''
-        if (type === 'email-verification') {
-          subject = 'Verificación de correo electrónico'
-          html = `<p>Tu código de verificación es: <strong>${otp}</strong></p>`
-        } else if (type === 'forget-password') {
-          subject = 'Recuperación de contraseña'
-          html = `<p>Tu código para recuperar la contraseña es: <strong>${otp}</strong></p>
-          <p>Haz clic <a href="${env.BETTER_AUTH_URL}/auth/reset-password?email=${encodeURIComponent(email)}&otp=${encodeURIComponent(otp)}">aquí</a> para restablecer tu contraseña.</p>
-          <p> Este código es válido por 10 minutos.</p>
-          <p>Si no solicitaste este código, puedes ignorar este correo.</p>
-          `
-        } else {
-          subject = 'Inicio de sesión'
-          html = `<p>Tu código OTP es: <strong>${otp}</strong></p>`
-        }
+        const { subject, html } = buildVerificationOtpEmail({
+          type,
+          otp,
+          email,
+          baseUrl: env.BETTER_AUTH_URL,
+        })
         await transporter.sendMail({
           to: email,
           subject,
