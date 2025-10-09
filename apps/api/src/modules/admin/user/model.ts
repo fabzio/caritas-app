@@ -19,6 +19,7 @@ export namespace UserModel {
   export const listUsersQuery = t.Object({
     organizationId: t.String(),
     q: t.Optional(t.String()),
+    role: t.Optional(t.String()),
     page: t.Optional(t.Integer({ minimum: 0 })),
     limit: t.Optional(t.Integer({ minimum: 1, maximum: 100 })),
     sortBy: t.Optional(t.String()), // ej: "name.asc"

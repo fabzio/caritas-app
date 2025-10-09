@@ -4,6 +4,10 @@ import { QueryKeys } from '@frontend/shared/constants/query-keys'
 import type { Filters } from '@frontend/shared/types/filters'
 import { createFileRoute } from '@tanstack/react-router'
 
+export type UsersFilters = Filters & {
+  role?: string
+}
+
 export const Route = createFileRoute('/_authenticated/admin/users/')({
   loader: async ({ context: { queryClient, authClient } }) => {
     const { data } = await authClient.getSession()
@@ -24,6 +28,6 @@ export const Route = createFileRoute('/_authenticated/admin/users/')({
       },
     })
   },
-  validateSearch: () => ({}) as Filters,
+  validateSearch: () => ({}) as UsersFilters,
   component: TableView,
 })
