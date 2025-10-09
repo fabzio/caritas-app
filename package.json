@@ -8,30 +8,36 @@
     "lint": "biome check . --write",
     "check-types": "turbo run check-types",
     "prepare": "husky",
-    "setup": "bun run scripts/develop.ts"
+    "setup": "bun run scripts/develop.ts",
+    "terraform": "bun run scripts/terraform.ts"
   },
   "lint-staged": {
     "*": "bun lint"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.2.4",
-    "@commitlint/cli": "20.0.0",
+    "@biomejs/biome": "2.2.5",
+    "@commitlint/cli": "20.1.0",
     "@commitlint/config-conventional": "20.0.0",
+    "@types/prompts": "2.4.9",
     "@workspace/typescript-config": "workspace:*",
     "husky": "^9.1.7",
-    "lint-staged": "16.2.1",
+    "lint-staged": "16.2.3",
     "turbo": "^2.5.8",
-    "typescript": "5.9.2"
+    "typescript": "5.9.3"
   },
   "engines": {
     "node": ">=20"
   },
-  "packageManager": "bun@1.2.22",
+  "packageManager": "bun@1.2.23",
   "workspaces": [
     "apps/*",
     "packages/*"
   ],
   "dependencies": {
-    "@types/minimatch": "6.0.0"
+    "@types/minimatch": "6.0.0",
+    "execa": "9.6.0",
+    "kleur": "4.1.5",
+    "ora": "9.0.0",
+    "prompts": "2.4.2"
   }
 }

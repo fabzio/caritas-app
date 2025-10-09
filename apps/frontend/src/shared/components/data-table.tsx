@@ -17,6 +17,13 @@ import {
   PaginationItem,
 } from '@workspace/ui/components/pagination'
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@workspace/ui/components/select'
+import {
   Table,
   TableBody,
   TableCell,
@@ -37,6 +44,8 @@ type Props<T> = {
   onSortingChange: OnChangeFn<SortingState>
   rowSelection?: Record<string, boolean>
   setRowSelection: OnChangeFn<Record<string, boolean>>
+  showPageSizeSelector?: boolean
+  pageSizeOptions?: number[]
 }
 
 export default function DataTable<T>({
@@ -48,6 +57,8 @@ export default function DataTable<T>({
   onSortingChange,
   rowSelection,
   setRowSelection,
+  showPageSizeSelector = false,
+  pageSizeOptions = [5, 10, 20, 30, 50],
 }: Readonly<Props<T>>) {
   const table = useReactTable({
     data,
@@ -116,45 +127,74 @@ export default function DataTable<T>({
         </TableBody>
       </Table>
 
-      <Pagination className="flex justify-center my-4 space-x-2">
-        <PaginationContent>
-          <PaginationItem>
-            <Button
-              variant="secondary"
-              onClick={() => table.previousPage()}
-              disabled={!table.getCanPreviousPage()}
-            >
-              Anterior
-            </Button>
-          </PaginationItem>
-
-          {paginationNumbers.map((page) => (
-            <PaginationItem key={page.toString()}>
-              {page === '...' ? (
-                <PaginationEllipsis />
-              ) : (
-                <Button
-                  variant={+page === currentPage + 1 ? 'outline' : 'ghost'}
-                  size="icon"
-                  onClick={() => table.setPageIndex(+page)}
-                >
-                  {page}
-                </Button>
-              )}
+      <div className="flex items-center justify-center gap-4 my-4 relative">
+        <Pagination className="flex justify-center space-x-2">
+          <PaginationContent>
+            <PaginationItem>
+              <Button
+                variant="secondary"
+                onClick={() => table.previousPage()}
+                disabled={!table.getCanPreviousPage()}
+              >
+                Anterior
+              </Button>
             </PaginationItem>
-          ))}
 
-          <PaginationItem>
-            <Button
-              variant="secondary"
-              onClick={() => table.nextPage()}
-              disabled={!table.getCanNextPage()}
+            {paginationNumbers.map((page) => (
+              <PaginationItem key={page.toString()}>
+                {page === '...' ? (
+                  <PaginationEllipsis />
+                ) : (
+                  <Button
+                    variant={+page === currentPage + 1 ? 'outline' : 'ghost'}
+                    size="icon"
+                    onClick={() => table.setPageIndex(+page - 1)}
+                  >
+                    {page}
+                  </Button>
+                )}
+              </PaginationItem>
+            ))}
+
+            <PaginationItem>
+              <Button
+                variant="secondary"
+                onClick={() => table.nextPage()}
+                disabled={!table.getCanNextPage()}
+              >
+                Siguiente
+              </Button>
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
+
+        {showPageSizeSelector && (
+          <div className="lg:absolute lg:right-0 pr-2">
+            <Select
+              value={pagination.pageSize.toString()}
+              onValueChange={(value) => {
+                const newPageSize = Number(value)
+                paginationOptions.onPaginationChange?.((old) => ({
+                  ...old,
+                  pageSize: newPageSize,
+                  pageIndex: 0,
+                }))
+              }}
             >
-              Siguiente
-            </Button>
-          </PaginationItem>
-        </PaginationContent>
-      </Pagination>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {pageSizeOptions.map((size) => (
+                  <SelectItem key={size} value={size.toString()}>
+                    Mostrar {size}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
+      </div>
       {import.meta.env.DEV && (
         <ReactTableDevtools initialIsOpen={false} table={table} />
       )}

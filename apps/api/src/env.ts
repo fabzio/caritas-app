@@ -13,7 +13,7 @@ const EnvSchema = z.discriminatedUnion('NODE_ENV', [
     GOOGLE_CLIENT_SECRET: z.string().optional(),
     GOOGLE_SMTP_USER: z.string(),
     GOOGLE_SMTP_APP_PASSWORD: z.string(),
-    CLOUDFARE_TURNSTILE_SECRET_KEY: z.string(),
+    CLOUDFLARE_TURNSTILE_SECRET_KEY: z.string(),
   }),
   z.object({
     PORT: z.coerce.number().default(8000),
@@ -24,7 +24,7 @@ const EnvSchema = z.discriminatedUnion('NODE_ENV', [
     GOOGLE_SMTP_USER: z.string().default('test'),
     GOOGLE_SMTP_APP_PASSWORD: z.string().default('test'),
     BETTER_AUTH_URL: z.string().default('http://localhost:8000'),
-    CLOUDFARE_TURNSTILE_SECRET_KEY: z.string().default('test'),
+    CLOUDFLARE_TURNSTILE_SECRET_KEY: z.string().default('test'),
   }),
 ])
 
