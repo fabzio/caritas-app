@@ -7,21 +7,13 @@ export namespace ScholarshipApplicationModel {
   const _createScholarshipApplication = createInsertSchema(
     scholarshipApplication,
   )
-  export const createScholarshipApplication = t.Object({
-    scholarshipId: t.Number(),
-    userId: t.String(),
-    comments: t.Optional(t.String()),
-  })
+  export const createScholarshipApplication = t.Pick(
+    _createScholarshipApplication,
+    ['scholarshipId', 'userId', 'comments'],
+  )
+
   export type CreateScholarshipApplication =
     typeof createScholarshipApplication.static
-
-  export const acceptScholarshipApplication = t.Object({
-    scholarship_id: t.Number(),
-    userId: t.String(),
-    comments: t.Optional(t.String()),
-  })
-  export type AcceptScholarshipApplication =
-    typeof acceptScholarshipApplication.static
 
   const _getScholarshipApplications = createSelectSchema(scholarshipApplication)
   export const getScholarshipApplication = t.Array(

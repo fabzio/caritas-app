@@ -10,7 +10,9 @@ import {
 import type { ScholarshipRecipientModel } from './model'
 
 export async function createScholarshipRecipient(
-  data: ScholarshipRecipientModel.CreateScholarshipRecipient,
+  data: ScholarshipRecipientModel.CreateScholarshipRecipient & {
+    reviewedBy: string
+  },
 ): Promise<number> {
   try {
     const userExists = await db.query.user.findFirst({
@@ -91,8 +93,6 @@ export async function getRecipients(
       scholarshipName: scholarship.name,
       organizationName: organization.name,
     } as const
-
-    console.log({ page, limit })
 
     const column = columns[sortField as keyof typeof columns] ?? user.name
     const orderExpr = sortOrder === 'desc' ? desc(column) : asc(column)

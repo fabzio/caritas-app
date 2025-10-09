@@ -6,7 +6,3 @@ export const Route = createFileRoute(
 )({
   component: CreateScholarship,
 })
-
-function _RouteComponent() {
-  return <div>Hello "/_authenticated/education/scholarship/create"!</div>
-}

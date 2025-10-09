@@ -1,4 +1,6 @@
+import { createInsertSchema } from 'drizzle-typebox'
 import { t } from 'elysia'
+import { scholarshipApplication } from '@/db/schemas/education'
 
 export namespace ScholarshipRecipientModel {
   const listScholarshipRecipients = t.Object({
@@ -28,12 +30,11 @@ export namespace ScholarshipRecipientModel {
   })
   export type ListRecipientsQuery = typeof listRecipientsQuery.static
 
-  export const createScholarshipRecipient = t.Object({
-    scholarshipId: t.Number(),
-    userId: t.String(),
-    reviewedBy: t.String(),
-    comments: t.Optional(t.String()),
-  })
+  const _createScholarshipRecipient = createInsertSchema(scholarshipApplication)
+  export const createScholarshipRecipient = t.Pick(
+    _createScholarshipRecipient,
+    ['scholarshipId', 'userId', 'comments'],
+  )
   export type CreateScholarshipRecipient =
     typeof createScholarshipRecipient.static
 }

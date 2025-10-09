@@ -30,7 +30,12 @@ export default function ScholarshipPage() {
     pageSize,
   )
 
-  const scholarships = data?.data || []
+  const scholarships = (data?.data || []).map((s) => ({
+    id: String(s.id),
+    name: s.name,
+    organizationName: s.organizationId ?? '',
+    vacancies: s.vacancies,
+  }))
 
   return (
     <div className="flex flex-1 flex-col gap-6 p-4">

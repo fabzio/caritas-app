@@ -30,32 +30,6 @@ export const createScholarshipApplication = async (
   }
 }
 
-export const acceptScholarshipApplication = async (
-  args: ScholarshipApplicationModel.AcceptScholarshipApplication,
-) => {
-  try {
-    if (!args.userId) throw new PostgresError('Reviewer id is required')
-    const [{ id: updatedId }] = await db.transaction(async (tx) => {
-      return await tx
-        .update(scholarshipApplication)
-        .set({
-          status: 'accepted',
-          reviewedBy: args.userId,
-          reviewDate: new Date(),
-          comments: args.comments ?? null,
-        })
-        .where(eq(scholarshipApplication.id, args.scholarship_id))
-        .returning({ id: scholarshipApplication.id })
-    })
-    if (updatedId == null)
-      throw new PostgresError('Scholarship application not found')
-    return updatedId
-  } catch (e) {
-    if (e instanceof Error) throw new PostgresError(e.message)
-    throw e
-  }
-}
-
 export const getScholarshipApplications =
   async (): Promise<ScholarshipApplicationModel.GetScholarshipApplication> => {
     try {
