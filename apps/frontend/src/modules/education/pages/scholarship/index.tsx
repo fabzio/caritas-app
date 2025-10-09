@@ -5,9 +5,9 @@ import { Card, CardContent } from '@workspace/ui/components/card'
 import { Input } from '@workspace/ui/components/input'
 import { Skeleton } from '@workspace/ui/components/skeleton'
 import { Filter, PlusCircle, Search } from 'lucide-react'
-import useGetScholarship from '../../hooks/use-get-scholarship'
-import useScholarshipTable from '../../hooks/use-scholarship-table'
 import ScholarshipTable from './components/scholarship-table'
+import useGetScholarship from './hooks/use-get-scholarship'
+import useScholarshipTable from './hooks/use-scholarship-table'
 
 export default function ScholarshipPage() {
   const isMobile = useIsMobile()

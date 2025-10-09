@@ -3,8 +3,8 @@ import { useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
-import useGetScholarship from '../../../hooks/use-get-scholarship'
-import usePostScholarshipApplication from '../../../hooks/use-post-scholarship-application'
+import useGetScholarship from '../../scholarship/hooks/use-get-scholarship'
+import usePostScholarshipApplication from '../../scholarship/pages/create-scholarship/hooks/use-post-scholarship-application'
 import type { Beneficiary } from './use-get-beneficiaries'
 
 const formSchema = z.object({
@@ -63,7 +63,7 @@ export function useScholarshipRecipientForm() {
   })
 
   const handleCancel = () => {
-    navigate({ to: '/education/scholarship' })
+    navigate({ to: '/education/recipients' })
   }
 
   return {

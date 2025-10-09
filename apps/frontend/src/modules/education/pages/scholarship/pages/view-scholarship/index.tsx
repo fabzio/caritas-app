@@ -11,8 +11,8 @@ import {
 } from '@workspace/ui/components/tabs'
 import { ArrowLeftIcon, FileTextIcon, GraduationCapIcon } from 'lucide-react'
 import { useState } from 'react'
-import ApplicantsTable from './components/applicants-table'
-import ScholarshipGeneralInfo from './components/scholarship-general-info'
+import ApplicantsTable from '../../components/applicants-table'
+import ScholarshipGeneralInfo from '../../components/scholarship-general-info'
 
 export default function ViewScholarship() {
   const { scholarshipId } = useParams({ strict: false })

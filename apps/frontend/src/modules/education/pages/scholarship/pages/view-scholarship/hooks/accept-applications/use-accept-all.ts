@@ -1,6 +1,6 @@
+import rpc from '@frontend/lib/rpc'
+import { QueryKeys } from '@frontend/shared/constants/query-keys'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import rpc from '../../../../lib/rpc'
-import { QueryKeys } from '../../../../shared/constants/query-keys'
 
 type AcceptAllInput = {
   scholarshipId: number

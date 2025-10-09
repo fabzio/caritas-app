@@ -29,7 +29,7 @@ export default function MoreMenu({
   align = 'end',
   trigger,
   className,
-}: Props) {
+}: Readonly<Props>) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
