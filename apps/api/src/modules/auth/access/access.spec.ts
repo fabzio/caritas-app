@@ -33,12 +33,12 @@ describe('Auth Access Module', () => {
       health: {
         admin: false,
         organization: false,
-        user: true,
+        user: false,
       },
       education: {
         admin: false,
         organization: false,
-        user: true,
+        user: false,
       },
       beneficiary: false,
     })
