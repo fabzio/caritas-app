@@ -35,10 +35,12 @@ import { Route as AuthenticatedUserOrganizationsRouteImport } from './routes/_au
 import { Route as AuthenticatedEducationRecipientsRouteImport } from './routes/_authenticated/education/recipients'
 import { Route as AuthenticatedAdminOrganizationsRouteImport } from './routes/_authenticated/admin/organizations'
 import { Route as AuthenticatedUserSettingsIndexRouteImport } from './routes/_authenticated/user/settings/index'
+import { Route as AuthenticatedHealthSpecialityIndexRouteImport } from './routes/_authenticated/health/speciality/index'
 import { Route as AuthenticatedHealthAlliesIndexRouteImport } from './routes/_authenticated/health/allies/index'
 import { Route as AuthenticatedEducationScholarshipIndexRouteImport } from './routes/_authenticated/education/scholarship/index'
 import { Route as AuthenticatedAdminUsersIndexRouteImport } from './routes/_authenticated/admin/users/index'
 import { Route as AuthenticatedUserSettingsAuthenticationRouteImport } from './routes/_authenticated/user/settings/authentication'
+import { Route as AuthenticatedHealthSpecialityCreateRouteImport } from './routes/_authenticated/health/speciality/create'
 import { Route as AuthenticatedHealthAlliesFormRouteImport } from './routes/_authenticated/health/allies/form'
 import { Route as AuthenticatedEducationScholarshipCreateRouteImport } from './routes/_authenticated/education/scholarship/create'
 import { Route as AuthenticatedAdminUsersFormRouteImport } from './routes/_authenticated/admin/users/form'
@@ -183,6 +185,12 @@ const AuthenticatedUserSettingsIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedUserSettingsRoute,
   } as any)
+const AuthenticatedHealthSpecialityIndexRoute =
+  AuthenticatedHealthSpecialityIndexRouteImport.update({
+    id: '/speciality/',
+    path: '/speciality/',
+    getParentRoute: () => AuthenticatedHealthRoute,
+  } as any)
 const AuthenticatedHealthAlliesIndexRoute =
   AuthenticatedHealthAlliesIndexRouteImport.update({
     id: '/allies/',
@@ -206,6 +214,12 @@ const AuthenticatedUserSettingsAuthenticationRoute =
     id: '/authentication',
     path: '/authentication',
     getParentRoute: () => AuthenticatedUserSettingsRoute,
+  } as any)
+const AuthenticatedHealthSpecialityCreateRoute =
+  AuthenticatedHealthSpecialityCreateRouteImport.update({
+    id: '/speciality/create',
+    path: '/speciality/create',
+    getParentRoute: () => AuthenticatedHealthRoute,
   } as any)
 const AuthenticatedHealthAlliesFormRoute =
   AuthenticatedHealthAlliesFormRouteImport.update({
@@ -254,10 +268,12 @@ export interface FileRoutesByFullPath {
   '/admin/users/form': typeof AuthenticatedAdminUsersFormRoute
   '/education/scholarship/create': typeof AuthenticatedEducationScholarshipCreateRoute
   '/health/allies/form': typeof AuthenticatedHealthAlliesFormRoute
+  '/health/speciality/create': typeof AuthenticatedHealthSpecialityCreateRoute
   '/user/settings/authentication': typeof AuthenticatedUserSettingsAuthenticationRoute
   '/admin/users': typeof AuthenticatedAdminUsersIndexRoute
   '/education/scholarship': typeof AuthenticatedEducationScholarshipIndexRoute
   '/health/allies': typeof AuthenticatedHealthAlliesIndexRoute
+  '/health/speciality': typeof AuthenticatedHealthSpecialityIndexRoute
   '/user/settings/': typeof AuthenticatedUserSettingsIndexRoute
 }
 export interface FileRoutesByTo {
@@ -280,10 +296,12 @@ export interface FileRoutesByTo {
   '/admin/users/form': typeof AuthenticatedAdminUsersFormRoute
   '/education/scholarship/create': typeof AuthenticatedEducationScholarshipCreateRoute
   '/health/allies/form': typeof AuthenticatedHealthAlliesFormRoute
+  '/health/speciality/create': typeof AuthenticatedHealthSpecialityCreateRoute
   '/user/settings/authentication': typeof AuthenticatedUserSettingsAuthenticationRoute
   '/admin/users': typeof AuthenticatedAdminUsersIndexRoute
   '/education/scholarship': typeof AuthenticatedEducationScholarshipIndexRoute
   '/health/allies': typeof AuthenticatedHealthAlliesIndexRoute
+  '/health/speciality': typeof AuthenticatedHealthSpecialityIndexRoute
   '/user/settings': typeof AuthenticatedUserSettingsIndexRoute
 }
 export interface FileRoutesById {
@@ -316,10 +334,12 @@ export interface FileRoutesById {
   '/_authenticated/admin/users/form': typeof AuthenticatedAdminUsersFormRoute
   '/_authenticated/education/scholarship/create': typeof AuthenticatedEducationScholarshipCreateRoute
   '/_authenticated/health/allies/form': typeof AuthenticatedHealthAlliesFormRoute
+  '/_authenticated/health/speciality/create': typeof AuthenticatedHealthSpecialityCreateRoute
   '/_authenticated/user/settings/authentication': typeof AuthenticatedUserSettingsAuthenticationRoute
   '/_authenticated/admin/users/': typeof AuthenticatedAdminUsersIndexRoute
   '/_authenticated/education/scholarship/': typeof AuthenticatedEducationScholarshipIndexRoute
   '/_authenticated/health/allies/': typeof AuthenticatedHealthAlliesIndexRoute
+  '/_authenticated/health/speciality/': typeof AuthenticatedHealthSpecialityIndexRoute
   '/_authenticated/user/settings/': typeof AuthenticatedUserSettingsIndexRoute
 }
 export interface FileRouteTypes {
@@ -352,10 +372,12 @@ export interface FileRouteTypes {
     | '/admin/users/form'
     | '/education/scholarship/create'
     | '/health/allies/form'
+    | '/health/speciality/create'
     | '/user/settings/authentication'
     | '/admin/users'
     | '/education/scholarship'
     | '/health/allies'
+    | '/health/speciality'
     | '/user/settings/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -378,10 +400,12 @@ export interface FileRouteTypes {
     | '/admin/users/form'
     | '/education/scholarship/create'
     | '/health/allies/form'
+    | '/health/speciality/create'
     | '/user/settings/authentication'
     | '/admin/users'
     | '/education/scholarship'
     | '/health/allies'
+    | '/health/speciality'
     | '/user/settings'
   id:
     | '__root__'
@@ -413,10 +437,12 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/users/form'
     | '/_authenticated/education/scholarship/create'
     | '/_authenticated/health/allies/form'
+    | '/_authenticated/health/speciality/create'
     | '/_authenticated/user/settings/authentication'
     | '/_authenticated/admin/users/'
     | '/_authenticated/education/scholarship/'
     | '/_authenticated/health/allies/'
+    | '/_authenticated/health/speciality/'
     | '/_authenticated/user/settings/'
   fileRoutesById: FileRoutesById
 }
@@ -610,6 +636,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedUserSettingsIndexRouteImport
       parentRoute: typeof AuthenticatedUserSettingsRoute
     }
+    '/_authenticated/health/speciality/': {
+      id: '/_authenticated/health/speciality/'
+      path: '/speciality'
+      fullPath: '/health/speciality'
+      preLoaderRoute: typeof AuthenticatedHealthSpecialityIndexRouteImport
+      parentRoute: typeof AuthenticatedHealthRoute
+    }
     '/_authenticated/health/allies/': {
       id: '/_authenticated/health/allies/'
       path: '/allies'
@@ -637,6 +670,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/user/settings/authentication'
       preLoaderRoute: typeof AuthenticatedUserSettingsAuthenticationRouteImport
       parentRoute: typeof AuthenticatedUserSettingsRoute
+    }
+    '/_authenticated/health/speciality/create': {
+      id: '/_authenticated/health/speciality/create'
+      path: '/speciality/create'
+      fullPath: '/health/speciality/create'
+      preLoaderRoute: typeof AuthenticatedHealthSpecialityCreateRouteImport
+      parentRoute: typeof AuthenticatedHealthRoute
     }
     '/_authenticated/health/allies/form': {
       id: '/_authenticated/health/allies/form'
@@ -719,13 +759,19 @@ const AuthenticatedEducationRouteWithChildren =
 interface AuthenticatedHealthRouteChildren {
   AuthenticatedHealthIndexRoute: typeof AuthenticatedHealthIndexRoute
   AuthenticatedHealthAlliesFormRoute: typeof AuthenticatedHealthAlliesFormRoute
+  AuthenticatedHealthSpecialityCreateRoute: typeof AuthenticatedHealthSpecialityCreateRoute
   AuthenticatedHealthAlliesIndexRoute: typeof AuthenticatedHealthAlliesIndexRoute
+  AuthenticatedHealthSpecialityIndexRoute: typeof AuthenticatedHealthSpecialityIndexRoute
 }
 
 const AuthenticatedHealthRouteChildren: AuthenticatedHealthRouteChildren = {
   AuthenticatedHealthIndexRoute: AuthenticatedHealthIndexRoute,
   AuthenticatedHealthAlliesFormRoute: AuthenticatedHealthAlliesFormRoute,
+  AuthenticatedHealthSpecialityCreateRoute:
+    AuthenticatedHealthSpecialityCreateRoute,
   AuthenticatedHealthAlliesIndexRoute: AuthenticatedHealthAlliesIndexRoute,
+  AuthenticatedHealthSpecialityIndexRoute:
+    AuthenticatedHealthSpecialityIndexRoute,
 }
 
 const AuthenticatedHealthRouteWithChildren =

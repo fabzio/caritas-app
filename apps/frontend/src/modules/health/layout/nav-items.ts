@@ -1,5 +1,5 @@
 import type { NavItem } from '@frontend/shared/types/nav-main'
-import { Hospital, Stethoscope } from 'lucide-react'
+import { HeartPlus, Hospital, Stethoscope } from 'lucide-react'
 
 const healthNavItems: NavItem[] = [
   {
@@ -12,6 +12,12 @@ const healthNavItems: NavItem[] = [
     title: 'Aliados',
     url: '/health/allies',
     icon: Hospital,
+    groupLabel: 'Salud',
+  },
+  {
+    title: 'Especialidades',
+    url: '/health/speciality',
+    icon: HeartPlus,
     groupLabel: 'Salud',
   },
 ]
