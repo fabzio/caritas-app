@@ -119,10 +119,18 @@ export const verification = authSchema.table('verification', {
 export const organization = authSchema.table('organization', {
   id: varchar('id', { length: 32 }).primaryKey(),
   name: varchar('name', { length: 100 }).notNull(),
+  active: boolean('active')
+    .notNull()
+    .$defaultFn(() => true),
   slug: varchar('slug', { length: 100 }).unique(),
   logo: varchar('logo', { length: 500 }),
-  createdAt: timestamp('created_at').notNull(),
-  updatedAt: timestamp('updated_at').$onUpdate(() => new Date()),
+  createdAt: timestamp('created_at')
+    .$defaultFn(() => new Date())
+    .notNull(),
+  updatedAt: timestamp('updated_at')
+    .$defaultFn(() => new Date())
+    .$onUpdate(() => new Date())
+    .notNull(),
   metadata: text('metadata'),
   type: varchar('type', {
     length: 20,

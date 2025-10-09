@@ -9,7 +9,7 @@ import {
 interface RoleFilterProps {
   value: string
   onValueChange: (value: string) => void
-  roles: string[]
+  roles: Array<{ value: string; label: string }>
 }
 
 export default function RoleFilter({
@@ -25,8 +25,8 @@ export default function RoleFilter({
       <SelectContent>
         <SelectItem value="all">Todos los roles</SelectItem>
         {roles.map((role) => (
-          <SelectItem key={role} value={role}>
-            {role}
+          <SelectItem key={role.value} value={role.value}>
+            {role.label}
           </SelectItem>
         ))}
       </SelectContent>

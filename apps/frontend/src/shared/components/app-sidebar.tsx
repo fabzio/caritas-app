@@ -95,7 +95,7 @@ const modules: {
     path: '/beneficiary',
   },
   {
-    name: 'Beneficiario',
+    name: 'Usuario',
     logo: UserStar,
     accessKey: 'user',
     path: '/user',

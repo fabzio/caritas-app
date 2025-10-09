@@ -13,9 +13,4 @@ export const Route = createFileRoute('/_authenticated/admin/organizations')({
       },
     })
   },
-  component: RouteComponent,
 })
-
-function RouteComponent() {
-  return <div>Hello "/_authenticated/admin/organizations"!</div>
-}
