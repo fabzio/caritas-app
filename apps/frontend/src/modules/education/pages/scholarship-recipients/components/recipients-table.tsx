@@ -1,3 +1,4 @@
+import type { RecipientFilters } from '@frontend/routes/_authenticated/education/recipients'
 import DataTable from '@frontend/shared/components/data-table'
 import { stateToSortBy } from '@frontend/shared/utils/sort-by-to-state'
 import type {
@@ -15,7 +16,7 @@ type Props = {
   columns: ColumnDef<Recipient>[]
   paginationState: PaginationState
   sortingState: SortingState
-  setFilters: (filters: any) => void
+  setFilters: (filters: RecipientFilters) => void
   pagination?: {
     total: number
     totalPages: number

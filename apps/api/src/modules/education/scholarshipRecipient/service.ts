@@ -21,7 +21,6 @@ export async function getRecipients(
       sortBy = 'name.asc',
     } = params
     const searchQuery = q.replace(/\s+/g, ' ').trim()
-    console.log(page)
 
     const [sortFieldRaw, sortOrderRaw] = (sortBy ?? 'name.asc').split('.', 2)
     const sortField = (sortFieldRaw ?? 'name').trim()
