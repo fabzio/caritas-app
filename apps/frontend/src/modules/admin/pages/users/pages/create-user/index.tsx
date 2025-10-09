@@ -36,6 +36,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@workspace/ui/components/select'
+import { Spinner } from '@workspace/ui/components/spinner'
 import { cn } from '@workspace/ui/lib/utils'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
@@ -93,9 +94,8 @@ export default function FormView() {
           },
   })
 
-  const { mutate: createUser } = useCreateUser()
-
-  const { mutate: updateUser } = useUpdateUser()
+  const { mutate: createUser, isPending: isPendingCreate } = useCreateUser()
+  const { mutate: updateUser, isPending: isPendingUpdate } = useUpdateUser()
 
   const [showAdminRemovalDialog, setShowAdminRemovalDialog] = useState(false)
   const [pendingValues, setPendingValues] = useState<z.infer<
@@ -442,8 +442,16 @@ export default function FormView() {
               </div>
 
               <div className="w-full flex gap-2 justify-center">
-                <Button type="submit" className="mt-4">
-                  {dependantText.submit[viewType]}
+                <Button
+                  type="submit"
+                  className="mt-4"
+                  disabled={isPendingCreate || isPendingUpdate}
+                >
+                  {isPendingCreate || isPendingUpdate ? (
+                    <Spinner />
+                  ) : (
+                    dependantText.submit[viewType]
+                  )}
                 </Button>
                 <Link to="/admin/users">
                   <Button variant="outline" className="mt-4">

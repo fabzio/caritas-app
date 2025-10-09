@@ -6,12 +6,13 @@ export const QueryKeys = {
   ORGANIZATIONSMAJOR: 'organizationsMajor',
   SCHOLARSHIP: 'scholarships',
   SPECIALITY: 'speciality',
-  TEAMS: 'teams',
+  USER_TEAMS: 'teams',
   SETTINGS: {
     ACCOUNTS: 'settings-accounts',
     PASSKEYS: 'settings-passkeys',
   },
   ADMIN: {
+    ORG_TEAMS: 'admin-org-teams',
     ORGS_ROLE: 'admin-org-role',
     ORGANIZATION: 'admin-organization',
     ALLIES: 'admin-allies',

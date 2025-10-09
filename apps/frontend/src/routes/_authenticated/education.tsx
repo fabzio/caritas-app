@@ -7,7 +7,7 @@ import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
 export const Route = createFileRoute('/_authenticated/education')({
   beforeLoad: async ({ context: { authClient, queryClient } }) => {
     const teams = await queryClient.fetchQuery({
-      queryKey: [QueryKeys.TEAMS],
+      queryKey: [QueryKeys.USER_TEAMS],
       queryFn: async () => {
         const { data, error } = await authClient.organization.listUserTeams()
         if (error) throw error
