@@ -13,6 +13,7 @@ export const QueryKeys = {
   ADMIN: {
     ORGS_ROLE: 'admin-org-role',
     ORGANIZATION: 'admin-organization',
+    ALLIES: 'admin-allies',
     USERS: 'admin-members',
   },
   EDUCATION: {

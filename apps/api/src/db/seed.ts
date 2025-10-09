@@ -55,6 +55,7 @@ export const seed = async () => {
       code: district.code,
     })),
   )
+
   console.info(`🌱 Seeded ${districts.length} districts`)
 }
 

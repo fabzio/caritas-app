@@ -89,7 +89,13 @@ export default function Dashboard() {
                   <User size={16} />
                   Roles
                 </div>
-                <span>{current?.role}</span>
+                <div>
+                  {current?.role.split(',').map((role) => (
+                    <Badge key={role} variant="outline">
+                      {role}
+                    </Badge>
+                  ))}
+                </div>
               </div>
             </div>
           </CardContent>

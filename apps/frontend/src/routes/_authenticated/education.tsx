@@ -9,24 +9,24 @@ export const Route = createFileRoute('/_authenticated/education')({
     const teams = await queryClient.fetchQuery({
       queryKey: [QueryKeys.TEAMS],
       queryFn: async () => {
-        const { data, error } = await authClient.organization.listTeams()
+        const { data, error } = await authClient.organization.listUserTeams()
         if (error) throw error
         return data
       },
     })
-    const haveEducationTeam = teams.filter(
-      (org) => org.name === DEFAULT_TEAMS.EDUCATION,
+    const educationTeam = teams.find(
+      (team) => team.name === DEFAULT_TEAMS.EDUCATION,
     )
-    if (!haveEducationTeam?.length)
+    if (!educationTeam)
       throw redirect({
         to: '/user',
       })
     await Promise.all([
       authClient.organization.setActive({
-        organizationId: haveEducationTeam?.[0]?.organizationId,
+        organizationId: educationTeam.organizationId,
       }),
       authClient.organization.setActiveTeam({
-        teamId: haveEducationTeam?.[0]?.id,
+        teamId: educationTeam.id,
       }),
     ])
   },

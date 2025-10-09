@@ -71,7 +71,7 @@ export const useRegister = () => {
       try {
         await initializeOrganization(user.id)
         await authClient.signOut()
-        navigate({ to: '/admin' })
+        navigate({ to: '/auth/login', search: { redirect: '/admin' } })
         toast.success('Inicialización exitosa, ya puede iniciar sesión')
       } catch (organizationError) {
         console.error('Organization initialization failed:', organizationError)
