@@ -37,12 +37,12 @@ import { Textarea } from '@workspace/ui/components/textarea'
 import { format } from 'date-fns'
 import { CalendarIcon, Loader2 } from 'lucide-react'
 import { useForm } from 'react-hook-form'
-import useGetOrganization from '../../hooks/use-get-organization'
-import usePostScholarship from '../../hooks/use-post-scholarship'
+import useGetOrganization from './hooks/use-get-organization'
+import usePostScholarship from './hooks/use-post-scholarship'
 import {
   type FormScholarShipSchema,
   formScholarShipSchema,
-} from '../../models/scholarship'
+} from './utils/scholarship'
 export default function CreateScholarship() {
   const form = useForm<FormScholarShipSchema>({
     resolver: zodResolver(formScholarShipSchema),
@@ -84,7 +84,7 @@ export default function CreateScholarship() {
             <CardHeader>
               <CardTitle>Información de la Beca</CardTitle>
               <CardDescription>
-                Complete todos los campos requeridos
+                Complete todos los campos requeridos*
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -95,7 +95,7 @@ export default function CreateScholarship() {
                     name="name"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Nombre de la Beca</FormLabel>
+                        <FormLabel>Nombre de la Beca*</FormLabel>
                         <FormControl>
                           <Input {...field} />
                         </FormControl>
@@ -108,7 +108,7 @@ export default function CreateScholarship() {
                     name="type"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Tipo de beca</FormLabel>
+                        <FormLabel>Tipo de beca*</FormLabel>
                         <Select
                           onValueChange={field.onChange}
                           defaultValue={field.value}
@@ -132,7 +132,7 @@ export default function CreateScholarship() {
                     name="organizationId"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Organización</FormLabel>
+                        <FormLabel>Organización*</FormLabel>
                         <Select
                           onValueChange={field.onChange}
                           defaultValue={field.value}
@@ -164,7 +164,7 @@ export default function CreateScholarship() {
                     name="description"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Descripción</FormLabel>
+                        <FormLabel>Descripción*</FormLabel>
                         <FormControl>
                           <Textarea rows={4} {...field} />
                         </FormControl>
@@ -190,7 +190,7 @@ export default function CreateScholarship() {
                     name="vacancies"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Vacantes Disponibles</FormLabel>
+                        <FormLabel>Vacantes Disponibles*</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
@@ -212,7 +212,7 @@ export default function CreateScholarship() {
                     name="startDate"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Fecha de Inicio </FormLabel>
+                        <FormLabel>Fecha de inicio*</FormLabel>
                         <Popover>
                           <PopoverTrigger asChild>
                             <FormControl>
@@ -228,6 +228,7 @@ export default function CreateScholarship() {
                           </PopoverTrigger>
                           <PopoverContent>
                             <Calendar
+                              captionLayout="dropdown"
                               mode="single"
                               selected={field.value}
                               onSelect={field.onChange}
@@ -246,7 +247,7 @@ export default function CreateScholarship() {
                     name="endDate"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Fecha de fin</FormLabel>
+                        <FormLabel>Fecha de fin*</FormLabel>
                         <Popover>
                           <PopoverTrigger asChild>
                             <FormControl>
@@ -262,6 +263,7 @@ export default function CreateScholarship() {
                           </PopoverTrigger>
                           <PopoverContent>
                             <Calendar
+                              captionLayout="dropdown"
                               mode="single"
                               selected={field.value}
                               onSelect={field.onChange}

@@ -2,7 +2,6 @@ import rpc from '@frontend/lib/rpc'
 import { QueryKeys } from '@frontend/shared/constants/query-keys'
 import { useQuery } from '@tanstack/react-query'
 
-//Hook to fech all scholarships
 const useGetScholarship = () => {
   return useQuery({
     queryKey: [QueryKeys.SCHOLARSHIP],

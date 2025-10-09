@@ -20,7 +20,7 @@ export default function ScholarshipPage() {
             </Button>
           </Link>
         </div>
-        {/* Aquí puedes agregar la tabla o lista de becas en formato desktop y mobile(priori) */}
+        {/* TODO: Agregar listado de becas*/}
       </div>
     </div>
   )

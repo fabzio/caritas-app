@@ -7,7 +7,7 @@ export namespace OrganizationModel {
 
   export const getOrganization = t.Array(
     t.Omit(_getOrganization, ['createdAt', 'updatedAt']),
-  ) //exclud some columns
+  )
 
   export type GetOrganization = typeof getOrganization.static
 }
