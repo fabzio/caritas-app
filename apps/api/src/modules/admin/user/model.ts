@@ -45,7 +45,7 @@ export namespace UserModel {
 
   export const createUser = t.Object({
     userId: t.String(),
-    teamId: t.String(),
+    teamIds: t.Array(t.String(), { minItems: 1 }),
     organizationId: t.String(),
   })
   export type CreateUser = typeof createUser.static
