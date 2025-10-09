@@ -32,7 +32,8 @@ export async function getUsers(
       )
     : undefined
 
-  const roleCondition = role && role !== 'all' ? eq(user.role, role) : undefined
+  const roleCondition =
+    role && role !== 'all' ? eq(member.role, role) : undefined
   const activeCondition = eq(user.active, true)
   const memberOrgCondition = eq(member.organizationId, params.organizationId)
   const where = and(
@@ -51,7 +52,7 @@ export async function getUsers(
 
   // Get paginated data
   const rows = await db
-    .select()
+    .select({ user: user, role: member.role })
     .from(user)
     .innerJoin(member, eq(user.id, member.userId))
     .where(where)
@@ -62,8 +63,9 @@ export async function getUsers(
   const totalPages = Math.ceil(total / limit)
 
   return {
-    data: rows.map(({ user: row }) => ({
+    data: rows.map(({ user: row, role }) => ({
       ...row,
+      role,
       birthDate: new Date(row.birthDate),
     })),
     total,
