@@ -3,26 +3,34 @@ const roleNames: Record<string, string> = {
   owner: 'Propietario',
   healthMember: 'Beneficiario Salud',
   educationMember: 'Beneficiario Educación',
-  member: 'Miembro',
 }
 
-export function formatRoles(roles: string[] | undefined | null): string {
-  if (!roles || roles.length === 0) {
+export function formatRoles(
+  roles: string[] | string | undefined | null,
+): string {
+  if (!roles) {
     return 'Sin rol'
   }
 
-  if (roles.length === 1) {
-    return roleNames[roles[0]] || roles[0]
+  const rolesArray =
+    typeof roles === 'string' ? roles.split(',').filter(Boolean) : roles
+
+  if (rolesArray.length === 0) {
+    return 'Sin rol'
   }
 
-  const hasHealthMember = roles.includes('healthMember')
-  const hasEducationMember = roles.includes('educationMember')
+  if (rolesArray.length === 1) {
+    return roleNames[rolesArray[0]] || rolesArray[0]
+  }
+
+  const hasHealthMember = rolesArray.includes('healthMember')
+  const hasEducationMember = rolesArray.includes('educationMember')
 
   if (hasHealthMember && hasEducationMember) {
     return 'Beneficiario Salud y Educación'
   }
 
-  const formattedRoles = roles
+  const formattedRoles = rolesArray
     .map((role) => roleNames[role] || role)
     .filter((value, index, self) => self.indexOf(value) === index)
 

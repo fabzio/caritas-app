@@ -91,11 +91,14 @@ export async function getUsers(
   const totalPages = Math.ceil(total / limit)
 
   return {
-    data: rows.map(({ user: row }) => ({
-      ...row,
-      roles: userRolesMap[row.id] || [],
-      birthDate: new Date(row.birthDate),
-    })),
+    data: rows.map(({ user: row }) => {
+      const userRoles = userRolesMap[row.id] || []
+      return {
+        ...row,
+        role: userRoles.join(',') || null,
+        birthDate: new Date(row.birthDate),
+      }
+    }),
     total,
     page,
     limit,

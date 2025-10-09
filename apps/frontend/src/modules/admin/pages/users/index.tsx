@@ -52,7 +52,6 @@ export default function TableView() {
     { value: 'owner', label: 'Propietario' },
     { value: 'healthMember', label: 'Beneficiario Salud' },
     { value: 'educationMember', label: 'Beneficiario Educación' },
-    { value: 'member', label: 'Miembro' },
   ]
 
   const selectedRows = Object.keys(rowSelection)

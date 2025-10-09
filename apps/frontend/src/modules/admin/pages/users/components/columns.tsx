@@ -63,9 +63,9 @@ export const userTableColumns: ColumnDef<User>[] = [
     cell: ({ row }) => `${row.original.name} ${row.original.surname}`,
   },
   {
-    accessorKey: 'roles',
+    accessorKey: 'role',
     header: () => <div>Rol</div>,
-    cell: ({ row }) => formatRoles(row.original.roles),
+    cell: ({ row }) => formatRoles(row.original.role),
     enableSorting: false,
   },
 ]

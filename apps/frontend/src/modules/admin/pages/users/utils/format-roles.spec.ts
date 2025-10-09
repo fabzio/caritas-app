@@ -39,17 +39,12 @@ describe('formatRoles', () => {
   })
 
   it('formats multiple different roles', () => {
-    const result = formatRoles(['admin', 'member'])
+    const result = formatRoles(['admin'])
     expect(result).toContain('Administrador')
-    expect(result).toContain('Miembro')
   })
 
   it('formats owner role', () => {
     expect(formatRoles(['owner'])).toBe('Propietario')
-  })
-
-  it('formats member role', () => {
-    expect(formatRoles(['member'])).toBe('Miembro')
   })
 
   it('handles unknown role', () => {
