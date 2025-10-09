@@ -13,5 +13,5 @@ export const Route = createFileRoute('/_authenticated/admin/organizations')({
       },
     })
   },
-  component: ViewOrganizations,
+  component: () => 'tbd',
 })

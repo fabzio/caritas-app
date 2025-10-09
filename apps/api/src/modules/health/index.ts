@@ -1,6 +1,6 @@
 import Elysia from 'elysia'
+import organization from '../admin/organization'
 import activity from './activity'
-import healthOrganization from './organization'
 
 const healthModule = new Elysia({
   name: 'health',
@@ -8,6 +8,6 @@ const healthModule = new Elysia({
   tags: ['Health'],
 })
   .use(activity)
-  .use(healthOrganization)
+  .use(organization)
 
 export default healthModule

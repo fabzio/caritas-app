@@ -14,6 +14,12 @@ const adminNavItems: NavItem[] = [
     icon: Users,
     groupLabel: 'Administración',
   },
+  {
+    title: 'Aliados',
+    url: '/admin/allies',
+    icon: Users,
+    groupLabel: 'Administración',
+  },
 ]
 
 export default adminNavItems

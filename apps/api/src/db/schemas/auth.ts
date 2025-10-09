@@ -122,6 +122,9 @@ export const organization = authSchema.table('organization', {
     .primaryKey()
     .$defaultFn(() => nanoid(32)),
   name: varchar('name', { length: 100 }).notNull(),
+  active: boolean('active')
+    .notNull()
+    .$defaultFn(() => true),
   slug: varchar('slug', { length: 100 }).unique(),
   logo: varchar('logo', { length: 500 }),
   createdAt: timestamp('created_at')
