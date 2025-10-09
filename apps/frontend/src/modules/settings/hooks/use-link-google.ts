@@ -7,13 +7,15 @@ export const useLinkGoogle = () => {
     mutationFn: async () => {
       await authClient.linkSocial({
         provider: 'google',
+        fetchOptions: {
+          onSuccess: () => {
+            toast.success('Cuenta de Google vinculada correctamente')
+          },
+          onError: () => {
+            toast.error('Error al vincular la cuenta de Google')
+          },
+        },
       })
-    },
-    onSuccess: () => {
-      toast.success('Cuenta de Google vinculada correctamente')
-    },
-    onError: () => {
-      toast.error('Error al vincular la cuenta de Google')
     },
   })
 }
