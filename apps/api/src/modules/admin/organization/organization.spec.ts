@@ -1,13 +1,12 @@
-import { afterAll, afterEach, beforeAll, describe, expect, it } from 'bun:test'
+import { afterEach, beforeAll, describe, expect, it } from 'bun:test'
 import db, { schema } from '@api/db'
 import { auth } from '@api/lib/auth'
 import { treaty } from '@elysiajs/eden'
 import { eq } from 'drizzle-orm'
 import organization from '.'
 
-type OwnerContext = {
+type TestUserContext = {
   cookie: string
-  ownerUserId: string
 }
 
 const api = treaty(organization)
@@ -15,49 +14,17 @@ const api = treaty(organization)
 const buildNumericSequence = () =>
   `${Date.now()}${Math.floor(Math.random() * 1_000_000)}`
 
-const buildDocumentNumber = (value: string, length: number) =>
-  value.padEnd(length, '0').slice(0, length)
-
-const buildPhone = (value: string) => `+51${value.slice(-9).padStart(9, '0')}`
-
-const createOwnerContext = async (): Promise<OwnerContext> => {
-  const sequence = buildNumericSequence()
-  const email = `owner+${sequence}@example.com`
-  const password = 'password'
-  const {
-    user: { id: ownerUserId },
-  } = await auth.api.createUser({
-    body: {
-      name: `Owner ${sequence}`,
-      email,
-      password,
-      role: 'admin',
-      data: {
-        documentType: 'DNI',
-        documentNumber: buildDocumentNumber(sequence, 12),
-        surname: 'Owner',
-        sex: 'M',
-        birthDate: '1990-01-01',
-        phone: buildPhone(sequence),
-        regionId: 1,
-      },
-    },
-  })
-
+const getTestUserContext = async (): Promise<TestUserContext> => {
   const { headers } = await auth.api.signInEmail({
     returnHeaders: true,
     body: {
-      email,
-      password,
+      email: 'test@example.com',
+      password: 'password',
     },
   })
   const cookie = headers.get('set-cookie')
   if (!cookie) throw new Error('Missing authentication cookie')
-
-  return {
-    cookie,
-    ownerUserId,
-  }
+  return { cookie }
 }
 
 const removeOrganizations = async (ids: string[]) => {
@@ -70,54 +37,59 @@ const removeOrganizations = async (ids: string[]) => {
       .where(eq(schema.organization.id, ids[index]))
 }
 
-let ownerContext: OwnerContext
+let ownerContext: TestUserContext
 const stagedOrganizationIds: string[] = []
 
 beforeAll(async () => {
-  ownerContext = await createOwnerContext()
+  ownerContext = await getTestUserContext()
 })
 
 afterEach(async () => {
   await removeOrganizations(stagedOrganizationIds.splice(0))
 })
 
-afterAll(async () => {
-  await db
-    .delete(schema.user)
-    .where(eq(schema.user.id, ownerContext.ownerUserId))
-})
-
 describe('Organization Module', () => {
   it('creates a new organization', async () => {
-    const response = await api.organization.post(
-      {
+    const slug = `test-health-org-${buildNumericSequence()}`
+    const response = await auth.api.createOrganization({
+      body: {
         name: 'Test Health Organization',
+        slug,
         type: 'health',
         logo: 'https://example.com/logo.png',
       },
-      { headers: { cookie: ownerContext.cookie } },
-    )
+      headers: { cookie: ownerContext.cookie },
+    })
 
-    expect(response.status).toBe(200)
-    expect(typeof response.data).toBe('string')
+    await auth.api.setActiveOrganization({
+      body: { organizationId: response?.id || '' },
+      headers: { cookie: ownerContext.cookie },
+    })
 
-    if (typeof response.data === 'string') {
-      stagedOrganizationIds.push(response.data)
+    expect(response).toBeTruthy()
+    if (response) {
+      expect(typeof response.id).toBe('string')
+      expect(response.name).toBe('Test Health Organization')
+      expect(response.slug).toBe(slug)
+      expect(response.type).toBe('health')
+      stagedOrganizationIds.push(response.id)
     }
   })
 
   it('returns a list of organizations', async () => {
-    const createResponse = await api.organization.post(
-      {
+    const slug = `organization-for-listing-${buildNumericSequence()}`
+    const createResponse = await auth.api.createOrganization({
+      body: {
         name: 'Organization for Listing',
+        slug,
         type: 'education',
         logo: 'https://example.com/education-logo.png',
       },
-      { headers: { cookie: ownerContext.cookie } },
-    )
+      headers: { cookie: ownerContext.cookie },
+    })
 
-    if (typeof createResponse.data === 'string') {
-      stagedOrganizationIds.push(createResponse.data)
+    if (createResponse) {
+      stagedOrganizationIds.push(createResponse.id)
     }
 
     const response = await api.organization.get({
@@ -134,26 +106,28 @@ describe('Organization Module', () => {
   })
 
   it('returns a single organization', async () => {
-    const createResponse = await api.organization.post(
-      {
+    const slug = `single-organization-test-${buildNumericSequence()}`
+    const createResponse = await auth.api.createOrganization({
+      body: {
         name: 'Single Organization Test',
+        slug,
         type: 'caritas',
         logo: 'https://example.com/caritas-logo.png',
       },
-      { headers: { cookie: ownerContext.cookie } },
-    )
+      headers: { cookie: ownerContext.cookie },
+    })
 
-    expect(typeof createResponse.data).toBe('string')
+    expect(createResponse).toBeTruthy()
 
-    if (typeof createResponse.data === 'string') {
-      stagedOrganizationIds.push(createResponse.data)
+    if (createResponse) {
+      stagedOrganizationIds.push(createResponse.id)
 
-      const response = await api.organization({ id: createResponse.data }).get({
+      const response = await api.organization({ id: createResponse.id }).get({
         headers: { cookie: ownerContext.cookie },
       })
 
       expect(response.status).toBe(200)
-      expect(response.data?.id).toBe(createResponse.data)
+      expect(response.data?.id).toBe(createResponse.id)
       expect(response.data?.name).toBe('Single Organization Test')
       expect(response.data?.type).toBe('caritas')
     }
@@ -163,36 +137,39 @@ describe('Organization Module', () => {
     const types = ['caritas', 'education', 'health', 'beneficiary'] as const
 
     for (const type of types) {
-      const response = await api.organization.post(
-        {
+      const slug = `${type}-organization-${buildNumericSequence()}`
+      const response = await auth.api.createOrganization({
+        body: {
           name: `${type} Organization`,
-          type: type,
+          slug,
+          type,
           logo: `https://example.com/${type}-logo.png`,
         },
-        { headers: { cookie: ownerContext.cookie } },
-      )
+        headers: { cookie: ownerContext.cookie },
+      })
 
-      expect(response.status).toBe(200)
-      expect(typeof response.data).toBe('string')
+      expect(response).toBeTruthy()
 
-      if (typeof response.data === 'string') {
-        stagedOrganizationIds.push(response.data)
+      if (response) {
+        stagedOrganizationIds.push(response.id)
       }
     }
   })
 
   it('filters organizations by search query', async () => {
-    const createResponse1 = await api.organization.post(
-      {
+    const slug = `unique-search-test-org-${buildNumericSequence()}`
+    const createResponse = await auth.api.createOrganization({
+      body: {
         name: 'Unique Search Test Org',
+        slug,
         type: 'health',
         logo: 'https://example.com/unique-logo.png',
       },
-      { headers: { cookie: ownerContext.cookie } },
-    )
+      headers: { cookie: ownerContext.cookie },
+    })
 
-    if (typeof createResponse1.data === 'string') {
-      stagedOrganizationIds.push(createResponse1.data)
+    if (createResponse) {
+      stagedOrganizationIds.push(createResponse.id)
     }
 
     const response = await api.organization.get({

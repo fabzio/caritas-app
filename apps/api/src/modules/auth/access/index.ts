@@ -18,14 +18,15 @@ const access = new Elysia({}).use(betterAuth).get(
             caritasOrg?.role.split(',').includes('owner')
           : false,
         health: {
-          admin: caritasOrg?.role.split(',').includes('healthMember'),
+          admin: caritasOrg?.role.split(',').includes('healthMember') ?? false,
           organization: orgRoles.some(
             (orgRol) => orgRol.organization.type === 'health',
           ),
           user: isPatient,
         },
         education: {
-          admin: caritasOrg?.role.split(',').includes('educationMember'),
+          admin:
+            caritasOrg?.role.split(',').includes('educationMember') ?? false,
           organization: orgRoles.some(
             (orgRol) => orgRol.organization.type === 'education',
           ),
