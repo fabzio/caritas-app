@@ -109,7 +109,14 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build Docker Frontend image
-        run: docker build -t ghcr.io/${{ github.repository_owner }}/caritas-frontend:latest -f ./apps/frontend/Dockerfile --build-arg VITE_API_URL=${{ vars.HOST }} --build-arg VITE_GOOGLE_CLIENT_ID=${{ vars.GOOGLE_CLIENT_ID }} .
+        run: |
+          docker build \
+            -t ghcr.io/${{ github.repository_owner }}/caritas-frontend:latest \
+            --build-arg VITE_API_URL=${{ vars.HOST }} \
+            --build-arg VITE_GOOGLE_CLIENT_ID=${{ vars.GOOGLE_CLIENT_ID }} \
+            --build-arg VITE_CLOUDFLARE_TURNSTILE_SITE_KEY=${{ vars.CLOUDFLARE_TURNSTILE_SITE_KEY }} \
+            -f ./apps/frontend/Dockerfile \
+            .
 
       - name: Push Docker Frontend image
         run: docker push ghcr.io/${{ github.repository_owner }}/caritas-frontend:latest

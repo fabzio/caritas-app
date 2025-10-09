@@ -11,7 +11,7 @@ describe('Auth Access Module', () => {
     expect(response.status).toBe(401)
   })
 
-  it('returns access permissions for authenticated admin user', async () => {
+  it('returns access permissions for authenticated user', async () => {
     const { headers } = await auth.api.signInEmail({
       returnHeaders: true,
       body: { email: 'test@example.com', password: 'password' },
@@ -29,7 +29,7 @@ describe('Auth Access Module', () => {
 
     expect(response.status).toBe(200)
     expect(response.data).toStrictEqual({
-      admin: true,
+      admin: false,
       health: {
         admin: false,
         organization: false,

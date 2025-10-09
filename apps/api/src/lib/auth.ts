@@ -16,6 +16,7 @@ import {
   openAPI,
   organization,
 } from 'better-auth/plugins'
+import { defaultRoles } from 'better-auth/plugins/organization/access'
 import { passkey } from 'better-auth/plugins/passkey'
 import { localization } from 'better-auth-localization'
 import transporter from '../mail'
@@ -105,6 +106,10 @@ export const auth = betterAuth({
         input: true,
         required: true,
       },
+      active: {
+        type: 'boolean',
+        input: false,
+      },
     },
   },
   account: {
@@ -122,6 +127,7 @@ export const auth = betterAuth({
     organization({
       ac,
       roles: {
+        ...defaultRoles,
         healthMember,
         educationMember,
       },
@@ -130,6 +136,9 @@ export const auth = betterAuth({
       },
       teams: {
         enabled: true,
+        defaultTeam: {
+          enabled: false,
+        },
       },
       schema: {
         organization: {

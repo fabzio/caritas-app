@@ -1,13 +1,19 @@
 import type { NavItem } from '@frontend/shared/types/nav-main'
-import { Layout } from 'lucide-react'
+import { Hospital, Stethoscope } from 'lucide-react'
 
-const adminNavItems: NavItem[] = [
+const healthNavItems: NavItem[] = [
   {
     title: 'General',
-    url: '/admin',
-    icon: Layout,
-    groupLabel: 'Administración',
+    url: '/health',
+    icon: Stethoscope,
+    groupLabel: 'Salud',
+  },
+  {
+    title: 'Aliados',
+    url: '/health/allies',
+    icon: Hospital,
+    groupLabel: 'Salud',
   },
 ]
 
-export default adminNavItems
+export default healthNavItems

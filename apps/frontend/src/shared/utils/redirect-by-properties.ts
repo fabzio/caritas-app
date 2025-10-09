@@ -31,17 +31,20 @@ const hasTeam = (teams: RedirectInput['teams'], target: string) =>
 const toRoleList = (role: RedirectInput['role']) => {
   if (!role) return []
   if (Array.isArray(role)) return role.filter(Boolean).map(String)
-  return [role]
+  return role.split(',').map((r) => r.trim())
 }
 
 const isAdmin = (input: RedirectInput) => {
   if (input.access?.admin) return true
-  return toRoleList(input.role).some((value) =>
-    value.toLowerCase().includes('admin'),
-  )
+  return false
 }
 
 const getRouteFromCaritas = (input: RedirectInput): ValidRoutes | undefined => {
+  if (
+    toRoleList(input.role).includes('admin') ||
+    toRoleList(input.role).includes('owner')
+  )
+    return '/admin'
   if (hasTeam(input.teams, 'salud')) return '/health'
   if (hasTeam(input.teams, 'educacion')) return '/education'
   return undefined
@@ -66,8 +69,8 @@ const getRouteFromAccess = (
   access: RedirectInput['access'],
 ): ValidRoutes | undefined => {
   if (!access) return undefined
-  if (access.health.admin || access.health.user) return '/health'
-  if (access.education.admin || access.education.user) return '/education'
+  if (access.health.admin) return '/health'
+  if (access.education.admin) return '/education'
   if (access.health.organization || access.education.organization) {
     return '/organization'
   }

@@ -15,12 +15,9 @@ LICENSE
 .travis.yml
 .circleci/
 
-# Environment files (except development)
+
 .env
-.env.local
-.env.production
-.env.staging
-.env.test
+.env.*
 
 # Dependencies
 node_modules/
