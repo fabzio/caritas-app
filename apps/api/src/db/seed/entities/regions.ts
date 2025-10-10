@@ -1,7 +1,4 @@
-import db from '@api/db'
-import { region } from './schemas/auth'
-
-const districts = [
+export const districts = [
   { name: 'Lima', code: 'Lima 01' },
   { name: 'Ancon', code: 'Lima 02' },
   { name: 'Ate', code: 'Lima 03' },
@@ -46,19 +43,3 @@ const districts = [
   { name: 'Villa El Salvador', code: 'Lima 42' },
   { name: 'Villa Maria Del Triunfo', code: 'Lima 35' },
 ] as const
-
-export const seed = async () => {
-  await db.insert(region).values(
-    districts.map((district) => ({
-      name: district.name,
-      type: 'district' as const,
-      code: district.code,
-    })),
-  )
-
-  console.info(`🌱 Seeded ${districts.length} districts`)
-}
-
-if (import.meta.main) {
-  seed().catch(console.error)
-}
