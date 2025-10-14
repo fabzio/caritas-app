@@ -11,7 +11,7 @@
     "db:push": "bun --env-file=.env.development drizzle-kit push",
     "db:generate": "bun --env-file=.env.development drizzle-kit generate",
     "db:migrate": "bun --env-file=.env.development drizzle-kit migrate",
-    "db:seed": "bun --env-file=.env.development src/db/seed.ts",
+    "db:seed": "bun --env-file=.env.development src/db/seed/index.ts",
     "build": "bun build --compile --minify --sourcemap --target=bun-linux-x64-modern ./src/index.ts --outfile dist/app"
   },
   "dependencies": {
