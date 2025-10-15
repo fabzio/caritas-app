@@ -15,6 +15,7 @@ import { es } from 'date-fns/locale'
 import { ArrowLeft, Award, CheckCircle } from 'lucide-react'
 import { useState } from 'react'
 import AttentionCard from './components/attention-card'
+import AttentionDetailsDialog from './components/attention-details-dialog'
 import SearchAttentionInput from './components/search-attention-input'
 import { useActivityParticipant } from './hooks/use-activity-participant'
 import { useUpdateActivityUser } from './hooks/use-update-activity-user'
@@ -35,6 +36,8 @@ export default function AttentionsPage() {
     useUpdateActivityUser()
   const [isMarkIncentiveModalOpen, setIsMarkIncentiveModalOpen] =
     useState(false)
+  const [selectedAttention, setSelectedAttention] =
+    useState<UserAttention | null>(null)
 
   const { data: participant } = useActivityParticipant({ activityId, userId })
   const { data: attentions, isLoading } = useUserAttentions({
@@ -44,9 +47,12 @@ export default function AttentionsPage() {
   })
 
   const handleAttentionClick = (attention: UserAttention) => {
-    // TODO: implement onClick functionality
-    // If hasAttention: show dialog with details
-    // If not: show modal to register attention
+    if (attention.hasAttention) {
+      setSelectedAttention(attention)
+    } else {
+      // TODO: Show modal to register attention
+      console.log('Register attention for:', attention.specialityName)
+    }
   }
 
   const handleSearch = (query: string) => {
@@ -195,6 +201,14 @@ export default function AttentionsPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <AttentionDetailsDialog
+        open={!!selectedAttention}
+        onOpenChange={(open) => !open && setSelectedAttention(null)}
+        specialityName={selectedAttention?.specialityName || ''}
+        attentionTime={selectedAttention?.attentionTime || null}
+        observations={selectedAttention?.observations || null}
+      />
     </div>
   )
 }
