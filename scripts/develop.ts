@@ -132,22 +132,20 @@ async function setupDevelopment() {
         { NODE_ENV: 'development' },
       )
       console.log('✅ Esquema migrado\n')
-      console.log('🌱 Sembrando datos iniciales...')
-      await runCommand(
-        'bun --env-file=.env.development src/db/seed.ts',
-        API_PATH,
-        { NODE_ENV: 'development' },
-      )
-      console.log('✅ Datos sembrados\n')
     }
 
     console.log('🎉 ¡Entorno de desarrollo configurado correctamente!')
     console.log('\n📋 Próximos pasos:')
-    console.log("1. Ejecuta 'bun dev' para iniciar todas las aplicaciones")
     console.log(
-      '2. Documentación: http://localhost:5173/api/v1/swagger (o :8000)',
+      '1. Ejecute "bun db:seed" en apps/api para poblar datos iniciales.\n',
     )
-    console.log('3. Revisa la terminal para puertos\n')
+    console.log("2. Ejecuta 'bun dev' para iniciar todas las aplicaciones")
+    console.log(
+      '3. Documentación: http://localhost:5173/api/v1/swagger (o :8000)',
+    )
+    console.log(
+      '4. Navega con ⬆/⬇ en la terminal para ver los logs entre apps\n',
+    )
   } catch (error) {
     console.error('❌ Error durante la configuración:', error)
     process.exit(1)
