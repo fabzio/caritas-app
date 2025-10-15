@@ -57,11 +57,44 @@ export namespace ActivityModel {
   })
 
   export const listParticipantsQuery = t.Object({
-    q: t.Optional(t.String()), // Búsqueda por nombre o documento
+    q: t.Optional(t.String()),
     activityId: t.String(),
   })
   export type ListParticipantsQuery = typeof listParticipantsQuery.static
 
   export const getParticipantsResponse = t.Array(activityParticipantSchema)
   export type GetParticipants = typeof getParticipantsResponse.static
+
+  export const userAttentionSchema = t.Object({
+    specialityId: t.Integer(),
+    specialityName: t.String(),
+    hasAttention: t.Boolean(),
+    attentionId: t.Nullable(t.Integer()),
+    attentionTime: t.Nullable(t.String()),
+    observations: t.Nullable(t.String()),
+  })
+
+  export const listUserAttentionsQuery = t.Object({
+    activityId: t.String(),
+    userId: t.String(),
+    q: t.Optional(t.String()),
+  })
+
+  export const setActivityUserQuery = t.Object({
+    userId: t.String(),
+    activityId: t.Integer(),
+    rewarded: t.Boolean(),
+  })
+
+  export const setActivityUserResponse = t.Object({
+    userId: t.String(),
+    activityId: t.Integer(),
+    rewarded: t.Boolean(),
+  })
+
+  export type SetActivityUserQuery = typeof setActivityUserQuery.static
+  export type ListUserAttentionsQuery = typeof listUserAttentionsQuery.static
+
+  export const getUserAttentionsResponse = t.Array(userAttentionSchema)
+  export type GetUserAttentions = typeof getUserAttentionsResponse.static
 }

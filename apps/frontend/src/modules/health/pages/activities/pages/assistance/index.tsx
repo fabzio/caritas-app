@@ -1,4 +1,9 @@
-import { getRouteApi, Link, useSearch } from '@tanstack/react-router'
+import {
+  getRouteApi,
+  Link,
+  useNavigate,
+  useSearch,
+} from '@tanstack/react-router'
 import { Button } from '@workspace/ui/components/button'
 import { Spinner } from '@workspace/ui/components/spinner'
 import { format } from 'date-fns'
@@ -18,6 +23,7 @@ export default function AssistancePage() {
   })
   const loaderData = routeApi.useLoaderData()
   const [searchQuery, setSearchQuery] = useState('')
+  const navigate = useNavigate()
 
   const { data: participants, isLoading } = useActivityParticipants({
     activityId: id,
@@ -25,7 +31,13 @@ export default function AssistancePage() {
   })
 
   const handleAssistantClick = (participant: ActivityParticipant) => {
-    // TODO: Implement onClick functionality later
+    navigate({
+      to: '/health/activities/attentions',
+      search: {
+        activityId: id,
+        userId: participant.id,
+      },
+    })
   }
 
   const handleSearch = (query: string) => {

@@ -6,6 +6,8 @@ import {
   getActivities,
   getActivityParticipants,
   getSingleActivity,
+  getUserAttentions,
+  setActivityUser,
 } from './service'
 
 const activityModule = new Elysia({
@@ -48,6 +50,22 @@ const activityModule = new Elysia({
     query: ActivityModel.listParticipantsQuery,
     response: {
       200: ActivityModel.getParticipantsResponse,
+      401: t.Literal('Unauthorized'),
+    },
+  })
+  .get('/user-attentions', ({ query }) => getUserAttentions(query), {
+    auth: true,
+    query: ActivityModel.listUserAttentionsQuery,
+    response: {
+      200: ActivityModel.getUserAttentionsResponse,
+      401: t.Literal('Unauthorized'),
+    },
+  })
+  .patch('/user-rewarded', ({ body }) => setActivityUser(body), {
+    auth: true,
+    body: ActivityModel.setActivityUserQuery,
+    response: {
+      200: ActivityModel.setActivityUserResponse,
       401: t.Literal('Unauthorized'),
     },
   })

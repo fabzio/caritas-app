@@ -6,6 +6,8 @@ import {
   activityStatus,
   activityType,
   activityUser,
+  atention,
+  speciality,
 } from '@api/db/schemas/health'
 import { and, asc, count, desc, eq, ilike, or } from 'drizzle-orm'
 import type { ActivityModel } from './model'
@@ -146,9 +148,9 @@ export async function getActivities(
   }
 }
 
-export async function getActivityParticipants(
+export const getActivityParticipants = async (
   params: ActivityModel.ListParticipantsQuery,
-): Promise<ActivityModel.GetParticipants> {
+): Promise<ActivityModel.GetParticipants> => {
   try {
     const { q = '', activityId } = params
     const searchQuery = q.replace(/\s+/g, ' ').trim()
@@ -184,6 +186,93 @@ export async function getActivityParticipants(
       .orderBy(asc(user.name))
 
     return participants
+  } catch (e) {
+    if (e instanceof Error) throw new PostgresError(e.message)
+    throw e
+  }
+}
+
+export const getUserAttentions = async (
+  params: ActivityModel.ListUserAttentionsQuery,
+): Promise<ActivityModel.GetUserAttentions> => {
+  try {
+    const { activityId, userId, q = '' } = params
+    const activityIdNum = Number.parseInt(activityId, 10)
+    const searchQuery = q.replace(/\s+/g, ' ').trim()
+
+    const allSpecialities = await db
+      .select({
+        id: speciality.id,
+        name: speciality.name,
+      })
+      .from(speciality)
+      .where(
+        searchQuery ? ilike(speciality.name, `%${searchQuery}%`) : undefined,
+      )
+      .orderBy(asc(speciality.name))
+
+    const userAttentions = await db
+      .select({
+        id: atention.id,
+        specialityId: atention.specialityId,
+        timestamp: atention.timestamp,
+        observations: atention.observations,
+      })
+      .from(atention)
+      .where(
+        and(
+          eq(atention.activityId, activityIdNum),
+          eq(atention.userId, userId),
+        ),
+      )
+
+    const attentionMap = new Map(
+      userAttentions.map((att) => [
+        att.specialityId,
+        {
+          id: att.id,
+          timestamp: att.timestamp,
+          observations: att.observations,
+        },
+      ]),
+    )
+
+    const result = allSpecialities.map((spec) => {
+      const attention = attentionMap.get(spec.id)
+      return {
+        specialityId: spec.id,
+        specialityName: spec.name,
+        hasAttention: !!attention,
+        attentionId: attention?.id || null,
+        attentionTime: attention?.timestamp
+          ? attention.timestamp.toISOString()
+          : null,
+        observations: attention?.observations || null,
+      }
+    })
+
+    return result
+  } catch (e) {
+    if (e instanceof Error) throw new PostgresError(e.message)
+    throw e
+  }
+}
+
+export const setActivityUser = async (
+  params: ActivityModel.SetActivityUserQuery,
+) => {
+  const { userId, activityId, rewarded } = params
+  try {
+    await db
+      .update(activityUser)
+      .set({ rewarded })
+      .where(
+        and(
+          eq(activityUser.activityId, activityId),
+          eq(activityUser.userId, userId),
+        ),
+      )
+    return { userId, activityId, rewarded }
   } catch (e) {
     if (e instanceof Error) throw new PostgresError(e.message)
     throw e
