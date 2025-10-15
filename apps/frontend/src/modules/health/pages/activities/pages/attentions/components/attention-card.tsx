@@ -20,7 +20,7 @@ interface AttentionCardProps {
 export default function AttentionCard({
   attention,
   onClick,
-}: AttentionCardProps) {
+}: Readonly<AttentionCardProps>) {
   const formatTime = (timeStr: string | null) => {
     if (!timeStr) return ''
     try {

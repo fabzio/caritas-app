@@ -157,7 +157,7 @@ export default function AttentionsPage() {
               ) : (
                 <>
                   <Award className="h-4 w-4 mr-2" />
-                  Marcar registro de incentivo
+                  Marcar incentivo entregado
                 </>
               )}
             </Button>
