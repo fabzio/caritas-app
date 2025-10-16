@@ -110,7 +110,9 @@ export default function ScholarshipPage() {
           <ScholarshipTable
             scholarships={scholarships}
             pagination={pagination}
-            onPaginationChange={handlePaginationChange}
+            currentPage={currentPage}
+            pageSize={pageSize}
+            handlePaginationChange={handlePaginationChange}
             sorting={sorting}
             onSortingChange={setSorting}
             rowSelection={rowSelection}

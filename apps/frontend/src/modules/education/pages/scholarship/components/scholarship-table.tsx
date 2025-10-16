@@ -1,5 +1,9 @@
 import DataTable from '@frontend/shared/components/data-table'
-import type { PaginationState, SortingState } from '@tanstack/react-table'
+import type {
+  OnChangeFn,
+  PaginationState,
+  SortingState,
+} from '@tanstack/react-table'
 import {
   type Scholarship,
   scholarshipTableColumns,
@@ -8,11 +12,13 @@ import {
 type Props = {
   scholarships: Scholarship[]
   pagination: PaginationState
-  onPaginationChange: (p: PaginationState) => void
+  currentPage: number
+  pageSize: number
+  handlePaginationChange: (p: PaginationState) => void
   sorting: SortingState
-  onSortingChange: (sorting: SortingState) => void
+  onSortingChange: OnChangeFn<SortingState>
   rowSelection: Record<string, boolean>
-  setRowSelection: (selection: Record<string, boolean>) => void
+  setRowSelection: OnChangeFn<Record<string, boolean>>
   totalCount: number
   pageCount: number
 }
@@ -20,30 +26,42 @@ type Props = {
 export default function ScholarshipTable({
   scholarships,
   pagination,
-  onPaginationChange,
+  currentPage,
+  pageSize,
+  handlePaginationChange,
   sorting,
   onSortingChange,
   rowSelection,
   setRowSelection,
   totalCount,
   pageCount,
-}: Props) {
+}: Readonly<Props>) {
   return (
     <div className="border rounded-lg overflow-hidden bg-card">
       <div className="overflow-x-auto">
         <DataTable
-          data={scholarships}
+          data={scholarships || []}
           columns={scholarshipTableColumns}
           pagination={pagination}
+          sorting={sorting}
+          onSortingChange={onSortingChange}
           paginationOptions={{
-            onPaginationChange,
+            onPaginationChange: (updaterOrValue) => {
+              const currentPaginationState = {
+                pageIndex: currentPage - 1,
+                pageSize,
+              }
+              const next =
+                typeof updaterOrValue === 'function'
+                  ? updaterOrValue(currentPaginationState)
+                  : updaterOrValue
+              handlePaginationChange(next)
+            },
             rowCount: totalCount,
             pageCount,
           }}
-          sorting={sorting}
-          onSortingChange={onSortingChange}
-          rowSelection={rowSelection}
           setRowSelection={setRowSelection}
+          rowSelection={rowSelection}
         />
       </div>
     </div>

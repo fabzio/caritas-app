@@ -77,10 +77,7 @@ export const scholarshipTableColumns: ColumnDef<Scholarship>[] = [
             label: 'Eliminar',
             icon: <Trash className="w-4 h-4" />,
             destructive: true,
-            onClick: () => {
-              // eslint-disable-next-line no-alert
-              alert(`Eliminar ${row.original.name}`)
-            },
+            onClick: () => {},
           },
         ]}
       />

@@ -2,11 +2,8 @@ import { Button } from '@workspace/ui/components/button'
 import { Input } from '@workspace/ui/components/input'
 import { Skeleton } from '@workspace/ui/components/skeleton'
 import { Search } from 'lucide-react'
-import { useMemo, useState } from 'react'
-import {
-  type Beneficiary,
-  useGetBeneficiaries,
-} from '../hooks/use-get-beneficiaries'
+import { useBeneficiarySearch } from '../hooks/use-beneficiary-search'
+import type { Beneficiary } from '../hooks/use-get-beneficiaries'
 
 type BeneficiarySearchProps = {
   selectedBeneficiary: Beneficiary | null
@@ -19,33 +16,18 @@ export default function BeneficiarySearch({
   onSelect,
   onClear,
 }: Readonly<BeneficiarySearchProps>) {
-  const [searchQuery, setSearchQuery] = useState('')
-  const { data: beneficiaries, isLoading } = useGetBeneficiaries()
-
-  const filteredBeneficiaries = useMemo(() => {
-    if (!beneficiaries) return []
-    if (!searchQuery) return beneficiaries
-    const query = searchQuery.toLowerCase()
-    return beneficiaries.filter(
-      (b) =>
-        b.name.toLowerCase().includes(query) ||
-        b.surname.toLowerCase().includes(query) ||
-        b.documentNumber.toLowerCase().includes(query) ||
-        b.documentType?.toLowerCase().includes(query),
-    )
-  }, [searchQuery, beneficiaries])
-
-  const handleSelectBeneficiary = (beneficiary: Beneficiary) => {
-    onSelect(beneficiary)
-    setSearchQuery('')
-  }
-
-  const formatDocument = (beneficiary: Beneficiary) => {
-    if (beneficiary.documentType) {
-      return `${beneficiary.documentType} - ${beneficiary.documentNumber}`
-    }
-    return beneficiary.documentNumber
-  }
+  const {
+    searchQuery,
+    setSearchQuery,
+    filteredBeneficiaries,
+    handleSelectBeneficiary,
+    formatDocument,
+    isLoading,
+  } = useBeneficiarySearch({
+    selectedBeneficiary,
+    onSelect,
+    onClear,
+  })
 
   if (selectedBeneficiary) {
     return (

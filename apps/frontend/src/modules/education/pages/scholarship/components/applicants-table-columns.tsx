@@ -1,7 +1,7 @@
 import type { ColumnDef } from '@tanstack/react-table'
 import { Badge } from '@workspace/ui/components/badge'
 import { Checkbox } from '@workspace/ui/components/checkbox'
-import type { Applicant } from '../hooks/use-get-applicant'
+import type { Applicant } from '../pages/view-scholarship/hooks/use-get-applicant'
 
 function getStatusBadge(status: Applicant['status']) {
   switch (status) {
