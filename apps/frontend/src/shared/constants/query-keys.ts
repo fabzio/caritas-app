@@ -20,6 +20,7 @@ export const QueryKeys = {
   },
   EDUCATION: {
     SCHOLARSHIP_RECIPIENTS: 'education-scholarship-recipients',
+    FAIR: 'education-fair',
   },
   HEALTH: {
     ACTIVITIES: 'health-activities',

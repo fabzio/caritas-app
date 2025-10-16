@@ -1,0 +1,42 @@
+import { useFilters } from '@frontend/hooks/use-filters'
+import { sortByToState } from '@frontend/shared/utils/sort-by-to-state'
+import { useMemo } from 'react'
+import { fairTableColumns } from '../components/fair-column'
+import { useGetFairs } from './use-get-fair'
+
+type SortBy = `${string}.${'asc' | 'desc'}`
+
+export const useFairTable = () => {
+  const { filters, setFilters } = useFilters('/_authenticated/education/fair/')
+  const { data: response, isLoading } = useGetFairs({
+    currentPage: filters.pageIndex,
+    pageSize: filters.pageSize,
+    filters: filters,
+  })
+
+  const sortingState = sortByToState((filters.sortBy || 'name.asc') as SortBy)
+  const paginationState = {
+    pageIndex: filters.pageIndex ?? 1,
+    pageSize: filters.pageSize ?? 10,
+  }
+
+  const columns = useMemo(() => fairTableColumns, [])
+
+  return {
+    data: response?.data,
+    isLoading,
+    pagination: response
+      ? {
+          total: response.total,
+          totalPages: response.totalPages,
+          currentPage: response.page,
+          pageSize: response.limit,
+        }
+      : undefined,
+    filters,
+    setFilters,
+    columns,
+    sortingState,
+    paginationState,
+  }
+}
