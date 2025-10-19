@@ -1,6 +1,6 @@
 import { useSession } from '@frontend/hooks/use-session'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Link } from '@tanstack/react-router'
+import { getRouteApi, Link, useSearch } from '@tanstack/react-router'
 import { Button } from '@workspace/ui/components/button'
 import { Calendar } from '@workspace/ui/components/calendar'
 import {
@@ -44,18 +44,44 @@ import {
   formScholarShipSchema,
 } from './utils/scholarship'
 export default function CreateScholarship() {
+  const viewType = useSearch({
+    from: '/_authenticated/education/scholarship/form',
+    select: (search) => search.type,
+  })
+  const loaderData = getRouteApi(
+    '/_authenticated/education/scholarship/form',
+  ).useLoaderData()
+
   const form = useForm<FormScholarShipSchema>({
     resolver: zodResolver(formScholarShipSchema),
-    defaultValues: {
-      name: '',
-      description: '',
-      requirements: '',
-      vacancies: undefined,
-      startDate: undefined,
-      endDate: undefined,
-      organizationId: undefined,
-      type: undefined,
-    },
+    defaultValues:
+      viewType === 'edit'
+        ? {
+            name: loaderData?.name,
+            description: loaderData?.description,
+            requirements: loaderData?.requirements,
+            vacancies: loaderData?.vacancies,
+            startDate: loaderData?.startDate
+              ? new Date(loaderData.startDate)
+              : undefined,
+            endDate: loaderData?.endDate
+              ? new Date(loaderData.endDate)
+              : undefined,
+            organizationId: loaderData?.organizationId
+              ? String(loaderData.organizationId)
+              : undefined,
+            type: loaderData?.type,
+          }
+        : {
+            name: '',
+            description: '',
+            requirements: '',
+            vacancies: undefined,
+            startDate: undefined,
+            endDate: undefined,
+            organizationId: undefined,
+            type: undefined,
+          },
   })
   const today = new Date()
   const { data: organizations, isLoading } = useGetOrganization()
