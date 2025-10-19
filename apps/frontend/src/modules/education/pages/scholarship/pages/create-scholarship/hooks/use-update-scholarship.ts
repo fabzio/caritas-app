@@ -25,14 +25,14 @@ export const useUpdateScholarship = () => {
       createdAt?: Date
       updatedAt?: Date
     }) => {
-      const body = {
+      const cleanBody = {
         ...params,
         startDate: params.startDate
           ? params.startDate.toISOString()
           : undefined,
         endDate: params.endDate ? params.endDate.toISOString() : undefined,
       }
-      delete body.id
+      const { id, ...body } = cleanBody
       const res = await rpc.education.scholarship({ id: params.id }).patch(body)
       if (res.error) throw res.error
       return res.data
