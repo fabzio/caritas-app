@@ -13,4 +13,14 @@ export namespace ScholarshipModel {
   )
 
   export type GetScholarShip = typeof getScholarship.static
+
+  export const getSingleScholarshipResponse = _getScholarships
+  export type GetSingleScholarshipResponse =
+    typeof getSingleScholarshipResponse.static
+
+  export const getSingleScholarshipQuery = t.Object({
+    id: t.String(),
+  })
+  export type GetSingleScholarshipQuery =
+    typeof getSingleScholarshipQuery.static
 }

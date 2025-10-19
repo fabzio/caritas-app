@@ -32,3 +32,15 @@ export const getScholarships =
       throw e
     }
   }
+
+export const getSingleScholarship = async ({ id }: { id: number }) => {
+  try {
+    const response = await db.query.scholarship.findFirst({
+      where: (scholarship, { eq }) => eq(scholarship.id, id),
+    })
+    return response
+  } catch (e) {
+    if (e instanceof Error) throw new PostgresError(e.message)
+    throw e
+  }
+}
