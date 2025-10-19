@@ -48,11 +48,7 @@ const scholarship = new Elysia({
   })
   .patch(
     '/:id',
-    async ({ params, body }) => {
-      const res = await PatchScholarship(Number(params.id), body)
-      if (!res) throw status(404, 'Scholarship not found')
-      return res
-    },
+    async ({ params, body }) => await PatchScholarship(Number(params.id), body),
     {
       auth: true,
       params: ScholarshipModel.getSingleScholarshipQuery,

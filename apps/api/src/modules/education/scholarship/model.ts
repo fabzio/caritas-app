@@ -25,7 +25,7 @@ export namespace ScholarshipModel {
     typeof getSingleScholarshipQuery.static
 
   export const updateScholarship = t.Partial(
-    t.Omit(_createScholarship, ['id', 'createdAt', 'updatedAt']),
+    t.Omit(_getScholarships, ['id', 'createdAt', 'updatedAt', 'createdBy']),
   )
   export type UpdateScholarship = typeof updateScholarship.static
 }

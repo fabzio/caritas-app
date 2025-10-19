@@ -39,6 +39,7 @@ import { CalendarIcon, Loader2 } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import useGetOrganization from './hooks/use-get-organization'
 import usePostScholarship from './hooks/use-post-scholarship'
+import { useUpdateScholarship } from './hooks/use-update-scholarship'
 import {
   type FormScholarShipSchema,
   formScholarShipSchema,
@@ -85,19 +86,28 @@ export default function CreateScholarship() {
   })
   const today = new Date()
   const { data: organizations, isLoading } = useGetOrganization()
-  const { mutate, isPending } = usePostScholarship()
+  const { mutate: createScholarship, isPending: isPendingCreate } =
+    usePostScholarship()
+  const { mutate: updateScholarship, isPending: isPendingUpdate } =
+    useUpdateScholarship()
+
   const { data: user } = useSession()
   const handleSubmit = form.handleSubmit((data) => {
     if (!user || form.getValues('vacancies') == null) return
-    const params = { ...data, createdBy: user.user.id, active: true }
-    mutate(params)
+    if (viewType === 'edit' && loaderData?.id) {
+      const params = { ...data, id: loaderData.id }
+      updateScholarship(params)
+    } else {
+      const params = { ...data, createdBy: user.user.id, active: true }
+      createScholarship(params)
+    }
   })
 
   return (
     <div className="flex flex-1 flex-col gap-6 p-4">
       <div className="flex flex-col gap-1">
         <h1 className="text-2xl font-semibold text-foreground">
-          Registrar nueva Beca
+          {dependantText.mainTitle[viewType]}
         </h1>
         <span className="text-muted-foreground">
           Complete la información de la beca
@@ -306,11 +316,14 @@ export default function CreateScholarship() {
                         Cancelar
                       </Button>
                     </Link>
-                    <Button type="submit" disabled={isPending}>
-                      {isPending ? (
+                    <Button
+                      type="submit"
+                      disabled={isPendingCreate || isPendingUpdate}
+                    >
+                      {isPendingCreate || isPendingUpdate ? (
                         <Loader2 className="animate-spin w-2" />
                       ) : (
-                        'Registrar'
+                        dependantText.submit[viewType]
                       )}
                     </Button>
                   </CardFooter>
@@ -322,4 +335,14 @@ export default function CreateScholarship() {
       </div>
     </div>
   )
+}
+const dependantText = {
+  mainTitle: {
+    new: 'Crear nueva beca',
+    edit: 'Editar beca',
+  },
+  submit: {
+    new: 'Crear Beca',
+    edit: 'Guardar Cambios',
+  },
 }

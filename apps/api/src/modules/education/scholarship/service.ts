@@ -1,6 +1,7 @@
 import db from '@api/db'
 import { PostgresError } from '@api/db/errors'
 import { scholarship } from '@api/db/schemas/education'
+import { s } from 'better-auth/dist/shared/better-auth.4SXCyo06'
 import { eq } from 'drizzle-orm'
 import type { ScholarshipModel } from './model'
 export const createScholarship = async (
@@ -65,7 +66,8 @@ export const PatchScholarship = async (
         updatedAt: new Date(), //me acutalizo mi update
       })
       .where(eq(scholarship.id, id)) //para el filtro
-    return response.rowCount
+      .returning({ id: scholarship.id })
+    return response.length
   } catch (e) {
     if (e instanceof Error) throw new PostgresError(e.message)
     throw e
