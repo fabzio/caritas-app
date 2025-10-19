@@ -120,7 +120,6 @@ export default function FormLogin() {
         <TurnstileWidget
           ref={ref}
           onSuccess={(token) => form.setValue('token', token)}
-          onExpire={() => form.setValue('token', undefined)}
         />
         {form.formState.errors.token && (
           <p className="text-sm text-red-600">

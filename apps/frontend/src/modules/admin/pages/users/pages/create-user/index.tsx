@@ -1,3 +1,4 @@
+import { env } from '@frontend/env'
 import { useRegions } from '@frontend/hooks/use-regions'
 import { useSession } from '@frontend/hooks/use-session'
 import { DEFAULT_TEAMS } from '@frontend/shared/constants/default-teams'
@@ -42,7 +43,6 @@ import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
 import { CalendarIcon, Check, ChevronsUpDown, Loader2 } from 'lucide-react'
 import { Activity, useState } from 'react'
-import type { ControllerRenderProps } from 'react-hook-form'
 import { useForm } from 'react-hook-form'
 import z from 'zod'
 import DeleteSelfAdminDialog from './components/delete-self-admin-dialog'
@@ -63,7 +63,7 @@ export default function FormView() {
   const { data: session } = useSession()
 
   const { data: regions, isLoading: regionsLoading } = useRegions()
-  const { data: teams, isLoading: teamsLoading } = useListTeams()
+  const { data: teams } = useListTeams()
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues:
@@ -155,27 +155,22 @@ export default function FormView() {
 
       submitUpdate(values)
     } else
-      createUser(
-        {
-          email: values.email,
-          name: values.name,
-          role: 'admin',
-          password: 'default',
-          data: {
-            surname: values.surname,
-            documentType: values.documentType,
-            documentNumber: values.documentNumber,
-            sex: values.sex,
-            birthDate: values.birthDate,
-            phone: values.phone,
-            regionId: values.regionId,
-          },
-          teamIds: values.teamIds,
+      createUser({
+        email: values.email,
+        name: values.name,
+        role: 'admin',
+        password: import.meta.env.DEV ? 'default' : crypto.randomUUID(),
+        data: {
+          surname: values.surname,
+          documentType: values.documentType,
+          documentNumber: values.documentNumber,
+          sex: values.sex,
+          birthDate: values.birthDate,
+          phone: values.phone,
+          regionId: values.regionId,
         },
-        {
-          onError: (error) => {},
-        },
-      )
+        teamIds: values.teamIds,
+      })
   }
 
   return (
