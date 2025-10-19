@@ -1,4 +1,4 @@
-FROM oven/bun:1.2.23-slim AS base
+FROM oven/bun:1.3-slim AS base
 
 ENV PORT=8000
 ENV NODE_ENV=development

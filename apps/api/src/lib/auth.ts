@@ -158,7 +158,6 @@ export const auth = betterAuth({
     anonymous(),
     localization({
       defaultLocale: 'es-ES',
-      fallbackLocale: 'default',
     }),
     captcha({
       provider: 'cloudflare-turnstile',
