@@ -5,6 +5,7 @@ import {
   createScholarship,
   getScholarships,
   getSingleScholarship,
+  PatchScholarship,
 } from './service'
 
 const scholarship = new Elysia({
@@ -45,5 +46,24 @@ const scholarship = new Elysia({
       401: t.Literal('Unauthorized'),
     },
   })
+  .patch(
+    '/:id',
+    async ({ params, body }) => {
+      const res = await PatchScholarship(Number(params.id), body)
+      if (!res) throw status(404, 'Scholarship not found')
+      return res
+    },
+    {
+      auth: true,
+      params: ScholarshipModel.getSingleScholarshipQuery,
+      body: ScholarshipModel.updateScholarship,
+      response: {
+        200: t.Number({
+          description: 'Number of updated rows',
+        }),
+        404: t.Literal('Scholarship not found'),
+      },
+    },
+  )
 
 export default scholarship

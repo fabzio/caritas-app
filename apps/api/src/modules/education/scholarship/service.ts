@@ -1,6 +1,7 @@
 import db from '@api/db'
 import { PostgresError } from '@api/db/errors'
 import { scholarship } from '@api/db/schemas/education'
+import { eq } from 'drizzle-orm'
 import type { ScholarshipModel } from './model'
 export const createScholarship = async (
   args: ScholarshipModel.CreateScholarship,
@@ -46,6 +47,25 @@ export const getSingleScholarship = async ({ id }: { id: number }) => {
       startDate: response.startDate?.toString(),
       endDate: response.endDate?.toString(),
     }
+  } catch (e) {
+    if (e instanceof Error) throw new PostgresError(e.message)
+    throw e
+  }
+}
+
+export const PatchScholarship = async (
+  id: number,
+  args: ScholarshipModel.UpdateScholarship,
+) => {
+  try {
+    const response = await db
+      .update(scholarship)
+      .set({
+        ...args,
+        updatedAt: new Date(), //me acutalizo mi update
+      })
+      .where(eq(scholarship.id, id)) //para el filtro
+    return response.rowCount
   } catch (e) {
     if (e instanceof Error) throw new PostgresError(e.message)
     throw e
