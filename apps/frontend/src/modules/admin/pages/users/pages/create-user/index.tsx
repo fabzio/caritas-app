@@ -41,11 +41,12 @@ import { cn } from '@workspace/ui/lib/utils'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
 import { CalendarIcon, Check, ChevronsUpDown, Loader2 } from 'lucide-react'
-import { useState } from 'react'
+import { Activity, useState } from 'react'
 import type { ControllerRenderProps } from 'react-hook-form'
 import { useForm } from 'react-hook-form'
 import z from 'zod'
 import DeleteSelfAdminDialog from './components/delete-self-admin-dialog'
+import SendInvitation from './components/send-invitation'
 import { useCreateUser } from './hooks/use-create-user'
 import { useListTeams } from './hooks/use-list-teams'
 import { useUpdateUser } from './hooks/use-update-user'
@@ -154,22 +155,27 @@ export default function FormView() {
 
       submitUpdate(values)
     } else
-      createUser({
-        email: values.email,
-        name: values.name,
-        role: 'admin',
-        password: 'default',
-        data: {
-          surname: values.surname,
-          documentType: values.documentType,
-          documentNumber: values.documentNumber,
-          sex: values.sex,
-          birthDate: values.birthDate,
-          phone: values.phone,
-          regionId: values.regionId,
+      createUser(
+        {
+          email: values.email,
+          name: values.name,
+          role: 'admin',
+          password: 'default',
+          data: {
+            surname: values.surname,
+            documentType: values.documentType,
+            documentNumber: values.documentNumber,
+            sex: values.sex,
+            birthDate: values.birthDate,
+            phone: values.phone,
+            regionId: values.regionId,
+          },
+          teamIds: values.teamIds,
         },
-        teamIds: values.teamIds,
-      })
+        {
+          onError: (error) => {},
+        },
+      )
   }
 
   return (
@@ -237,7 +243,7 @@ export default function FormView() {
                       <FormControl>
                         <Input
                           type="tel"
-                          placeholder="+51 987 654 321"
+                          placeholder="987 654 321"
                           {...field}
                         />
                       </FormControl>
@@ -429,12 +435,45 @@ export default function FormView() {
                 <FormField
                   control={form.control}
                   name="teamIds"
-                  render={({ field }) => (
+                  render={() => (
                     <FormItem>
                       <FormLabel>Equipos</FormLabel>
-                      <div className="flex flex-col gap-2">
-                        {renderTeamCheckboxes(field, teams, teamsLoading)}
-                      </div>
+                      {teams?.map((team) => (
+                        <FormField
+                          key={team.id}
+                          control={form.control}
+                          name="teamIds"
+                          render={({ field }) => (
+                            <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                              <FormControl>
+                                <Checkbox
+                                  checked={field.value?.includes(
+                                    team.id as
+                                      | 'healthMember'
+                                      | 'educationMember'
+                                      | 'admin',
+                                  )}
+                                  onCheckedChange={(checked) => {
+                                    return checked
+                                      ? field.onChange([
+                                          ...field.value,
+                                          team.id,
+                                        ])
+                                      : field.onChange(
+                                          field.value.filter(
+                                            (value) => value !== team.id,
+                                          ),
+                                        )
+                                  }}
+                                />
+                              </FormControl>
+                              <FormLabel className="text-sm font-normal">
+                                {team.name}
+                              </FormLabel>
+                            </FormItem>
+                          )}
+                        />
+                      ))}
                       <FormMessage />
                     </FormItem>
                   )}
@@ -468,6 +507,9 @@ export default function FormView() {
         onOpenChange={handleAdminRemovalDialogChange}
         onConfirm={handleAdminRemovalConfirm}
       />
+      <Activity mode={viewType === 'new' ? 'visible' : 'hidden'}>
+        <SendInvitation />
+      </Activity>
     </>
   )
 }
@@ -503,33 +545,4 @@ const hasTeamChanges = (
   const sortedOriginal = sortAlphabetically(originalIds)
   const sortedCurrent = sortAlphabetically(currentTeamIds)
   return sortedOriginal.some((id, index) => id !== sortedCurrent[index])
-}
-
-const renderTeamCheckboxes = (
-  field: ControllerRenderProps<z.infer<typeof formSchema>, 'teamIds'>,
-  teamList: { id: string; name: string }[] | undefined,
-  loading: boolean,
-) => {
-  if (loading) return <Loader2 className="h-4 w-4 animate-spin" />
-  if (!teamList || teamList.length === 0)
-    return (
-      <span className="text-sm text-muted-foreground">
-        No hay equipos disponibles
-      </span>
-    )
-  return teamList.map((team) => {
-    const checked = field.value?.includes(team.id) ?? false
-    const handleChange = (next: boolean | 'indeterminate') => {
-      const current = field.value ?? []
-      if (next === true && !checked) field.onChange([...current, team.id])
-      if (next === false && checked)
-        field.onChange(current.filter((value) => value !== team.id))
-    }
-    return (
-      <div key={team.id} className="flex flex-row items-center gap-3 px-3 py-2">
-        <Checkbox checked={checked} onCheckedChange={handleChange} />
-        <span className="text-sm font-normal">{team.name}</span>
-      </div>
-    )
-  })
 }

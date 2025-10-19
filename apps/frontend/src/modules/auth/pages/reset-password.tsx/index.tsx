@@ -1,3 +1,4 @@
+import PasswordStrengthBar from '@frontend/shared/components/password-strength-bar'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useSearch } from '@tanstack/react-router'
 import { Button } from '@workspace/ui/components/button'
@@ -48,6 +49,7 @@ export default function ResetPassword() {
               </FormItem>
             )}
           />
+          <PasswordStrengthBar password={form.watch('password')} />
           <FormField
             control={form.control}
             name="confirmPassword"

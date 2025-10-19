@@ -4,6 +4,7 @@ import GoogleButton from '@frontend/shared/components/google-button'
 import TurnstileWidget from '@frontend/shared/components/turnsile-widget'
 import type { ValidRoutes } from '@frontend/shared/types/valid-routes'
 import { zodResolver } from '@hookform/resolvers/zod'
+import type { TurnstileInstance } from '@marsidev/react-turnstile'
 import { Link, useSearch } from '@tanstack/react-router'
 import { Button } from '@workspace/ui/components/button'
 import { Checkbox } from '@workspace/ui/components/checkbox'
@@ -17,6 +18,7 @@ import {
 } from '@workspace/ui/components/form'
 import { Input } from '@workspace/ui/components/input'
 import { KeyRound, Loader2 } from 'lucide-react'
+import { useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { useGoogle } from './hooks/use-google'
@@ -24,6 +26,7 @@ import { usePasskey } from './hooks/use-passkey'
 
 export default function FormLogin() {
   const { redirect } = useSearch({ from: '/auth/login' })
+  const ref = useRef<TurnstileInstance>(null)
   const { mutate, isPending } = useLogin(redirect as ValidRoutes)
   const form = useForm<FormSchema>({
     resolver: zodResolver(schema),
@@ -38,7 +41,14 @@ export default function FormLogin() {
   const handleSubmit = form.handleSubmit((data) => {
     const token = data.token
     if (!token) return
-    mutate({ ...data, token })
+    mutate(
+      { ...data, token },
+      {
+        onError() {
+          ref.current?.reset()
+        },
+      },
+    )
   })
   const { mutate: googleLogin } = useGoogle()
   const { mutate: passkeyLogin, isPending: isPasskeyPending } = usePasskey()
@@ -108,6 +118,7 @@ export default function FormLogin() {
           )}
         />
         <TurnstileWidget
+          ref={ref}
           onSuccess={(token) => form.setValue('token', token)}
           onExpire={() => form.setValue('token', undefined)}
         />
