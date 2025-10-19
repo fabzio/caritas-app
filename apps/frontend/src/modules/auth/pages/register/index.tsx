@@ -7,6 +7,7 @@ import {
   formUserSchema,
 } from '@frontend/shared/models/user'
 import { zodResolver } from '@hookform/resolvers/zod'
+import type { TurnstileInstance } from '@marsidev/react-turnstile'
 import { Link } from '@tanstack/react-router'
 import { Button } from '@workspace/ui/components/button'
 import { Calendar } from '@workspace/ui/components/calendar'
@@ -46,10 +47,12 @@ import {
 import { cn } from '@workspace/ui/lib/utils'
 import { format } from 'date-fns'
 import { CalendarIcon, Check, ChevronsUpDown, Loader2 } from 'lucide-react'
+import { useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { useRegister } from './hooks/use-register'
 
 export default function Register() {
+  const ref = useRef<TurnstileInstance>(null)
   const form = useForm<FormUserSchema>({
     resolver: zodResolver(formUserSchema),
     defaultValues: {
@@ -73,7 +76,11 @@ export default function Register() {
   const passwordStrength = getPasswordStrength(passwordValue)
 
   const handleSubmit = form.handleSubmit((data) => {
-    mutate(data)
+    mutate(data, {
+      onError() {
+        ref.current?.reset()
+      },
+    })
   })
   return (
     <Form {...form}>
@@ -146,7 +153,7 @@ export default function Register() {
                   <Input
                     {...field}
                     type={
-                      form.watch('documentType') !== 'PAS' ? 'number' : 'text'
+                      form.watch('documentType') === 'PAS' ? 'text' : 'number'
                     }
                   />
                 </FormControl>
@@ -353,7 +360,10 @@ export default function Register() {
             )}
           />
         </div>
-        <TurnstileWidget onSuccess={(token) => form.setValue('token', token)} />
+        <TurnstileWidget
+          ref={ref}
+          onSuccess={(token) => form.setValue('token', token)}
+        />
         <Button className="mt-2 col-span-2" type="submit" disabled={isPending}>
           {isPending ? <Loader2 className="animate-spin w-2" /> : 'Registrar'}
         </Button>

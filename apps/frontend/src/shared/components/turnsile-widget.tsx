@@ -9,6 +9,7 @@ export default function TurnstileWidget(props: Readonly<Props>) {
   const { theme } = useTheme()
   return (
     <Turnstile
+      ref={props.ref}
       className="flex justify-center"
       siteKey={env.VITE_CLOUDFLARE_TURNSTILE_SITE_KEY}
       options={{

@@ -1,12 +1,11 @@
 // apps/api/src/modules/health/activity/model.ts
 
 import { activity } from '@api/db/schemas/health'
-import { createInsertSchema, createSelectSchema } from 'drizzle-typebox'
+import { createInsertSchema } from 'drizzle-typebox'
 import { t } from 'elysia'
 
 export namespace ActivityModel {
   // Esquemas de la tabla (generados automáticamente)
-  const _getActivities = createSelectSchema(activity)
   const _createActivity = createInsertSchema(activity)
 
   // 1. ESQUEMA DE LECTURA (Una fila)
