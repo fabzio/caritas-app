@@ -38,7 +38,14 @@ export const getSingleScholarship = async ({ id }: { id: number }) => {
     const response = await db.query.scholarship.findFirst({
       where: (scholarship, { eq }) => eq(scholarship.id, id),
     })
-    return response
+
+    if (!response) return null
+
+    return {
+      ...response,
+      startDate: response.startDate?.toString(),
+      endDate: response.endDate?.toString(),
+    }
   } catch (e) {
     if (e instanceof Error) throw new PostgresError(e.message)
     throw e

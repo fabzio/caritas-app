@@ -19,16 +19,6 @@ const scholarship = new Elysia({
       401: t.Literal('Unauthorized'),
     },
   })
-  .post('', ({ body }) => createScholarship(body), {
-    auth: true,
-    body: ScholarshipModel.createScholarship,
-    response: {
-      200: t.Number({
-        description: 'ID of the created scholarship',
-      }),
-      401: t.Literal('Unauthorized'),
-    },
-  })
   .get(
     '/:id',
     async ({ params }) => {
@@ -41,9 +31,19 @@ const scholarship = new Elysia({
       params: ScholarshipModel.getSingleScholarshipQuery,
       response: {
         200: ScholarshipModel.getSingleScholarshipResponse,
-        404: t.Literal('Organization not found'),
+        404: t.Literal('Scholarship not found'),
       },
     },
   )
+  .post('', ({ body }) => createScholarship(body), {
+    auth: true,
+    body: ScholarshipModel.createScholarship,
+    response: {
+      200: t.Number({
+        description: 'ID of the created scholarship',
+      }),
+      401: t.Literal('Unauthorized'),
+    },
+  })
 
 export default scholarship
