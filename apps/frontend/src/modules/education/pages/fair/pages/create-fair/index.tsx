@@ -251,7 +251,7 @@ export default function CreateFairPage() {
                     )}
                   />
                   <CardFooter className="flex justify-end gap-4 align-center ">
-                    <Link to="/education/scholarship">
+                    <Link to="/education/fair">
                       <Button variant="outline" type="button">
                         Cancelar
                       </Button>

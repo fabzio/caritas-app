@@ -9,10 +9,15 @@ import {
 } from '@workspace/ui/components/dropdown-menu'
 import { ArrowUpDown, MoreHorizontal, Pencil, Trash2 } from 'lucide-react'
 
-type Fair = {
+export type Fair = {
   id: number
-  name: string
-  organizationName: string
+  title: string
+  district: string
+  date: string
+  address: string
+  startTime: string
+  endTime: string
+  active: boolean
 }
 
 export const fairTableColumns: ColumnDef<Fair>[] = [
@@ -38,11 +43,12 @@ export const fairTableColumns: ColumnDef<Fair>[] = [
     enableSorting: false,
   },
   {
-    accessorKey: 'name',
+    accessorKey: 'title',
     header: ({ column }) => (
       <Button
         variant="ghost"
         onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+        className="-ml-3"
       >
         Nombre de la feria
         <ArrowUpDown />
@@ -50,10 +56,35 @@ export const fairTableColumns: ColumnDef<Fair>[] = [
     ),
   },
   {
-    accessorKey: 'organizationName',
-    header: 'Organización',
+    accessorKey: 'district',
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+        className="-ml-3"
+      >
+        Distrito
+        <ArrowUpDown />
+      </Button>
+    ),
+  },
+  {
+    accessorKey: 'date',
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+        className="-ml-3"
+      >
+        Fecha
+        <ArrowUpDown />
+      </Button>
+    ),
     cell: ({ row }) => {
-      return <span>{row.original.organizationName}</span>
+      const date = new Date(row.original.date)
+      return new Intl.DateTimeFormat('es-PE', {
+        dateStyle: 'short',
+      }).format(date)
     },
   },
   {

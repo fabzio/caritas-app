@@ -37,7 +37,7 @@ export default function FairPage() {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Link to="/education/fair">
+          <Link to="/education/fair/create">
             <Button size={isMobile ? 'sm' : 'default'}>
               <PlusCircle />
               {!isMobile && 'Nueva feria'}
