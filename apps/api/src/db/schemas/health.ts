@@ -2,7 +2,6 @@ import { relations } from 'drizzle-orm'
 import {
   boolean,
   date,
-  foreignKey,
   integer,
   interval,
   pgSchema,
@@ -49,8 +48,8 @@ export const activity = healthSchema.table('activity', {
 })
 
 export const activityRelations = relations(activity, ({ many, one }) => ({
-  allied: many(activityAllied),
-  atention: many(atention),
+  alliedParticipation: many(alliedParticipation),
+  attention: many(attention),
   status: one(activityStatus, {
     fields: [activity.statusId],
     references: [activityStatus.id],
@@ -69,19 +68,6 @@ export const activityRelations = relations(activity, ({ many, one }) => ({
   }),
   users: many(activityUser),
 }))
-
-export const activityAllied = healthSchema.table(
-  'activity_allied',
-  {
-    activityId: integer()
-      .notNull()
-      .references(() => activity.id, { onDelete: 'cascade' }),
-    alliedId: varchar('allied_id', { length: 32 })
-      .notNull()
-      .references(() => organization.id, { onDelete: 'cascade' }),
-  },
-  (table) => [primaryKey({ columns: [table.activityId, table.alliedId] })],
-)
 
 export const activityStatus = healthSchema.table('activity_status', {
   id: integer().primaryKey().generatedByDefaultAsIdentity(),
@@ -106,51 +92,33 @@ export const activityUser = healthSchema.table(
   (table) => [primaryKey({ columns: [table.userId, table.activityId] })],
 )
 
-export const atention = healthSchema.table(
-  'atention',
-  {
-    id: integer().primaryKey().generatedByDefaultAsIdentity(),
-    observations: text(),
-    timestamp: timestamp().defaultNow().notNull(),
-    activityId: integer()
-      .notNull()
-      .references(() => activity.id, { onDelete: 'cascade' }),
-    userId: varchar('user_id', { length: 32 })
-      .notNull()
-      .references(() => user.id, { onDelete: 'cascade' }),
-    specialityId: integer().references(() => speciality.id, {
-      onDelete: 'set null',
-    }),
-    registeredBy: varchar('registered_by', { length: 32 })
-      .notNull()
-      .references(() => user.id, { onDelete: 'cascade' }),
-  },
-  (table) => [
-    foreignKey({
-      columns: [table.activityId],
-      foreignColumns: [activity.id],
-    }),
-    foreignKey({
-      columns: [table.userId],
-      foreignColumns: [user.id],
-    }),
-  ],
-)
+export const attention = healthSchema.table('attention', {
+  id: integer().primaryKey().generatedByDefaultAsIdentity(),
+  observations: text(),
+  timestamp: timestamp().defaultNow().notNull(),
+  userId: varchar('user_id', { length: 32 })
+    .notNull()
+    .references(() => user.id, { onDelete: 'cascade' }),
+  alliedParticipationId: integer()
+    .notNull()
+    .references(() => alliedParticipation.id, { onDelete: 'cascade' }),
+  registeredBy: varchar('registered_by', { length: 32 })
+    .notNull()
+    .references(() => user.id, { onDelete: 'cascade' }),
+})
 
-export const organizationSpeciality = healthSchema.table(
-  'organization_speciality',
-  {
-    organizationId: varchar('organization_id', { length: 32 })
-      .notNull()
-      .references(() => organization.id, { onDelete: 'cascade' }),
-    specialityId: integer()
-      .notNull()
-      .references(() => speciality.id, { onDelete: 'cascade' }),
-  },
-  (table) => [
-    primaryKey({ columns: [table.organizationId, table.specialityId] }),
-  ],
-)
+export const alliedParticipation = healthSchema.table('allied_participation', {
+  id: integer().primaryKey().generatedByDefaultAsIdentity(),
+  activityId: integer()
+    .notNull()
+    .references(() => activity.id, { onDelete: 'cascade' }),
+  alliedId: varchar('allied_id', { length: 32 })
+    .notNull()
+    .references(() => organization.id, { onDelete: 'cascade' }),
+  specialityId: integer()
+    .notNull()
+    .references(() => speciality.id, { onDelete: 'cascade' }),
+})
 
 export const speciality = healthSchema.table('speciality', {
   id: integer().primaryKey().generatedByDefaultAsIdentity(),

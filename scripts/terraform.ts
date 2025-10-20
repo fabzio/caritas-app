@@ -77,8 +77,10 @@ type EnvValues = {
   valkeyUrl: string
   googleClientId: string
   googleClientSecret: string
-  googleSmtpUser: string
-  googleSmtpAppPassword: string
+  smtpHost: string
+  smtpPort: string
+  smtpUser: string
+  smtpPassword: string
   cloudflareTurnstileSecretKey: string
 }
 
@@ -351,11 +353,10 @@ async function collectEnvConfig(
   )
   const googleClientId = await helpers.ask('GOOGLE_CLIENT_ID', '')
   const googleClientSecret = await helpers.ask('GOOGLE_CLIENT_SECRET', '')
-  const googleSmtpUser = await helpers.ask('GOOGLE_SMTP_USER', '')
-  const googleSmtpAppPassword = await helpers.ask(
-    'GOOGLE_SMTP_APP_PASSWORD',
-    '',
-  )
+  const smtpHost = await helpers.ask('SMTP_HOST', '')
+  const smtpPort = await helpers.ask('SMTP_PORT', '465')
+  const smtpUser = await helpers.ask('SMTP_USER', '')
+  const smtpPassword = await helpers.ask('SMTP_PASSWORD', '')
   const cloudflareTurnstileSecretKey = await helpers.ask(
     'CLOUDFLARE_TURNSTILE_SECRET_KEY',
     '',
@@ -392,8 +393,10 @@ async function collectEnvConfig(
       valkeyUrl,
       googleClientId,
       googleClientSecret,
-      googleSmtpUser,
-      googleSmtpAppPassword,
+      smtpHost,
+      smtpPort,
+      smtpUser,
+      smtpPassword,
       cloudflareTurnstileSecretKey,
     },
   }
@@ -415,8 +418,10 @@ function serializeEnv(env: EnvValues): string {
     ['VALKEY_URL', env.valkeyUrl],
     ['GOOGLE_CLIENT_ID', env.googleClientId],
     ['GOOGLE_CLIENT_SECRET', env.googleClientSecret],
-    ['GOOGLE_SMTP_USER', env.googleSmtpUser],
-    ['GOOGLE_SMTP_APP_PASSWORD', env.googleSmtpAppPassword],
+    ['SMTP_HOST', env.smtpHost],
+    ['SMTP_PORT', env.smtpPort],
+    ['SMTP_USER', env.smtpUser],
+    ['SMTP_PASSWORD', env.smtpPassword],
     ['CLOUDFLARE_TURNSTILE_SECRET_KEY', env.cloudflareTurnstileSecretKey],
   ]
   return entries

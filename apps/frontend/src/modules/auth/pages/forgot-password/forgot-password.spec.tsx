@@ -1,10 +1,22 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { useEffect } from 'react'
 import { vi } from 'vitest'
 import ForgotPassword from './index'
 
 const mutate = vi.fn()
 const useSearchMock = vi.fn()
+const useNavigateMock = vi.fn()
+
+const renderForgotPassword = () => {
+  const queryClient = new QueryClient()
+  return render(
+    <QueryClientProvider client={queryClient}>
+      <ForgotPassword />
+    </QueryClientProvider>,
+  )
+}
 
 vi.mock('./hooks/use-forgot-password', () => ({
   useForgotPassword: () => ({ mutate }),
@@ -12,7 +24,22 @@ vi.mock('./hooks/use-forgot-password', () => ({
 
 vi.mock('@tanstack/react-router', () => ({
   useSearch: (opts?: unknown) => useSearchMock(opts),
+  useNavigate: () => useNavigateMock(),
 }))
+
+vi.mock('@frontend/shared/components/turnsile-widget', () => {
+  const MockTurnstile = ({
+    onSuccess,
+  }: {
+    onSuccess?: (token: string) => void
+  }) => {
+    useEffect(() => {
+      onSuccess?.('mocked-token')
+    }, [onSuccess])
+    return <div data-testid="turnstile-mock" />
+  }
+  return { default: MockTurnstile }
+})
 
 describe('ForgotPassword page', () => {
   beforeEach(() => {
@@ -23,7 +50,7 @@ describe('ForgotPassword page', () => {
   })
 
   it('prefills the email input with search param', () => {
-    render(<ForgotPassword />)
+    renderForgotPassword()
     const input =
       screen.getByPlaceholderText<HTMLInputElement>(/Introduce tu correo/i)
     expect(input.value).toBe('prefilled@example.com')
@@ -31,16 +58,28 @@ describe('ForgotPassword page', () => {
 
   it('calls mutate with typed email when clicking send', async () => {
     const user = userEvent.setup()
-    render(<ForgotPassword />)
+    renderForgotPassword()
 
     const input = screen.getByPlaceholderText(/Introduce tu correo/i)
     await user.clear(input)
     await user.type(input, 'user@example.com')
-    await user.click(screen.getByRole('button', { name: /Enviar/i }))
+    await user.click(
+      screen.getByRole('button', {
+        name: /Enviar correo de recuperación/i,
+      }),
+    )
 
     await waitFor(() => {
       expect(mutate).toHaveBeenCalledTimes(1)
-      expect(mutate).toHaveBeenCalledWith('user@example.com')
     })
+
+    const [payload, options] = mutate.mock.calls[0]
+    expect(payload).toEqual({
+      email: 'user@example.com',
+      token: 'mocked-token',
+    })
+    expect(options).toEqual(
+      expect.objectContaining({ onSuccess: expect.any(Function) }),
+    )
   })
 })

@@ -47,7 +47,7 @@ const user = new Elysia({
   )
   .post(
     '',
-    async ({ body }) => {
+    async ({ body, request: { headers } }) => {
       const teamIds = Array.from(new Set(body.teamIds))
       const teams = await getTeamsByIds(teamIds)
       if (teams.length !== teamIds.length) throw status(404, 'Team not found')
@@ -63,6 +63,7 @@ const user = new Elysia({
             organizationId: body.organizationId,
             role,
           },
+          headers,
         })
       const existingTeamIds = await getUserTeamIds(body.userId)
       const teamsToRemove = existingTeamIds.filter(
@@ -74,6 +75,7 @@ const user = new Elysia({
             userId: body.userId,
             teamId,
           },
+          headers,
         })
       const teamsToAdd = teamIds.filter(
         (teamId) => !existingTeamIds.includes(teamId),
@@ -84,6 +86,7 @@ const user = new Elysia({
             userId: body.userId,
             teamId,
           },
+          headers,
         })
       return { success: true }
     },

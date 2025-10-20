@@ -1,5 +1,5 @@
 import authClient from '@frontend/lib/authClient'
-import { Link, useNavigate } from '@tanstack/react-router'
+import { Link, useLocation, useNavigate } from '@tanstack/react-router'
 import {
   Avatar,
   AvatarFallback,
@@ -32,6 +32,7 @@ type Props = {
 function NavUser({ user }: Readonly<Props>) {
   const { isMobile } = useSidebar()
   const navigation = useNavigate()
+  const { href } = useLocation()
 
   const onSignOut = async () => {
     await authClient.signOut({
@@ -92,7 +93,7 @@ function NavUser({ user }: Readonly<Props>) {
             </DropdownMenuLabel>
             <DropdownMenuGroup>
               <DropdownMenuItem asChild>
-                <Link to="/user/settings">
+                <Link to="/settings" search={{ redirect: href }}>
                   <Settings />
                   Configuración
                 </Link>

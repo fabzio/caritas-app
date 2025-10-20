@@ -1,6 +1,6 @@
 import { beforeAll } from 'bun:test'
 import db, { schema } from '@api/db'
-import { seed } from '@api/db/seed'
+import { seedDistricts } from '@api/db/seed/index'
 import { auth } from '@api/lib/auth'
 import { pushSchema } from 'drizzle-kit/api'
 
@@ -13,8 +13,7 @@ beforeAll(async () => {
     // biome-ignore lint/suspicious/noExplicitAny: drizzle-kit types
     const { apply } = await pushSchema(schema, db as any)
     await apply()
-    await seed()
-
+    await seedDistricts()
     console.info('🧪 Setting up test user with credentials:')
     console.info('🧪 - Email: test@example.com')
     console.info('🧪 - Password: password')

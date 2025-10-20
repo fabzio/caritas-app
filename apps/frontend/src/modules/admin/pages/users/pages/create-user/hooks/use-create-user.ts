@@ -32,8 +32,8 @@ export const useCreateUser = () => {
         to: '/admin/users',
       })
     },
-    onError: (error: Error) => {
-      toast.error(error.message)
+    onError: (error) => {
+      toast.error(`Error al crear el usuario: ${error.message}`)
     },
   })
 }

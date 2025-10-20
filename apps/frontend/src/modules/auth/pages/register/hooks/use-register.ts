@@ -1,7 +1,4 @@
-import { env } from '@frontend/env'
 import authClient from '@frontend/lib/authClient'
-import rpc from '@frontend/lib/rpc'
-import { DEFAULT_TEAMS } from '@frontend/shared/constants/default-teams'
 import { useMutation } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { APIError } from 'better-auth/api'
@@ -56,99 +53,9 @@ export const useRegister = () => {
         )
       }
     },
-    onSuccess: async ({ user }) => {
+    onSuccess: async () => {
       toast.success('Usuario registrado correctamente')
-      const setupResponse = await rpc.auth.setup.post({ id: user.id })
-      if (setupResponse.status === 500) {
-        toast.error('Error al verificar el usuario, intente luego')
-        return
-      }
-      if (setupResponse.status === 401) {
-        navigate({ to: '/auth/welcome' })
-        return
-      }
-      if (!setupResponse.data) return
-      try {
-        await initializeOrganization(user.id)
-        await authClient.signOut()
-        navigate({ to: '/admin' })
-        toast.success('Inicialización exitosa, ya puede iniciar sesión')
-      } catch (organizationError) {
-        console.error('Organization initialization failed:', organizationError)
-        toast.error('Error al inicializar la organización, intente luego')
-      }
+      navigate({ to: '/auth/welcome' })
     },
   })
-}
-
-type OrganizationCreationResult = Awaited<
-  ReturnType<typeof authClient.organization.create>
->
-type OrganizationData = NonNullable<OrganizationCreationResult['data']>
-type OrganizationId = OrganizationData['id']
-type TeamCreationResult = Awaited<
-  ReturnType<typeof authClient.organization.createTeam>
->
-type TeamId = NonNullable<TeamCreationResult['data']>['id']
-
-const defaultTeams = [
-  DEFAULT_TEAMS.ADMIN,
-  DEFAULT_TEAMS.EDUCATION,
-  DEFAULT_TEAMS.HEALTH,
-]
-
-const createOrganization = async () => {
-  const { data, error } = await authClient.organization.create({
-    name: env.VITE_ORG_NAME,
-    slug: env.VITE_ORG_NAME.split(' ').join('-').toLowerCase(),
-    type: 'caritas',
-  })
-  if (error) throw error
-  if (!data) throw new Error('No se pudo crear la organización')
-  const { error: setActiveError } = await authClient.organization.setActive({
-    organizationId: data.id,
-  })
-  if (setActiveError) throw setActiveError
-  return data
-}
-
-const createDefaultTeams = async (
-  organizationId: OrganizationId,
-): Promise<TeamId> => {
-  const responses = await Promise.all(
-    defaultTeams.map((name) =>
-      authClient.organization.createTeam({ name, organizationId }),
-    ),
-  )
-  const teamError = responses.find((response) => response.error)?.error
-  if (teamError) throw teamError
-  const primaryTeam = responses[0]?.data
-  if (!primaryTeam)
-    throw new Error('No se pudo crear los equipos predeterminados')
-  return primaryTeam.id
-}
-
-const addUserToPrimaryTeam = async (teamId: TeamId, userId: string) => {
-  const { error } = await authClient.organization.addTeamMember({
-    teamId,
-    userId,
-  })
-  if (error) throw error
-}
-
-const initializeOrganization = async (userId: string) => {
-  try {
-    const organization = await createOrganization()
-
-    const { error: updateError } =
-      await authClient.organization.updateMemberRole({
-        memberId: organization.members[0]?.id as string,
-        role: ['admin', 'owner'],
-      })
-    if (updateError) throw updateError
-    const primaryTeamId = await createDefaultTeams(organization.id)
-    await addUserToPrimaryTeam(primaryTeamId, userId)
-  } catch (error) {
-    console.error('Organization initialization failed:', error)
-  }
 }
