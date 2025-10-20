@@ -22,6 +22,7 @@ COPY . .
 RUN turbo prune api --docker
 
 FROM base AS installer
+RUN apt-get update && apt-get install -y g++ make python3 && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 COPY --from=builder /app/out/json/ .

@@ -1,4 +1,3 @@
-import { env } from '@frontend/env'
 import { useRegions } from '@frontend/hooks/use-regions'
 import { useSession } from '@frontend/hooks/use-session'
 import { DEFAULT_TEAMS } from '@frontend/shared/constants/default-teams'
