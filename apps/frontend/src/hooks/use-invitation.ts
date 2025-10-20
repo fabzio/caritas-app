@@ -18,6 +18,9 @@ export const useInvitation = () => {
     onError: (error) => {
       toast.error(`Error al enviar la invitación: ${error.message}`)
     },
+    onSuccess: () => {
+      toast.success('Invitación enviada correctamente')
+    },
   })
 }
 

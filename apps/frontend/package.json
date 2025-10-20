@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "bun run --bun vite",
     "start": "vite",
     "build": "vite build",
     "serve": "vite preview",

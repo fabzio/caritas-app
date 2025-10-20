@@ -1,5 +1,4 @@
 export const buildInviteOrganizationTemplate = (params: {
-  email: string
   invitedByUsername: string
   invitedByEmail: string
   teamName: string
