@@ -7,12 +7,7 @@ import type {
   PaginationState,
   SortingState,
 } from '@tanstack/react-table'
-
-type Fair = {
-  id: number
-  name: string
-  organizationName: string
-}
+import type { Fair } from './fair-column'
 
 type Props = {
   rowSelection: Record<string, boolean>

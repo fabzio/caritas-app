@@ -71,13 +71,18 @@ describe('Login form', () => {
 
     await waitFor(() => {
       expect(mutate).toHaveBeenCalledTimes(1)
-      expect(mutate).toHaveBeenCalledWith({
-        email: 'user@example.com',
-        password: 'secret12',
-        rememberMe: false,
-        token: 'mocked-token',
-      })
     })
+
+    const [payload, options] = mutate.mock.calls[0]
+    expect(payload).toEqual({
+      email: 'user@example.com',
+      password: 'secret12',
+      rememberMe: false,
+      token: 'mocked-token',
+    })
+    expect(options).toEqual(
+      expect.objectContaining({ onError: expect.any(Function) }),
+    )
   })
 
   it('includes rememberMe when checkbox is checked', async () => {
@@ -97,13 +102,19 @@ describe('Login form', () => {
     await user.click(submit)
 
     await waitFor(() => {
-      expect(mutate).toHaveBeenCalledWith({
-        email: 'user2@example.com',
-        password: 'secret34',
-        rememberMe: true,
-        token: 'mocked-token',
-      })
+      expect(mutate).toHaveBeenCalledTimes(1)
     })
+
+    const [payload, options] = mutate.mock.calls[0]
+    expect(payload).toEqual({
+      email: 'user2@example.com',
+      password: 'secret34',
+      rememberMe: true,
+      token: 'mocked-token',
+    })
+    expect(options).toEqual(
+      expect.objectContaining({ onError: expect.any(Function) }),
+    )
   })
 
   it('disables submit button when isPending is true', () => {

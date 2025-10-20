@@ -1,4 +1,5 @@
 import Elysia from 'elysia'
+import fair from './fair'
 import organization from './organization'
 import organizationMajor from './organizationMajor'
 import scholarship from './scholarship'
@@ -13,5 +14,6 @@ const educationModule = new Elysia({
   .use(organization)
   .use(scholarship)
   .use(scholarshipRecipient)
+  .use(fair)
 
 export default educationModule

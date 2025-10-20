@@ -14,7 +14,7 @@ export const useFairTable = () => {
     filters: filters,
   })
 
-  const sortingState = sortByToState((filters.sortBy || 'name.asc') as SortBy)
+  const sortingState = sortByToState((filters.sortBy || 'date.desc') as SortBy)
   const paginationState = {
     pageIndex: filters.pageIndex ?? 1,
     pageSize: filters.pageSize ?? 10,

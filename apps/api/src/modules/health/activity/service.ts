@@ -96,7 +96,16 @@ export async function getActivities(
       .limit(limit)
       .orderBy(orderExpr)
 
-    return { data: rows, total, page, limit, totalPages }
+    return {
+      data: rows.map((row) => ({
+        ...row,
+        date: new Date(row.date),
+      })),
+      total,
+      page,
+      limit,
+      totalPages,
+    }
   } catch (e) {
     if (e instanceof Error) throw new PostgresError(e.message)
     throw e

@@ -16,12 +16,17 @@ const mockCreateUser = vi.fn()
 const mockUpdateUser = vi.fn()
 const mockUseSearch = vi.fn()
 const mockUseLoaderData = vi.fn()
+const mockUseInvitation = vi.fn()
 
 vi.mock('@frontend/hooks/use-session', () => ({
   useSession: () => ({ data: { user: { id: 'current-user-id', teams: [] } } }),
 }))
 vi.mock('./hooks/use-create-user', () => ({
   useCreateUser: () => ({ mutate: mockCreateUser }),
+}))
+
+vi.mock('@frontend/hooks/use-invitation', () => ({
+  useInvitation: () => ({ mutate: mockUseInvitation }),
 }))
 
 vi.mock('./hooks/use-update-user', () => ({
@@ -266,7 +271,7 @@ describe('FormView - Create Mode', () => {
     expect(screen.getByPlaceholderText('John')).toBeTruthy()
     expect(screen.getByPlaceholderText('Doe')).toBeTruthy()
     expect(screen.getByPlaceholderText('john.doe@example.com')).toBeTruthy()
-    expect(screen.getByPlaceholderText('+51 987 654 321')).toBeTruthy()
+    expect(screen.getByPlaceholderText('987 654 321')).toBeTruthy()
     expect(screen.getByPlaceholderText('12345678')).toBeTruthy()
   })
 
