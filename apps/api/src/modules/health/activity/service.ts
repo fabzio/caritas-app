@@ -6,7 +6,8 @@ import {
   activityStatus,
   activityType,
   activityUser,
-  atention,
+  alliedParticipation,
+  attention,
   speciality,
 } from '@api/db/schemas/health'
 import { and, asc, count, desc, eq, ilike, or } from 'drizzle-orm'
@@ -200,35 +201,38 @@ export const getUserAttentions = async (
     const activityIdNum = Number.parseInt(activityId, 10)
     const searchQuery = q.replace(/\s+/g, ' ').trim()
 
-    const allSpecialities = await db
+    const participatingSpecialities = await db
       .select({
-        id: speciality.id,
-        name: speciality.name,
+        alliedParticipationId: alliedParticipation.id,
+        specialityId: speciality.id,
+        specialityName: speciality.name,
       })
-      .from(speciality)
+      .from(alliedParticipation)
+      .innerJoin(
+        speciality,
+        eq(alliedParticipation.specialityId, speciality.id),
+      )
       .where(
-        searchQuery ? ilike(speciality.name, `%${searchQuery}%`) : undefined,
+        and(
+          eq(alliedParticipation.activityId, activityIdNum),
+          searchQuery ? ilike(speciality.name, `%${searchQuery}%`) : undefined,
+        ),
       )
       .orderBy(asc(speciality.name))
 
     const userAttentions = await db
       .select({
-        id: atention.id,
-        specialityId: atention.specialityId,
-        timestamp: atention.timestamp,
-        observations: atention.observations,
+        id: attention.id,
+        alliedParticipationId: attention.alliedParticipationId,
+        timestamp: attention.timestamp,
+        observations: attention.observations,
       })
-      .from(atention)
-      .where(
-        and(
-          eq(atention.activityId, activityIdNum),
-          eq(atention.userId, userId),
-        ),
-      )
+      .from(attention)
+      .where(eq(attention.userId, userId))
 
     const attentionMap = new Map(
       userAttentions.map((att) => [
-        att.specialityId,
+        att.alliedParticipationId,
         {
           id: att.id,
           timestamp: att.timestamp,
@@ -237,17 +241,15 @@ export const getUserAttentions = async (
       ]),
     )
 
-    const result = allSpecialities.map((spec) => {
-      const attention = attentionMap.get(spec.id)
+    const result = participatingSpecialities.map((spec) => {
+      const att = attentionMap.get(spec.alliedParticipationId)
       return {
-        specialityId: spec.id,
-        specialityName: spec.name,
-        hasAttention: !!attention,
-        attentionId: attention?.id || null,
-        attentionTime: attention?.timestamp
-          ? attention.timestamp.toISOString()
-          : null,
-        observations: attention?.observations || null,
+        specialityId: spec.specialityId,
+        specialityName: spec.specialityName,
+        hasAttention: !!att,
+        attentionId: att?.id || null,
+        attentionTime: att?.timestamp ? att.timestamp.toISOString() : null,
+        observations: att?.observations || null,
       }
     })
 
