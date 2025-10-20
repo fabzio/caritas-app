@@ -1,11 +1,11 @@
-import z from 'zod'
+import { z } from 'zod'
 
 export const personFormSchema = z.object({
   profiles: z.array(z.enum(['student', 'patient'])),
 })
 export const studentFormSchema = z.object({
-  grade: z.string('Seleccione un grado escolar'),
-  guardianEmail: z.email('Ingrese un correo válido'),
+  grade: z.string({ message: 'Seleccione un grado escolar' }),
+  guardianEmail: z.string().email('Ingrese un correo válido'),
 })
 
 export const patientFormSchema = z.object({

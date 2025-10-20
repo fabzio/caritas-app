@@ -146,7 +146,7 @@ export default function SendInvitation() {
 }
 
 const formSchema = z.object({
-  email: z.email(),
+  email: z.string().email(),
   teams: z
     .array(z.enum(['healthMember', 'educationMember', 'admin']))
     .min(1, 'Selecciona al menos un equipo'),

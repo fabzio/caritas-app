@@ -79,7 +79,7 @@ export default function ForgotPassword() {
 
 const formSchema = z
   .object({
-    email: z.email(),
+    email: z.string().email(),
     token: z.string().optional(),
   })
   .refine((data) => !!data.token, {
