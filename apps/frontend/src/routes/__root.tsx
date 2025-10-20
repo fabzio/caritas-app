@@ -21,7 +21,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
     meta: [
       {
         name: 'description',
-        content: 'Cáritas Lima - Sistema de Gestión',
+        content: `${env.VITE_ORG_NAME} | Sistema de Gestión`,
       },
       {
         title: env.VITE_APP_TITLE,

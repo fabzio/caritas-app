@@ -1,3 +1,4 @@
+import { env } from '@frontend/env'
 import adminNavItems from '@frontend/modules/admin/layout/nav-items'
 import { DEFAULT_TEAMS } from '@frontend/shared/constants/default-teams'
 import { QueryKeys } from '@frontend/shared/constants/query-keys'
@@ -55,4 +56,11 @@ export const Route = createFileRoute('/_authenticated/admin')({
       <Outlet />
     </MainLayout>
   ),
+  head: () => ({
+    meta: [
+      {
+        title: `${env.VITE_APP_TITLE} | Administrador`,
+      },
+    ],
+  }),
 })

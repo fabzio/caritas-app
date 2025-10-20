@@ -1,9 +1,9 @@
 import { activity } from '@api/db/schemas/health'
-import { createInsertSchema, createSelectSchema } from 'drizzle-typebox'
+import { createInsertSchema } from 'drizzle-typebox'
 import { t } from 'elysia'
 
 export namespace ActivityModel {
-  const _getActivities = createSelectSchema(activity)
+  // Esquemas de la tabla (generados automáticamente)
   const _createActivity = createInsertSchema(activity)
 
   export const listActivitySchema = t.Object({

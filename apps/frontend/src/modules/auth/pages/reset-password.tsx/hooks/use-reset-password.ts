@@ -11,7 +11,11 @@ export const useResetPassword = () => {
       otp: string
       password: string
     }) => {
-      const { data, error } = await authClient.emailOtp.resetPassword(params)
+      const { data, error } = await authClient.emailOtp.resetPassword({
+        email: params.email,
+        otp: params.otp.toString(),
+        password: params.password,
+      })
       if (error) throw error
       return data
     },
