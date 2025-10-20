@@ -1,4 +1,4 @@
-FROM oven/bun:1.3 AS base
+FROM oven/bun:1.3-slim AS base
 
 ENV PORT=8000
 ENV NODE_ENV=development
@@ -22,6 +22,7 @@ COPY . .
 RUN turbo prune api --docker
 
 FROM base AS installer
+RUN apt-get update && apt-get install -y g++ make python3 && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 COPY --from=builder /app/out/json/ .

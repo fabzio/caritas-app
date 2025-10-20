@@ -23,7 +23,7 @@ jobs:
 
           branch="${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}"
           echo "Checking branch: ${branch}"
-          if [[ ! "${branch}" =~ ^(main|develop|(feature|hotfix)\/[a-z0-9._-]+)$ ]]; then
+          if [[ ! "${branch}" =~ ^(main|develop|(feature|hotfix|refactor)\/[a-z0-9._-]+)$ ]]; then
             echo "❌ Nombre de rama inválido: ${branch}"
             exit 1
           fi
