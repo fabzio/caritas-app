@@ -40,7 +40,7 @@ export const formUserSchema = z
     sex: z.enum(['M', 'F'], {
       error: () => ({ message: 'Debes seleccionar una opción' }),
     }),
-    email: z.email({ message: 'El correo electrónico no es válido' }),
+    email: z.string().email({ message: 'El correo electrónico no es válido' }),
     regionId: z.number().min(1, { message: 'Debes seleccionar una región' }),
     token: z.string().optional(),
   })
