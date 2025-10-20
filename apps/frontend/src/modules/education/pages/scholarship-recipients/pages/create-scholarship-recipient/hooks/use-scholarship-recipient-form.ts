@@ -3,9 +3,9 @@ import { useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
-import useGetScholarship from '../../scholarship/hooks/use-get-scholarship'
-import usePostScholarshipApplication from '../../scholarship/pages/create-scholarship/hooks/use-post-scholarship-application'
+import useGetScholarship from '../../../../scholarship/hooks/use-get-scholarship'
 import type { Beneficiary } from './use-get-beneficiaries'
+import usePostScholarshipApplication from './use-post-scholarship-application'
 
 const formSchema = z.object({
   beneficiaryId: z.string().min(1, 'Debe seleccionar un beneficiario'),

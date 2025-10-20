@@ -74,12 +74,12 @@ export default function ViewScholarship() {
         <TabsContent value="applicants" className="mt-0">
           <Card>
             <CardContent className="px-6">
-              {!scholarshipId ? (
-                'ID de beca no proporcionado'
-              ) : (
+              {scholarshipId ? (
                 <ApplicantsTable
                   scholarshipId={Number.parseInt(scholarshipId, 10)}
                 />
+              ) : (
+                'ID de beca no proporcionado'
               )}
             </CardContent>
           </Card>

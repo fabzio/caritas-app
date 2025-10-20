@@ -70,7 +70,7 @@ export default function BeneficiarySearch({
         <div className="absolute z-50 w-full mt-2 rounded-md border bg-popover shadow-md max-h-60 overflow-y-auto">
           {filteredBeneficiaries.length > 0 ? (
             <div className="divide-y">
-              {filteredBeneficiaries.map((beneficiary) => (
+              {filteredBeneficiaries.map((beneficiary: Beneficiary) => (
                 <button
                   key={beneficiary.id}
                   type="button"
