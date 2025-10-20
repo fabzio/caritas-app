@@ -32,7 +32,7 @@ export default function Speciality() {
           </div>
         </div>
 
-        <Link to="/health/speciality/create">
+        <Link to="/health/speciality/form">
           <Button>
             <HeartPlus />
             Nueva especialidad

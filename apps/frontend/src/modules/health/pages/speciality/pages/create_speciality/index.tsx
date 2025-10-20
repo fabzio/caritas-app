@@ -22,13 +22,13 @@ import { Input } from '@workspace/ui/components/input'
 import { Separator } from '@workspace/ui/components/separator'
 import { Loader2 } from 'lucide-react'
 import { useForm } from 'react-hook-form'
-import usePostSpeciality from './hooks/use-post-speciality'
+import usePostSpeciality from '../../hooks/use-post-speciality'
 import {
   type FormSpecialitySchema,
   formSpecialitySchema,
-} from './models/speciality'
+} from '../../models/speciality'
 
-export default function CreateSpeciality() {
+export default function FormView() {
   const form = useForm<FormSpecialitySchema>({
     resolver: zodResolver(formSpecialitySchema),
     defaultValues: {
