@@ -26,9 +26,7 @@ const createOwnerContext = async (): Promise<OwnerContext> => {
   const sequence = buildNumericSequence()
   const email = `owner+${sequence}@example.com`
   const password = 'password'
-  const {
-    user: { id: ownerUserId },
-  } = await auth.api.createUser({
+  const createUserResponse = await auth.api.createUser({
     body: {
       name: `Owner ${sequence}`,
       email,
@@ -45,6 +43,12 @@ const createOwnerContext = async (): Promise<OwnerContext> => {
       },
     },
   })
+  const ownerUserId =
+    (createUserResponse.user as unknown as { id?: string; userId?: string })
+      .id ??
+    (createUserResponse.user as unknown as { id?: string; userId?: string })
+      .userId
+  if (!ownerUserId) throw new Error('Failed to get created user id')
 
   const { headers } = await auth.api.signInEmail({
     returnHeaders: true,
@@ -62,8 +66,9 @@ const createOwnerContext = async (): Promise<OwnerContext> => {
     body: {
       name: `Test Organization ${sequence}`,
       slug: organizationSlug,
-      type: 'caritas',
-    },
+      type: 'education',
+      logo: 'https://example.com/logo.png',
+    } as unknown as Record<string, unknown>,
   })
   if (!organization) throw new Error('Failed to create test organization')
 
@@ -71,7 +76,6 @@ const createOwnerContext = async (): Promise<OwnerContext> => {
     headers: { cookie },
     body: {
       organizationId: organization.id,
-      organizationSlug,
     },
   })
 
@@ -105,6 +109,7 @@ afterEach(async () => {
 })
 
 afterAll(async () => {
+  if (!ownerContext) return
   await db
     .delete(schema.organization)
     .where(eq(schema.organization.id, ownerContext.organizationId))
@@ -165,10 +170,12 @@ describe('Scholarship Module', () => {
     })
 
     expect(response.status).toBe(200)
-    expect(response.data).toBeInstanceOf(Array)
-    expect(response.data?.length).toBeGreaterThan(0)
+    expect(response.data).toBeObject()
+    expect(response.data?.data).toBeInstanceOf(Array)
+    expect(response.data?.data.length).toBeGreaterThan(0)
+    expect(response.data?.total).toBeGreaterThan(0)
 
-    const scholarshipNames = response.data?.map((s) => s.name) || []
+    const scholarshipNames = response.data?.data.map((s) => s.name) || []
     expect(scholarshipNames).toContain('Scholarship for Listing')
   })
 
