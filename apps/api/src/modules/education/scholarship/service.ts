@@ -1,7 +1,6 @@
 import db from '@api/db'
 import { PostgresError } from '@api/db/errors'
 import { scholarship } from '@api/db/schemas/education'
-import { s } from 'better-auth/dist/shared/better-auth.4SXCyo06'
 import { eq } from 'drizzle-orm'
 import type { ScholarshipModel } from './model'
 export const createScholarship = async (
