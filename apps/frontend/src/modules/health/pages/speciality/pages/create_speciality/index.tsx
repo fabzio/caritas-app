@@ -1,6 +1,6 @@
 import { useSession } from '@frontend/hooks/use-session'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Link } from '@tanstack/react-router'
+import { getRouteApi, Link, useSearch } from '@tanstack/react-router'
 import { Button } from '@workspace/ui/components/button'
 import {
   Card,
@@ -23,45 +23,81 @@ import { Separator } from '@workspace/ui/components/separator'
 import { Loader2 } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import usePostSpeciality from '../../hooks/use-post-speciality'
+import useUpdateSpeciality from '../../hooks/use-update-speciality'
 import {
   type FormSpecialitySchema,
   formSpecialitySchema,
 } from '../../models/speciality'
 
 export default function FormView() {
-  const form = useForm<FormSpecialitySchema>({
-    resolver: zodResolver(formSpecialitySchema),
-    defaultValues: {
-      name: '',
-    },
+  const viewType = useSearch({
+    from: '/_authenticated/health/speciality/form',
+    select: (s) => s.type,
   })
 
-  const { mutate, isPending } = usePostSpeciality()
+  const loaderData = getRouteApi(
+    '/_authenticated/health/speciality/form',
+  ).useLoaderData()
+
   const { data: user } = useSession()
+  const { mutate: createSpeciality, isPending: isCreating } =
+    usePostSpeciality()
+  const { mutate: updateSpeciality, isPending: isUpdating } =
+    useUpdateSpeciality()
+
+  const form = useForm<FormSpecialitySchema>({
+    resolver: zodResolver(formSpecialitySchema),
+    defaultValues:
+      viewType === 'edit'
+        ? {
+            name: loaderData?.name ?? '',
+          }
+        : {
+            name: '',
+          },
+  })
 
   const handleSubmit = form.handleSubmit((data) => {
     if (!user) return
-    const params = { ...data, createdBy: user.user.id, active: true }
-    mutate(params)
+
+    if (viewType === 'edit' && loaderData?.id) {
+      updateSpeciality({
+        id: loaderData.id,
+        name: data.name,
+      })
+    } else {
+      const params = { ...data, createdBy: user.user.id, active: true }
+      createSpeciality(params)
+    }
   })
+
+  const editLabel = viewType === 'edit' ? 'Guardar Cambios' : 'Registrar'
 
   return (
     <div className="flex flex-1 flex-col gap-6 p-4">
       <div className="flex flex-col gap-1">
         <h1 className="text-2xl font-semibold text-foreground">
-          Registrar Nueva Especialidad
+          {viewType === 'edit'
+            ? 'Editar Especialidad'
+            : 'Registrar Nueva Especialidad'}
         </h1>
         <span className="text-muted-foreground">
-          Complete la información de la especialidad
+          {viewType === 'edit'
+            ? 'Actualiza el nombre de la especialidad'
+            : 'Complete la información de la especialidad'}
         </span>
         <Separator />
       </div>
       <div>
-        <div className=" flex justify-center ">
+        <div className="flex justify-center">
           <Card className="w-full lg:w-3/4">
             <CardHeader>
               <CardTitle>Información de la Especialidad</CardTitle>
-              <CardDescription>Complete el campo requerido</CardDescription>
+              <CardDescription>
+                {viewType === 'edit'
+                  ? 'Modifique el campo requerido'
+                  : 'Complete el campo requerido'}
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <Form {...form}>
@@ -88,12 +124,12 @@ export default function FormView() {
                     <Button
                       className="mt-2 col-span-2"
                       type="submit"
-                      disabled={isPending}
+                      disabled={isCreating || isUpdating}
                     >
-                      {isPending ? (
+                      {isCreating || isUpdating ? (
                         <Loader2 className="animate-spin w-2" />
                       ) : (
-                        'Registrar'
+                        editLabel
                       )}
                     </Button>
                   </CardFooter>

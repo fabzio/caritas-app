@@ -5,7 +5,6 @@ export const QueryKeys = {
   ORGANIZATIONSEDU: 'organizationsEducation',
   ORGANIZATIONSMAJOR: 'organizationsMajor',
   SCHOLARSHIP: 'scholarships',
-  SPECIALITY: 'speciality',
   USER_TEAMS: 'teams',
   SETTINGS: {
     ACCOUNTS: 'settings-accounts',
@@ -23,6 +22,7 @@ export const QueryKeys = {
   },
   HEALTH: {
     ACTIVITIES: 'health-activities',
+    SPECIALITIES: 'health-specialities',
   },
 } as const
 
