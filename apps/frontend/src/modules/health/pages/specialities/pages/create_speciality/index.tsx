@@ -22,21 +22,21 @@ import { Input } from '@workspace/ui/components/input'
 import { Separator } from '@workspace/ui/components/separator'
 import { Loader2 } from 'lucide-react'
 import { useForm } from 'react-hook-form'
-import usePostSpeciality from '../../hooks/use-post-speciality'
-import useUpdateSpeciality from '../../hooks/use-update-speciality'
 import {
   type FormSpecialitySchema,
   formSpecialitySchema,
-} from '../../models/speciality'
+} from '../../../speciality/models/speciality'
+import usePostSpeciality from '../../hooks/use-post-speciality'
+import useUpdateSpeciality from '../../hooks/use-update-speciality'
 
 export default function FormView() {
   const viewType = useSearch({
-    from: '/_authenticated/health/speciality/form',
+    from: '/_authenticated/health/specialities/form',
     select: (s) => s.type,
   })
 
   const loaderData = getRouteApi(
-    '/_authenticated/health/speciality/form',
+    '/_authenticated/health/specialities/form',
   ).useLoaderData()
 
   const { data: user } = useSession()
@@ -116,7 +116,7 @@ export default function FormView() {
                     )}
                   />
                   <CardFooter className="flex justify-end gap-4 ">
-                    <Link to="/health/speciality">
+                    <Link to="/health/specialities">
                       <Button className="mt-2" variant="outline">
                         Cancelar
                       </Button>

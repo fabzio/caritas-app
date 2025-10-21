@@ -1,4 +1,4 @@
-import type { Speciality } from '@frontend/modules/health/pages/speciality/hooks/use-specialities'
+import type { Speciality } from '@frontend/modules/health/pages/specialities/hooks/use-list-specialities'
 import type { ColumnDef } from '@tanstack/react-table'
 import { Button } from '@workspace/ui/components/button'
 import { Checkbox } from '@workspace/ui/components/checkbox'

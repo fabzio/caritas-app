@@ -1,18 +1,25 @@
 import { Link, useNavigate } from '@tanstack/react-router'
 import { Button } from '@workspace/ui/components/button'
-import { Input } from '@workspace/ui/components/input'
-import { HeartPlus, Search } from 'lucide-react'
+import { HeartPlus } from 'lucide-react'
 import { useState } from 'react'
 import ActionsButton from './components/actions-button'
+import SearchSpecialityInput from './components/search-speciality-input'
 import SpecialityTable from './components/speciality-table'
 import { useSpecialityTable } from './hooks/use-table'
 
 export default function Speciality() {
   const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({})
-  const [search, setSearch] = useState('')
   const navigate = useNavigate()
 
-  const { data: specialities } = useSpecialityTable(search)
+  const {
+    data: specialities,
+    pagination,
+    columns,
+    paginationState,
+    sortingState,
+    filters,
+    setFilters,
+  } = useSpecialityTable()
 
   const selectedRows = Object.keys(rowSelection)
     .filter((key) => rowSelection[key])
@@ -26,9 +33,10 @@ export default function Speciality() {
 
   const handleEdit = () => {
     const selected = selectedSpecialities[0]
+    if (!selected) return
 
     navigate({
-      to: '/health/speciality/form',
+      to: '/health/specialities/form',
       search: { id: String(selected.id), type: 'edit' },
     })
   }
@@ -44,15 +52,7 @@ export default function Speciality() {
       <div className="flex justify-between items-center mt-4">
         <div className="w-1/3">
           <div className="relative">
-            <Input
-              placeholder="Buscar especialidad..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="pl-8"
-            />
-            <span className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground">
-              <Search size={18} />
-            </span>
+            <SearchSpecialityInput />
           </div>
         </div>
 
@@ -63,7 +63,7 @@ export default function Speciality() {
             selectedCount={selectedCount}
           />
 
-          <Link to="/health/speciality/form" search={{ type: 'new' }}>
+          <Link to="/health/specialities/form" search={{ type: 'new' }}>
             <Button>
               <HeartPlus className="mr-1 w-4 h-4" />
               Nueva especialidad
@@ -76,7 +76,12 @@ export default function Speciality() {
         <SpecialityTable
           rowSelection={rowSelection}
           setRowSelection={setRowSelection}
-          search={search}
+          data={specialities || []}
+          columns={columns}
+          paginationState={paginationState}
+          sortingState={sortingState}
+          setFilters={setFilters}
+          pagination={pagination}
         />
       </div>
     </div>

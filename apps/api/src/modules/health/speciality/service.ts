@@ -1,30 +1,51 @@
 import db from '@api/db'
 import { PostgresError } from '@api/db/errors'
 import { speciality } from '@api/db/schemas/health'
-import { eq } from 'drizzle-orm'
+import { asc, count, desc, eq, ilike } from 'drizzle-orm'
 import type { SpecialityModel } from './model'
 
-interface GetSpecialitiesArgs {
-  search?: string
-}
+export async function getSpecialities(
+  params: SpecialityModel.ListSpecialitiesQuery,
+): Promise<SpecialityModel.GetSpecialitiesResponse> {
+  const { q = '', page = 0, limit = 10, sortBy = 'name.asc' } = params
 
-export const getSpecialities = async ({
-  query,
-}: {
-  query: GetSpecialitiesArgs
-}): Promise<SpecialityModel.GetSpecialities> => {
-  try {
-    const { search } = query
+  const [sortFieldRaw, sortOrderRaw] = (sortBy ?? 'name.asc').split('.', 2)
+  const sortField = (sortFieldRaw ?? 'name').trim()
+  const sortOrder =
+    (sortOrderRaw ?? 'asc').trim().toLowerCase() === 'desc' ? 'desc' : 'asc'
 
-    const response = await db.query.speciality.findMany({
-      where: search
-        ? (fields, { ilike }) => ilike(fields.name, `%${search}%`)
-        : undefined,
-    })
-    return response
-  } catch (e) {
-    if (e instanceof Error) throw new PostgresError(e.message)
-    throw e
+  const columns = {
+    name: speciality.name,
+  } as const
+
+  const column = columns[sortField as keyof typeof columns] ?? speciality.name
+  const orderExpr = sortOrder === 'desc' ? desc(column) : asc(column)
+
+  const searchCondition = q ? ilike(speciality.name, `%${q}%`) : undefined
+
+  // Get total count
+  const [{ total }] = await db
+    .select({ total: count() })
+    .from(speciality)
+    .where(searchCondition)
+
+  // Get paginated data
+  const rows = await db
+    .select({ speciality: speciality })
+    .from(speciality)
+    .where(searchCondition)
+    .offset(page * limit)
+    .limit(limit)
+    .orderBy(orderExpr)
+
+  const totalPages = Math.ceil(total / limit)
+
+  return {
+    data: rows.map((r) => r.speciality),
+    total,
+    page,
+    limit,
+    totalPages,
   }
 }
 

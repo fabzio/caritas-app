@@ -3,7 +3,7 @@ import { useMutation } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 
 const usePostSpeciality = () => {
-  const navigate = useNavigate({ from: '/health/speciality/form' })
+  const navigate = useNavigate({ from: '/health/specialities/form' })
   return useMutation({
     mutationFn: async (params: { name: string }) => {
       const res = await rpc.health.speciality.post(params)
@@ -14,7 +14,7 @@ const usePostSpeciality = () => {
       console.error(error)
     },
     onSuccess: (_) => {
-      navigate({ to: '/health/speciality' })
+      navigate({ to: '/health/specialities' })
     },
   })
 }

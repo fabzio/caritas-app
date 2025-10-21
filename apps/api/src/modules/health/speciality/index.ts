@@ -13,16 +13,11 @@ const speciality = new Elysia({
   prefix: '/speciality',
 })
   .use(betterAuth)
-  .get('', getSpecialities, {
+  .get('/', ({ query }) => getSpecialities(query), {
     auth: true,
-    query: t.Object({
-      search: t.Optional(
-        t.String({ description: 'Filtro de búsqueda por nombre' }),
-      ),
-    }),
+    query: SpecialityModel.listSpecialitiesQuery,
     response: {
-      200: SpecialityModel.getSpecialities,
-      401: t.Literal('Unauthorized'),
+      200: SpecialityModel.getSpecialitiesResponse,
     },
   })
   .get(

@@ -31,7 +31,7 @@ export default function useUpdateSpeciality() {
         queryKey: [QueryKeys.HEALTH.SPECIALITIES],
       })
       toast.success('Especialidad modificada exitosamente')
-      navigate({ to: '/health/speciality' })
+      navigate({ to: '/health/specialities' })
     },
     onError: (error: Error) => {
       toast.error(error.message)
