@@ -1,3 +1,5 @@
+import ApplicantsTable from '@frontend/modules/user/components/applicants-table'
+import ScholarshipGeneralInfo from '@frontend/modules/user/components/scholarship-general-info'
 import { useNavigate, useParams } from '@tanstack/react-router'
 import { Badge } from '@workspace/ui/components/badge'
 import { Button } from '@workspace/ui/components/button'
@@ -11,8 +13,7 @@ import {
 } from '@workspace/ui/components/tabs'
 import { ArrowLeftIcon, FileTextIcon, GraduationCapIcon } from 'lucide-react'
 import { useState } from 'react'
-import ApplicantsTable from '../../components/applicants-table'
-import ScholarshipGeneralInfo from '../../components/scholarship-general-info'
+
 
 export default function ViewScholarship() {
   const { scholarshipId } = useParams({ strict: false })

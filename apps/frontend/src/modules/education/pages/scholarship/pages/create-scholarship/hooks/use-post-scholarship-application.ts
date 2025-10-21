@@ -17,7 +17,7 @@ export default function usePostScholarshipApplication() {
   return useMutation({
     mutationFn: async (params: CreateScholarshipApplicationParams) => {
       const { data, error } =
-        await rpc.education.scholarshipRecipients.post(params)
+        await rpc.education.scholarship.recipients.post(params)
       if (error) throw error
       return data
     },

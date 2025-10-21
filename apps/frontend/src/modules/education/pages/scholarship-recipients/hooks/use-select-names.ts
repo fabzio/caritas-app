@@ -7,7 +7,7 @@ export const useSelectNames = () => {
     queryKey: [QueryKeys.EDUCATION.SCHOLARSHIP_RECIPIENTS],
     queryFn: async () => {
       const { data, error } =
-        await rpc.education.scholarshipRecipients.selectNames.get()
+        await rpc.education.scholarship.recipients.selectNames.get()
       if (error) throw error
       return data
     },

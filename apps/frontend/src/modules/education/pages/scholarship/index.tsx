@@ -9,8 +9,6 @@ import useGetScholarship from './hooks/use-get-scholarship'
 export default function ScholarshipPage() {
   const isMobile = useIsMobile()
   const { data: scholarships, isLoading, isError } = useGetScholarship()
-  console.log(scholarships)
-  // const displayScholarships = scholarships
 
   return (
     <div className="flex flex-1 flex-col gap-6 p-4">
@@ -31,7 +29,7 @@ export default function ScholarshipPage() {
         {/* lista de becas en formato desktop y mobile(priori) */}
         {isLoading && (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {[1, 2, 3].map((i) => (
+            {Array.from({ length: 6 }).map((_, i) => (
               <Card key={i}>
                 <CardContent className="pt-6 space-y-4">
                   <Skeleton className="h-6" />

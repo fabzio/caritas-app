@@ -17,7 +17,7 @@ export const useScholarshipRecipients = ({
   return useQuery({
     queryKey: [QueryKeys.EDUCATION.SCHOLARSHIP_RECIPIENTS, filters],
     queryFn: async () => {
-      const { data, error } = await rpc.education.scholarshipRecipients.get({
+      const { data, error } = await rpc.education.scholarship.recipients.get({
         query: {
           q: filters?.q || '',
           page: Math.max(0, (currentPage || 1) - 1),

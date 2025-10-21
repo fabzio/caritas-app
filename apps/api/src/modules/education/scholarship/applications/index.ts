@@ -1,5 +1,5 @@
+import betterAuth from '@api/modules/auth/middleware'
 import Elysia, { t } from 'elysia'
-import betterAuth from '@/modules/auth/middleware'
 import { ScholarshipApplicationModel } from './model'
 import {
   acceptAllScholarshipApplications,
@@ -12,7 +12,7 @@ import {
 
 const scholarshipApplication = new Elysia({
   name: 'scholarship-application',
-  prefix: '/scholarship-application',
+  prefix: '/application',
 })
   .use(betterAuth)
   .get('', getScholarshipApplications, {
@@ -23,12 +23,12 @@ const scholarshipApplication = new Elysia({
     },
   })
   .get(
-    '/:scholarship_id',
+    '/:scholarshipId',
     ({ params }) =>
-      getApplicantsByScholarshipId({ scholarship_id: params.scholarship_id }),
+      getApplicantsByScholarshipId({ scholarshipId: params.scholarshipId }),
     {
       auth: true,
-      params: t.Object({ scholarship_id: t.String() }),
+      params: t.Object({ scholarshipId: t.String() }),
       response: {
         200: ScholarshipApplicationModel.getApplicantsByScholarshipId,
         401: t.Literal('Unauthorized'),
@@ -46,15 +46,8 @@ const scholarshipApplication = new Elysia({
     },
   })
   .patch(
-    '/:scholarship_id/accept',
-    (context) => {
-      type AcceptContext = {
-        params: { scholarship_id: string }
-        body: { comments?: string }
-        session?: { userId?: string }
-        user?: { id?: string }
-      }
-      const ctx = context as unknown as AcceptContext
+    '/:scholarshipId/accept',
+    ({ body }) => {
       const args: ScholarshipApplicationModel.AcceptScholarshipApplication = {
         scholarship_id: Number(ctx.params.scholarship_id),
         userId: ctx.session?.userId ?? ctx.user?.id ?? '',
@@ -64,6 +57,7 @@ const scholarshipApplication = new Elysia({
     },
     {
       auth: true,
+      params: t.Object({ scholarshipId: t.String() }),
       response: {
         200: t.Number({
           description: 'ID of the accepted scholarship application',
@@ -74,13 +68,7 @@ const scholarshipApplication = new Elysia({
   )
   .patch(
     '/accept-batch',
-    (context) => {
-      type AcceptBatchContext = {
-        body: { ids: number[]; comments?: string }
-        session?: { userId?: string }
-        user?: { id?: string }
-      }
-      const ctx = context as unknown as AcceptBatchContext
+    ({ body }) => {
       const args = {
         ids: ctx.body.ids,
         userId: ctx.session?.userId ?? ctx.user?.id ?? '',
@@ -98,25 +86,17 @@ const scholarshipApplication = new Elysia({
     },
   )
   .patch(
-    '/:scholarship_id/accept-all',
-    (context) => {
-      type AcceptAllContext = {
-        params: { scholarship_id: string }
-        body: { comments?: string }
-        session?: { userId?: string }
-        user?: { id?: string }
-      }
-      const ctx = context as unknown as AcceptAllContext
-      const args = {
-        scholarshipId: Number(ctx.params.scholarship_id),
-        userId: ctx.session?.userId ?? ctx.user?.id ?? '',
-        comments: ctx.body.comments,
-      }
-      return acceptAllScholarshipApplications(args)
+    '/:scholarshipId/accept-all',
+    ({ body: { comments, scholarshipId, userId } }) => {
+      return acceptAllScholarshipApplications({
+        scholarshipId,
+        userId,
+        comments,
+      })
     },
     {
       auth: true,
-      params: t.Object({ scholarship_id: t.String() }),
+      params: t.Object({ scholarshipId: t.String() }),
       body: ScholarshipApplicationModel.acceptAllByScholarship,
       response: {
         200: t.Array(t.Number({ description: 'IDs of accepted applications' })),

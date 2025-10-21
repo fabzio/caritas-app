@@ -1,7 +1,9 @@
+import { ScholarshipCard } from '@frontend/modules/user/components/scolarship-card'
+import useGetScholarship from '@frontend/modules/user/hooks/use-get-scholarship'
 import { Button } from '@workspace/ui/components/button'
 import { Card, CardContent } from '@workspace/ui/components/card'
 import { Input } from '@workspace/ui/components/input'
-// import { Link } from '@tanstack/react-router'
+
 import {
   Pagination,
   PaginationContent,
@@ -13,8 +15,7 @@ import {
 import { Skeleton } from '@workspace/ui/components/skeleton'
 import { Filter, Search } from 'lucide-react'
 import { useState } from 'react'
-import { ScholarshipCard } from '../../../components/scolarship-card'
-import useGetScholarship from '../../../hooks/use-get-scholarship'
+
 export default function ScholarshipPage() {
   const [nameFilter, setNameFilter] = useState('')
   const [currentPage, setCurrentPage] = useState(1)

@@ -1,7 +1,7 @@
+import db from '@api/db'
+import { PostgresError } from '@api/db/errors'
+import { scholarshipApplication } from '@api/db/schemas/education'
 import { eq, inArray } from 'drizzle-orm'
-import db from '@/db'
-import { PostgresError } from '@/db/errors'
-import { scholarshipApplication } from '@/db/schemas/education'
 import type { ScholarshipApplicationModel } from './model'
 
 export const createScholarshipApplication = async (
@@ -74,20 +74,17 @@ export const getScholarshipApplications =
   }
 
 export const getApplicantsByScholarshipId = async (args: {
-  scholarship_id: string
+  scholarshipId: string
 }): Promise<ScholarshipApplicationModel.GetApplicantsByScholarshipId> => {
   try {
     const response = await db.query.scholarshipApplication.findMany({
-      where: (app, { eq }) =>
-        eq(app.scholarshipId, Number(args.scholarship_id)),
+      where: (app, { eq }) => eq(app.scholarshipId, Number(args.scholarshipId)),
       with: {
         user: true,
       },
     })
     return response.map((app) => {
-      const user = app.user as
-        | { name: string; surname: string; email: string }
-        | undefined
+      const user = app.user
       return {
         id: app.id,
         userName: user ? `${user.name} ${user.surname}` : '',

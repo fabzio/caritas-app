@@ -1,5 +1,6 @@
+import ViewScholarship from '@frontend/modules/education/pages/scholarship/pages/view-scholarship'
 import { createFileRoute } from '@tanstack/react-router'
-import ViewScholarship from '@/modules/education/pages/scholarship/view'
+
 
 export const Route = createFileRoute(
   '/_authenticated/education/scholarship/$scholarshipId/view',

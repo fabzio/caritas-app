@@ -1,6 +1,8 @@
 import betterAuth from '@api/modules/auth'
 import Elysia, { t } from 'elysia'
+import scholarshipApplication from './applications'
 import { ScholarshipModel } from './model'
+import scholarshipRecipients from './recipients'
 import { createScholarship, getScholarships } from './service'
 
 const scholarship = new Elysia({
@@ -8,8 +10,9 @@ const scholarship = new Elysia({
   prefix: '/scholarship',
 })
   .use(betterAuth)
+  .use(scholarshipApplication)
+  .use(scholarshipRecipients)
   .get('', ({ query }) => getScholarships(query), {
-    // listado de becas con filtrado por nombre
     auth: true,
     query: t.Object({
       name: t.Optional(t.String()),
@@ -17,7 +20,7 @@ const scholarship = new Elysia({
       pageSize: t.Optional(t.Numeric({ minimum: 1, maximum: 20, default: 10 })),
     }),
     response: {
-      200: ScholarshipModel.paginated, // con el esquema de paginación
+      200: ScholarshipModel.paginated,
       401: t.Literal('Unauthorized'),
     },
   })

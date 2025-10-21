@@ -1,7 +1,7 @@
+import { PostgresError } from '@api/db/errors'
+import { scholarshipApplication } from '@api/db/schemas/education'
 import { createInsertSchema, createSelectSchema } from 'drizzle-typebox'
 import { t } from 'elysia'
-import { PostgresError } from '@/db/errors'
-import { scholarshipApplication } from '@/db/schemas/education'
 
 export namespace ScholarshipApplicationModel {
   const _createScholarshipApplication = createInsertSchema(
@@ -68,6 +68,8 @@ export namespace ScholarshipApplicationModel {
   export type AcceptApplicationsBatch = typeof acceptApplicationsBatch.static
 
   export const acceptAllByScholarship = t.Object({
+    scholarshipId: t.Number(),
+    userId: t.String(),
     comments: t.Optional(t.String()),
   })
   export type AcceptAllByScholarship = typeof acceptAllByScholarship.static
