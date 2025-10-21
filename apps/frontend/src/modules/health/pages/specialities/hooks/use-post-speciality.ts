@@ -23,7 +23,7 @@ const usePostSpeciality = () => {
       queryClient.invalidateQueries({
         queryKey: [QueryKeys.HEALTH.SPECIALITIES],
       })
-      toast.success('Especialidad modificada exitosamente')
+      toast.success('Especialidad creada exitosamente')
       navigate({ to: '/health/specialities' })
     },
     onError: (error: Error) => {

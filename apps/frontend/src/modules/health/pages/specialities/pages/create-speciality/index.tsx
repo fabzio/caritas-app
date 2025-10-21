@@ -71,7 +71,7 @@ export default function FormView() {
     }
   })
 
-  const editLabel = viewType === 'edit' ? 'Guardar Cambios' : 'Registrar'
+  const submitLabel = viewType === 'edit' ? 'Guardar Cambios' : 'Registrar'
 
   return (
     <div className="flex flex-1 flex-col gap-6 p-4">
@@ -129,7 +129,7 @@ export default function FormView() {
                       {isCreating || isUpdating ? (
                         <Loader2 className="animate-spin w-2" />
                       ) : (
-                        editLabel
+                        submitLabel
                       )}
                     </Button>
                   </CardFooter>

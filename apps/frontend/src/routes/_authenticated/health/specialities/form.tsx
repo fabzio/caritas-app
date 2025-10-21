@@ -1,5 +1,5 @@
 import rpc from '@frontend/lib/rpc'
-import FormView from '@frontend/modules/health/pages/specialities/pages/create_speciality'
+import FormView from '@frontend/modules/health/pages/specialities/pages/create-speciality'
 import { QueryKeys } from '@frontend/shared/constants/query-keys'
 import { createFileRoute } from '@tanstack/react-router'
 import { z } from 'zod'
