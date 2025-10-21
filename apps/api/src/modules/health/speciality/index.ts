@@ -3,6 +3,7 @@ import Elysia, { status, t } from 'elysia'
 import { SpecialityModel } from './model'
 import {
   createSpeciality,
+  findDuplicateSpeciality,
   getSingleSpeciality,
   getSpecialities,
   updateSpeciality,
@@ -24,7 +25,7 @@ const speciality = new Elysia({
     '/:id',
     async ({ params }) => {
       const res = await getSingleSpeciality(Number(params.id))
-      if (!res) throw status(404, 'Speciality not found')
+      if (!res) throw status(404, 'No se encontró la especialidad')
       return res
     },
     {
@@ -32,25 +33,43 @@ const speciality = new Elysia({
       params: SpecialityModel.getSingleSpecialityQuery,
       response: {
         200: SpecialityModel.getSingleSpecialityResponse,
-        404: t.Literal('Speciality not found'),
+        404: t.String(),
       },
     },
   )
-  .post('', ({ body }) => createSpeciality(body), {
-    auth: true,
-    body: SpecialityModel.createSpeciality,
-    response: {
-      200: t.Number({
-        description: 'ID of the created speciality',
-      }),
-      401: t.Literal('Unauthorized'),
+  .post(
+    '',
+    async ({ body }) => {
+      const duplicate = await findDuplicateSpeciality(body.name)
+      if (duplicate)
+        throw status(400, `La especialidad "${duplicate.name}" ya existe`)
+
+      return createSpeciality(body)
     },
-  })
+    {
+      auth: true,
+      body: SpecialityModel.createSpeciality,
+      response: {
+        200: t.Number({
+          description: 'ID de la especialidad creada',
+        }),
+        400: t.String(),
+      },
+    },
+  )
   .patch(
     '/:id',
     async ({ params, body }) => {
-      const updated = await updateSpeciality(Number(params.id), body)
-      if (!updated) throw status(404, 'Speciality not found')
+      const id = Number(params.id)
+
+      const existing = await getSingleSpeciality(id)
+      if (!existing) throw status(404, 'No se encontró la especialidad')
+
+      const duplicate = await findDuplicateSpeciality(body.name, id)
+      if (duplicate)
+        throw status(400, `La especialidad "${duplicate.name}" ya existe`)
+
+      const updated = await updateSpeciality(id, body)
       return updated
     },
     {
@@ -59,7 +78,8 @@ const speciality = new Elysia({
       body: SpecialityModel.updateSpeciality,
       response: {
         200: SpecialityModel.getSingleSpecialityResponse,
-        404: t.Literal('Speciality not found'),
+        400: t.String(),
+        404: t.String(),
       },
     },
   )

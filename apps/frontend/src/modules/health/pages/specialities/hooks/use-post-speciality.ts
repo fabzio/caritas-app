@@ -1,20 +1,33 @@
 import rpc from '@frontend/lib/rpc'
-import { useMutation } from '@tanstack/react-query'
+import { QueryKeys } from '@frontend/shared/constants/query-keys'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
+import { toast } from 'sonner'
+
+interface PostSpecialityProps {
+  name: string
+}
 
 const usePostSpeciality = () => {
-  const navigate = useNavigate({ from: '/health/specialities/form' })
+  const navigate = useNavigate()
+  const queryClient = useQueryClient()
+
   return useMutation({
-    mutationFn: async (params: { name: string }) => {
-      const res = await rpc.health.speciality.post(params)
-      if (res.error) throw res.error
-      return res.data
-    },
-    onError: (error) => {
-      console.error(error)
+    mutationFn: async (props: PostSpecialityProps) => {
+      const { data, error } = await rpc.health.speciality.post(props)
+
+      if (error) throw error
+      return data
     },
     onSuccess: (_) => {
+      queryClient.invalidateQueries({
+        queryKey: [QueryKeys.HEALTH.SPECIALITIES],
+      })
+      toast.success('Especialidad modificada exitosamente')
       navigate({ to: '/health/specialities' })
+    },
+    onError: (error: Error) => {
+      toast.error(error.message)
     },
   })
 }

@@ -8,6 +8,7 @@ import {
   primaryKey,
   text,
   timestamp,
+  unique,
   varchar,
 } from 'drizzle-orm/pg-core'
 import { organization, user } from './auth'
@@ -120,7 +121,11 @@ export const alliedParticipation = healthSchema.table('allied_participation', {
     .references(() => speciality.id, { onDelete: 'cascade' }),
 })
 
-export const speciality = healthSchema.table('speciality', {
-  id: integer().primaryKey().generatedByDefaultAsIdentity(),
-  name: varchar('name', { length: 100 }).notNull(),
-})
+export const speciality = healthSchema.table(
+  'speciality',
+  {
+    id: integer().primaryKey().generatedByDefaultAsIdentity(),
+    name: varchar('name', { length: 100 }).notNull(),
+  },
+  (table) => [unique('unique_speciality_name').on(table.name)],
+)

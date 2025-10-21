@@ -1,7 +1,8 @@
 import db from '@api/db'
 import { PostgresError } from '@api/db/errors'
 import { speciality } from '@api/db/schemas/health'
-import { asc, count, desc, eq, ilike } from 'drizzle-orm'
+import { normalizeText } from '@api/utils/normalize-text'
+import { asc, desc, eq } from 'drizzle-orm'
 import type { SpecialityModel } from './model'
 
 export async function getSpecialities(
@@ -21,27 +22,25 @@ export async function getSpecialities(
   const column = columns[sortField as keyof typeof columns] ?? speciality.name
   const orderExpr = sortOrder === 'desc' ? desc(column) : asc(column)
 
-  const searchCondition = q ? ilike(speciality.name, `%${q}%`) : undefined
-
-  // Get total count
-  const [{ total }] = await db
-    .select({ total: count() })
+  const allRows = await db
+    .select({ speciality })
     .from(speciality)
-    .where(searchCondition)
-
-  // Get paginated data
-  const rows = await db
-    .select({ speciality: speciality })
-    .from(speciality)
-    .where(searchCondition)
-    .offset(page * limit)
-    .limit(limit)
     .orderBy(orderExpr)
 
+  const normalizedQ = normalizeText(q)
+  const filteredRows = normalizedQ
+    ? allRows.filter(({ speciality: s }) =>
+        normalizeText(s.name).includes(normalizedQ),
+      )
+    : allRows
+
+  const total = filteredRows.length
+  const start = page * limit
+  const paginated = filteredRows.slice(start, start + limit)
   const totalPages = Math.ceil(total / limit)
 
   return {
-    data: rows.map((r) => r.speciality),
+    data: paginated.map((r) => r.speciality),
     total,
     page,
     limit,
@@ -87,4 +86,17 @@ export const updateSpeciality = async (
     if (e instanceof Error) throw new PostgresError(e.message)
     throw e
   }
+}
+
+export async function findDuplicateSpeciality(
+  name: string,
+  excludeId?: number,
+) {
+  const { data: coincidences } = await getSpecialities({ q: name })
+
+  if (!coincidences?.length) return null
+
+  const excluded = coincidences.find((s) => s.id !== excludeId)
+
+  return excluded || null
 }
