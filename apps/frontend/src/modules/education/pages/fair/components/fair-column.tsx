@@ -1,3 +1,4 @@
+import { Link } from '@tanstack/react-router'
 import type { ColumnDef } from '@tanstack/react-table'
 import { Button } from '@workspace/ui/components/button'
 import { Checkbox } from '@workspace/ui/components/checkbox'
@@ -90,7 +91,9 @@ export const fairTableColumns: ColumnDef<Fair>[] = [
   {
     id: 'actions',
     header: 'Acciones',
-    cell: () => {
+    cell: ({ row }) => {
+      const getIsSelected = row.getIsSelected()
+      const fairId = row.original.id
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -100,11 +103,20 @@ export const fairTableColumns: ColumnDef<Fair>[] = [
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem disabled>
-              <Pencil className="mr-2 h-4 w-4" />
-              Editar
+            <DropdownMenuItem disabled={!getIsSelected}>
+              <Link
+                to="/education/fair/form"
+                className="flex w-full"
+                search={{ id: fairId, type: 'edit' }}
+              >
+                <Pencil className="mr-2 h-4 w-4" />
+                Editar
+              </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem className="text-destructive" disabled>
+            <DropdownMenuItem
+              className="text-destructive"
+              disabled={!getIsSelected}
+            >
               <Trash2 className="mr-2 h-4 w-4" />
               Eliminar
             </DropdownMenuItem>
