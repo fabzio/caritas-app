@@ -1,4 +1,4 @@
-import { Link } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
 import { Button } from '@workspace/ui/components/button'
 import {
   Dialog,
@@ -18,6 +18,7 @@ import { useActivityTable } from './hooks/use-activity-table'
 import { useDeleteActivities } from './hooks/use-delete-activities'
 
 export default function ActivityPage() {
+  const navigate = useNavigate()
   const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({})
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
 
@@ -47,6 +48,13 @@ export default function ActivityPage() {
     })
   }
 
+  const handleEdit = () => {
+    if (activityCount === 1) {
+      const activityId = selectedActivities[0].id
+      navigate({ to: `/health/activities/edit/${activityId}` })
+    }
+  }
+
   return (
     <div className="w-full p-4">
       <header className="mb-6">
@@ -67,7 +75,7 @@ export default function ActivityPage() {
         <div className="flex items-center gap-2">
           <ActionsButton
             onDeleteClick={() => setIsDeleteModalOpen(true)}
-            onEditClick={() => {}}
+            onEditClick={handleEdit}
             selectedCount={activityCount}
           />
           <Link to="/health/activities/form">

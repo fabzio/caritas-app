@@ -13,6 +13,8 @@ import {
   createCompleteActivity,
   deleteActivities,
   getActivities,
+  getActivityById,
+  updateCompleteActivity,
 } from './service'
 
 const activityModule = new Elysia({
@@ -81,6 +83,82 @@ const activityModule = new Elysia({
       401: t.Literal('Unauthorized'),
     },
   })
+  // Endpoint para OBTENER una actividad por ID (GET)
+  .get(
+    '/:id',
+    async ({ params, set }) => {
+      try {
+        const id = Number(params.id)
+        if (Number.isNaN(id)) {
+          set.status = 400
+          return { error: 'ID inválido' }
+        }
+        return await getActivityById(id)
+      } catch (error) {
+        if (error instanceof Error) {
+          set.status = 404
+          return { error: error.message }
+        }
+        throw error
+      }
+    },
+    {
+      auth: true,
+      response: {
+        200: t.Object({
+          id: t.Number(),
+          name: t.String(),
+          date: t.String(),
+          duration: t.String(),
+          spaceId: t.String(),
+          typeId: t.Number(),
+          statusId: t.Number(),
+          userId: t.String(),
+          state: t.Boolean(),
+          participants: t.Array(
+            t.Object({
+              alliedId: t.String(),
+              specialityIds: t.Array(t.Number()),
+            }),
+          ),
+        }),
+        400: t.Object({ error: t.String() }),
+        404: t.Object({ error: t.String() }),
+        401: t.Literal('Unauthorized'),
+      },
+    },
+  )
+  // Endpoint para ACTUALIZAR una actividad completa (PUT)
+  .put(
+    '/:id/complete',
+    async ({ params, body, set }) => {
+      try {
+        const id = Number(params.id)
+        if (Number.isNaN(id)) {
+          set.status = 400
+          return { error: 'ID inválido' }
+        }
+        const result = await updateCompleteActivity(id, body)
+        set.status = 200
+        return result
+      } catch (error) {
+        if (error instanceof Error) {
+          set.status = 400
+          return { error: error.message }
+        }
+        throw error
+      }
+    },
+    {
+      auth: true,
+      body: ActivityModel.createCompleteActivity,
+      response: {
+        200: t.Object({ id: t.Number() }),
+        400: t.Object({ error: t.String() }),
+        401: t.Literal('Unauthorized'),
+      },
+    },
+  )
   // Endpoint para ELIMINAR actividades (DELETE) - Eliminación lógica
   .delete(
     '',

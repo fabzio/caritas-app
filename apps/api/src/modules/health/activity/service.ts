@@ -237,3 +237,158 @@ export const createCompleteActivity = async (
     throw error
   }
 }
+
+export const getActivityById = async (id: number) => {
+  try {
+    console.log('[getActivityById] Buscando actividad id:', id)
+
+    const allActivities = await db
+      .select({ id: activity.id, name: activity.name, state: activity.state })
+      .from(activity)
+      .where(eq(activity.id, id))
+
+    console.log(
+      '[getActivityById] Todas las actividades con ese id:',
+      allActivities,
+    )
+
+    const [activityData] = await db
+      .select({
+        id: activity.id,
+        name: activity.name,
+        date: activity.date,
+        duration: activity.duration,
+        spaceId: activity.spaceId,
+        typeId: activity.typeId,
+        statusId: activity.statusId,
+        userId: activity.userId,
+        state: activity.state,
+      })
+      .from(activity)
+      .where(and(eq(activity.id, id), eq(activity.state, true)))
+
+    console.log('[getActivityById] Actividad encontrada:', activityData)
+
+    if (!activityData) {
+      throw new Error('Actividad no encontrada')
+    }
+
+    const participations = await db
+      .select({
+        alliedId: alliedParticipation.alliedId,
+        specialityId: alliedParticipation.specialityId,
+      })
+      .from(alliedParticipation)
+      .where(eq(alliedParticipation.activityId, id))
+
+    console.log(
+      '[getActivityById] Participaciones encontradas:',
+      participations,
+    )
+
+    const participantsMap = new Map<
+      string,
+      { alliedId: string; specialityIds: number[] }
+    >()
+
+    for (const p of participations) {
+      if (!participantsMap.has(p.alliedId)) {
+        participantsMap.set(p.alliedId, {
+          alliedId: p.alliedId,
+          specialityIds: [],
+        })
+      }
+      const participant = participantsMap.get(p.alliedId)
+      if (participant) {
+        participant.specialityIds.push(p.specialityId)
+      }
+    }
+
+    const result = {
+      ...activityData,
+      date:
+        activityData.date instanceof Date
+          ? activityData.date.toISOString().split('T')[0]
+          : activityData.date,
+      participants: Array.from(participantsMap.values()),
+    }
+
+    console.log(
+      '[getActivityById] Resultado final:',
+      JSON.stringify(result, null, 2),
+    )
+
+    return result
+  } catch (error) {
+    if (error instanceof Error) throw new PostgresError(error.message)
+    throw error
+  }
+}
+
+export const updateCompleteActivity = async (
+  id: number,
+  args: ActivityModel.CreateCompleteActivity,
+) => {
+  try {
+    const { participants, ...activityData } = args
+
+    const alliedIds = [...new Set(participants.map((p) => p.alliedId))]
+    const allSpecialityIds = [
+      ...new Set(participants.flatMap((p) => p.specialityIds)),
+    ]
+
+    const [allies, specialities] = await Promise.all([
+      db
+        .select({ id: organization.id })
+        .from(organization)
+        .where(or(...alliedIds.map((aid) => eq(organization.id, aid)))),
+      db
+        .select({ id: speciality.id })
+        .from(speciality)
+        .where(or(...allSpecialityIds.map((sid) => eq(speciality.id, sid)))),
+    ])
+
+    if (allies.length !== alliedIds.length) {
+      throw new Error('Algunos aliados no existen')
+    }
+
+    if (specialities.length !== allSpecialityIds.length) {
+      throw new Error('Algunas especialidades no existen')
+    }
+
+    await db.transaction(async (tx) => {
+      await tx
+        .update(activity)
+        .set({
+          name: activityData.name,
+          date: activityData.date.toISOString().split('T')[0],
+          duration: activityData.duration,
+          spaceId: activityData.spaceId,
+          statusId: activityData.statusId,
+          typeId: activityData.typeId,
+          userId: activityData.userId,
+          updatedAt: new Date(),
+        })
+        .where(eq(activity.id, id))
+
+      await tx
+        .delete(alliedParticipation)
+        .where(eq(alliedParticipation.activityId, id))
+
+      const participationRecords = participants.flatMap((participant) =>
+        participant.specialityIds.map((specialityId) => ({
+          activityId: id,
+          alliedId: participant.alliedId,
+          specialityId,
+        })),
+      )
+
+      await tx.insert(alliedParticipation).values(participationRecords)
+    })
+
+    return { id }
+  } catch (error) {
+    if (error instanceof Error) throw new PostgresError(error.message)
+    throw error
+  }
+}
