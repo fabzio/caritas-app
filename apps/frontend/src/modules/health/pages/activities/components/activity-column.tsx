@@ -2,6 +2,7 @@
 import type { ActivityModel } from '@api/modules/health/activity/model'
 import type { ColumnDef } from '@tanstack/react-table'
 import { Button } from '@workspace/ui/components/button' // Componente de UI
+import { Checkbox } from '@workspace/ui/components/checkbox' // Componente Checkbox
 import { ArrowUpDown } from 'lucide-react' // Icono de ordenamiento
 import { useMemo } from 'react'
 
@@ -9,6 +10,29 @@ import { useMemo } from 'react'
 type Activity = ActivityModel.GetActivities['data'][number]
 
 const activityTableColumns: ColumnDef<Activity>[] = [
+  {
+    // Columna de selección
+    id: 'select',
+    header: ({ table }) => (
+      <Checkbox
+        checked={
+          table.getIsAllPageRowsSelected() ||
+          (table.getIsSomePageRowsSelected() && 'indeterminate')
+        }
+        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+        aria-label="Seleccionar todos"
+      />
+    ),
+    cell: ({ row }) => (
+      <Checkbox
+        checked={row.getIsSelected()}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        aria-label="Seleccionar fila"
+      />
+    ),
+    enableSorting: false,
+    enableHiding: false,
+  },
   {
     // Columna 1: Nombre de la Actividad
     accessorKey: 'name', // Debe coincidir con el campo de la API para ordenar (e.g., 'name')

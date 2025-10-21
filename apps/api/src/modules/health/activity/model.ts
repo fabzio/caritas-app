@@ -43,6 +43,42 @@ export namespace ActivityModel {
   export type GetActivities = typeof getActivitiesResponse.static // Nuevo tipo de retorno
 
   // 4. ESQUEMA DE CREACIÓN
-  export const createActivity = t.Omit(_createActivity, ['id'])
+  export const createActivity = t.Object({
+    name: t.String({ minLength: 1, maxLength: 100 }),
+    date: t.Date(),
+    duration: t.String(), // interval se envía como string, ejemplo: '2 hours'
+    spaceId: t.String({ minLength: 32, maxLength: 32 }), // UUID/ref a organization
+    statusId: t.Integer({ minimum: 1, maximum: 6 }), // 1-6 según activity_status
+    typeId: t.Integer({ minimum: 1, maximum: 2 }), // 1-2 según activity_type
+    userId: t.String({ minLength: 32, maxLength: 32 }), // UUID del creador
+  })
   export type CreateActivity = typeof createActivity.static
+
+  // 5. ESQUEMA DE ELIMINACIÓN (Lógica)
+  export const deleteActivities = t.Object({
+    ids: t.Array(t.Integer({ minimum: 1 }), { minItems: 1 }), // Array de IDs a eliminar
+  })
+  export type DeleteActivities = typeof deleteActivities.static
+
+  // 6. ESQUEMA DE CREACIÓN COMPLETA (Actividad + Participantes)
+  export const createCompleteActivity = t.Object({
+    // Datos de la actividad
+    name: t.String({ minLength: 1, maxLength: 100 }),
+    date: t.Date(),
+    duration: t.String(),
+    description: t.Optional(t.String({ maxLength: 500 })),
+    spaceId: t.String({ minLength: 32, maxLength: 32 }),
+    statusId: t.Integer({ minimum: 1, maximum: 6 }),
+    typeId: t.Integer({ minimum: 1, maximum: 2 }),
+    userId: t.String({ minLength: 32, maxLength: 32 }),
+    // Participantes (aliados con especialidades)
+    participants: t.Array(
+      t.Object({
+        alliedId: t.String({ minLength: 32, maxLength: 32 }), // ID del aliado (organization)
+        specialityIds: t.Array(t.Integer({ minimum: 1 }), { minItems: 1 }), // IDs de especialidades
+      }),
+      { minItems: 1 },
+    ),
+  })
+  export type CreateCompleteActivity = typeof createCompleteActivity.static
 }
