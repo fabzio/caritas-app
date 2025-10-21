@@ -7,7 +7,6 @@ import { toast } from 'sonner'
 
 export const useUpdateScholarship = () => {
   const navigate = useNavigate()
-  const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: async (params: {

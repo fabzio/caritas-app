@@ -90,3 +90,48 @@ export async function getFairs(
     throw e
   }
 }
+export const getSingleFair = async ({ id }: { id: number }) => {
+  try {
+    const response = await db.query.fairs.findFirst({
+      where: (fairs, { eq }) => eq(fairs.id, id),
+    })
+
+    if (!response) return null
+
+    return {
+      ...response,
+      date: response.date?.toString(),
+    }
+  } catch (e) {
+    if (e instanceof Error) throw new PostgresError(e.message)
+    throw e
+  }
+}
+export const createFair = async (args: FairModel.CreateFair) => {
+  try {
+    const [{ id }] = await db.transaction(async (tx) => {
+      return await tx.insert(fairs).values(args).returning({
+        id: fairs.id,
+      })
+    })
+    return id
+  } catch (e) {
+    if (e instanceof Error) throw new PostgresError(e.message)
+    throw e
+  }
+}
+export const patchFair = async (id: number, args: FairModel.UpdateFair) => {
+  try {
+    const response = await db
+      .update(fairs)
+      .set({
+        ...args,
+      })
+      .where(eq(fairs.id, id))
+      .returning({ id: fairs.id })
+    return response.length
+  } catch (e) {
+    if (e instanceof Error) throw new PostgresError(e.message)
+    throw e
+  }
+}

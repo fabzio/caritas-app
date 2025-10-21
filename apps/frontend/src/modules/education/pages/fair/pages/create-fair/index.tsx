@@ -1,6 +1,7 @@
 import { useRegions } from '@frontend/hooks/use-regions'
+import { useSession } from '@frontend/hooks/use-session'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Link } from '@tanstack/react-router'
+import { getRouteApi, Link, useSearch } from '@tanstack/react-router'
 import { Button } from '@workspace/ui/components/button'
 import { Calendar } from '@workspace/ui/components/calendar'
 import {
@@ -33,42 +34,66 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@workspace/ui/components/popover'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@workspace/ui/components/select'
 import { Separator } from '@workspace/ui/components/separator'
 import { cn } from '@workspace/ui/lib/utils'
 import { format } from 'date-fns'
 import { CalendarIcon, Check, ChevronsUpDown, Loader2 } from 'lucide-react'
 import { useForm } from 'react-hook-form'
+import usePostFair from './hooks/use-post-fair'
+import { useUpdateFairs } from './hooks/use-update-fairs'
 import { type FormFairSchema, formFairSchema } from './utils/fair'
 
 export default function CreateFairPage() {
+  const viewType = useSearch({
+    from: '/_authenticated/education/fair/form',
+    select: (s) => s.type,
+  })
+  const loaderData = getRouteApi(
+    '/_authenticated/education/fair/form',
+  ).useLoaderData()
+
   const form = useForm<FormFairSchema>({
     resolver: zodResolver(formFairSchema),
-    defaultValues: {
-      name: '',
-      date: undefined,
-      location: '',
-      startTime: '08:30:00',
-      endTime: '08:30:00',
-      regionId: undefined,
-    },
+    defaultValues:
+      viewType === 'edit' && loaderData
+        ? {
+            title: loaderData.title,
+            date: loaderData.date ? new Date(loaderData.date) : undefined,
+            address: loaderData.address,
+            startTime: loaderData.startTime,
+            endTime: loaderData.endTime,
+            regionId: loaderData.regionId,
+          }
+        : {
+            title: '',
+            date: undefined,
+            address: '',
+            startTime: '08:30:00',
+            endTime: '08:30:00',
+            regionId: undefined,
+          },
   })
   const today = new Date()
   const { data: districts, isLoading } = useRegions()
-  const isPending = false // por ahora
-  const handleSubmit = form.handleSubmit(() => {})
+  const { mutate: createFair, isPending: isPendingCreate } = usePostFair()
+  const { mutate: updateFair, isPending: isPendingUpdate } = useUpdateFairs()
+  const { data: user } = useSession()
+  const handleSubmit = form.handleSubmit((data) => {
+    if (!user) return
+    if (viewType === 'edit' && loaderData?.id) {
+      const params = { ...data, id: loaderData.id }
+      updateFair(params)
+    } else {
+      const params = { ...data, createdBy: user.user.id, active: true }
+      createFair(params)
+    }
+  })
 
   return (
     <div className="flex flex-1 flex-col gap-6 p-4">
       <div className="flex flex-col gap-1">
         <h1 className="text-2xl font-semibold text-foreground">
-          Registrar nueva Feria Vocacional
+          {dependantText.mainTitle[viewType]}
         </h1>
         <span className="text-muted-foreground">
           Complete la información de la feria vocacional
@@ -89,7 +114,7 @@ export default function CreateFairPage() {
                 <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
                   <FormField
                     control={form.control}
-                    name="name"
+                    name="title"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Nombre de la feria vocacional*</FormLabel>
@@ -170,7 +195,7 @@ export default function CreateFairPage() {
                   />
                   <FormField
                     control={form.control}
-                    name="location"
+                    name="address"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Dirección de la feria *</FormLabel>
@@ -256,11 +281,14 @@ export default function CreateFairPage() {
                         Cancelar
                       </Button>
                     </Link>
-                    <Button type="submit" disabled={isPending}>
-                      {isPending ? (
+                    <Button
+                      type="submit"
+                      disabled={isPendingCreate || isPendingUpdate}
+                    >
+                      {isPendingCreate || isPendingUpdate ? (
                         <Loader2 className="animate-spin w-2" />
                       ) : (
-                        'Registrar'
+                        dependantText.submit[viewType]
                       )}
                     </Button>
                   </CardFooter>
@@ -272,4 +300,14 @@ export default function CreateFairPage() {
       </div>
     </div>
   )
+}
+const dependantText = {
+  mainTitle: {
+    new: 'Crear nueva Feria Vocacional',
+    edit: 'Editar Feria Vocacional',
+  },
+  submit: {
+    new: 'Crear feria',
+    edit: 'Guardar Cambios',
+  },
 }
