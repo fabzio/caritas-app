@@ -101,11 +101,6 @@ export default function InvitationList({ status }: Readonly<Props>) {
                       <Badge variant="outline">
                         {roleLabels[invitation.role]}
                       </Badge>
-                      {invitation.teamId ? (
-                        <Badge variant="secondary">
-                          Equipo {invitation.teamId}
-                        </Badge>
-                      ) : null}
                     </div>
                   </CardContent>
                   <CardFooter className="flex items-center justify-between text-sm text-muted-foreground">

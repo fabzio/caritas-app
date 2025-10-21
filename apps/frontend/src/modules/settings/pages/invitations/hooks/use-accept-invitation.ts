@@ -17,6 +17,7 @@ export const useAcceptInvitation = () => {
       queryClient.invalidateQueries({
         queryKey: [QueryKeys.SETTINGS.INVITATIONS],
       })
+      queryClient.invalidateQueries({ queryKey: [QueryKeys.ACCESS] })
       toast.success('Invitación aceptada correctamente')
     },
     onError: (error: Error) => {

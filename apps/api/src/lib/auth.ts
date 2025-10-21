@@ -157,6 +157,26 @@ export const auth = betterAuth({
     openAPI(),
     passkey(),
     organization({
+      schema: {
+        organization: {
+          additionalFields: {
+            type: {
+              type: 'string',
+              input: true,
+              required: true,
+            },
+          },
+        },
+        team: {
+          additionalFields: {
+            role: {
+              type: 'string',
+              input: true,
+              required: false,
+            },
+          },
+        },
+      },
       ac,
       roles: {
         ...defaultRoles,
@@ -170,17 +190,6 @@ export const auth = betterAuth({
         enabled: true,
         defaultTeam: {
           enabled: false,
-        },
-      },
-      schema: {
-        organization: {
-          additionalFields: {
-            type: {
-              type: 'string',
-              input: true,
-              required: true,
-            },
-          },
         },
       },
       sendInvitationEmail: async ({
