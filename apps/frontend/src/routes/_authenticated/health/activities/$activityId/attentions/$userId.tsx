@@ -2,22 +2,14 @@ import rpc from '@frontend/lib/rpc'
 import AttentionsPage from '@frontend/modules/health/pages/activities/pages/attentions'
 import { QueryKeys } from '@frontend/shared/constants/query-keys'
 import { createFileRoute } from '@tanstack/react-router'
-import { z } from 'zod'
 
 export const Route = createFileRoute(
-  '/_authenticated/health/activities/attentions',
+  '/_authenticated/health/activities/$activityId/attentions/$userId',
 )({
-  loaderDeps: ({ search: { activityId, userId } }) => ({
-    activityId,
-    userId,
-  }),
   loader: async ({
     context: { queryClient },
-    deps: { activityId, userId },
+    params: { activityId, userId },
   }) => {
-    if (!activityId || !userId) return undefined
-
-    // Load activity data
     const activityData = await queryClient.ensureQueryData({
       queryKey: [QueryKeys.HEALTH.ACTIVITIES, activityId],
       queryFn: async () => {
@@ -31,7 +23,6 @@ export const Route = createFileRoute(
       },
     })
 
-    // Load participant data
     const participantData = await queryClient.ensureQueryData({
       queryKey: ['activity-participant', activityId, userId],
       queryFn: async () => {
@@ -52,9 +43,5 @@ export const Route = createFileRoute(
       participant: participantData,
     }
   },
-  validateSearch: z.object({
-    activityId: z.coerce.string(),
-    userId: z.string(),
-  }),
   component: AttentionsPage,
 })

@@ -4,24 +4,24 @@ import type { ReactNode } from 'react'
 import { vi } from 'vitest'
 import AttentionsPage from './index'
 
-const mockUseSearch = vi.fn()
+const mockUseParams = vi.fn()
 const mockUseLoaderData = vi.fn()
 const mockUseActivityParticipant = vi.fn()
 const mockUseUserAttentions = vi.fn()
 const mockUpdateActivityUser = vi.fn()
 
 vi.mock('@tanstack/react-router', () => ({
-  useSearch: (opts?: unknown) => mockUseSearch(opts),
+  useParams: (opts?: unknown) => mockUseParams(opts),
   Link: ({
     children,
     to,
-    search,
+    params,
   }: {
     children: ReactNode
     to: string
-    search?: Record<string, unknown>
+    params?: Record<string, unknown>
   }) => (
-    <a href={to} data-search={JSON.stringify(search)}>
+    <a href={to} data-params={JSON.stringify(params)}>
       {children}
     </a>
   ),
@@ -153,7 +153,7 @@ vi.mock('@workspace/ui/components/dialog', () => ({
 describe('AttentionsPage', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    mockUseSearch.mockReturnValue({ activityId: '1', userId: 'user-1' })
+    mockUseParams.mockReturnValue({ activityId: '1', userId: 'user-1' })
     mockUseLoaderData.mockReturnValue({
       activity: {
         id: 1,

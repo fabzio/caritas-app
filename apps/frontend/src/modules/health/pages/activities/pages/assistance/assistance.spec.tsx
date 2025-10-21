@@ -5,12 +5,12 @@ import { vi } from 'vitest'
 import AssistancePage from './index'
 
 const mockNavigate = vi.fn()
-const mockUseSearch = vi.fn()
+const mockUseParams = vi.fn()
 const mockUseLoaderData = vi.fn()
 const mockUseActivityParticipants = vi.fn()
 
 vi.mock('@tanstack/react-router', () => ({
-  useSearch: (opts?: unknown) => mockUseSearch(opts),
+  useParams: (opts?: unknown) => mockUseParams(opts),
   useNavigate: () => mockNavigate,
   Link: ({ children, to }: { children: ReactNode; to: string }) => (
     <a href={to}>{children}</a>
@@ -83,7 +83,7 @@ vi.mock('@workspace/ui/components/spinner', () => ({
 describe('AssistancePage', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    mockUseSearch.mockReturnValue({ id: '1' })
+    mockUseParams.mockReturnValue({ activityId: '1' })
     mockUseLoaderData.mockReturnValue({
       id: 1,
       name: 'Jornada de Salud',
@@ -269,8 +269,8 @@ describe('AssistancePage', () => {
 
       await waitFor(() => {
         expect(mockNavigate).toHaveBeenCalledWith({
-          to: '/health/activities/attentions',
-          search: {
+          to: '/health/activities/$activityId/attentions/$userId',
+          params: {
             activityId: '1',
             userId: 'user-1',
           },

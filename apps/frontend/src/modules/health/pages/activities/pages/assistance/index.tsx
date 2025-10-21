@@ -2,7 +2,7 @@ import {
   getRouteApi,
   Link,
   useNavigate,
-  useSearch,
+  useParams,
 } from '@tanstack/react-router'
 import { Button } from '@workspace/ui/components/button'
 import { Spinner } from '@workspace/ui/components/spinner'
@@ -15,26 +15,28 @@ import SearchAssistantInput from './components/search-assistant-input'
 import type { ActivityParticipant } from './hooks/use-activity-participants'
 import { useActivityParticipants } from './hooks/use-activity-participants'
 
-const routeApi = getRouteApi('/_authenticated/health/activities/assistance')
+const routeApi = getRouteApi(
+  '/_authenticated/health/activities/$activityId/assistance',
+)
 
 export default function AssistancePage() {
-  const { id } = useSearch({
-    from: '/_authenticated/health/activities/assistance',
+  const { activityId } = useParams({
+    from: '/_authenticated/health/activities/$activityId/assistance',
   })
   const loaderData = routeApi.useLoaderData()
   const [searchQuery, setSearchQuery] = useState('')
   const navigate = useNavigate()
 
   const { data: participants, isLoading } = useActivityParticipants({
-    activityId: id,
+    activityId,
     searchQuery,
   })
 
   const handleAssistantClick = (participant: ActivityParticipant) => {
     navigate({
-      to: '/health/activities/attentions',
-      search: {
-        activityId: id,
+      to: '/health/activities/$activityId/attentions/$userId',
+      params: {
+        activityId,
         userId: participant.id,
       },
     })

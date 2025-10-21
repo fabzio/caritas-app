@@ -1,4 +1,4 @@
-import { getRouteApi, Link, useSearch } from '@tanstack/react-router'
+import { getRouteApi, Link, useParams } from '@tanstack/react-router'
 import { Button } from '@workspace/ui/components/button'
 import {
   Dialog,
@@ -24,11 +24,13 @@ import {
   useUserAttentions,
 } from './hooks/use-user-attentions'
 
-const routeApi = getRouteApi('/_authenticated/health/activities/attentions')
+const routeApi = getRouteApi(
+  '/_authenticated/health/activities/$activityId/attentions/$userId',
+)
 
 export default function AttentionsPage() {
-  const { activityId, userId } = useSearch({
-    from: '/_authenticated/health/activities/attentions',
+  const { activityId, userId } = useParams({
+    from: '/_authenticated/health/activities/$activityId/attentions/$userId',
   })
   const loaderData = routeApi.useLoaderData()
   const [searchQuery, setSearchQuery] = useState('')
@@ -135,8 +137,8 @@ export default function AttentionsPage() {
 
           <div className="flex sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
             <Link
-              to="/health/activities/assistance"
-              search={{ id: activityId }}
+              to="/health/activities/$activityId/assistance"
+              params={{ activityId }}
             >
               <Button variant="outline">
                 <ArrowLeft className="h-4 w-4 mr-2" />
