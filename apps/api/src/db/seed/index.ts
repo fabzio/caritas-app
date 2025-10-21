@@ -275,7 +275,7 @@ const initialize = async (rl: Interface) => {
   const lastName = faker.person.lastName()
   const password = createPassword()
   const documentNumber = faker.helpers.replaceSymbols('#########')
-  const phone = `+51${faker.helpers.replaceSymbols('9########')}`
+  const phone = `${faker.helpers.replaceSymbols('9########')}`
   const birthDate = faker.date.birthdate({ min: 23, max: 55, mode: 'age' })
   const regionId = await chooseRegionId()
   const organizationName = 'Cáritas Lima'
@@ -339,18 +339,23 @@ const initialize = async (rl: Interface) => {
       organizationSlug: organization.slug ?? organizationSlug,
     },
   })
-  const teamNames = ['Administrador', 'Educación', 'Salud']
+  const teamNames = [
+    { name: 'Administrador', role: 'admin' },
+    { name: 'Educación', role: 'educationMember' },
+    { name: 'Salud', role: 'healthMember' },
+  ]
   const teams = await Promise.all(
-    teamNames.map(async (teamName) => {
-      const team = await auth.api.createTeam({
+    teamNames.map(async (team) => {
+      const teamCreated = await auth.api.createTeam({
         headers: { cookie },
         body: {
-          name: teamName,
+          name: team.name,
           organizationId: organization.id,
+          role: team.role,
         },
       })
-      if (!team) throw new Error(`Failed to create team ${teamName}`)
-      return team
+      if (!teamCreated) throw new Error(`Failed to create team ${team}`)
+      return teamCreated
     }),
   )
 

@@ -5,6 +5,12 @@ import db from '@api/db'
 import * as schema from '@api/db/schemas/auth'
 import valkey from '@api/db/valkey'
 import env from '@api/env'
+import {
+  buildEmailVerificationTemplate,
+  buildInviteOrganizationTemplate,
+  buildPasswordResetTemplate,
+  buildSignInTemplate,
+} from '@api/mail/templates'
 import { APIError, betterAuth } from 'better-auth'
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
 import {
@@ -20,7 +26,6 @@ import { defaultRoles } from 'better-auth/plugins/organization/access'
 import { passkey } from 'better-auth/plugins/passkey'
 import { localization } from 'better-auth-localization'
 import transporter from '../mail'
-import { buildVerificationOtpEmail } from '../mail/templates/verification-otp'
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
@@ -152,6 +157,26 @@ export const auth = betterAuth({
     openAPI(),
     passkey(),
     organization({
+      schema: {
+        organization: {
+          additionalFields: {
+            type: {
+              type: 'string',
+              input: true,
+              required: true,
+            },
+          },
+        },
+        team: {
+          additionalFields: {
+            role: {
+              type: 'string',
+              input: true,
+              required: false,
+            },
+          },
+        },
+      },
       ac,
       roles: {
         ...defaultRoles,
@@ -167,16 +192,23 @@ export const auth = betterAuth({
           enabled: false,
         },
       },
-      schema: {
-        organization: {
-          additionalFields: {
-            type: {
-              type: 'string',
-              input: true,
-              required: true,
-            },
-          },
-        },
+      sendInvitationEmail: async ({
+        inviter,
+        invitation,
+        email,
+        organization,
+      }) => {
+        const { subject, html } = buildInviteOrganizationTemplate({
+          invitedByEmail: inviter.user.email,
+          invitedByUsername: inviter.user.name,
+          inviteLink: `${env.BETTER_AUTH_URL}/settings/invitations?id=${invitation.id}`,
+          teamName: organization.name,
+        })
+        await transporter.sendMail({
+          to: email,
+          subject: subject,
+          html,
+        })
       },
     }),
     admin({}),
@@ -191,12 +223,17 @@ export const auth = betterAuth({
     }),
     emailOTP({
       sendVerificationOTP: async ({ type, otp, email }) => {
-        const { subject, html } = buildVerificationOtpEmail({
-          type,
-          otp,
-          email,
-          baseUrl: env.BETTER_AUTH_URL,
-        })
+        const { subject, html } = (() => {
+          if (type === 'email-verification')
+            return buildEmailVerificationTemplate({ otp })
+          if (type === 'forget-password')
+            return buildPasswordResetTemplate({
+              otp,
+              email,
+              baseUrl: env.BETTER_AUTH_URL,
+            })
+          return buildSignInTemplate({ otp })
+        })()
 
         await transporter.sendMail({
           to: email,

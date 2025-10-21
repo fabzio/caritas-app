@@ -32,8 +32,8 @@ import { Route as AuthenticatedHealthIndexRouteImport } from './routes/_authenti
 import { Route as AuthenticatedEducationIndexRouteImport } from './routes/_authenticated/education/index'
 import { Route as AuthenticatedBeneficiaryIndexRouteImport } from './routes/_authenticated/beneficiary/index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
-import { Route as AuthenticatedUserSettingsRouteImport } from './routes/_authenticated/user/settings'
 import { Route as AuthenticatedUserOrganizationsRouteImport } from './routes/_authenticated/user/organizations'
+import { Route as AuthenticatedSettingsInvitationsRouteImport } from './routes/_authenticated/settings/invitations'
 import { Route as AuthenticatedSettingsAuthenticationRouteImport } from './routes/_authenticated/settings/authentication'
 import { Route as AuthenticatedEducationRecipientsRouteImport } from './routes/_authenticated/education/recipients'
 import { Route as AuthenticatedAdminOrganizationsRouteImport } from './routes/_authenticated/admin/organizations'
@@ -170,17 +170,17 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
-const AuthenticatedUserSettingsRoute =
-  AuthenticatedUserSettingsRouteImport.update({
-    id: '/settings',
-    path: '/settings',
-    getParentRoute: () => AuthenticatedUserRoute,
-  } as any)
 const AuthenticatedUserOrganizationsRoute =
   AuthenticatedUserOrganizationsRouteImport.update({
     id: '/organizations',
     path: '/organizations',
     getParentRoute: () => AuthenticatedUserRoute,
+  } as any)
+const AuthenticatedSettingsInvitationsRoute =
+  AuthenticatedSettingsInvitationsRouteImport.update({
+    id: '/invitations',
+    path: '/invitations',
+    getParentRoute: () => AuthenticatedSettingsRoute,
   } as any)
 const AuthenticatedSettingsAuthenticationRoute =
   AuthenticatedSettingsAuthenticationRouteImport.update({
@@ -285,8 +285,8 @@ export interface FileRoutesByFullPath {
   '/admin/organizations': typeof AuthenticatedAdminOrganizationsRoute
   '/education/recipients': typeof AuthenticatedEducationRecipientsRoute
   '/settings/authentication': typeof AuthenticatedSettingsAuthenticationRoute
+  '/settings/invitations': typeof AuthenticatedSettingsInvitationsRoute
   '/user/organizations': typeof AuthenticatedUserOrganizationsRoute
-  '/user/settings': typeof AuthenticatedUserSettingsRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/beneficiary/': typeof AuthenticatedBeneficiaryIndexRoute
   '/education/': typeof AuthenticatedEducationIndexRoute
@@ -317,8 +317,8 @@ export interface FileRoutesByTo {
   '/admin/organizations': typeof AuthenticatedAdminOrganizationsRoute
   '/education/recipients': typeof AuthenticatedEducationRecipientsRoute
   '/settings/authentication': typeof AuthenticatedSettingsAuthenticationRoute
+  '/settings/invitations': typeof AuthenticatedSettingsInvitationsRoute
   '/user/organizations': typeof AuthenticatedUserOrganizationsRoute
-  '/user/settings': typeof AuthenticatedUserSettingsRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/beneficiary': typeof AuthenticatedBeneficiaryIndexRoute
   '/education': typeof AuthenticatedEducationIndexRoute
@@ -359,8 +359,8 @@ export interface FileRoutesById {
   '/_authenticated/admin/organizations': typeof AuthenticatedAdminOrganizationsRoute
   '/_authenticated/education/recipients': typeof AuthenticatedEducationRecipientsRoute
   '/_authenticated/settings/authentication': typeof AuthenticatedSettingsAuthenticationRoute
+  '/_authenticated/settings/invitations': typeof AuthenticatedSettingsInvitationsRoute
   '/_authenticated/user/organizations': typeof AuthenticatedUserOrganizationsRoute
-  '/_authenticated/user/settings': typeof AuthenticatedUserSettingsRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/beneficiary/': typeof AuthenticatedBeneficiaryIndexRoute
   '/_authenticated/education/': typeof AuthenticatedEducationIndexRoute
@@ -401,8 +401,8 @@ export interface FileRouteTypes {
     | '/admin/organizations'
     | '/education/recipients'
     | '/settings/authentication'
+    | '/settings/invitations'
     | '/user/organizations'
-    | '/user/settings'
     | '/admin/'
     | '/beneficiary/'
     | '/education/'
@@ -433,8 +433,8 @@ export interface FileRouteTypes {
     | '/admin/organizations'
     | '/education/recipients'
     | '/settings/authentication'
+    | '/settings/invitations'
     | '/user/organizations'
-    | '/user/settings'
     | '/admin'
     | '/beneficiary'
     | '/education'
@@ -474,8 +474,8 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/organizations'
     | '/_authenticated/education/recipients'
     | '/_authenticated/settings/authentication'
+    | '/_authenticated/settings/invitations'
     | '/_authenticated/user/organizations'
-    | '/_authenticated/user/settings'
     | '/_authenticated/admin/'
     | '/_authenticated/beneficiary/'
     | '/_authenticated/education/'
@@ -666,19 +666,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
-    '/_authenticated/user/settings': {
-      id: '/_authenticated/user/settings'
-      path: '/settings'
-      fullPath: '/user/settings'
-      preLoaderRoute: typeof AuthenticatedUserSettingsRouteImport
-      parentRoute: typeof AuthenticatedUserRoute
-    }
     '/_authenticated/user/organizations': {
       id: '/_authenticated/user/organizations'
       path: '/organizations'
       fullPath: '/user/organizations'
       preLoaderRoute: typeof AuthenticatedUserOrganizationsRouteImport
       parentRoute: typeof AuthenticatedUserRoute
+    }
+    '/_authenticated/settings/invitations': {
+      id: '/_authenticated/settings/invitations'
+      path: '/invitations'
+      fullPath: '/settings/invitations'
+      preLoaderRoute: typeof AuthenticatedSettingsInvitationsRouteImport
+      parentRoute: typeof AuthenticatedSettingsRoute
     }
     '/_authenticated/settings/authentication': {
       id: '/_authenticated/settings/authentication'
@@ -881,12 +881,14 @@ const AuthenticatedOrganizationRouteWithChildren =
 
 interface AuthenticatedSettingsRouteChildren {
   AuthenticatedSettingsAuthenticationRoute: typeof AuthenticatedSettingsAuthenticationRoute
+  AuthenticatedSettingsInvitationsRoute: typeof AuthenticatedSettingsInvitationsRoute
   AuthenticatedSettingsIndexRoute: typeof AuthenticatedSettingsIndexRoute
 }
 
 const AuthenticatedSettingsRouteChildren: AuthenticatedSettingsRouteChildren = {
   AuthenticatedSettingsAuthenticationRoute:
     AuthenticatedSettingsAuthenticationRoute,
+  AuthenticatedSettingsInvitationsRoute: AuthenticatedSettingsInvitationsRoute,
   AuthenticatedSettingsIndexRoute: AuthenticatedSettingsIndexRoute,
 }
 
@@ -897,13 +899,11 @@ const AuthenticatedSettingsRouteWithChildren =
 
 interface AuthenticatedUserRouteChildren {
   AuthenticatedUserOrganizationsRoute: typeof AuthenticatedUserOrganizationsRoute
-  AuthenticatedUserSettingsRoute: typeof AuthenticatedUserSettingsRoute
   AuthenticatedUserIndexRoute: typeof AuthenticatedUserIndexRoute
 }
 
 const AuthenticatedUserRouteChildren: AuthenticatedUserRouteChildren = {
   AuthenticatedUserOrganizationsRoute: AuthenticatedUserOrganizationsRoute,
-  AuthenticatedUserSettingsRoute: AuthenticatedUserSettingsRoute,
   AuthenticatedUserIndexRoute: AuthenticatedUserIndexRoute,
 }
 
