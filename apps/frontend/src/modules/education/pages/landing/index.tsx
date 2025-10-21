@@ -1,3 +1,11 @@
+import CoverImage from '@frontend/assets/img/landing/cover.png'
+import CaritasLogo from '@frontend/assets/img/landing/logo.png'
+import FullColorCaritasLogo from '@frontend/assets/img/landing/logo-fullcolor.png'
+import PUCPLogo from '@frontend/assets/img/landing/pucp.png'
+import UNILogo from '@frontend/assets/img/landing/uni.png'
+import UNMSMLogo from '@frontend/assets/img/landing/unmsm.png'
+import USATLogo from '@frontend/assets/img/landing/usat.png'
+import UTPLogo from '@frontend/assets/img/landing/utp.png'
 import { GraduationCap, TrendingUp } from 'lucide-react'
 import { useState } from 'react'
 
@@ -10,20 +18,11 @@ export default function LandingPage() {
         <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12">
           <div className="flex items-center justify-between h-20">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-green-600 rounded-full flex items-center justify-center">
-                <span className="text-white font-bold text-2xl">+</span>
-              </div>
-              <div className="flex flex-col">
-                <span className="text-green-600 font-bold text-xl leading-tight">
-                  Cáritas
-                </span>
-                <span className="text-green-600 text-xs font-semibold leading-tight">
-                  LIMA
-                </span>
-              </div>
-              <span className="hidden sm:inline-block bg-green-600 text-white text-xs px-2 py-1 rounded ml-2">
-                Educación
-              </span>
+              <img
+                src={FullColorCaritasLogo}
+                alt="Cáritas lima"
+                className="h-12"
+              />
             </div>
 
             <div className="hidden lg:flex items-center gap-8">
@@ -123,9 +122,9 @@ export default function LandingPage() {
       <section className="relative bg-gray-900 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-gray-900/90 to-gray-900/70">
           <img
-            src="https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?w=1600&h=900&fit=crop"
+            src={CoverImage}
             alt="Estudiantes en clase"
-            className="w-full h-full object-cover mix-blend-overlay opacity-50"
+            className="w-full h-full object-cover blur-[2px] opacity-60"
           />
         </div>
 
@@ -272,38 +271,38 @@ export default function LandingPage() {
           <h2 className="text-4xl md:text-5xl font-bold text-gray-800 text-center mb-16">
             Trabajamos junto a
           </h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-12 items-center justify-items-center">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-12 items-center justify-items-center">
             <div className="w-full max-w-[200px]">
               <img
-                src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Universidad_Tecnol%C3%B3gica_del_Per%C3%BA_logo.svg/320px-Universidad_Tecnol%C3%B3gica_del_Per%C3%BA_logo.svg.png"
+                src={UTPLogo}
                 alt="UTP"
                 className="w-full h-auto object-contain"
               />
             </div>
             <div className="w-full max-w-[200px]">
               <img
-                src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Logo_USAT.png/320px-Logo_USAT.png"
+                src={USATLogo}
                 alt="USAT"
                 className="w-full h-auto object-contain"
               />
             </div>
             <div className="w-full max-w-[200px]">
               <img
-                src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Seal_of_the_Pontifical_Catholic_University_of_Peru.svg/320px-Seal_of_the_Pontifical_Catholic_University_of_Peru.svg.png"
+                src={PUCPLogo}
                 alt="PUCP"
                 className="w-full h-auto object-contain"
               />
             </div>
             <div className="w-full max-w-[200px]">
               <img
-                src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f4/Uni-logo-transparente_granate.png/320px-Uni-logo-transparente_granate.png"
+                src={UNILogo}
                 alt="UNI"
                 className="w-full h-auto object-contain"
               />
             </div>
             <div className="w-full max-w-[200px] md:col-start-2">
               <img
-                src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/Escudo_de_la_Universidad_Nacional_Mayor_de_San_Marcos.svg/240px-Escudo_de_la_Universidad_Nacional_Mayor_de_San_Marcos.svg.png"
+                src={UNMSMLogo}
                 alt="UNMSM"
                 className="w-full h-auto object-contain"
               />
@@ -317,13 +316,7 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
             <div>
               <div className="flex items-center gap-2 mb-6">
-                <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center">
-                  <span className="text-green-600 font-bold text-xl">+</span>
-                </div>
-                <div>
-                  <div className="text-white font-bold text-xl">Cáritas</div>
-                  <div className="text-white text-xs">LIMA</div>
-                </div>
+                <img src={CaritasLogo} alt="Cáritas Lima" className="h-10" />
               </div>
               <p className="text-gray-400 text-sm">
                 Cáritas Lima © 2023.
