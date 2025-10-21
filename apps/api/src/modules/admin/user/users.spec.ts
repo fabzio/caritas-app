@@ -5,18 +5,30 @@ import { treaty } from '@elysiajs/eden'
 import { eq } from 'drizzle-orm'
 import users from '.'
 
-type TeamName = 'Salud' | 'Educación'
+type Team = {
+  name: string
+  role: 'healthMember' | 'educationMember' | 'admin'
+}
 
 type OwnerContext = {
   cookie: string
   organizationId: string
   organizationSlug: string
-  teamIds: Record<TeamName, string>
+  teamIds: Record<string, string>
   ownerUserId: string
 }
 
 const api = treaty(users)
-const defaultTeams: TeamName[] = ['Salud', 'Educación']
+const defaultTeams: Team[] = [
+  {
+    name: 'Salud',
+    role: 'healthMember',
+  },
+  {
+    name: 'Educación',
+    role: 'educationMember',
+  },
+]
 
 const buildNumericSequence = () =>
   `${Date.now()}${Math.floor(Math.random() * 1_000_000)}`
@@ -84,16 +96,17 @@ const createOwnerContext = async (): Promise<OwnerContext> => {
       const created = await auth.api.createTeam({
         headers: { cookie },
         body: {
-          name: team,
+          name: team.name,
           organizationId: organization.id,
+          role: team.role,
         },
       })
       if (!created) throw new Error(`Failed to create test team ${team}`)
-      return [team, created.id] as const
+      return [team.name, created.id] as const
     }),
   )
 
-  const teamIds = Object.fromEntries(teams) as Record<TeamName, string>
+  const teamIds = Object.fromEntries(teams)
 
   return {
     cookie,
@@ -107,11 +120,12 @@ const createOwnerContext = async (): Promise<OwnerContext> => {
 const createMemberUser = async (label: string) => {
   const sequence = buildNumericSequence()
   const email = `${label}+${sequence}@example.com`
+
   const {
     user: { id },
   } = await auth.api.createUser({
     body: {
-      name: `${label} ${sequence}`,
+      name: `Member ${sequence}`,
       email,
       password: 'password',
       role: 'user',
@@ -159,8 +173,8 @@ afterAll(async () => {
 describe('Common Users Module', () => {
   it('returns a list of users', async () => {
     const member = await createMemberUser('member-list')
-    stagedUserIds.push(member.id)
 
+    stagedUserIds.push(member.id)
     await auth.api.addMember({
       headers: { cookie: ownerContext.cookie },
       body: {

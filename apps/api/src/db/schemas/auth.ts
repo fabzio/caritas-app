@@ -210,6 +210,7 @@ export const organizationRole = authSchema.table('organization_role', {
 export const team = authSchema.table('team', {
   id: varchar('id', { length: 32 }).primaryKey(),
   name: varchar('name', { length: 100 }).notNull(),
+  role: varchar('role', { length: 50 }).notNull(),
   organizationId: varchar('organization_id', { length: 32 })
     .notNull()
     .references(() => organization.id, { onDelete: 'cascade' }),

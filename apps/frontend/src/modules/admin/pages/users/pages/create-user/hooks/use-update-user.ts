@@ -1,3 +1,4 @@
+import { useSession } from '@frontend/hooks/use-session'
 import authClient from '@frontend/lib/authClient'
 import rpc from '@frontend/lib/rpc'
 import { QueryKeys } from '@frontend/shared/constants/query-keys'
@@ -12,7 +13,7 @@ type UpdateUserProps = Parameters<typeof authClient.admin.updateUser>[0] & {
 export const useUpdateUser = () => {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
-
+  const { data: session } = useSession()
   return useMutation({
     mutationFn: async (props: UpdateUserProps) => {
       const { teamIds, ...userPayload } = props
@@ -28,8 +29,10 @@ export const useUpdateUser = () => {
           })
       return data
     },
-    onSuccess: () => {
+    onSuccess: (_, { userId }) => {
       queryClient.invalidateQueries({ queryKey: [QueryKeys.ADMIN.USERS] })
+      if (session?.user.id === userId)
+        queryClient.invalidateQueries({ queryKey: [QueryKeys.ACCESS] })
       toast.success('Modificado el usuario exitosamente')
       navigate({
         to: '/admin/users',

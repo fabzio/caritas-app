@@ -21,7 +21,7 @@ export const useLogin = (redirectPath: ValidRoutes) => {
             toast.success('Inicio de sesión exitoso')
           },
           onError: (error) => {
-            toast.error(error.error.message)
+            toast.error(error.error.message || 'Error al iniciar sesión')
           },
           headers: {
             'x-captcha-response': params.token,

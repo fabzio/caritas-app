@@ -9,6 +9,7 @@ export const QueryKeys = {
   SETTINGS: {
     ACCOUNTS: 'settings-accounts',
     PASSKEYS: 'settings-passkeys',
+    INVITATIONS: 'settings-invitations',
   },
   ADMIN: {
     ORG_TEAMS: 'admin-org-teams',
