@@ -1,3 +1,4 @@
+import { env } from '@frontend/env'
 import educationNavItems from '@frontend/modules/education/layout/nav-items'
 import { DEFAULT_TEAMS } from '@frontend/shared/constants/default-teams'
 import { QueryKeys } from '@frontend/shared/constants/query-keys'
@@ -35,4 +36,11 @@ export const Route = createFileRoute('/_authenticated/education')({
       <Outlet />
     </MainLayout>
   ),
+  head: () => ({
+    meta: [
+      {
+        title: `${env.VITE_APP_TITLE} | Educación`,
+      },
+    ],
+  }),
 })

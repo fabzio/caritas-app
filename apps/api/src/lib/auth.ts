@@ -5,7 +5,7 @@ import db from '@api/db'
 import * as schema from '@api/db/schemas/auth'
 import valkey from '@api/db/valkey'
 import env from '@api/env'
-import { betterAuth } from 'better-auth'
+import { APIError, betterAuth } from 'better-auth'
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
 import {
   admin,
@@ -37,35 +37,6 @@ export const auth = betterAuth({
     },
     delete: async (key) => {
       await valkey.del(key)
-    },
-  },
-  databaseHooks: {
-    session: {
-      create: {
-        async before(session) {
-          const [orgResponse, teamResponse] = await Promise.all([
-            db.query.member.findFirst({
-              where: (member, { eq }) => eq(member.userId, session.userId),
-              columns: { organizationId: true },
-              orderBy: (member, { desc }) => [desc(member.createdAt)],
-            }),
-            db.query.teamMember.findFirst({
-              where: (teamMember, { eq }) =>
-                eq(teamMember.userId, session.userId),
-              columns: { teamId: true },
-              orderBy: (teamMember, { desc }) => [desc(teamMember.createdAt)],
-            }),
-          ])
-
-          return {
-            data: {
-              ...session,
-              activeOrganizationId: orgResponse?.organizationId ?? null,
-              activeTeamId: teamResponse?.teamId ?? null,
-            },
-          }
-        },
-      },
     },
   },
   user: {
@@ -122,6 +93,61 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
   },
+
+  databaseHooks: {
+    user: {
+      create: {
+        async before(user) {
+          const [sameDocument, samePhone] = await Promise.all([
+            db.query.user.findFirst({
+              where: (u, { eq, and }) =>
+                and(
+                  eq(u.documentNumber, user.documentNumber as string),
+                  eq(u.documentType, user.documentType as string),
+                ),
+              columns: { id: true },
+            }),
+            db.query.user.findFirst({
+              where: (u, { eq }) => eq(u.phone, user.phone as string),
+              columns: { id: true },
+            }),
+          ])
+
+          if (samePhone || sameDocument)
+            throw new APIError('CONFLICT', {
+              message: 'Documento o teléfono ya registrado',
+            })
+        },
+      },
+    },
+    session: {
+      create: {
+        async before(session) {
+          const [orgResponse, teamResponse] = await Promise.all([
+            db.query.member.findFirst({
+              where: (member, { eq }) => eq(member.userId, session.userId),
+              columns: { organizationId: true },
+              orderBy: (member, { desc }) => [desc(member.createdAt)],
+            }),
+            db.query.teamMember.findFirst({
+              where: (teamMember, { eq }) =>
+                eq(teamMember.userId, session.userId),
+              columns: { teamId: true },
+              orderBy: (teamMember, { desc }) => [desc(teamMember.createdAt)],
+            }),
+          ])
+
+          return {
+            data: {
+              ...session,
+              activeOrganizationId: orgResponse?.organizationId ?? null,
+              activeTeamId: teamResponse?.teamId ?? null,
+            },
+          }
+        },
+      },
+    },
+  },
   plugins: [
     openAPI(),
     passkey(),
@@ -158,7 +184,6 @@ export const auth = betterAuth({
     anonymous(),
     localization({
       defaultLocale: 'es-ES',
-      fallbackLocale: 'default',
     }),
     captcha({
       provider: 'cloudflare-turnstile',
@@ -172,9 +197,10 @@ export const auth = betterAuth({
           email,
           baseUrl: env.BETTER_AUTH_URL,
         })
+
         await transporter.sendMail({
           to: email,
-          subject,
+          subject: subject,
           html,
         })
       },
