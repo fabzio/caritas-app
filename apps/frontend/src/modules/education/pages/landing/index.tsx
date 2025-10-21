@@ -147,10 +147,10 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section className="bg-gray-50 py-20">
+      <section className="bg-gray-50 py-30">
         <div className="max-w-7xl mx-auto px-12">
           <div className="flex flex-col lg:flex-row gap-12">
-            <div className="lg:w-2/5 lg:sticky lg:top-24 lg:self-start">
+            <div className="lg:w-2/5 lg:sticky lg:top-96 lg:self-start">
               <h2 className="text-4xl font-bold text-gray-800 mb-6">
                 Nuestros líneas de educación
               </h2>
@@ -266,7 +266,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section className="bg-white py-20">
+      <section className="bg-white py-30">
         <div className="max-w-7xl mx-auto px-12">
           <h2 className="text-4xl md:text-5xl font-bold text-gray-800 text-center mb-16">
             Trabajamos junto a
