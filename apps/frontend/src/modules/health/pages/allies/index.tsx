@@ -1,4 +1,3 @@
-import { Link } from '@tanstack/react-router'
 import { Button } from '@workspace/ui/components/button'
 import {
   Dialog,
@@ -9,9 +8,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@workspace/ui/components/dialog'
-import { UserPlus } from 'lucide-react'
 import { useState } from 'react'
 import ActionsButton from './components/actions-button'
+import CreateAlly from './components/create-ally'
 import OrganizationTable from './components/organization-table'
 import SearchHealthOrganizationInput from './components/search-organization-input'
 import { useOrganizationTable } from './hooks/use-organization-table'
@@ -57,12 +56,7 @@ export default function AlliesTableView() {
             onEditClick={() => {}}
             selectedCount={userCount}
           />
-          <Link to={'/health/allies/form'} search={{ type: 'new' }}>
-            <Button>
-              <UserPlus />
-              Nuevo aliado
-            </Button>
-          </Link>
+          <CreateAlly viewType="new" />
         </div>
       </div>
       <div className="mt-4">
@@ -81,7 +75,7 @@ export default function AlliesTableView() {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>
-              {`¿Seguro que desea eliminar ${userCount} organizaci${userCount !== 1 ? 'ones' : 'ón'}?`}
+              {`¿Seguro que desea eliminar ${userCount} organizaci${userCount === 1 ? 'ón' : 'ones'}?`}
             </DialogTitle>
             <DialogDescription>
               Esta acción no se puede deshacer.

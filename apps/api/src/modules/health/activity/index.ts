@@ -1,4 +1,3 @@
-// apps/api/src/modules/health/activity/index.ts
 import betterAuth from '@api/modules/auth'
 import Elysia, { t } from 'elysia'
 import {

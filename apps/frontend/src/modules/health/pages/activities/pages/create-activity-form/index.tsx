@@ -120,14 +120,16 @@ export default function CreateActivityForm() {
       </div>
 
       <div className="flex justify-center">
-        <Card className="w-full lg:w-3/4">
-          <CardHeader>
-            <CardTitle>Información de la Actividad</CardTitle>
-            <CardDescription>
+        <div className="w-full lg:w-3/4">
+          <header className="pb-4">
+            <h2 className="text-lg font-semibold">
+              Información de la Actividad
+            </h2>
+            <p className="text-sm text-muted-foreground">
               Complete todos los campos requeridos*
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
+            </p>
+          </header>
+          <div>
             <Form {...form}>
               <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
                 <FormField
@@ -322,12 +324,12 @@ export default function CreateActivityForm() {
                   </div>
 
                   {fields.map((field, index) => (
-                    <Card key={field.id}>
-                      <CardHeader className="pb-3">
+                    <div key={field.id} className="border rounded-md">
+                      <div className="pb-3 px-4">
                         <div className="flex items-center justify-between">
-                          <CardTitle className="text-base">
+                          <h4 className="text-base font-medium">
                             Participante {index + 1}
-                          </CardTitle>
+                          </h4>
                           {fields.length > 1 && (
                             <Button
                               type="button"
@@ -339,8 +341,8 @@ export default function CreateActivityForm() {
                             </Button>
                           )}
                         </div>
-                      </CardHeader>
-                      <CardContent className="space-y-4">
+                      </div>
+                      <div className="space-y-4 px-4 pb-4">
                         <FormField
                           control={form.control}
                           name={`participants.${index}.alliedId`}
@@ -426,12 +428,12 @@ export default function CreateActivityForm() {
                             </FormItem>
                           )}
                         />
-                      </CardContent>
-                    </Card>
+                      </div>
+                    </div>
                   ))}
                 </div>
 
-                <CardFooter className="flex justify-between px-0 pt-6">
+                <div className="flex justify-between px-0 pt-6">
                   <Button type="button" variant="outline" asChild>
                     <Link to="/health/activities">Cancelar</Link>
                   </Button>
@@ -445,11 +447,11 @@ export default function CreateActivityForm() {
                       'Crear Actividad'
                     )}
                   </Button>
-                </CardFooter>
+                </div>
               </form>
             </Form>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
     </div>
   )

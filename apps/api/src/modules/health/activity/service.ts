@@ -240,17 +240,10 @@ export const createCompleteActivity = async (
 
 export const getActivityById = async (id: number) => {
   try {
-    console.log('[getActivityById] Buscando actividad id:', id)
-
     const allActivities = await db
       .select({ id: activity.id, name: activity.name, state: activity.state })
       .from(activity)
       .where(eq(activity.id, id))
-
-    console.log(
-      '[getActivityById] Todas las actividades con ese id:',
-      allActivities,
-    )
 
     const [activityData] = await db
       .select({
@@ -267,8 +260,6 @@ export const getActivityById = async (id: number) => {
       .from(activity)
       .where(and(eq(activity.id, id), eq(activity.state, true)))
 
-    console.log('[getActivityById] Actividad encontrada:', activityData)
-
     if (!activityData) {
       throw new Error('Actividad no encontrada')
     }
@@ -280,11 +271,6 @@ export const getActivityById = async (id: number) => {
       })
       .from(alliedParticipation)
       .where(eq(alliedParticipation.activityId, id))
-
-    console.log(
-      '[getActivityById] Participaciones encontradas:',
-      participations,
-    )
 
     const participantsMap = new Map<
       string,
@@ -312,11 +298,6 @@ export const getActivityById = async (id: number) => {
           : activityData.date,
       participants: Array.from(participantsMap.values()),
     }
-
-    console.log(
-      '[getActivityById] Resultado final:',
-      JSON.stringify(result, null, 2),
-    )
 
     return result
   } catch (error) {
