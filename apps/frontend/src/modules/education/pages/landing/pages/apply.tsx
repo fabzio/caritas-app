@@ -1,4 +1,4 @@
-import FullColorCaritasLogo from '@frontend/assets/img/landing/logo-fullcolor.png'
+import FullColorCaritasLogo from '@frontend/assets/img/landing/logo-fullcolor.webp'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useLoaderData, useNavigate } from '@tanstack/react-router'
 import { Button } from '@workspace/ui/components/button'
