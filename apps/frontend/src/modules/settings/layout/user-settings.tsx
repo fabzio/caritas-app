@@ -16,7 +16,7 @@ export default function UserSettingsLayout({ children }: Readonly<Props>) {
   const { data } = useSession()
   return (
     <article className="flex flex-col flex-1 p-4">
-      <Link to={redirect} className="flex gap-2 py-4 w-fit">
+      <Link to={redirect ?? '/'} className="flex gap-2 py-4 w-fit">
         <ChevronLeft />
         Volver
       </Link>
@@ -81,5 +81,9 @@ const subRoutes: {
   {
     path: '/settings/authentication',
     label: 'Autenticación',
+  },
+  {
+    path: '/settings/invitations',
+    label: 'Invitaciones',
   },
 ]

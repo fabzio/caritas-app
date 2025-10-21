@@ -10,6 +10,7 @@ export const QueryKeys = {
   SETTINGS: {
     ACCOUNTS: 'settings-accounts',
     PASSKEYS: 'settings-passkeys',
+    INVITATIONS: 'settings-invitations',
   },
   ADMIN: {
     ORG_TEAMS: 'admin-org-teams',
@@ -21,6 +22,7 @@ export const QueryKeys = {
   EDUCATION: {
     SCHOLARSHIP_RECIPIENTS: 'education-scholarship-recipients',
     FAIR: 'education-fair',
+    SCHOLARSHIP_APPLICATION: 'education-scholarship-applications',
   },
   HEALTH: {
     ACTIVITIES: 'health-activities',

@@ -10,6 +10,7 @@ import {
   FormMessage,
 } from '@workspace/ui/components/form'
 import { Input } from '@workspace/ui/components/input'
+import { Spinner } from '@workspace/ui/components/spinner'
 import { useForm } from 'react-hook-form'
 import z from 'zod'
 import { useCreateAlly } from './hooks/use-create-ally'
@@ -34,7 +35,7 @@ export default function AllyFormView() {
     },
   })
 
-  const { mutate: createOrganization } = useCreateAlly()
+  const { mutate: createOrganization, isPending } = useCreateAlly()
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     // TODO: handle edit ally
@@ -67,8 +68,8 @@ export default function AllyFormView() {
               />
             </div>
             <div className="w-full flex gap-2 justify-center">
-              <Button type="submit" className="mt-4">
-                {dependantText.submit[viewType]}
+              <Button type="submit" className="mt-4" disabled={isPending}>
+                {isPending ? <Spinner /> : dependantText.submit[viewType]}
               </Button>
               <Link to="/health/allies">
                 <Button variant="outline" className="mt-4">

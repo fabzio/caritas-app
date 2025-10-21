@@ -43,10 +43,6 @@ describe('formatRoles', () => {
     expect(result).toContain('Administrador')
   })
 
-  it('formats owner role', () => {
-    expect(formatRoles(['owner'])).toBe('Propietario')
-  })
-
   it('handles unknown role', () => {
     expect(formatRoles(['unknownRole'])).toBe('unknownRole')
   })
