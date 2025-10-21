@@ -2,23 +2,28 @@ import db from '@api/db'
 import { PostgresError } from '@api/db/errors'
 import { scholarshipApplication } from '@api/db/schemas/education'
 import { eq } from 'drizzle-orm'
+import type { Application } from './model'
 
-// interface GetSpecialitiesArgs {
-//   search?: string
-// }
-
-export const createScholarshipApplication = async (args: any) => {
+export const createScholarshipApplication = async (
+  args: Application.CreateScholarshipApplicationBody,
+) => {
   try {
-    // First checks if application already exists for this user
-    await db
+    const res = await db
       .select()
       .from(scholarshipApplication)
       .where(eq(scholarshipApplication.userId, args.userId))
+    if (res.length > 0)
+      throw new Error('El usuario ya ha postulado a dicha oportunidad')
 
     const [{ id }] = await db.transaction(async (tx) => {
       return await tx
         .insert(scholarshipApplication)
-        .values(args)
+        .values({
+          scholarshipId: args.scholarshipId,
+          userId: args.userId,
+          applicationDate: new Date(),
+          status: 'pending',
+        })
         .returning({ id: scholarshipApplication.id })
     })
     return id
@@ -27,39 +32,3 @@ export const createScholarshipApplication = async (args: any) => {
     throw e
   }
 }
-
-// export const createSpeciality = async (
-//   args: SpecialityModel.CreateSpeciality,
-// ) => {
-//   try {
-//     const [{ id }] = await db.transaction(async (tx) => {
-//       return await tx.insert(speciality).values(args).returning({
-//         id: speciality.id,
-//       })
-//     })
-//     return id
-//   } catch (e) {
-//     if (e instanceof Error) throw new PostgresError(e.message)
-//     throw e
-//   }
-// }
-//
-// export const getSpecialities = async ({
-//   query,
-// }: {
-//   query: GetSpecialitiesArgs
-// }): Promise<SpecialityModel.GetSpecialities> => {
-//   try {
-//     const { search } = query
-//
-//     const response = await db.query.speciality.findMany({
-//       where: search
-//         ? (fields, { ilike }) => ilike(fields.name, `%${search}%`)
-//         : undefined,
-//     })
-//     return response
-//   } catch (e) {
-//     if (e instanceof Error) throw new PostgresError(e.message)
-//     throw e
-//   }
-// }

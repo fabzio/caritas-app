@@ -12,8 +12,8 @@ import { useState } from 'react'
 
 const originalPageReferences = {
   nosotros: 'https://caritaslima.org.pe/quienes-somos/',
-  'que-hacemos': 'https://caritaslima.org.pe/que-hacemos/',
-  'que-puedes-hacer-tu': 'https://caritaslima.org.pe/que-puedes-hacer-tu/',
+  queHacemos: 'https://caritaslima.org.pe/que-hacemos/',
+  quePuedesHacerTu: 'https://caritaslima.org.pe/que-puedes-hacer-tu/',
   transparencia: 'https://caritaslima.org.pe/transparencia/',
   contacto: 'https://caritaslima.org.pe/contacto/',
 }
@@ -37,31 +37,31 @@ export default function LandingPage() {
 
             <div className="hidden lg:flex items-center gap-8">
               <a
-                href={originalPageReferences['nosotros']}
+                href={originalPageReferences.nosotros}
                 className="text-gray-700 hover:text-green-600 font-medium transition"
               >
                 Nosotros
               </a>
               <a
-                href={originalPageReferences['que-hacemos']}
+                href={originalPageReferences.queHacemos}
                 className="text-gray-700 hover:text-green-600 font-medium transition"
               >
                 Qué Hacemos
               </a>
               <a
-                href={originalPageReferences['que-puedes-hacer-tu']}
+                href={originalPageReferences.quePuedesHacerTu}
                 className="text-gray-700 hover:text-green-600 font-medium transition"
               >
                 Qué Puedes Hacer Tú
               </a>
               <a
-                href={originalPageReferences['transparencia']}
+                href={originalPageReferences.transparencia}
                 className="text-gray-700 hover:text-green-600 font-medium transition"
               >
                 Transparencia
               </a>
               <a
-                href={originalPageReferences['contacto']}
+                href={originalPageReferences.contacto}
                 className="text-gray-700 hover:text-green-600 font-medium transition"
               >
                 Contacto
@@ -94,31 +94,31 @@ export default function LandingPage() {
             <div className="lg:hidden border-t border-gray-200 py-4">
               <div className="flex flex-col space-y-4">
                 <a
-                  href={originalPageReferences['nosotros']}
+                  href={originalPageReferences.nosotros}
                   className="text-gray-700 hover:text-green-600 font-medium transition px-4"
                 >
                   Nosotros
                 </a>
                 <a
-                  href={originalPageReferences['que-hacemos']}
+                  href={originalPageReferences.queHacemos}
                   className="text-gray-700 hover:text-green-600 font-medium transition px-4"
                 >
                   Qué Hacemos
                 </a>
                 <a
-                  href={originalPageReferences['que-puedes-hacer-tu']}
+                  href={originalPageReferences.quePuedesHacerTu}
                   className="text-gray-700 hover:text-green-600 font-medium transition px-4"
                 >
                   Qué Puedes Hacer Tú
                 </a>
                 <a
-                  href={originalPageReferences['transparencia']}
+                  href={originalPageReferences.transparencia}
                   className="text-gray-700 hover:text-green-600 font-medium transition px-4"
                 >
                   Transparencia
                 </a>
                 <a
-                  href={originalPageReferences['contacto']}
+                  href={originalPageReferences.contacto}
                   className="text-gray-700 hover:text-green-600 font-medium transition px-4"
                 >
                   Contacto
@@ -356,7 +356,7 @@ export default function LandingPage() {
               <ul className="space-y-3 text-gray-300 text-sm">
                 <li>
                   <a
-                    href={originalPageReferences['nosotros']}
+                    href={originalPageReferences.nosotros}
                     className="hover:text-white transition"
                   >
                     Nosotros
@@ -364,7 +364,7 @@ export default function LandingPage() {
                 </li>
                 <li>
                   <a
-                    href={originalPageReferences['que-hacemos']}
+                    href={originalPageReferences.queHacemos}
                     className="hover:text-white transition"
                   >
                     Qué Hacemos
@@ -372,7 +372,7 @@ export default function LandingPage() {
                 </li>
                 <li>
                   <a
-                    href={originalPageReferences['que-puedes-hacer-tu']}
+                    href={originalPageReferences.quePuedesHacerTu}
                     className="hover:text-white transition"
                   >
                     Qué Puedes Hacer Tú
@@ -380,7 +380,7 @@ export default function LandingPage() {
                 </li>
                 <li>
                   <a
-                    href={originalPageReferences['transparencia']}
+                    href={originalPageReferences.transparencia}
                     className="hover:text-white transition"
                   >
                     Transparencia
@@ -388,7 +388,7 @@ export default function LandingPage() {
                 </li>
                 <li>
                   <a
-                    href={originalPageReferences['contacto']}
+                    href={originalPageReferences.contacto}
                     className="hover:text-white transition"
                   >
                     Contacto
@@ -402,7 +402,7 @@ export default function LandingPage() {
               <ul className="space-y-3 text-gray-300 text-sm">
                 <li>
                   <a
-                    href={originalPageReferences['transparencia']}
+                    href={originalPageReferences.transparencia}
                     className="hover:text-white transition"
                   >
                     Información General
@@ -410,7 +410,7 @@ export default function LandingPage() {
                 </li>
                 <li>
                   <a
-                    href={originalPageReferences['transparencia']}
+                    href={originalPageReferences.transparencia}
                     className="hover:text-white transition"
                   >
                     Información Financiera
@@ -418,7 +418,7 @@ export default function LandingPage() {
                 </li>
                 <li>
                   <a
-                    href={originalPageReferences['transparencia']}
+                    href={originalPageReferences.transparencia}
                     className="hover:text-white transition"
                   >
                     Información De Salvaguarda
@@ -426,7 +426,7 @@ export default function LandingPage() {
                 </li>
                 <li>
                   <a
-                    href={originalPageReferences['transparencia']}
+                    href={originalPageReferences.transparencia}
                     className="hover:text-white transition"
                   >
                     A Donde Van Tus Donaciones

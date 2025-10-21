@@ -27,10 +27,10 @@ import {
 import { Spinner } from '@workspace/ui/components/spinner'
 import { cn } from '@workspace/ui/lib/utils'
 import { Check, ChevronsUpDown, LogIn } from 'lucide-react'
-import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
+import { useCreateApplication } from '../hooks/use-create-application'
 
 const applyFormSchema = z.object({
   scholarshipId: z.number({
@@ -43,7 +43,8 @@ export default function ApplyPage() {
     from: '/landing/apply',
   })
   const navigate = useNavigate()
-  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const { mutate, isPending } = useCreateApplication()
 
   const form = useForm<z.infer<typeof applyFormSchema>>({
     resolver: zodResolver(applyFormSchema),
@@ -53,16 +54,23 @@ export default function ApplyPage() {
   })
 
   const onSubmit = async (values: z.infer<typeof applyFormSchema>) => {
-    setIsSubmitting(true)
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-      toast.success('¡Postulación enviada exitosamente!')
-      navigate({ to: '/landing' })
-    } catch (error) {
-      toast.error('Error al enviar la postulación')
-    } finally {
-      setIsSubmitting(false)
-    }
+    mutate(
+      {
+        scholarshipId: values.scholarshipId,
+        userId: user?.id ?? '',
+      },
+      {
+        onSuccess: () => {
+          toast.success('Se ha postulado exitosamente')
+          navigate({
+            to: '/landing',
+          })
+        },
+        onError: ({ message }) => {
+          toast.error(message)
+        },
+      },
+    )
   }
 
   const handleSubmit = form.handleSubmit(onSubmit)
@@ -281,10 +289,10 @@ export default function ApplyPage() {
                   <div className="flex gap-3 pt-4">
                     <Button
                       type="submit"
-                      disabled={isSubmitting}
+                      disabled={isPending}
                       className="bg-green-600 hover:bg-green-700 text-white font-semibold px-8"
                     >
-                      {isSubmitting ? <Spinner /> : 'Postular'}
+                      {isPending ? <Spinner /> : 'Postular'}
                     </Button>
                     <Button
                       type="button"
