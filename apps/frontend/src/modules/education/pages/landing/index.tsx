@@ -6,11 +6,21 @@ import UNILogo from '@frontend/assets/img/landing/uni.png'
 import UNMSMLogo from '@frontend/assets/img/landing/unmsm.png'
 import USATLogo from '@frontend/assets/img/landing/usat.png'
 import UTPLogo from '@frontend/assets/img/landing/utp.png'
+import { useNavigate } from '@tanstack/react-router'
 import { GraduationCap, TrendingUp } from 'lucide-react'
 import { useState } from 'react'
 
+const originalPageReferences = {
+  nosotros: 'https://caritaslima.org.pe/quienes-somos/',
+  'que-hacemos': 'https://caritaslima.org.pe/que-hacemos/',
+  'que-puedes-hacer-tu': 'https://caritaslima.org.pe/que-puedes-hacer-tu/',
+  transparencia: 'https://caritaslima.org.pe/transparencia/',
+  contacto: 'https://caritaslima.org.pe/contacto/',
+}
+
 export default function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const navigate = useNavigate()
 
   return (
     <div className="min-h-screen">
@@ -27,31 +37,31 @@ export default function LandingPage() {
 
             <div className="hidden lg:flex items-center gap-8">
               <a
-                href="https://caritaslima.org.pe"
+                href={originalPageReferences['nosotros']}
                 className="text-gray-700 hover:text-green-600 font-medium transition"
               >
                 Nosotros
               </a>
               <a
-                href="https://caritaslima.org.pe"
+                href={originalPageReferences['que-hacemos']}
                 className="text-gray-700 hover:text-green-600 font-medium transition"
               >
                 Qué Hacemos
               </a>
               <a
-                href="https://caritaslima.org.pe"
+                href={originalPageReferences['que-puedes-hacer-tu']}
                 className="text-gray-700 hover:text-green-600 font-medium transition"
               >
                 Qué Puedes Hacer Tú
               </a>
               <a
-                href="https://caritaslima.org.pe"
+                href={originalPageReferences['transparencia']}
                 className="text-gray-700 hover:text-green-600 font-medium transition"
               >
                 Transparencia
               </a>
               <a
-                href="https://caritaslima.org.pe"
+                href={originalPageReferences['contacto']}
                 className="text-gray-700 hover:text-green-600 font-medium transition"
               >
                 Contacto
@@ -84,31 +94,31 @@ export default function LandingPage() {
             <div className="lg:hidden border-t border-gray-200 py-4">
               <div className="flex flex-col space-y-4">
                 <a
-                  href="https://caritaslima.org.pe"
+                  href={originalPageReferences['nosotros']}
                   className="text-gray-700 hover:text-green-600 font-medium transition px-4"
                 >
                   Nosotros
                 </a>
                 <a
-                  href="https://caritaslima.org.pe"
+                  href={originalPageReferences['que-hacemos']}
                   className="text-gray-700 hover:text-green-600 font-medium transition px-4"
                 >
                   Qué Hacemos
                 </a>
                 <a
-                  href="https://caritaslima.org.pe"
+                  href={originalPageReferences['que-puedes-hacer-tu']}
                   className="text-gray-700 hover:text-green-600 font-medium transition px-4"
                 >
                   Qué Puedes Hacer Tú
                 </a>
                 <a
-                  href="https://caritaslima.org.pe"
+                  href={originalPageReferences['transparencia']}
                   className="text-gray-700 hover:text-green-600 font-medium transition px-4"
                 >
                   Transparencia
                 </a>
                 <a
-                  href="https://caritaslima.org.pe"
+                  href={originalPageReferences['contacto']}
                   className="text-gray-700 hover:text-green-600 font-medium transition px-4"
                 >
                   Contacto
@@ -140,6 +150,7 @@ export default function LandingPage() {
             <button
               type="button"
               className="bg-green-600 hover:bg-green-700 text-white font-semibold px-8 py-4 rounded-lg transition transform hover:scale-105 shadow-lg"
+              onClick={() => navigate({ to: '/landing/apply' })}
             >
               Regístrate ahora
             </button>
@@ -179,12 +190,13 @@ export default function LandingPage() {
                   de financiamiento que se alinean con tus objetivos
                   profesionales y posibilidades.
                 </p>
-                <a
-                  href="https://caritaslima.org.pe"
+                <button
+                  type="button"
+                  onClick={() => navigate({ to: '/landing/apply' })}
                   className="inline-flex items-center font-semibold hover:underline"
                 >
                   Regístrese →
-                </a>
+                </button>
               </div>
 
               <div className="bg-green-600 text-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition">
@@ -201,12 +213,13 @@ export default function LandingPage() {
                   donde podrás conocer opciones de carreras académicas y obtener
                   información de estas.
                 </p>
-                <a
-                  href="https://caritaslima.org.pe"
+                <button
+                  type="button"
+                  onClick={() => navigate({ to: '/landing/apply' })}
                   className="inline-flex items-center font-semibold hover:underline"
                 >
                   Regístrese →
-                </a>
+                </button>
               </div>
 
               <div className="bg-green-600 text-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition">
@@ -222,12 +235,13 @@ export default function LandingPage() {
                   encontrar su verdadera potenciar y tomar decisiones informadas
                   sobre su futuro profesional.
                 </p>
-                <a
-                  href="https://caritaslima.org.pe"
+                <button
+                  type="button"
+                  onClick={() => navigate({ to: '/landing/apply' })}
                   className="inline-flex items-center font-semibold hover:underline"
                 >
                   Regístrese →
-                </a>
+                </button>
               </div>
             </div>
           </div>
@@ -342,7 +356,7 @@ export default function LandingPage() {
               <ul className="space-y-3 text-gray-300 text-sm">
                 <li>
                   <a
-                    href="https://caritaslima.org.pe"
+                    href={originalPageReferences['nosotros']}
                     className="hover:text-white transition"
                   >
                     Nosotros
@@ -350,7 +364,7 @@ export default function LandingPage() {
                 </li>
                 <li>
                   <a
-                    href="#que-hacemos"
+                    href={originalPageReferences['que-hacemos']}
                     className="hover:text-white transition"
                   >
                     Qué Hacemos
@@ -358,7 +372,7 @@ export default function LandingPage() {
                 </li>
                 <li>
                   <a
-                    href="#que-puedes-hacer"
+                    href={originalPageReferences['que-puedes-hacer-tu']}
                     className="hover:text-white transition"
                   >
                     Qué Puedes Hacer Tú
@@ -366,7 +380,7 @@ export default function LandingPage() {
                 </li>
                 <li>
                   <a
-                    href="https://caritaslima.org.pe"
+                    href={originalPageReferences['transparencia']}
                     className="hover:text-white transition"
                   >
                     Transparencia
@@ -374,7 +388,7 @@ export default function LandingPage() {
                 </li>
                 <li>
                   <a
-                    href="https://caritaslima.org.pe"
+                    href={originalPageReferences['contacto']}
                     className="hover:text-white transition"
                   >
                     Contacto
@@ -388,7 +402,7 @@ export default function LandingPage() {
               <ul className="space-y-3 text-gray-300 text-sm">
                 <li>
                   <a
-                    href="https://caritaslima.org.pe"
+                    href={originalPageReferences['transparencia']}
                     className="hover:text-white transition"
                   >
                     Información General
@@ -396,7 +410,7 @@ export default function LandingPage() {
                 </li>
                 <li>
                   <a
-                    href="https://caritaslima.org.pe"
+                    href={originalPageReferences['transparencia']}
                     className="hover:text-white transition"
                   >
                     Información Financiera
@@ -404,7 +418,7 @@ export default function LandingPage() {
                 </li>
                 <li>
                   <a
-                    href="https://caritaslima.org.pe"
+                    href={originalPageReferences['transparencia']}
                     className="hover:text-white transition"
                   >
                     Información De Salvaguarda
@@ -412,7 +426,7 @@ export default function LandingPage() {
                 </li>
                 <li>
                   <a
-                    href="https://caritaslima.org.pe"
+                    href={originalPageReferences['transparencia']}
                     className="hover:text-white transition"
                   >
                     A Donde Van Tus Donaciones
