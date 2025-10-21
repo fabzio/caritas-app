@@ -23,10 +23,14 @@ export const user = authSchema.table(
     email: varchar('email', { length: 254 }).notNull().unique(),
     emailVerified: boolean('email_verified').default(false).notNull(),
     image: varchar('image', { length: 500 }),
-    createdAt: timestamp('created_at')
+    createdAt: timestamp('created_at', {
+      withTimezone: true,
+    })
       .$defaultFn(() => new Date())
       .notNull(),
-    updatedAt: timestamp('updated_at')
+    updatedAt: timestamp('updated_at', {
+      withTimezone: true,
+    })
       .$defaultFn(() => new Date())
       .$onUpdate(() => new Date())
       .notNull(),
@@ -35,6 +39,7 @@ export const user = authSchema.table(
     banReason: text('ban_reason'),
     isAnonymous: boolean('is_anonymous'),
     banExpires: timestamp('ban_expires', {
+      withTimezone: true,
       mode: 'date',
     }),
     documentType: varchar('document_type', { length: 20 }),
@@ -62,12 +67,18 @@ export const userRelations = relations(user, ({ many }) => ({
 
 export const session = authSchema.table('session', {
   id: varchar('id', { length: 32 }).primaryKey(),
-  expiresAt: timestamp('expires_at').notNull(),
+  expiresAt: timestamp('expires_at', {
+    withTimezone: true,
+  }).notNull(),
   token: varchar('token', { length: 255 }).notNull().unique(),
-  createdAt: timestamp('created_at')
+  createdAt: timestamp('created_at', {
+    withTimezone: true,
+  })
     .$defaultFn(() => new Date())
     .notNull(),
-  updatedAt: timestamp('updated_at')
+  updatedAt: timestamp('updated_at', {
+    withTimezone: true,
+  })
     .$onUpdate(() => new Date())
     .notNull(),
   ipAddress: varchar('ip_address', { length: 45 }),
@@ -90,14 +101,22 @@ export const account = authSchema.table('account', {
   accessToken: text('access_token'),
   refreshToken: text('refresh_token'),
   idToken: text('id_token'),
-  accessTokenExpiresAt: timestamp('access_token_expires_at'),
-  refreshTokenExpiresAt: timestamp('refresh_token_expires_at'),
+  accessTokenExpiresAt: timestamp('access_token_expires_at', {
+    withTimezone: true,
+  }),
+  refreshTokenExpiresAt: timestamp('refresh_token_expires_at', {
+    withTimezone: true,
+  }),
   scope: varchar('scope', { length: 500 }),
   password: varchar('password', { length: 255 }),
-  createdAt: timestamp('created_at')
+  createdAt: timestamp('created_at', {
+    withTimezone: true,
+  })
     .$defaultFn(() => new Date())
     .notNull(),
-  updatedAt: timestamp('updated_at')
+  updatedAt: timestamp('updated_at', {
+    withTimezone: true,
+  })
     .$onUpdate(() => new Date())
     .notNull(),
 })
@@ -106,11 +125,17 @@ export const verification = authSchema.table('verification', {
   id: varchar('id', { length: 32 }).primaryKey(),
   identifier: varchar('identifier', { length: 100 }).notNull(),
   value: text().notNull(),
-  expiresAt: timestamp('expires_at').notNull(),
-  createdAt: timestamp('created_at')
+  expiresAt: timestamp('expires_at', {
+    withTimezone: true,
+  }).notNull(),
+  createdAt: timestamp('created_at', {
+    withTimezone: true,
+  })
     .$defaultFn(() => new Date())
     .notNull(),
-  updatedAt: timestamp('updated_at')
+  updatedAt: timestamp('updated_at', {
+    withTimezone: true,
+  })
     .$defaultFn(() => new Date())
     .$onUpdate(() => new Date())
     .notNull(),
@@ -119,10 +144,22 @@ export const verification = authSchema.table('verification', {
 export const organization = authSchema.table('organization', {
   id: varchar('id', { length: 32 }).primaryKey(),
   name: varchar('name', { length: 100 }).notNull(),
+  active: boolean('active')
+    .notNull()
+    .$defaultFn(() => true),
   slug: varchar('slug', { length: 100 }).unique(),
   logo: varchar('logo', { length: 500 }),
-  createdAt: timestamp('created_at').notNull(),
-  updatedAt: timestamp('updated_at').$onUpdate(() => new Date()),
+  createdAt: timestamp('created_at', {
+    withTimezone: true,
+  })
+    .$defaultFn(() => new Date())
+    .notNull(),
+  updatedAt: timestamp('updated_at', {
+    withTimezone: true,
+  })
+    .$defaultFn(() => new Date())
+    .$onUpdate(() => new Date())
+    .notNull(),
   metadata: text('metadata'),
   type: varchar('type', {
     length: 20,
@@ -147,7 +184,9 @@ export const passkey = authSchema.table('passkey', {
   deviceType: varchar('device_type', { length: 50 }).notNull(),
   backedUp: boolean('backed_up').notNull(),
   transports: varchar('transports', { length: 255 }),
-  createdAt: timestamp('created_at'),
+  createdAt: timestamp('created_at', {
+    withTimezone: true,
+  }),
   aaguid: varchar('aaguid', { length: 36 }),
 })
 
@@ -158,20 +197,29 @@ export const organizationRole = authSchema.table('organization_role', {
     .references(() => organization.id, { onDelete: 'cascade' }),
   role: varchar('role', { length: 50 }).notNull(),
   permission: varchar('permission', { length: 100 }).notNull(),
-  createdAt: timestamp('created_at')
+  createdAt: timestamp('created_at', {
+    withTimezone: true,
+  })
     .$defaultFn(() => new Date())
     .notNull(),
-  updatedAt: timestamp('updated_at').$onUpdate(() => new Date()),
+  updatedAt: timestamp('updated_at', {
+    withTimezone: true,
+  }).$onUpdate(() => new Date()),
 })
 
 export const team = authSchema.table('team', {
   id: varchar('id', { length: 32 }).primaryKey(),
   name: varchar('name', { length: 100 }).notNull(),
+  role: varchar('role', { length: 50 }).notNull(),
   organizationId: varchar('organization_id', { length: 32 })
     .notNull()
     .references(() => organization.id, { onDelete: 'cascade' }),
-  createdAt: timestamp('created_at').notNull(),
-  updatedAt: timestamp('updated_at').$onUpdate(() => new Date()),
+  createdAt: timestamp('created_at', {
+    withTimezone: true,
+  }).notNull(),
+  updatedAt: timestamp('updated_at', {
+    withTimezone: true,
+  }).$onUpdate(() => new Date()),
 })
 
 export const teamRelations = relations(team, ({ many, one }) => ({
@@ -190,7 +238,9 @@ export const teamMember = authSchema.table('team_member', {
   userId: varchar('user_id', { length: 32 })
     .notNull()
     .references(() => user.id, { onDelete: 'cascade' }),
-  createdAt: timestamp('created_at'),
+  createdAt: timestamp('created_at', {
+    withTimezone: true,
+  }),
 })
 
 export const teamMemberRelations = relations(teamMember, ({ one }) => ({
@@ -213,7 +263,9 @@ export const member = authSchema.table('member', {
     .notNull()
     .references(() => user.id, { onDelete: 'cascade' }),
   role: varchar('role', { length: 50 }).default('member').notNull(),
-  createdAt: timestamp('created_at').notNull(),
+  createdAt: timestamp('created_at', {
+    withTimezone: true,
+  }).notNull(),
 })
 
 export const memberRelations = relations(member, ({ one }) => ({
@@ -236,7 +288,9 @@ export const invitation = authSchema.table('invitation', {
   role: varchar('role', { length: 50 }),
   teamId: varchar('team_id', { length: 32 }),
   status: varchar('status', { length: 20 }).default('pending').notNull(),
-  expiresAt: timestamp('expires_at').notNull(),
+  expiresAt: timestamp('expires_at', {
+    withTimezone: true,
+  }).notNull(),
   inviterId: varchar('inviter_id', { length: 32 })
     .notNull()
     .references(() => user.id, { onDelete: 'cascade' }),

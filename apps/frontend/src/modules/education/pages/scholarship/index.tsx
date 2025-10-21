@@ -4,7 +4,7 @@ import { Button } from '@workspace/ui/components/button'
 import { Card, CardContent } from '@workspace/ui/components/card'
 import { Skeleton } from '@workspace/ui/components/skeleton'
 import { PlusCircle } from 'lucide-react'
-import useGetScholarship from '../../hooks/use-get-scholarship'
+import useGetScholarship from './hooks/use-get-scholarship'
 
 export default function ScholarshipPage() {
   const isMobile = useIsMobile()

@@ -1,4 +1,6 @@
-import { useNavigate } from '@tanstack/react-router'
+import { env } from '@frontend/env'
+import authClient from '@frontend/lib/authClient'
+import { useLocation, useNavigate } from '@tanstack/react-router'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,6 +16,7 @@ import {
 } from '@workspace/ui/components/sidebar.tsx'
 import { ChevronsUpDown } from 'lucide-react'
 import { useState } from 'react'
+import { toast } from 'sonner'
 import type { ValidRoutes } from '../types/valid-routes'
 
 type Props = {
@@ -21,16 +24,47 @@ type Props = {
     name: string
     logo: React.ElementType
     path: ValidRoutes
+    accessKey:
+      | 'admin'
+      | 'health'
+      | 'education'
+      | 'organization'
+      | 'beneficiary'
+      | 'user'
   }[]
 }
 function PlatformSwitcher({ platforms }: Readonly<Props>) {
   const navigate = useNavigate()
-  const { isMobile } = useSidebar()
-  const [selectedPlatform, setSelectedPlatform] = useState(platforms[0])
+  const { pathname } = useLocation()
 
-  const onChangePlatform = (platform: typeof selectedPlatform) => {
+  const { isMobile } = useSidebar()
+  const [selectedPlatform, setSelectedPlatform] = useState(
+    platforms.find((platform) => pathname.startsWith(platform.path)) ||
+      platforms[0],
+  )
+
+  const onChangePlatform = async (platform: typeof selectedPlatform) => {
+    const { data: organizations, error } = await authClient.organization.list()
+    if (error) {
+      toast.error('Error al cambiar de módulo')
+      return
+    }
+    if (['admin', 'health', 'education'].includes(platform.accessKey)) {
+      const targetOrg = organizations?.find((org) => org.type === 'caritas')
+      if (!targetOrg) {
+        toast.error('No se encontró la organización destino')
+        return
+      }
+      await authClient.organization.setActive({ organizationId: targetOrg.id })
+    } else {
+      await authClient.organization.setActive({
+        organizationId: organizations?.[0]?.id || '',
+      })
+    }
     setSelectedPlatform(platform)
-    navigate({ to: platform.path })
+    navigate({
+      to: platform.path,
+    })
   }
   if (!platforms.length) return null
   return (
@@ -40,7 +74,8 @@ function PlatformSwitcher({ platforms }: Readonly<Props>) {
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton
               size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+              disabled={platforms.length < 2}
+              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground disabled:opacity-100 disabled:hover:opacity-100"
             >
               <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
                 <selectedPlatform.logo className="size-4" />
@@ -49,9 +84,9 @@ function PlatformSwitcher({ platforms }: Readonly<Props>) {
                 <span className="truncate font-medium">
                   {selectedPlatform.name}
                 </span>
-                <span className="truncate text-xs">Cáritas Lima</span>
+                <span className="truncate text-xs">{env.VITE_ORG_NAME}</span>
               </div>
-              <ChevronsUpDown className="ml-auto" />
+              {platforms.length > 1 && <ChevronsUpDown className="ml-auto" />}
             </SidebarMenuButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent

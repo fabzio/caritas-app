@@ -1,3 +1,4 @@
+import { useSession } from '@frontend/hooks/use-session'
 import authClient from '@frontend/lib/authClient'
 import rpc from '@frontend/lib/rpc'
 import { QueryKeys } from '@frontend/shared/constants/query-keys'
@@ -6,29 +7,32 @@ import { useNavigate } from '@tanstack/react-router'
 import { toast } from 'sonner'
 
 type UpdateUserProps = Parameters<typeof authClient.admin.updateUser>[0] & {
-  teamId?: string
+  teamIds?: string[]
 }
 
 export const useUpdateUser = () => {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
-
+  const { data: session } = useSession()
   return useMutation({
     mutationFn: async (props: UpdateUserProps) => {
-      const { data, error } = await authClient.admin.updateUser(props)
+      const { teamIds, ...userPayload } = props
+      const { data, error } = await authClient.admin.updateUser(userPayload)
       if (error) throw error
-      if (props.teamId)
+      if (teamIds && teamIds.length > 0)
         await rpc.admin
           .users({
             id: props.userId as string,
           })
           .patch({
-            teamId: props.teamId,
+            teamIds,
           })
       return data
     },
-    onSuccess: () => {
+    onSuccess: (_, { userId }) => {
       queryClient.invalidateQueries({ queryKey: [QueryKeys.ADMIN.USERS] })
+      if (session?.user.id === userId)
+        queryClient.invalidateQueries({ queryKey: [QueryKeys.ACCESS] })
       toast.success('Modificado el usuario exitosamente')
       navigate({
         to: '/admin/users',

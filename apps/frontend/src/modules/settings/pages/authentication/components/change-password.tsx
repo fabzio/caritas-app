@@ -11,6 +11,7 @@ import {
   FormMessage,
 } from '@workspace/ui/components/form'
 import { Input } from '@workspace/ui/components/input'
+import { Spinner } from '@workspace/ui/components/spinner'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
@@ -23,7 +24,7 @@ export default function ChangePassword() {
       confirmNewPassword: '',
     },
   })
-  const { mutate } = useChangePassword()
+  const { mutate, isPending } = useChangePassword()
   const onSubmit = form.handleSubmit((data) =>
     mutate({
       currentPassword: data.currentPassword,
@@ -86,7 +87,9 @@ export default function ChangePassword() {
               </FormItem>
             )}
           />
-          <Button type="submit">Cambiar Contraseña</Button>
+          <Button type="submit" disabled={isPending}>
+            {isPending ? <Spinner /> : 'Cambiar Contraseña'}
+          </Button>
         </form>
       </Form>
     </div>

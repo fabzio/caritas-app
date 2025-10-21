@@ -25,8 +25,20 @@ export namespace ScholarshipRecipientModel {
     page: t.Optional(t.Integer({ minimum: 0 })),
     limit: t.Optional(t.Integer({ minimum: 1, maximum: 100 })),
     sortBy: t.Optional(t.String()),
+    selectFilters: t.Optional(
+      t.Object({
+        scholarshipName: t.Optional(t.String()),
+        regionNames: t.Optional(t.String()),
+      }),
+    ),
   })
   export type ListRecipientsQuery = typeof listRecipientsQuery.static
+
+  export const getSelectNamesResponse = t.Object({
+    scholarshipNames: t.Array(t.String()),
+    regionNames: t.Array(t.String()),
+  })
+  export type GetScholarshipNames = typeof getSelectNamesResponse.static
 
   export const createScholarshipRecipient = t.Object({
     scholarshipId: t.Number(),

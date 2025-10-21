@@ -2,12 +2,12 @@ import env from '@api/env'
 import nodemailer from 'nodemailer'
 
 const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 465,
-  secure: true,
+  host: env.SMTP_HOST,
+  port: env.SMTP_PORT,
+  requireTLS: true,
   auth: {
-    user: env.GOOGLE_SMTP_USER,
-    pass: env.GOOGLE_SMTP_APP_PASSWORD,
+    user: env.SMTP_USER,
+    pass: env.SMTP_PASSWORD,
   },
 })
 

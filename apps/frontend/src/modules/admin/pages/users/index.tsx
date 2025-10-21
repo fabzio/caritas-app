@@ -11,7 +11,7 @@ import {
   DialogTitle,
 } from '@workspace/ui/components/dialog'
 import { UserPlus } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { toast } from 'sonner'
 import ActionsButton from './components/actions-button'
 import RoleFilter from './components/role-filter'
@@ -24,7 +24,6 @@ import { useUserTable } from './hooks/use-table'
 export default function TableView() {
   const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({})
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
-  const [roleFilter, setRoleFilter] = useState<string>('all')
   const { mutateAsync: removeUser, isPending: removeUserIsPending } =
     useRemoveUser()
   const { mutateAsync: banUser, isPending: banUserIsPending } = useBanUser()
@@ -34,28 +33,32 @@ export default function TableView() {
     columns,
     paginationState,
     sortingState,
+    filters,
     setFilters,
   } = useUserTable()
 
-  const uniqueRoles = useMemo(() => {
-    if (!users) return []
-    const roles = users
-      .map((user) => user.role)
-      .filter((role): role is string => role !== null && role !== undefined)
-    return Array.from(new Set(roles)).sort((a, b) => a.localeCompare(b, 'es'))
-  }, [users])
+  const roleFilter = filters.role || 'all'
 
-  const filteredUsers = useMemo(() => {
-    if (!users || roleFilter === 'all') return users
-    return users.filter((user) => user.role === roleFilter)
-  }, [users, roleFilter])
+  const handleRoleFilterChange = (newRole: string) => {
+    setRowSelection({})
+    setFilters({
+      role: newRole === 'all' ? undefined : newRole,
+      pageIndex: 1,
+    })
+  }
+
+  const uniqueRoles = [
+    { value: 'admin', label: 'Administrador' },
+    { value: 'healthMember', label: 'Personal de Salud' },
+    { value: 'educationMember', label: 'Personal de Educación' },
+  ]
 
   const selectedRows = Object.keys(rowSelection)
     .filter((key) => rowSelection[key])
     .map((key) => Number.parseInt(key, 10))
 
   const selectedUsers = selectedRows
-    .map((rowIndex) => filteredUsers?.[rowIndex])
+    .map((rowIndex) => users?.[rowIndex])
     .filter((user): user is NonNullable<typeof user> => Boolean(user))
 
   const resetSelectedRows = () => setRowSelection({})
@@ -127,7 +130,7 @@ export default function TableView() {
           <div className="sm:w-auto w-full">
             <RoleFilter
               value={roleFilter}
-              onValueChange={setRoleFilter}
+              onValueChange={handleRoleFilterChange}
               roles={uniqueRoles}
             />
           </div>
@@ -155,7 +158,7 @@ export default function TableView() {
         <UserTable
           rowSelection={rowSelection}
           setRowSelection={setRowSelection}
-          data={filteredUsers || []}
+          data={users || []}
           columns={columns}
           paginationState={paginationState}
           sortingState={sortingState}

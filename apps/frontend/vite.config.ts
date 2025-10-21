@@ -15,14 +15,6 @@ export default defineConfig({
       filter: (url) => url.includes('192.'),
     }),
   ],
-  test: {
-    environment: 'happy-dom',
-    globals: true,
-    coverage: {
-      reporter: ['lcov', 'html'],
-      provider: 'v8',
-    },
-  },
   server: {
     host: true,
     proxy: {
@@ -38,7 +30,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@frontend': resolve(__dirname, './src'),
-      '@': resolve(__dirname, './src'),
+      '@api': resolve(__dirname, '../api/src'),
       '@workspace/ui': resolve(__dirname, '../../packages/ui/src'),
     },
   },

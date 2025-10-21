@@ -1,4 +1,4 @@
-import CreateScholarship from '@frontend/modules/education/pages/scholarship/create'
+import CreateScholarship from '@frontend/modules/education/pages/scholarship/pages/create-scholarship'
 import { createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute(
@@ -6,7 +6,3 @@ export const Route = createFileRoute(
 )({
   component: CreateScholarship,
 })
-
-function _RouteComponent() {
-  return <div>Hello "/_authenticated/education/scholarship/create"!</div>
-}
