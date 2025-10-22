@@ -3,7 +3,6 @@ import { createInsertSchema } from 'drizzle-typebox'
 import { t } from 'elysia'
 
 export namespace ActivityModel {
-  // Esquemas de la tabla (generados automáticamente)
   const _createActivity = createInsertSchema(activity)
 
   export const listActivitySchema = t.Object({
@@ -41,7 +40,6 @@ export namespace ActivityModel {
 
   export const getSingleActivityResponse = listActivitySchema
   export type GetSingleActivity = typeof getSingleActivityResponse.static
-
   export const createActivity = t.Omit(_createActivity, ['id'])
   export type CreateActivity = typeof createActivity.static
 
@@ -97,4 +95,27 @@ export namespace ActivityModel {
 
   export const getUserAttentionsResponse = t.Array(userAttentionSchema)
   export type GetUserAttentions = typeof getUserAttentionsResponse.static
+  export const deleteActivities = t.Object({
+    ids: t.Array(t.Integer({ minimum: 1 }), { minItems: 1 }),
+  })
+  export type DeleteActivities = typeof deleteActivities.static
+
+  export const createCompleteActivity = t.Object({
+    name: t.String({ minLength: 1, maxLength: 100 }),
+    date: t.Date(),
+    duration: t.String(),
+    description: t.Optional(t.String({ maxLength: 500 })),
+    spaceId: t.String({ minLength: 32, maxLength: 32 }),
+    statusId: t.Integer({ minimum: 1, maximum: 6 }),
+    typeId: t.Integer({ minimum: 1, maximum: 2 }),
+    userId: t.String({ minLength: 32, maxLength: 32 }),
+    participants: t.Array(
+      t.Object({
+        alliedId: t.String({ minLength: 32, maxLength: 32 }),
+        specialityIds: t.Array(t.Integer({ minimum: 1 }), { minItems: 1 }),
+      }),
+      { minItems: 1 },
+    ),
+  })
+  export type CreateCompleteActivity = typeof createCompleteActivity.static
 }
