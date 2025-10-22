@@ -71,6 +71,8 @@ export default function EditActivityForm() {
     defaultValues: {
       name: '',
       durationHours: 2,
+      typeId: undefined,
+      statusId: undefined,
       participants: [{ alliedId: '', specialityIds: [] }],
     },
   })
@@ -81,7 +83,6 @@ export default function EditActivityForm() {
   })
 
   const formReset = form.reset
-  const setValue = form.setValue
 
   useEffect(() => {
     if (
@@ -105,9 +106,6 @@ export default function EditActivityForm() {
             ? activity.participants
             : [{ alliedId: '', specialityIds: [] }],
       })
-
-      setValue('typeId', activity.typeId)
-      setValue('statusId', activity.statusId)
     }
   }, [
     activity,
@@ -116,7 +114,6 @@ export default function EditActivityForm() {
     allies,
     specialities,
     formReset,
-    setValue,
   ])
 
   const { mutate, isPending } = useUpdateCompleteActivity(id)
@@ -381,114 +378,129 @@ export default function EditActivityForm() {
                     </Button>
                   </div>
 
-                  {fields.map((field, index) => (
-                    <Card key={field.id}>
-                      <CardHeader className="pb-3">
-                        <div className="flex items-center justify-between">
-                          <CardTitle className="text-base">
-                            Participante {index + 1}
-                          </CardTitle>
-                          {fields.length > 1 && (
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => remove(index)}
-                            >
-                              <Trash2 className="h-4 w-4 text-destructive" />
-                            </Button>
-                          )}
-                        </div>
-                      </CardHeader>
-                      <CardContent className="space-y-4">
-                        <FormField
-                          control={form.control}
-                          name={`participants.${index}.alliedId`}
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Aliado*</FormLabel>
-                              <Select
-                                onValueChange={field.onChange}
-                                value={field.value}
+                  {fields.map((field, index) => {
+                    const selectedAlliedIds = form
+                      .watch('participants')
+                      .map((p) => p.alliedId)
+                      .filter((id, idx) => idx !== index && id)
+
+                    const availableAllies = allies?.filter(
+                      (ally: { id: string; name: string }) =>
+                        !selectedAlliedIds.includes(ally.id),
+                    )
+
+                    return (
+                      <Card key={field.id}>
+                        <CardHeader className="pb-3">
+                          <div className="flex items-center justify-between">
+                            <CardTitle className="text-base">
+                              Participante {index + 1}
+                            </CardTitle>
+                            {fields.length > 1 && (
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => remove(index)}
                               >
-                                <FormControl>
-                                  <SelectTrigger>
-                                    <SelectValue placeholder="Seleccione un aliado" />
-                                  </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                  {allies?.map(
-                                    (ally: { id: string; name: string }) => (
-                                      <SelectItem key={ally.id} value={ally.id}>
-                                        {ally.name}
-                                      </SelectItem>
+                                <Trash2 className="h-4 w-4 text-destructive" />
+                              </Button>
+                            )}
+                          </div>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                          <FormField
+                            control={form.control}
+                            name={`participants.${index}.alliedId`}
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Aliado*</FormLabel>
+                                <Select
+                                  onValueChange={field.onChange}
+                                  value={field.value}
+                                >
+                                  <FormControl>
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="Seleccione un aliado" />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    {availableAllies?.map(
+                                      (ally: { id: string; name: string }) => (
+                                        <SelectItem
+                                          key={ally.id}
+                                          value={ally.id}
+                                        >
+                                          {ally.name}
+                                        </SelectItem>
+                                      ),
+                                    )}
+                                  </SelectContent>
+                                </Select>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={form.control}
+                            name={`participants.${index}.specialityIds`}
+                            render={() => (
+                              <FormItem>
+                                <FormLabel>Especialidades*</FormLabel>
+                                <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
+                                  {specialities?.map(
+                                    (speciality: {
+                                      id: number
+                                      name: string
+                                    }) => (
+                                      <FormField
+                                        key={speciality.id}
+                                        control={form.control}
+                                        name={`participants.${index}.specialityIds`}
+                                        render={({ field }) => (
+                                          <FormItem className="flex items-center space-x-2 space-y-0">
+                                            <FormControl>
+                                              <Checkbox
+                                                checked={field.value?.includes(
+                                                  speciality.id,
+                                                )}
+                                                onCheckedChange={(checked) => {
+                                                  const currentValue =
+                                                    field.value || []
+                                                  if (checked) {
+                                                    field.onChange([
+                                                      ...currentValue,
+                                                      speciality.id,
+                                                    ])
+                                                  } else {
+                                                    field.onChange(
+                                                      currentValue.filter(
+                                                        (id) =>
+                                                          id !== speciality.id,
+                                                      ),
+                                                    )
+                                                  }
+                                                }}
+                                              />
+                                            </FormControl>
+                                            <FormLabel className="font-normal">
+                                              {speciality.name}
+                                            </FormLabel>
+                                          </FormItem>
+                                        )}
+                                      />
                                     ),
                                   )}
-                                </SelectContent>
-                              </Select>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        <FormField
-                          control={form.control}
-                          name={`participants.${index}.specialityIds`}
-                          render={() => (
-                            <FormItem>
-                              <FormLabel>Especialidades*</FormLabel>
-                              <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
-                                {specialities?.map(
-                                  (speciality: {
-                                    id: number
-                                    name: string
-                                  }) => (
-                                    <FormField
-                                      key={speciality.id}
-                                      control={form.control}
-                                      name={`participants.${index}.specialityIds`}
-                                      render={({ field }) => (
-                                        <FormItem className="flex items-center space-x-2 space-y-0">
-                                          <FormControl>
-                                            <Checkbox
-                                              checked={field.value?.includes(
-                                                speciality.id,
-                                              )}
-                                              onCheckedChange={(checked) => {
-                                                const currentValue =
-                                                  field.value || []
-                                                if (checked) {
-                                                  field.onChange([
-                                                    ...currentValue,
-                                                    speciality.id,
-                                                  ])
-                                                } else {
-                                                  field.onChange(
-                                                    currentValue.filter(
-                                                      (id) =>
-                                                        id !== speciality.id,
-                                                    ),
-                                                  )
-                                                }
-                                              }}
-                                            />
-                                          </FormControl>
-                                          <FormLabel className="font-normal">
-                                            {speciality.name}
-                                          </FormLabel>
-                                        </FormItem>
-                                      )}
-                                    />
-                                  ),
-                                )}
-                              </div>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </CardContent>
-                    </Card>
-                  ))}
+                                </div>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </CardContent>
+                      </Card>
+                    )
+                  })}
                 </div>
 
                 <CardFooter className="flex justify-between px-0 pt-6">
