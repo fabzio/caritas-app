@@ -12,7 +12,7 @@ import {
 import { Input } from '@workspace/ui/components/input'
 import { useForm } from 'react-hook-form'
 import z from 'zod'
-import { useCreateAlly } from './hooks/use-create-ally'
+import { useCreateAlly } from '../../hooks/use-create-ally'
 
 const formSchema = z.object({
   name: z
