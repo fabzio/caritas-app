@@ -101,9 +101,20 @@ export async function findDuplicateSpeciality(
   name: string,
   excludeId?: number,
 ) {
-  const { data: coincidences } = await getSpecialities({ q: name })
+  const response = await db
+    .select({ speciality })
+    .from(speciality)
+    .where(eq(speciality.active, true))
 
-  if (!coincidences?.length) return null
+  const allRows = response.map((s) => s.speciality)
+
+  if (!allRows?.length) return null
+
+  const coincidences = allRows.filter(
+    (s) => normalizeText(s.name) === normalizeText(name),
+  )
+
+  if (!coincidences.length) return null
 
   const excluded = coincidences.find((s) => s.id !== excludeId)
 
