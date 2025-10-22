@@ -5,8 +5,14 @@ export const formSpecialitySchema = z.object({
     .string()
     .nonempty('El nombre es obligatorio')
     .trim()
-    .refine((val) => val.trim().length > 0, {
+    .refine((val) => val.length > 0, {
       message: 'El nombre no puede contener solo espacios',
+    })
+    .refine((val) => !/^\d+$/.test(val), {
+      message: 'El nombre no puede contener solo números',
+    })
+    .refine((val) => !/^[^\p{L}\p{N}]+$/u.test(val), {
+      message: 'El nombre no puede contener solo símbolos',
     })
     .max(100, { message: 'El nombre no debe superar los 100 caracteres' }),
 })
