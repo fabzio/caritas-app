@@ -49,7 +49,6 @@ export default function TableView() {
 
   const uniqueRoles = [
     { value: 'admin', label: 'Administrador' },
-    { value: 'owner', label: 'Propietario' },
     { value: 'healthMember', label: 'Personal de Salud' },
     { value: 'educationMember', label: 'Personal de Educación' },
   ]

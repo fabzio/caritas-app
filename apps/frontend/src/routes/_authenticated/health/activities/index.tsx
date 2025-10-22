@@ -11,7 +11,7 @@ const ActivitySearchSchema = z.object({
   sortBy: z.string().optional(),
 })
 
-export const Route = createFileRoute('/_authenticated/health/activities')({
+export const Route = createFileRoute('/_authenticated/health/activities/')({
   loader: ({ context: { queryClient } }) =>
     queryClient.ensureQueryData({
       queryKey: [QueryKeys.HEALTH.ACTIVITIES, {}],
