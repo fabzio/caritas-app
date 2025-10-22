@@ -1,14 +1,17 @@
-import { fairs } from '@api/db/schemas/education'
-import { createInsertSchema, createSelectSchema } from 'drizzle-typebox'
+import { fair } from '@api/db/schemas/education'
+import {
+  createInsertSchema,
+  createSelectSchema,
+  createUpdateSchema,
+} from 'drizzle-typebox'
 import { t } from 'elysia'
 
 export namespace FairModel {
-  const _getFair = createSelectSchema(fairs, {
-    date: t.String(),
+  const _getFair = createSelectSchema(fair, {
+    date: t.Date(),
   })
-  const _createFair = createInsertSchema(fairs)
-  export const createFair = t.Omit(_createFair, ['id']) //exclude id
-  export type CreateFair = typeof createFair.static //new type more beauty
+  export const createFair = createInsertSchema(fair)
+  export type CreateFair = typeof createFair.static
 
   export const getFairsResponse = t.Object({
     data: t.Array(
@@ -44,8 +47,7 @@ export namespace FairModel {
   })
   export type GetSingleFairsQuery = typeof getSingleFairsQuery.static
 
-  export const updateFair = t.Partial(
-    t.Omit(_getFair, ['id', 'createdAt', 'updatedAt', 'createdBy']),
-  )
+  const _updateFair = createUpdateSchema(fair)
+  export const updateFair = _updateFair
   export type UpdateFair = typeof updateFair.static
 }

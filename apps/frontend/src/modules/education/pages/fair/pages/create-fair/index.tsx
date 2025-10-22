@@ -5,14 +5,6 @@ import { getRouteApi, Link, useSearch } from '@tanstack/react-router'
 import { Button } from '@workspace/ui/components/button'
 import { Calendar } from '@workspace/ui/components/calendar'
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@workspace/ui/components/card'
-import {
   Command,
   CommandEmpty,
   CommandGroup,
@@ -35,6 +27,7 @@ import {
   PopoverTrigger,
 } from '@workspace/ui/components/popover'
 import { Separator } from '@workspace/ui/components/separator'
+import { Spinner } from '@workspace/ui/components/spinner'
 import { cn } from '@workspace/ui/lib/utils'
 import { format } from 'date-fns'
 import { CalendarIcon, Check, ChevronsUpDown, Loader2 } from 'lucide-react'
@@ -102,14 +95,16 @@ export default function CreateFairPage() {
       </div>
       <div>
         <div className=" flex justify-center ">
-          <Card className="w-full lg:w-3/4">
-            <CardHeader>
-              <CardTitle>Información de la Feria vocacional</CardTitle>
-              <CardDescription>
+          <div className="w-full lg:w-3/4">
+            <header>
+              <h3 className="text-lg font-medium">
+                Información de la Feria vocacional
+              </h3>
+              <p className="text-sm text-muted-foreground">
                 Complete todos los campos requeridos*
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
+              </p>
+            </header>
+            <div>
               <Form {...form}>
                 <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
                   <FormField
@@ -275,7 +270,7 @@ export default function CreateFairPage() {
                       </FormItem>
                     )}
                   />
-                  <CardFooter className="flex justify-end gap-4 align-center ">
+                  <footer className="flex justify-end gap-4 items-center">
                     <Link to="/education/fair">
                       <Button variant="outline" type="button">
                         Cancelar
@@ -286,16 +281,16 @@ export default function CreateFairPage() {
                       disabled={isPendingCreate || isPendingUpdate}
                     >
                       {isPendingCreate || isPendingUpdate ? (
-                        <Loader2 className="animate-spin w-2" />
+                        <Spinner />
                       ) : (
                         dependantText.submit[viewType]
                       )}
                     </Button>
-                  </CardFooter>
+                  </footer>
                 </form>
               </Form>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
       </div>
     </div>

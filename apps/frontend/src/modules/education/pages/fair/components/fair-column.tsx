@@ -8,7 +8,7 @@ export type Fair = {
   id: number
   title: string
   district: string
-  date: string
+  date: Date
   address: string
   startTime: string
   endTime: string
@@ -84,11 +84,11 @@ export const fairTableColumns: ColumnDef<Fair>[] = [
         <ArrowUpDown />
       </Button>
     ),
-    cell: ({ row }) => {
-      const date = new Date(row.original.date)
-      return new Intl.DateTimeFormat('es-PE', {
-        dateStyle: 'short',
-      }).format(date)
-    },
+    cell: ({ row }) =>
+      row.original.date.toLocaleDateString('es-PE', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+      }),
   },
 ]

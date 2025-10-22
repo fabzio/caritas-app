@@ -4,15 +4,21 @@ import { Button } from '@workspace/ui/components/button'
 import { Skeleton } from '@workspace/ui/components/skeleton'
 import { PlusCircle } from 'lucide-react'
 import { useState } from 'react'
+import { toast } from 'sonner'
 import ActionsButton from './components/actions-button'
+import DeleteFairDialog from './components/delete-fair-dialog.tsx'
 import FairTable from './components/fair-table'
 import SearchFairInput from './components/search-fair-input'
 import { useFairTable } from './hooks/use-fair-table'
+import { useRemoveFair } from './hooks/use-remove-fair.ts'
 
 export default function FairPage() {
   const isMobile = useIsMobile()
   const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({})
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const navigate = useNavigate()
+  const { mutateAsync: removeFair, isPending: removeFairIsPending } =
+    useRemoveFair()
 
   const {
     data: fairs,
@@ -30,9 +36,60 @@ export default function FairPage() {
 
   const selectedFairs = selectedRows
     .map((rowIndex) => fairs?.[rowIndex])
-    .filter(Boolean)
+    .filter(
+      (fair): fair is NonNullable<typeof fair> =>
+        fair !== undefined && fair !== null,
+    )
 
   const fairCount = selectedFairs.length
+  const resetSelectedRows = () => setRowSelection({})
+
+  const handleEdit = () => {
+    const targetFair = selectedFairs[0]
+    if (!targetFair) return
+    navigate({
+      to: '/education/fair/form',
+      search: { id: targetFair.id, type: 'edit' },
+    })
+  }
+
+  const handleDelete = async () => {
+    if (!selectedFairs.length) {
+      setIsDeleteModalOpen(false)
+      return
+    }
+
+    const results = await Promise.allSettled(
+      selectedFairs.map((fair) =>
+        removeFair({
+          fairId: fair.id,
+        }),
+      ),
+    )
+
+    let totalSuccessful = 0
+
+    for (const result of results) {
+      if (result.status === 'fulfilled') totalSuccessful++
+    }
+
+    const totalFailed = selectedFairs.length - totalSuccessful
+
+    if (totalSuccessful > 0) {
+      toast.success(
+        `${totalSuccessful} de ${selectedFairs.length} feria(s) eliminadas correctamente.`,
+      )
+    }
+
+    if (totalFailed > 0) {
+      toast.error(
+        `Atención: Falló el procesamiento de ${totalFailed} feria(s).`,
+      )
+    }
+
+    setIsDeleteModalOpen(false)
+    resetSelectedRows()
+  }
 
   return (
     <div className="w-full p-4">
@@ -50,13 +107,8 @@ export default function FairPage() {
         </div>
         <div className="flex items-center gap-2">
           <ActionsButton
-            onDeleteClick={() => {}}
-            onEditClick={() =>
-              navigate({
-                to: '/education/fair/form',
-                search: { id: selectedFairs[0].id, type: 'edit' },
-              })
-            }
+            onDeleteClick={() => setIsDeleteModalOpen(true)}
+            onEditClick={handleEdit}
             selectedCount={fairCount}
           />
           <Link search={{ type: 'new' }} to="/education/fair/form">
@@ -87,6 +139,13 @@ export default function FairPage() {
           />
         )}
       </div>
+      <DeleteFairDialog
+        open={isDeleteModalOpen}
+        onOpenChange={setIsDeleteModalOpen}
+        count={fairCount}
+        onConfirm={handleDelete}
+        isLoading={removeFairIsPending}
+      />
     </div>
   )
 }

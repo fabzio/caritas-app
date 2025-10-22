@@ -29,7 +29,10 @@ export default function ActionsButton({
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuGroup>
-          <DropdownMenuItem onClick={onDeleteClick} disabled>
+          <DropdownMenuItem
+            onClick={onDeleteClick}
+            disabled={selectedCount === 0}
+          >
             Eliminar
           </DropdownMenuItem>
           <DropdownMenuItem

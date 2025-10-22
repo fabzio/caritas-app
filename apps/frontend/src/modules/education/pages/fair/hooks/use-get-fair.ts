@@ -21,11 +21,11 @@ export const useGetFairs = ({
   filters,
 }: GetFairsParams) => {
   return useQuery({
-    queryKey: [QueryKeys.EDUCATION.FAIR, currentPage, pageSize, filters],
+    queryKey: [QueryKeys.EDUCATION.FAIR, filters],
     queryFn: async () => {
-      const response = await rpc.education.fairs.index.get({
+      const response = await rpc.education.fairs.get({
         query: {
-          page: currentPage - 1,
+          page: Math.max(0, (currentPage || 1) - 1),
           limit: pageSize,
           q: filters?.q,
           district: filters?.district,

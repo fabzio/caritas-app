@@ -1,7 +1,7 @@
 import db from '@api/db'
 import { PostgresError } from '@api/db/errors'
 import { region } from '@api/db/schemas/auth'
-import { fairs } from '@api/db/schemas/education'
+import { fair } from '@api/db/schemas/education'
 import { and, asc, count, desc, eq, ilike, or } from 'drizzle-orm'
 import type { FairModel } from './model'
 
@@ -23,23 +23,23 @@ export async function getFairs(
     (sortOrderRaw ?? 'desc').trim().toLowerCase() === 'desc' ? 'desc' : 'asc'
 
   const columns = {
-    title: fairs.title,
-    date: fairs.date,
+    title: fair.title,
+    date: fair.date,
     district: region.name,
   } as const
 
-  const column = columns[sortField as keyof typeof columns] ?? fairs.date
+  const column = columns[sortField as keyof typeof columns] ?? fair.date
   const orderExpr = sortOrder === 'desc' ? desc(column) : asc(column)
 
-  const searchCondition = q ? or(ilike(fairs.title, `%${q}%`)) : undefined
+  const searchCondition = q ? or(ilike(fair.title, `%${q}%`)) : undefined
 
   const districtCondition = district
-    ? eq(fairs.regionId, Number(district))
+    ? eq(fair.regionId, Number(district))
     : undefined
 
-  const dateCondition = date ? eq(fairs.date, date) : undefined
+  const dateCondition = date ? eq(fair.date, date) : undefined
 
-  const activeCondition = eq(fairs.active, true)
+  const activeCondition = eq(fair.active, true)
 
   const where = and(
     activeCondition,
@@ -51,23 +51,23 @@ export async function getFairs(
   try {
     const [{ total }] = await db
       .select({ total: count() })
-      .from(fairs)
-      .innerJoin(region, eq(fairs.regionId, region.id))
+      .from(fair)
+      .innerJoin(region, eq(fair.regionId, region.id))
       .where(where)
 
     const rows = await db
       .select({
-        id: fairs.id,
-        title: fairs.title,
-        address: fairs.address,
+        id: fair.id,
+        title: fair.title,
+        address: fair.address,
         district: region.name,
-        active: fairs.active,
-        startTime: fairs.startTime,
-        endTime: fairs.endTime,
-        date: fairs.date,
+        active: fair.active,
+        startTime: fair.startTime,
+        endTime: fair.endTime,
+        date: fair.date,
       })
-      .from(fairs)
-      .innerJoin(region, eq(fairs.regionId, region.id))
+      .from(fair)
+      .innerJoin(region, eq(fair.regionId, region.id))
       .where(where)
       .offset(page * limit)
       .limit(limit)
@@ -78,7 +78,7 @@ export async function getFairs(
     return {
       data: rows.map((row) => ({
         ...row,
-        date: row.date?.toString() ?? '',
+        date: new Date(row.date),
       })),
       total,
       page,
@@ -92,7 +92,7 @@ export async function getFairs(
 }
 export const getSingleFair = async ({ id }: { id: number }) => {
   try {
-    const response = await db.query.fairs.findFirst({
+    const response = await db.query.fair.findFirst({
       where: (fairs, { eq }) => eq(fairs.id, id),
     })
 
@@ -100,7 +100,7 @@ export const getSingleFair = async ({ id }: { id: number }) => {
 
     return {
       ...response,
-      date: response.date?.toString(),
+      date: new Date(response.date),
     }
   } catch (e) {
     if (e instanceof Error) throw new PostgresError(e.message)
@@ -110,8 +110,8 @@ export const getSingleFair = async ({ id }: { id: number }) => {
 export const createFair = async (args: FairModel.CreateFair) => {
   try {
     const [{ id }] = await db.transaction(async (tx) => {
-      return await tx.insert(fairs).values(args).returning({
-        id: fairs.id,
+      return await tx.insert(fair).values(args).returning({
+        id: fair.id,
       })
     })
     return id
@@ -123,12 +123,12 @@ export const createFair = async (args: FairModel.CreateFair) => {
 export const patchFair = async (id: number, args: FairModel.UpdateFair) => {
   try {
     const response = await db
-      .update(fairs)
+      .update(fair)
       .set({
         ...args,
       })
-      .where(eq(fairs.id, id))
-      .returning({ id: fairs.id })
+      .where(eq(fair.id, id))
+      .returning({ id: fair.id })
     return response.length
   } catch (e) {
     if (e instanceof Error) throw new PostgresError(e.message)

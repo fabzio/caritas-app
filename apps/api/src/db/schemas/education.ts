@@ -84,7 +84,7 @@ export const organizationOpportunity = educationSchema.table('opportunity', {
     .$onUpdateFn(() => new Date()),
   active: boolean().default(true).notNull(),
 })
-export const fairs = educationSchema.table('fairs', {
+export const fair = educationSchema.table('fair', {
   id: integer('id').primaryKey().generatedByDefaultAsIdentity(),
   title: varchar('title', { length: 200 }).notNull(),
   address: text('address').notNull(),
