@@ -6,6 +6,7 @@ import db, { schema } from '@api/db'
 import { auth } from '@api/lib/auth'
 import { fakerES as faker } from '@faker-js/faker'
 import { count, eq, sql } from 'drizzle-orm'
+import { activityStatus, activityTypes } from './entities/activities'
 import { districts } from './entities/regions'
 
 const colors = {
@@ -144,6 +145,16 @@ export const seedDistricts = async () => {
     )
     .onConflictDoNothing({ target: schema.region.code })
 }
+export const seedActivities = async () => {
+  await Promise.all([
+    db
+      .insert(schema.activityType)
+      .values(activityTypes.map((type) => ({ name: type }))),
+    db
+      .insert(schema.activityStatus)
+      .values(activityStatus.map((status) => ({ name: status }))),
+  ])
+}
 
 const resetDatabase = async () => {
   await ensureSchema()
@@ -268,8 +279,10 @@ const initialize = async (rl: Interface) => {
     await resetDatabase()
   }
 
-  console.log(`${colors.accent}Hydrating regions...${colors.reset}`)
-  await seedDistricts()
+  console.log(
+    `${colors.accent}Hydrating regions, activities types and statuses...${colors.reset}`,
+  )
+  await seed()
   const email = await requestEmail(rl)
   const firstName = faker.person.firstName()
   const lastName = faker.person.lastName()
@@ -377,7 +390,7 @@ const initialize = async (rl: Interface) => {
 }
 
 export const seed = async () => {
-  await seedDistricts()
+  await Promise.all([seedDistricts(), seedActivities()])
 }
 
 const runCli = async () => {

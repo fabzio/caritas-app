@@ -1,11 +1,13 @@
 import db from '@api/db'
 import { PostgresError } from '@api/db/errors'
-import { organization, user } from '@api/db/schemas/auth' // Tablas de autenticación
+import { organization, user } from '@api/db/schemas/auth'
 import {
   activity,
   activityStatus,
   activityType,
+  activityUser,
   alliedParticipation,
+  attention,
   speciality,
 } from '@api/db/schemas/health'
 import { and, asc, count, desc, eq, ilike, or } from 'drizzle-orm'
@@ -25,6 +27,44 @@ export const createActivity = async (args: ActivityModel.CreateActivity) => {
   }
 }
 
+export async function getSingleActivity(
+  activityId: string,
+): Promise<ActivityModel.GetSingleActivity | null> {
+  try {
+    const activityIdNum = Number.parseInt(activityId, 10)
+
+    const [result] = await db
+      .select({
+        id: activity.id,
+        name: activity.name,
+        date: activity.date,
+        duration: activity.duration,
+        state: activity.state,
+        statusName: activityStatus.name,
+        typeName: activityType.name,
+        spaceName: organization.name,
+        creatorName: user.name,
+      })
+      .from(activity)
+      .innerJoin(activityStatus, eq(activity.statusId, activityStatus.id))
+      .innerJoin(activityType, eq(activity.typeId, activityType.id))
+      .innerJoin(organization, eq(activity.spaceId, organization.id))
+      .innerJoin(user, eq(activity.userId, user.id))
+      .where(eq(activity.id, activityIdNum))
+      .limit(1)
+
+    if (!result) return null
+
+    return {
+      ...result,
+      date: new Date(result.date),
+    }
+  } catch (e) {
+    if (e instanceof Error) throw new PostgresError(e.message)
+    throw e
+  }
+}
+
 export async function getActivities(
   params: ActivityModel.ListActivitiesQuery,
 ): Promise<ActivityModel.GetActivities> {
@@ -32,13 +72,11 @@ export async function getActivities(
     const { q = '', page = 0, limit = 10, sortBy = 'name.asc' } = params
     const searchQuery = q.replace(/\s+/g, ' ').trim()
 
-    // 1. Procesamiento de Ordenamiento
     const [sortFieldRaw, sortOrderRaw] = (sortBy ?? 'name.asc').split('.', 2)
     const sortField = (sortFieldRaw ?? 'name').trim()
     const sortOrder =
       (sortOrderRaw ?? 'asc').trim().toLowerCase() === 'desc' ? 'desc' : 'asc'
 
-    // Mapeo de columnas para ordenar
     const columnsMap = {
       name: activity.name,
       date: activity.date,
@@ -51,24 +89,19 @@ export async function getActivities(
       columnsMap[sortField as keyof typeof columnsMap] ?? activity.name
     const orderExpr = sortOrder === 'desc' ? desc(column) : asc(column)
 
-    // 2. Cláusula WHERE (Filtro de Búsqueda + Solo actividades activas)
     const searchConditions = searchQuery
       ? or(
-          ilike(activity.name, `%${searchQuery}%`), // Por nombre de actividad
-          ilike(activityStatus.name, `%${searchQuery}%`), // Por estado
-          ilike(activityType.name, `%${searchQuery}%`), // Por tipo
-          ilike(organization.name, `%${searchQuery}%`), // Por espacio
-          ilike(user.name, `%${searchQuery}%`), // Por creador/responsable
+          ilike(activity.name, `%${searchQuery}%`),
+          ilike(activityStatus.name, `%${searchQuery}%`),
+          ilike(activityType.name, `%${searchQuery}%`),
+          ilike(organization.name, `%${searchQuery}%`),
+          ilike(user.name, `%${searchQuery}%`),
         )
       : undefined
 
-    // Combinar filtro de búsqueda con filtro de state = true
     const where = searchConditions
       ? and(eq(activity.state, true), searchConditions)
       : eq(activity.state, true)
-
-    // 3. Conteo Total (para paginación)
-    // **INICIA la consulta de conteo y aplica los JOINs aquí**
     const [{ total }] = await db
       .select({ total: count(activity.id) })
       .from(activity)
@@ -80,18 +113,14 @@ export async function getActivities(
 
     const totalPages = Math.ceil(total / limit)
 
-    // 4. Consulta Principal (Obtener las filas de la página)
-    // **INICIA la consulta SELECT y aplica los JOINs aquí**
     const rows = await db
       .select({
-        // Campos de la tabla (activity.*)
         id: activity.id,
         name: activity.name,
         date: activity.date,
         duration: activity.duration,
         state: activity.state,
 
-        // Campos JOINED (nombres legibles)
         statusName: activityStatus.name,
         typeName: activityType.name,
         spaceName: organization.name,
@@ -129,7 +158,6 @@ export const deleteActivities = async (
   try {
     const { ids } = args
 
-    // Validar que los IDs existan y estén activos
     const existingActivities = await db
       .select({ id: activity.id })
       .from(activity)
@@ -150,7 +178,6 @@ export const deleteActivities = async (
       throw new Error('Algunos IDs no existen o ya están eliminados')
     }
 
-    // Realizar eliminación lógica (state = false)
     const result = await db.transaction(async (tx) => {
       return await tx
         .update(activity)
@@ -175,7 +202,6 @@ export const createCompleteActivity = async (
   try {
     const { participants, ...activityData } = args
 
-    // Validar que todos los aliados y especialidades existan
     const alliedIds = [...new Set(participants.map((p) => p.alliedId))]
     const allSpecialityIds = [
       ...new Set(participants.flatMap((p) => p.specialityIds)),
@@ -200,9 +226,7 @@ export const createCompleteActivity = async (
       throw new Error('Algunas especialidades no existen')
     }
 
-    // Crear actividad y participantes en una transacción
     const result = await db.transaction(async (tx) => {
-      // 1. Crear la actividad
       const [createdActivity] = await tx
         .insert(activity)
         .values({
@@ -216,8 +240,6 @@ export const createCompleteActivity = async (
           state: true,
         })
         .returning({ id: activity.id })
-
-      // 2. Crear las participaciones (allied_participation)
       const participationRecords = participants.flatMap((participant) =>
         participant.specialityIds.map((specialityId) => ({
           activityId: createdActivity.id,
@@ -240,11 +262,6 @@ export const createCompleteActivity = async (
 
 export const getActivityById = async (id: number) => {
   try {
-    const allActivities = await db
-      .select({ id: activity.id, name: activity.name, state: activity.state })
-      .from(activity)
-      .where(eq(activity.id, id))
-
     const [activityData] = await db
       .select({
         id: activity.id,
@@ -292,10 +309,9 @@ export const getActivityById = async (id: number) => {
 
     const result = {
       ...activityData,
-      date:
-        activityData.date instanceof Date
-          ? activityData.date.toISOString().split('T')[0]
-          : activityData.date,
+      date: new Date(activityData.date as unknown as string | Date)
+        .toISOString()
+        .split('T')[0],
       participants: Array.from(participantsMap.values()),
     }
 
@@ -371,5 +387,137 @@ export const updateCompleteActivity = async (
   } catch (error) {
     if (error instanceof Error) throw new PostgresError(error.message)
     throw error
+  }
+}
+
+export const getActivityParticipants = async (
+  params: ActivityModel.ListParticipantsQuery,
+): Promise<ActivityModel.GetParticipants> => {
+  try {
+    const { q = '', activityId } = params
+    const searchQuery = q.replace(/\s+/g, ' ').trim()
+
+    const searchCondition = searchQuery
+      ? or(
+          ilike(user.name, `%${searchQuery}%`),
+          ilike(user.surname, `%${searchQuery}%`),
+          ilike(user.documentNumber, `%${searchQuery}%`),
+        )
+      : undefined
+
+    const activityIdNum = Number.parseInt(activityId, 10)
+    const activityCondition = eq(activityUser.activityId, activityIdNum)
+    const whereCondition = searchCondition
+      ? and(activityCondition, searchCondition)
+      : activityCondition
+
+    const participants = await db
+      .select({
+        id: user.id,
+        name: user.name,
+        surname: user.surname,
+        documentType: user.documentType,
+        documentNumber: user.documentNumber,
+        email: user.email,
+        phone: user.phone,
+        rewarded: activityUser.rewarded,
+      })
+      .from(activityUser)
+      .innerJoin(user, eq(activityUser.userId, user.id))
+      .where(whereCondition)
+      .orderBy(asc(user.name))
+
+    return participants
+  } catch (e) {
+    if (e instanceof Error) throw new PostgresError(e.message)
+    throw e
+  }
+}
+
+export const getUserAttentions = async (
+  params: ActivityModel.ListUserAttentionsQuery,
+): Promise<ActivityModel.GetUserAttentions> => {
+  try {
+    const { activityId, userId, q = '' } = params
+    const activityIdNum = Number.parseInt(activityId, 10)
+    const searchQuery = q.replace(/\s+/g, ' ').trim()
+
+    const participatingSpecialities = await db
+      .select({
+        alliedParticipationId: alliedParticipation.id,
+        specialityId: speciality.id,
+        specialityName: speciality.name,
+      })
+      .from(alliedParticipation)
+      .innerJoin(
+        speciality,
+        eq(alliedParticipation.specialityId, speciality.id),
+      )
+      .where(
+        and(
+          eq(alliedParticipation.activityId, activityIdNum),
+          searchQuery ? ilike(speciality.name, `%${searchQuery}%`) : undefined,
+        ),
+      )
+      .orderBy(asc(speciality.name))
+
+    const userAttentions = await db
+      .select({
+        id: attention.id,
+        alliedParticipationId: attention.alliedParticipationId,
+        timestamp: attention.timestamp,
+        observations: attention.observations,
+      })
+      .from(attention)
+      .where(eq(attention.userId, userId))
+
+    const attentionMap = new Map(
+      userAttentions.map((att) => [
+        att.alliedParticipationId,
+        {
+          id: att.id,
+          timestamp: att.timestamp,
+          observations: att.observations,
+        },
+      ]),
+    )
+
+    const result = participatingSpecialities.map((spec) => {
+      const att = attentionMap.get(spec.alliedParticipationId)
+      return {
+        specialityId: spec.specialityId,
+        specialityName: spec.specialityName,
+        hasAttention: !!att,
+        attentionId: att?.id || null,
+        attentionTime: att?.timestamp ? att.timestamp.toISOString() : null,
+        observations: att?.observations || null,
+      }
+    })
+
+    return result
+  } catch (e) {
+    if (e instanceof Error) throw new PostgresError(e.message)
+    throw e
+  }
+}
+
+export const setActivityUser = async (
+  params: ActivityModel.SetActivityUserQuery,
+) => {
+  const { userId, activityId, rewarded } = params
+  try {
+    await db
+      .update(activityUser)
+      .set({ rewarded })
+      .where(
+        and(
+          eq(activityUser.activityId, activityId),
+          eq(activityUser.userId, userId),
+        ),
+      )
+    return { userId, activityId, rewarded }
+  } catch (e) {
+    if (e instanceof Error) throw new PostgresError(e.message)
+    throw e
   }
 }

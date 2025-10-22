@@ -1,5 +1,5 @@
 import betterAuth from '@api/modules/auth'
-import Elysia, { t } from 'elysia'
+import Elysia, { status, t } from 'elysia'
 import {
   getActivityStatuses,
   getActivityTypes,
@@ -13,67 +13,32 @@ import {
   deleteActivities,
   getActivities,
   getActivityById,
+  getActivityParticipants,
+  getUserAttentions,
+  setActivityUser,
   updateCompleteActivity,
 } from './service'
 
-const activityModule = new Elysia({
-  name: 'activity',
-  prefix: '/activities',
-})
+const activityModule = new Elysia({ name: 'activity', prefix: '/activities' })
   .use(betterAuth)
-  // Endpoint para CREAR una nueva actividad (POST)
-  .post(
-    '',
-    async ({ body, set }) => {
-      try {
-        const id = await createActivity(body)
-        set.status = 201
-        return id
-      } catch (error) {
-        if (error instanceof Error) {
-          set.status = 400
-          return { error: error.message }
-        }
-        throw error
-      }
-    },
-    {
-      auth: true,
-      body: ActivityModel.createActivity,
-      response: {
-        201: t.Number(),
-        400: t.Object({ error: t.String() }),
-        401: t.Literal('Unauthorized'),
-      },
-    },
-  )
-  // Endpoint para CREAR una actividad completa con participantes (POST)
+  .post('', async ({ body }) => status(201, await createActivity(body)), {
+    auth: true,
+    body: ActivityModel.createActivity,
+    response: { 201: t.Number(), 401: t.Literal('Unauthorized') },
+  })
   .post(
     '/complete',
-    async ({ body, set }) => {
-      try {
-        const id = await createCompleteActivity(body)
-        set.status = 201
-        return { activityId: id }
-      } catch (error) {
-        if (error instanceof Error) {
-          set.status = 400
-          return { error: error.message }
-        }
-        throw error
-      }
-    },
+    async ({ body }) =>
+      status(201, { activityId: await createCompleteActivity(body) }),
     {
       auth: true,
       body: ActivityModel.createCompleteActivity,
       response: {
         201: t.Object({ activityId: t.Number() }),
-        400: t.Object({ error: t.String() }),
         401: t.Literal('Unauthorized'),
       },
     },
   )
-  // Endpoint para LISTAR actividades (GET)
   .get('', ({ query }) => getActivities(query), {
     auth: true,
     query: ActivityModel.listActivitiesQuery,
@@ -82,23 +47,16 @@ const activityModule = new Elysia({
       401: t.Literal('Unauthorized'),
     },
   })
-  // Endpoint para OBTENER una actividad por ID (GET)
   .get(
     '/:id',
-    async ({ params, set }) => {
+    async ({ params }) => {
+      const id = Number(params.id)
+      if (Number.isNaN(id)) throw status(400, 'Invalid id')
       try {
-        const id = Number(params.id)
-        if (Number.isNaN(id)) {
-          set.status = 400
-          return { error: 'ID inválido' }
-        }
         return await getActivityById(id)
-      } catch (error) {
-        if (error instanceof Error) {
-          set.status = 404
-          return { error: error.message }
-        }
-        throw error
+      } catch (e) {
+        if (e instanceof Error) throw status(404, e.message)
+        throw e
       }
     },
     {
@@ -127,115 +85,82 @@ const activityModule = new Elysia({
       },
     },
   )
-  // Endpoint para ACTUALIZAR una actividad completa (PUT)
   .put(
     '/:id/complete',
-    async ({ params, body, set }) => {
-      try {
-        const id = Number(params.id)
-        if (Number.isNaN(id)) {
-          set.status = 400
-          return { error: 'ID inválido' }
-        }
-        const result = await updateCompleteActivity(id, body)
-        set.status = 200
-        return result
-      } catch (error) {
-        if (error instanceof Error) {
-          set.status = 400
-          return { error: error.message }
-        }
-        throw error
-      }
+    async ({ params, body }) => {
+      const id = Number(params.id)
+      if (Number.isNaN(id)) throw status(400, 'Invalid id')
+      return await updateCompleteActivity(id, body)
     },
     {
       auth: true,
       body: ActivityModel.createCompleteActivity,
       response: {
         200: t.Object({ id: t.Number() }),
-        400: t.Object({ error: t.String() }),
         401: t.Literal('Unauthorized'),
       },
     },
   )
-  // Endpoint para ELIMINAR actividades (DELETE) - Eliminación lógica
-  .delete(
-    '',
-    async ({ body, set }) => {
-      try {
-        const result = await deleteActivities(body)
-        set.status = 200
-        return result
-      } catch (error) {
-        if (error instanceof Error) {
-          set.status = 400
-          return { error: error.message }
-        }
-        throw error
-      }
+  .delete('', ({ body }) => deleteActivities(body), {
+    auth: true,
+    body: ActivityModel.deleteActivities,
+    response: {
+      200: t.Object({
+        deletedCount: t.Number(),
+        deletedIds: t.Array(t.Number()),
+      }),
+      401: t.Literal('Unauthorized'),
     },
-    {
-      auth: true,
-      body: ActivityModel.deleteActivities,
-      response: {
-        200: t.Object({
-          deletedCount: t.Number(),
-          deletedIds: t.Array(t.Number()),
-        }),
-        400: t.Object({ error: t.String() }),
-        401: t.Literal('Unauthorized'),
-      },
-    },
-  )
-  // Endpoint para obtener tipos de actividad
+  })
   .get('/types', () => getActivityTypes(), {
     auth: true,
     response: {
-      200: t.Array(
-        t.Object({
-          id: t.Number(),
-          name: t.String(),
-        }),
-      ),
+      200: t.Array(t.Object({ id: t.Number(), name: t.String() })),
       401: t.Literal('Unauthorized'),
     },
   })
-  // Endpoint para obtener estados de actividad
   .get('/statuses', () => getActivityStatuses(), {
     auth: true,
     response: {
-      200: t.Array(
-        t.Object({
-          id: t.Number(),
-          name: t.String(),
-        }),
-      ),
+      200: t.Array(t.Object({ id: t.Number(), name: t.String() })),
       401: t.Literal('Unauthorized'),
     },
   })
-  // Endpoint para obtener aliados (organizaciones tipo allied)
   .get('/allies', () => getAllieds(), {
     auth: true,
     response: {
-      200: t.Array(
-        t.Object({
-          id: t.String(),
-          name: t.String(),
-        }),
-      ),
+      200: t.Array(t.Object({ id: t.String(), name: t.String() })),
       401: t.Literal('Unauthorized'),
     },
   })
-  // Endpoint para obtener especialidades
   .get('/specialities', () => getSpecialities(), {
     auth: true,
     response: {
-      200: t.Array(
-        t.Object({
-          id: t.Number(),
-          name: t.String(),
-        }),
-      ),
+      200: t.Array(t.Object({ id: t.Number(), name: t.String() })),
+      401: t.Literal('Unauthorized'),
+    },
+  })
+  .get('/participants', ({ query }) => getActivityParticipants(query), {
+    auth: true,
+    query: ActivityModel.listParticipantsQuery,
+    response: {
+      200: ActivityModel.getParticipantsResponse,
+      401: t.Literal('Unauthorized'),
+    },
+  })
+  .get('/user-attentions', ({ query }) => getUserAttentions(query), {
+    auth: true,
+    query: ActivityModel.listUserAttentionsQuery,
+    response: {
+      200: ActivityModel.getUserAttentionsResponse,
+      401: t.Literal('Unauthorized'),
+    },
+  })
+  .patch('/user-rewarded', ({ body }) => setActivityUser(body), {
+    auth: true,
+    body: ActivityModel.setActivityUserQuery,
+    response: {
+      200: ActivityModel.setActivityUserResponse,
       401: t.Literal('Unauthorized'),
     },
   })
