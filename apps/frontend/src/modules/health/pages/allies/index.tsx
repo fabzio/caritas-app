@@ -13,7 +13,7 @@ import ActionsButton from './components/actions-button'
 import CreateAlly from './components/create-ally'
 import OrganizationTable from './components/organization-table'
 import SearchHealthOrganizationInput from './components/search-organization-input'
-import { useOrganizationTable } from './hooks/use-organization-table'
+import { useOrganizationTable } from './hooks/use-organization-table.ts'
 
 export default function AlliesTableView() {
   const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({})

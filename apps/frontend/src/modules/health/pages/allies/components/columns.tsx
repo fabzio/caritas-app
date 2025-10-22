@@ -14,7 +14,7 @@ export const OrganizationsTableColumns: ColumnDef<Organization>[] = [
           (table.getIsSomePageRowsSelected() && 'indeterminate')
         }
         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        araia-label="Select all"
+        aria-label="Select all"
       />
     ),
     cell: ({ row }) => (
