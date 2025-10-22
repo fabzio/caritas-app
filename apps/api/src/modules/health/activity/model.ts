@@ -22,6 +22,8 @@ export namespace ActivityModel {
     page: t.Optional(t.Integer({ minimum: 0 })),
     limit: t.Optional(t.Integer({ minimum: 1, maximum: 100 })),
     sortBy: t.Optional(t.String()),
+    startDate: t.Optional(t.String()),
+    endDate: t.Optional(t.String()),
   })
   export type ListActivitiesQuery = typeof listActivitiesQuery.static
 

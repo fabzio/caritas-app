@@ -8,6 +8,8 @@ type UseActivitiesParams = {
   filters?: Omit<Filters, 'page' | 'limit'> & {
     pageIndex?: number
     pageSize?: number
+    startDate?: string
+    endDate?: string
   }
 }
 
@@ -25,6 +27,8 @@ export const useActivities = ({
           page: Math.max(0, (currentPage || 1) - 1),
           limit: pageSize,
           sortBy: filters?.sortBy || 'name.asc',
+          startDate: filters?.startDate,
+          endDate: filters?.endDate,
         },
       })
 

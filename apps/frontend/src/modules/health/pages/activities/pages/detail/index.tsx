@@ -178,7 +178,7 @@ export default function ActivityDetailPage() {
                     name="date"
                     render={({ field }) => (
                       <FormItem className="flex flex-col">
-                        <FormLabel>Fecha de la Actividad*</FormLabel>
+                        <FormLabel>Fecha de la Actividad</FormLabel>
                         <Popover>
                           <PopoverTrigger asChild>
                             <FormControl>
@@ -245,7 +245,7 @@ export default function ActivityDetailPage() {
                     name="typeId"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Tipo de Actividad*</FormLabel>
+                        <FormLabel>Tipo de Actividad</FormLabel>
                         <Select disabled value={field.value?.toString()}>
                           <FormControl>
                             <SelectTrigger>

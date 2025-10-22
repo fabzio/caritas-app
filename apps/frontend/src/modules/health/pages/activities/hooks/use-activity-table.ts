@@ -4,17 +4,28 @@ import { useColumnDefs } from '../components/activity-column'
 import { useActivities } from './use-activity'
 
 type SortBy = `${string}.${'asc' | 'desc'}`
+type ActivitySearchFilters = {
+  q?: string
+  page?: number
+  limit?: number
+  sortBy?: string
+  startDate?: string
+  endDate?: string
+}
+type SetFiltersFn = (partialFilters: Partial<ActivitySearchFilters>) => void
 
 export const useActivityTable = () => {
   const { filters: rawFilters, setFilters } = useFilters(
     '/_authenticated/health/activities/',
-  )
+  ) as { filters: ActivitySearchFilters; setFilters: SetFiltersFn }
 
   const filtersForHook = {
     q: rawFilters.q,
     pageIndex: (rawFilters.page ?? 0) + 1,
     pageSize: rawFilters.limit ?? 10,
     sortBy: (rawFilters.sortBy || 'name.asc') as SortBy,
+    startDate: rawFilters.startDate,
+    endDate: rawFilters.endDate,
   }
 
   const { data: response, isLoading } = useActivities({
@@ -23,6 +34,8 @@ export const useActivityTable = () => {
     filters: {
       q: filtersForHook.q,
       sortBy: filtersForHook.sortBy,
+      startDate: filtersForHook.startDate,
+      endDate: filtersForHook.endDate,
     },
   })
 

@@ -10,7 +10,18 @@ import {
   attention,
   speciality,
 } from '@api/db/schemas/health'
-import { and, asc, count, desc, eq, ilike, or } from 'drizzle-orm'
+import {
+  and,
+  asc,
+  count,
+  desc,
+  eq,
+  gte,
+  ilike,
+  lte,
+  or,
+  type SQL,
+} from 'drizzle-orm'
 import type { ActivityModel } from './model'
 
 export const createActivity = async (args: ActivityModel.CreateActivity) => {
@@ -69,14 +80,28 @@ export async function getActivities(
   params: ActivityModel.ListActivitiesQuery,
 ): Promise<ActivityModel.GetActivities> {
   try {
-    const { q = '', page = 0, limit = 10, sortBy = 'name.asc' } = params
+    const {
+      q = '',
+      page = 0,
+      limit = 10,
+      sortBy = 'name.asc',
+      startDate,
+      endDate,
+    } = params
     const searchQuery = q.replace(/\s+/g, ' ').trim()
-
+    const dateRangeConditions: SQL[] = []
     const [sortFieldRaw, sortOrderRaw] = (sortBy ?? 'name.asc').split('.', 2)
     const sortField = (sortFieldRaw ?? 'name').trim()
     const sortOrder =
       (sortOrderRaw ?? 'asc').trim().toLowerCase() === 'desc' ? 'desc' : 'asc'
 
+    if (startDate) {
+      dateRangeConditions.push(gte(activity.date, startDate))
+    }
+    if (endDate) {
+      dateRangeConditions.push(lte(activity.date, endDate))
+    }
+    console.log(dateRangeConditions)
     const columnsMap = {
       name: activity.name,
       date: activity.date,
@@ -99,9 +124,14 @@ export async function getActivities(
         )
       : undefined
 
-    const where = searchConditions
-      ? and(eq(activity.state, true), searchConditions)
-      : eq(activity.state, true)
+    const allConditions = [
+      eq(activity.state, true),
+      ...dateRangeConditions,
+      ...(searchConditions ? [searchConditions] : []),
+    ]
+
+    const where = and(...allConditions)
+
     const [{ total }] = await db
       .select({ total: count(activity.id) })
       .from(activity)
