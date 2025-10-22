@@ -3,6 +3,7 @@ import { Button } from '@workspace/ui/components/button'
 import { Input } from '@workspace/ui/components/input'
 import { HeartPlus, Search } from 'lucide-react'
 import { useState } from 'react'
+import CreateSpeciality from './components/create-speciality'
 import SpecialityTable from './components/speciality-table'
 
 export default function Speciality() {
@@ -32,12 +33,7 @@ export default function Speciality() {
           </div>
         </div>
 
-        <Link to="/health/speciality/create">
-          <Button>
-            <HeartPlus />
-            Nueva especialidad
-          </Button>
-        </Link>
+        <CreateSpeciality />
       </div>
 
       <div className="mt-4">
