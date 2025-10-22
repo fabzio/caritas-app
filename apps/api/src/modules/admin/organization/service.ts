@@ -1,6 +1,7 @@
 import db from '@api/db'
 import { PostgresError } from '@api/db/errors'
 import { organization } from '@api/db/schemas/auth'
+import { withHeaders } from '@elysiajs/openapi'
 import { and, asc, count, desc, eq, ilike, not, or } from 'drizzle-orm'
 import type { OrganizationModel } from './model'
 
@@ -66,6 +67,15 @@ export async function getOrganizations(
     totalPages,
   }
 }
+export async function getOrganizationsSimple(name: string) {
+  const rows = await db
+    .select()
+    .from(organization)
+    .where(ilike(organization.name, `%${name}%`))
+  return {
+    data: rows,
+  }
+}
 
 export async function getSingleOrganization({ id }: { id: string }) {
   const data = await db.query.organization.findFirst({
@@ -92,14 +102,14 @@ export const updateOrganization = async (
 }
 
 export async function findDuplicateOrganizations(
+  name: string,
   organizationId: string,
-  excludeId?: string,
 ) {
-  const { data: coincidences } = await getOrganizations({ organizationId })
+  const { data: coincidences } = await getOrganizationsSimple(name)
 
   if (!coincidences?.length) return null
 
-  const excluded = coincidences.find((s) => s.id !== excludeId)
+  const excluded = coincidences.find((s) => s.id !== organizationId)
 
   return excluded || null
 }

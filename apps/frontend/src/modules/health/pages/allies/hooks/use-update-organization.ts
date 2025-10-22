@@ -28,7 +28,7 @@ export default function useUpdateAlly() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [QueryKeys.ADMIN.ORGANIZATION],
+        queryKey: [QueryKeys.ADMIN.ALLIES],
       })
       toast.success('Organización modificada exitosamente')
       navigate({ to: '/health/allies' })

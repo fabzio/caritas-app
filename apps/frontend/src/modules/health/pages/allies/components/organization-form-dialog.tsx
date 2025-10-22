@@ -70,7 +70,6 @@ export default function OrganizationFormDialog({
         { id: initialData.id, name: data.name },
         {
           onSuccess: () => {
-            toast.success('Organización actualizada correctamente')
             onOpenChange({ open: false, type: 'new' })
           },
           onError: (error) => {
@@ -82,7 +81,6 @@ export default function OrganizationFormDialog({
     } else {
       create(data, {
         onSuccess: () => {
-          toast.success('Organización registrada correctamente')
           onOpenChange({ open: false, type: 'new' })
         },
         onError: (error) => {
