@@ -17,7 +17,6 @@ export namespace SpecialityModel {
 
   export const getSpecialitiesQuery = t.Object({
     q: t.Optional(t.String()),
-    search: t.Optional(t.String()),
     page: t.Optional(t.Integer({ minimum: 0 })),
     limit: t.Optional(t.Integer({ minimum: 1, maximum: 100 })),
     sortBy: t.Optional(t.String()),
@@ -25,7 +24,7 @@ export namespace SpecialityModel {
   export type GetSpecialitiesQuery = typeof getSpecialitiesQuery.static
 
   const _createSpeciality = createInsertSchema(speciality)
-  export const createSpeciality = t.Omit(_createSpeciality, ['id'])
+  export const createSpeciality = t.Omit(_createSpeciality, ['id', 'active'])
   export type CreateSpeciality = typeof createSpeciality.static
 
   export const updateSpeciality = t.Object({

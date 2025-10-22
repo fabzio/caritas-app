@@ -60,6 +60,13 @@ export async function getSingleSpeciality(id: number) {
 export const createSpeciality = async (
   args: SpecialityModel.CreateSpeciality,
 ) => {
+  const similarInactive = await findSimilarInactiveSpeciality(args.name)
+
+  if (similarInactive) {
+    await activateSpeciality(similarInactive.id)
+    return similarInactive.id
+  }
+
   try {
     const [{ id }] = await db.transaction(async (tx) => {
       return await tx.insert(speciality).values(args).returning({
@@ -101,6 +108,35 @@ export async function findDuplicateSpeciality(
   const excluded = coincidences.find((s) => s.id !== excludeId)
 
   return excluded || null
+}
+
+async function findSimilarInactiveSpeciality(name: string) {
+  const normalizedName = normalizeText(name)
+
+  const allInactive = await db
+    .select({ speciality })
+    .from(speciality)
+    .where(eq(speciality.active, false))
+
+  return (
+    allInactive
+      .map((r) => r.speciality)
+      .find((s) => normalizeText(s.name) === normalizedName) ?? null
+  )
+}
+
+const activateSpeciality = async (id: number) => {
+  try {
+    const result = await db
+      .update(speciality)
+      .set({ active: true })
+      .where(eq(speciality.id, id))
+      .returning()
+    return result[0] ?? null
+  } catch (e) {
+    if (e instanceof Error) throw new PostgresError(e.message)
+    throw e
+  }
 }
 
 export const deleteSpecialities = async (ids: number[]) => {
