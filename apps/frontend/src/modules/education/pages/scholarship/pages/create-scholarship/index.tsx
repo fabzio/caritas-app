@@ -42,7 +42,7 @@ import usePostScholarship from './hooks/use-post-scholarship'
 import {
   type FormScholarShipSchema,
   formScholarShipSchema,
-} from './utils/scholarship'
+} from './models/scholarship'
 export default function CreateScholarship() {
   const form = useForm<FormScholarShipSchema>({
     resolver: zodResolver(formScholarShipSchema),
@@ -198,7 +198,9 @@ export default function CreateScholarship() {
                             onChange={(e) => {
                               const value = e.target.value
                               const number =
-                                value === '' ? undefined : parseInt(value, 10)
+                                value === ''
+                                  ? undefined
+                                  : Number.parseInt(value, 10)
                               field.onChange(number)
                             }}
                           />

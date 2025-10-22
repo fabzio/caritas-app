@@ -104,7 +104,7 @@ export default function ActivityPage() {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>
-              {`¿Seguro que desea eliminar ${activityCount} actividad${activityCount !== 1 ? 'es' : ''}?`}
+              {`¿Seguro que desea eliminar ${activityCount} actividad${activityCount === 1 ? '' : 'es'}?`}
             </DialogTitle>
             <DialogDescription>
               Esta acción no se puede deshacer.
