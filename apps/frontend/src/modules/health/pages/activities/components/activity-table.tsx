@@ -1,4 +1,4 @@
-import DataTable from '@frontend/shared/components/data-table' // La ruta correcta de tu componente genérico
+import DataTable from '@frontend/shared/components/data-table'
 import { stateToSortBy } from '@frontend/shared/utils/sort-by-to-state'
 import type {
   ColumnDef,
@@ -11,7 +11,7 @@ import { useActivityTable } from '../hooks/use-activity-table'
 
 type ActivityTableProps = {
   rowSelection: Record<string, boolean>
-  setRowSelection: OnChangeFn<Record<string, boolean>> // O el tipo de Dispatch de React
+  setRowSelection: OnChangeFn<Record<string, boolean>>
 }
 
 type Props = {
@@ -21,7 +21,7 @@ type Props = {
   columns: ColumnDef<Activity>[]
   paginationState: PaginationState
   sortingState: SortingState
-  setFilters: (filters: any) => void // Usamos 'any' para evitar tipar el useFilters internamente
+  setFilters: (filters: any) => void
   pagination?: {
     total: number
     totalPages: number
@@ -55,8 +55,6 @@ function ActivityListComponent({
             ? updateOrValue(sortingState)
             : updateOrValue
 
-        // 1. NO LLAMAR CON FUNCIÓN. Llama con un objeto plano.
-        // 2. Aquí estás sobrescribiendo el sortBy, lo cual es correcto para la URL.
         return setFilters({
           sortBy: stateToSortBy(newSortingState),
         })
@@ -66,7 +64,6 @@ function ActivityListComponent({
       // ----------------------------------------------------
       paginationOptions={{
         onPaginationChange: (pagination) => {
-          // Crea un estado base 0 (lo que sale del useReactTable)
           const currentState = {
             pageIndex: paginationState.pageIndex - 1,
             pageSize: paginationState.pageSize,
@@ -76,10 +73,9 @@ function ActivityListComponent({
               ? pagination(currentState)
               : pagination
 
-          // ESCRIBE EN LA URL: Transforma el pageIndex de TanStack Table (Base 0) a Base 1 para el hook useFilters
           setFilters({
-            page: newPaginationState.pageIndex, // El router/backend espera 'page' (Base 0)
-            limit: newPaginationState.pageSize, // El router/backend espera 'limit'
+            page: newPaginationState.pageIndex,
+            limit: newPaginationState.pageSize,
           })
         },
         rowCount: pagination?.total || 0,
@@ -108,22 +104,18 @@ export function ActivityTable({
     isLoading,
   } = useActivityTable()
 
-  // Manejo de carga mejorado
   if (isLoading || !data || !pagination) {
-    // Devuelve null o un componente de carga si es necesario para evitar errores de renderizado
     return null
   }
 
   return (
     <ActivityListComponent
-      // Pasa las props que vienen del hook
       data={data}
       columns={columns as ColumnDef<Activity>[]}
       pagination={pagination}
       paginationState={paginationState}
       sortingState={sortingState}
       setFilters={setFilters}
-      // Pasa las props que vienen de index.tsx
       rowSelection={rowSelection}
       setRowSelection={setRowSelection}
     />

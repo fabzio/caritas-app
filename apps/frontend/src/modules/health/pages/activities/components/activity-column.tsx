@@ -7,7 +7,6 @@ import { Checkbox } from '@workspace/ui/components/checkbox' // Componente Check
 import { ArrowUpDown } from 'lucide-react' // Icono de ordenamiento
 import { useMemo } from 'react'
 
-// Define el tipo de dato de la fila (Activity)
 type Activity = ActivityModel.GetActivities['data'][number]
 
 const activityTableColumns: ColumnDef<Activity>[] = [
@@ -35,8 +34,8 @@ const activityTableColumns: ColumnDef<Activity>[] = [
     enableHiding: false,
   },
   {
-    // Columna 1: Nombre de la Actividad
-    accessorKey: 'name', // Debe coincidir con el campo de la API para ordenar (e.g., 'name')
+    // Columna 2: Nombre de la Actividad
+    accessorKey: 'name',
     header: ({ column }) => (
       <Button
         variant="ghost"
@@ -58,8 +57,8 @@ const activityTableColumns: ColumnDef<Activity>[] = [
     ),
   },
   {
-    // Columna 2: Duración de la actividad
-    accessorKey: 'duration', // Debe coincidir con el campo de la API para ordenar (e.g., 'duracion')
+    // Columna 3: Duración de la actividad
+    accessorKey: 'duration',
     header: ({ column }) => (
       <Button
         variant="ghost"
@@ -72,8 +71,8 @@ const activityTableColumns: ColumnDef<Activity>[] = [
     cell: ({ row }) => `${row.original.duration} h`,
   },
   {
-    // Columna 2: Duración de la actividad
-    accessorKey: 'type', // Debe coincidir con el campo de la API para ordenar (e.g., 'duracion')
+    // Columna 3: Tipo de actividad
+    accessorKey: 'type',
     header: ({ column }) => (
       <Button
         variant="ghost"
@@ -86,7 +85,7 @@ const activityTableColumns: ColumnDef<Activity>[] = [
     cell: ({ row }) => row.original.typeName,
   },
   {
-    // Columna 3: Organización de Actividad
+    // Columna 4: Organización de la Actividad
     accessorKey: 'spaceName', // Asume que este campo existe en el modelo
     header: ({ column }) => (
       <Button
@@ -100,7 +99,7 @@ const activityTableColumns: ColumnDef<Activity>[] = [
     cell: ({ row }) => row.original.spaceName,
   },
   {
-    // Columna 4: Fecha de la Actividad
+    // Columna 5: Fecha de la Actividad
     accessorKey: 'date',
     header: ({ column }) => (
       <Button
@@ -111,12 +110,11 @@ const activityTableColumns: ColumnDef<Activity>[] = [
         <ArrowUpDown className="ml-2 h-4 w-4" />
       </Button>
     ),
-    // Formatea la fecha para mejor visualización (asume que 'date' es un string ISO)
     cell: ({ row }) => new Date(row.original.date).toLocaleDateString(),
   },
   {
-    // Columna 5: Organización de Actividad
-    accessorKey: 'state', // Asume que este campo existe en el modelo
+    // Columna 5: Estado de la Actividad
+    accessorKey: 'state',
     header: ({ column }) => (
       <Button
         variant="ghost"
@@ -135,6 +133,5 @@ const activityTableColumns: ColumnDef<Activity>[] = [
  * @returns ColumnDef<Activity>[]
  */
 export const useColumnDefs = () => {
-  // Memoiza las columnas para optimizar el rendimiento de la tabla
   return useMemo(() => activityTableColumns, [])
 }
