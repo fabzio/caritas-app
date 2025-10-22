@@ -33,8 +33,5 @@ export default function useUpdateSpeciality() {
       toast.success('Especialidad modificada exitosamente')
       navigate({ to: '/health/specialities' })
     },
-    onError: (error: Error) => {
-      toast.error(error.message)
-    },
   })
 }

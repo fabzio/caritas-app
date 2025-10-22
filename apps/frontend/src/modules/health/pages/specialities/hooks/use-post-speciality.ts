@@ -26,9 +26,6 @@ const usePostSpeciality = () => {
       toast.success('Especialidad creada exitosamente')
       navigate({ to: '/health/specialities' })
     },
-    onError: (error: Error) => {
-      toast.error(error.message)
-    },
   })
 }
 export default usePostSpeciality

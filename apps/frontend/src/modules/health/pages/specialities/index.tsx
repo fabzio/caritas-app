@@ -1,15 +1,19 @@
-import { Link, useNavigate } from '@tanstack/react-router'
 import { Button } from '@workspace/ui/components/button'
 import { HeartPlus } from 'lucide-react'
 import { useState } from 'react'
 import ActionsButton from './components/actions-button'
 import SearchSpecialityInput from './components/search-speciality-input'
+import SpecialityFormDialog from './components/speciality-form-dialog'
 import SpecialityTable from './components/speciality-table'
 import { useSpecialityTable } from './hooks/use-table'
 
 export default function Speciality() {
   const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({})
-  const navigate = useNavigate()
+  const [formOpen, setFormOpen] = useState(false)
+  const [selected, setSelected] = useState<{
+    id?: number
+    name?: string
+  } | null>(null)
 
   const {
     data: specialities,
@@ -17,7 +21,6 @@ export default function Speciality() {
     columns,
     paginationState,
     sortingState,
-    filters,
     setFilters,
   } = useSpecialityTable()
 
@@ -32,13 +35,15 @@ export default function Speciality() {
   const selectedCount = selectedSpecialities.length
 
   const handleEdit = () => {
-    const selected = selectedSpecialities[0]
-    if (!selected) return
+    const item = selectedSpecialities[0]
+    if (!item) return
+    setSelected({ id: item.id, name: item.name })
+    setFormOpen(true)
+  }
 
-    navigate({
-      to: '/health/specialities/form',
-      search: { id: String(selected.id), type: 'edit' },
-    })
+  const handleNew = () => {
+    setSelected(null)
+    setFormOpen(true)
   }
 
   return (
@@ -51,9 +56,7 @@ export default function Speciality() {
 
       <div className="flex justify-between items-center mt-4">
         <div className="w-1/3">
-          <div className="relative">
-            <SearchSpecialityInput />
-          </div>
+          <SearchSpecialityInput />
         </div>
 
         <div className="flex items-center gap-2">
@@ -63,12 +66,10 @@ export default function Speciality() {
             selectedCount={selectedCount}
           />
 
-          <Link to="/health/specialities/form" search={{ type: 'new' }}>
-            <Button>
-              <HeartPlus className="mr-1 w-4 h-4" />
-              Nueva especialidad
-            </Button>
-          </Link>
+          <Button onClick={handleNew}>
+            <HeartPlus className="mr-1 w-4 h-4" />
+            Nueva especialidad
+          </Button>
         </div>
       </div>
 
@@ -84,6 +85,13 @@ export default function Speciality() {
           pagination={pagination}
         />
       </div>
+
+      {/* Modal para crear/editar */}
+      <SpecialityFormDialog
+        open={formOpen}
+        onOpenChange={setFormOpen}
+        initialData={selected || undefined}
+      />
     </div>
   )
 }
