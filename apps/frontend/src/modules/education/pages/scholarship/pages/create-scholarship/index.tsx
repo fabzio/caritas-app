@@ -342,7 +342,7 @@ const dependantText = {
     edit: 'Editar beca',
   },
   submit: {
-    new: 'Crear Beca',
+    new: 'Registrar',
     edit: 'Guardar Cambios',
   },
 }

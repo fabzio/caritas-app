@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import type { ReactNode } from 'react'
+import { type ReactNode, use } from 'react'
 import { vi } from 'vitest'
 import CreateScholarship from './index'
 
@@ -48,6 +48,7 @@ vi.mock('@tanstack/react-router', () => ({
   getRouteApi: () => ({
     useLoaderData: () => null,
   }),
+  useNavigate: () => vi.fn(),
 }))
 
 vi.mock('@workspace/ui/components/button', () => ({
@@ -196,7 +197,6 @@ vi.mock('lucide-react', () => ({
   CalendarIcon: () => <span>📅</span>,
   Loader2: () => <span>⏳</span>,
 }))
-
 describe('CreateScholarship', () => {
   beforeEach(() => {
     vi.clearAllMocks()
