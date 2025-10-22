@@ -107,7 +107,7 @@ export default function CreateScholarship() {
     <div className="flex flex-1 flex-col gap-6 p-4">
       <div className="flex flex-col gap-1">
         <h1 className="text-2xl font-semibold text-foreground">
-          {dependantText.mainTitle[viewType]}
+          {dependantText.mainTitle[viewType] || 'Crear nueva beca'}
         </h1>
         <span className="text-muted-foreground">
           Complete la información de la beca
@@ -323,7 +323,7 @@ export default function CreateScholarship() {
                       {isPendingCreate || isPendingUpdate ? (
                         <Loader2 className="animate-spin w-2" />
                       ) : (
-                        dependantText.submit[viewType]
+                        dependantText.submit[viewType] || 'Registrar'
                       )}
                     </Button>
                   </CardFooter>
