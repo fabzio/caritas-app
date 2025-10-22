@@ -52,7 +52,13 @@ export default function SendInvitation() {
     )
   })
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog
+      open={open}
+      onOpenChange={(val) => {
+        if (!val) form.reset()
+        setOpen(val)
+      }}
+    >
       <DialogTrigger asChild>
         <div className="flex justify-center">
           <Button variant="link">¿El usuario ya tiene una cuenta?</Button>
@@ -134,7 +140,7 @@ export default function SendInvitation() {
         </Form>
         <DialogFooter>
           <DialogClose asChild>
-            <Button variant="secondary">Cancelars</Button>
+            <Button variant="secondary">Cancelar</Button>
           </DialogClose>
           <Button disabled={isPending} onClick={handleSubmit}>
             {isPending ? <Spinner /> : 'Enviar invitación'}
