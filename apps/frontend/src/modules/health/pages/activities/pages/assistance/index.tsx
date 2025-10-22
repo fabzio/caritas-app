@@ -109,7 +109,7 @@ export default function AssistancePage() {
           </header>
 
           <div className="flex justify-between items-start sm:items-center gap-4 mb-6">
-            <Link to="/health/activities">
+            <Link to="/health/activities/$activityId" params={{ activityId }}>
               <Button variant="outline">
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Regresar
