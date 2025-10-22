@@ -106,7 +106,6 @@ export default function EditActivityForm() {
             : [{ alliedId: '', specialityIds: [] }],
       })
 
-      // Refuerzo explícito para selects controlados
       setValue('typeId', activity.typeId)
       setValue('statusId', activity.statusId)
     }
