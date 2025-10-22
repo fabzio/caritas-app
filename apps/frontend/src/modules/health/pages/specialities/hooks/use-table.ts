@@ -2,13 +2,13 @@ import { useFilters } from '@frontend/hooks/use-filters'
 import { sortByToState } from '@frontend/shared/utils/sort-by-to-state'
 import { useMemo } from 'react'
 import { specialityTableColumns } from '../components/columns'
-import { useListSpecialities } from './use-list-specialities'
+import { useGetSpecialities } from './use-get-specialities'
 
 export const useSpecialityTable = () => {
   const { filters, setFilters } = useFilters(
     '/_authenticated/health/specialities/',
   )
-  const { data: response } = useListSpecialities({
+  const { data: response } = useGetSpecialities({
     currentPage: filters.pageIndex,
     pageSize: filters.pageSize,
     filters: filters,

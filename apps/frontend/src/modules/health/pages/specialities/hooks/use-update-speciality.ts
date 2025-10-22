@@ -10,7 +10,6 @@ interface UpdateSpecialityProps {
 }
 
 export default function useUpdateSpeciality() {
-  const navigate = useNavigate()
   const queryClient = useQueryClient()
 
   return useMutation({
@@ -31,7 +30,6 @@ export default function useUpdateSpeciality() {
         queryKey: [QueryKeys.HEALTH.SPECIALITIES],
       })
       toast.success('Especialidad modificada exitosamente')
-      navigate({ to: '/health/specialities' })
     },
   })
 }

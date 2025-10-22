@@ -22,29 +22,31 @@ import { Loader2 } from 'lucide-react'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import useGetSpeciality from '../hooks/use-get-speciality' // 🆕
+import useGetSpeciality from '../hooks/use-get-speciality'
 import usePostSpeciality from '../hooks/use-post-speciality'
 import useUpdateSpeciality from '../hooks/use-update-speciality'
 import {
   type FormSpecialitySchema,
   formSpecialitySchema,
-} from '../models/speciality'
+} from '../models/specialityForm'
 
 type Props = {
   open: boolean
   onOpenChange: (open: boolean) => void
   initialData?: { id?: number }
+  clearSelection?: () => void
 }
 
 export default function SpecialityFormDialog({
   open,
   onOpenChange,
   initialData,
+  clearSelection,
 }: Readonly<Props>) {
   const viewType = initialData?.id ? 'edit' : 'new'
   const { data: user } = useSession()
 
-  const { data: specialityData, isFetching } = useGetSpeciality(initialData?.id) // 🧠 carga si hay id
+  const { data: specialityData, isFetching } = useGetSpeciality(initialData?.id)
   const { mutate: createSpeciality, isPending: isCreating } =
     usePostSpeciality()
   const { mutate: updateSpeciality, isPending: isUpdating } =
@@ -55,7 +57,6 @@ export default function SpecialityFormDialog({
     defaultValues: { name: '' },
   })
 
-  // 🧩 Cuando llegan los datos del backend → actualiza el form
   useEffect(() => {
     if (specialityData) {
       form.reset({ name: specialityData.name })
@@ -64,7 +65,6 @@ export default function SpecialityFormDialog({
     }
   }, [specialityData, initialData, form])
 
-  // 🧹 Limpiar al cerrar
   useEffect(() => {
     if (!open) form.reset({ name: '' })
   }, [open, form])
@@ -77,7 +77,7 @@ export default function SpecialityFormDialog({
         { id: initialData.id, name: data.name },
         {
           onSuccess: () => {
-            toast.success('Especialidad actualizada correctamente')
+            clearSelection?.()
             onOpenChange(false)
           },
           onError: (error) => {
@@ -89,7 +89,7 @@ export default function SpecialityFormDialog({
     } else {
       createSpeciality(data, {
         onSuccess: () => {
-          toast.success('Especialidad registrada correctamente')
+          clearSelection?.()
           onOpenChange(false)
         },
         onError: (error) => {

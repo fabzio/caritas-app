@@ -4,17 +4,17 @@ import type { SpecialitiesFilters } from '@frontend/routes/_authenticated/health
 import { QueryKeys } from '@frontend/shared/constants/query-keys'
 import { useQuery } from '@tanstack/react-query'
 
-type UseSpecialitiesParams = {
+type UseGetSpecialitiesParams = {
   currentPage?: number
   pageSize?: number
   filters?: SpecialitiesFilters
 }
 
-export const useListSpecialities = ({
+export const useGetSpecialities = ({
   currentPage = 1,
   pageSize = 10,
   filters,
-}: UseSpecialitiesParams) => {
+}: UseGetSpecialitiesParams) => {
   const { data: speciality } = useSession()
   return useQuery({
     queryKey: [QueryKeys.HEALTH.SPECIALITIES, filters],
@@ -36,6 +36,5 @@ export const useListSpecialities = ({
 }
 
 export type SpecialitiesResponse = NonNullable<
-  ReturnType<typeof useListSpecialities>['data']
+  ReturnType<typeof useGetSpecialities>['data']
 >
-export type Speciality = SpecialitiesResponse['data'][number]

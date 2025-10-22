@@ -3,16 +3,16 @@ import { QueryKeys } from '@frontend/shared/constants/query-keys'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-interface PostSpecialityProps {
-  name: string
+interface DeleteSpecialitiesProps {
+  ids: number[]
 }
 
-const usePostSpeciality = () => {
+const useDeleteSpecialities = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async (props: PostSpecialityProps) => {
-      const { data, error } = await rpc.health.speciality.post(props)
+    mutationFn: async (props: DeleteSpecialitiesProps) => {
+      const { data, error } = await rpc.health.speciality.delete(props)
 
       if (error) throw error
       return data
@@ -21,8 +21,11 @@ const usePostSpeciality = () => {
       queryClient.invalidateQueries({
         queryKey: [QueryKeys.HEALTH.SPECIALITIES],
       })
-      toast.success('Especialidad creada exitosamente')
+      toast.success('Especialidad eliminada exitosamente')
+    },
+    onError: (error) => {
+      toast.error(`Error al eliminar la especialidad: ${error.message}`)
     },
   })
 }
-export default usePostSpeciality
+export default useDeleteSpecialities

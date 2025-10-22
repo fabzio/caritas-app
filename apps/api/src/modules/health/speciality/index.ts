@@ -3,6 +3,7 @@ import Elysia, { status, t } from 'elysia'
 import { SpecialityModel } from './model'
 import {
   createSpeciality,
+  deleteSpecialities,
   findDuplicateSpeciality,
   getSingleSpeciality,
   getSpecialities,
@@ -16,7 +17,7 @@ const speciality = new Elysia({
   .use(betterAuth)
   .get('/', ({ query }) => getSpecialities(query), {
     auth: true,
-    query: SpecialityModel.listSpecialitiesQuery,
+    query: SpecialityModel.getSpecialitiesQuery,
     response: {
       200: SpecialityModel.getSpecialitiesResponse,
     },
@@ -80,6 +81,25 @@ const speciality = new Elysia({
         200: SpecialityModel.getSingleSpecialityResponse,
         400: t.String(),
         404: t.String(),
+      },
+    },
+  )
+  .delete(
+    '/',
+    async ({ body }) => {
+      const { ids } = body
+      if (!ids.length)
+        throw status(400, 'No hay ningún ID de especialidad para eliminar')
+
+      const deleted = await deleteSpecialities(ids)
+      return deleted
+    },
+    {
+      auth: true,
+      body: SpecialityModel.deleteSpecialities,
+      response: {
+        200: t.Object({ success: t.Boolean() }),
+        400: t.String(),
       },
     },
   )

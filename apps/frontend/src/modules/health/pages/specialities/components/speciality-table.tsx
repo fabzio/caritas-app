@@ -7,7 +7,7 @@ import type {
   PaginationState,
   SortingState,
 } from '@tanstack/react-table'
-import type { Speciality } from '../hooks/use-list-specialities'
+import type { Speciality } from '../hooks/use-get-specialities'
 
 type Props = {
   rowSelection: Record<string, boolean>

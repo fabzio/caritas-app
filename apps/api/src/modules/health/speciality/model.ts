@@ -4,9 +4,10 @@ import { t } from 'elysia'
 
 export namespace SpecialityModel {
   const _getSpeciality = createSelectSchema(speciality)
+  const _getSpecialityPublic = t.Omit(_getSpeciality, ['active'])
 
   export const getSpecialitiesResponse = t.Object({
-    data: t.Array(_getSpeciality),
+    data: t.Array(_getSpecialityPublic),
     total: t.Integer(),
     page: t.Integer(),
     limit: t.Integer(),
@@ -14,17 +15,14 @@ export namespace SpecialityModel {
   })
   export type GetSpecialitiesResponse = typeof getSpecialitiesResponse.static
 
-  export const getSpecialities = t.Array(_getSpeciality)
-  export type GetSpecialities = typeof getSpecialities.static
-
-  export const listSpecialitiesQuery = t.Object({
+  export const getSpecialitiesQuery = t.Object({
     q: t.Optional(t.String()),
     search: t.Optional(t.String()),
     page: t.Optional(t.Integer({ minimum: 0 })),
     limit: t.Optional(t.Integer({ minimum: 1, maximum: 100 })),
     sortBy: t.Optional(t.String()),
   })
-  export type ListSpecialitiesQuery = typeof listSpecialitiesQuery.static
+  export type GetSpecialitiesQuery = typeof getSpecialitiesQuery.static
 
   const _createSpeciality = createInsertSchema(speciality)
   export const createSpeciality = t.Omit(_createSpeciality, ['id'])
@@ -38,7 +36,7 @@ export namespace SpecialityModel {
   })
   export type UpdateSpeciality = typeof updateSpeciality.static
 
-  export const getSingleSpecialityResponse = _getSpeciality
+  export const getSingleSpecialityResponse = _getSpecialityPublic
   export type GetSingleSpecialityResponse =
     typeof getSingleSpecialityResponse.static
 
@@ -46,4 +44,9 @@ export namespace SpecialityModel {
     id: t.String({ description: 'ID numérico de la especialidad' }),
   })
   export type GetSingleSpecialityQuery = typeof getSingleSpecialityQuery.static
+
+  export const deleteSpecialities = t.Object({
+    ids: t.Array(t.Integer({ minimum: 1 })),
+  })
+  export type DeleteSpecialities = typeof deleteSpecialities.static
 }

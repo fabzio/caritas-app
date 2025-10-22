@@ -2,18 +2,18 @@ import { Button } from '@workspace/ui/components/button'
 import { HeartPlus } from 'lucide-react'
 import { useState } from 'react'
 import ActionsButton from './components/actions-button'
+import DeleteConfirmationDialog from './components/delete-confirmation-dialog'
 import SearchSpecialityInput from './components/search-speciality-input'
 import SpecialityFormDialog from './components/speciality-form-dialog'
 import SpecialityTable from './components/speciality-table'
 import { useSpecialityTable } from './hooks/use-table'
+import type { Speciality } from './models/speciality'
 
-export default function Speciality() {
+export default function Specialities() {
   const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({})
   const [formOpen, setFormOpen] = useState(false)
-  const [selected, setSelected] = useState<{
-    id?: number
-    name?: string
-  } | null>(null)
+  const [deleteOpen, setDeleteOpen] = useState(false)
+  const [editSelected, setEditSelected] = useState<Speciality | null>(null)
 
   const {
     data: specialities,
@@ -30,19 +30,30 @@ export default function Speciality() {
 
   const selectedSpecialities = selectedRows
     .map((rowIndex) => specialities?.[rowIndex])
-    .filter(Boolean)
+    .filter(Boolean) as Speciality[]
 
-  const selectedCount = selectedSpecialities.length
+  const selectedIds = selectedSpecialities
+    ? selectedSpecialities.map((s) => s.id)
+    : []
+  const selectedCount = selectedIds.length
+
+  const clearSelection = () => {
+    setRowSelection({})
+  }
+
+  const handleDelete = () => {
+    setDeleteOpen(true)
+  }
 
   const handleEdit = () => {
     const item = selectedSpecialities[0]
     if (!item) return
-    setSelected({ id: item.id, name: item.name })
+    setEditSelected(item)
     setFormOpen(true)
   }
 
   const handleNew = () => {
-    setSelected(null)
+    setEditSelected(null)
     setFormOpen(true)
   }
 
@@ -61,7 +72,7 @@ export default function Speciality() {
 
         <div className="flex items-center gap-2">
           <ActionsButton
-            onDeleteClick={() => {}}
+            onDeleteClick={handleDelete}
             onEditClick={handleEdit}
             selectedCount={selectedCount}
           />
@@ -86,11 +97,19 @@ export default function Speciality() {
         />
       </div>
 
-      {/* Modal para crear/editar */}
       <SpecialityFormDialog
         open={formOpen}
         onOpenChange={setFormOpen}
-        initialData={selected || undefined}
+        initialData={editSelected || undefined}
+        clearSelection={clearSelection}
+      />
+
+      <DeleteConfirmationDialog
+        open={deleteOpen}
+        onOpenChange={setDeleteOpen}
+        selectedCount={selectedCount}
+        ids={selectedIds}
+        clearSelection={clearSelection}
       />
     </div>
   )

@@ -1,14 +1,5 @@
-import { z } from 'zod'
+import type rpc from '@frontend/lib/rpc'
 
-export const formSpecialitySchema = z.object({
-  name: z
-    .string()
-    .nonempty('El nombre es obligatorio')
-    .trim()
-    .refine((val) => val.trim().length > 0, {
-      message: 'El nombre no puede contener solo espacios',
-    })
-    .max(100, { message: 'El nombre no debe superar los 100 caracteres' }),
-})
-
-export type FormSpecialitySchema = z.infer<typeof formSpecialitySchema>
+export type Speciality = NonNullable<
+  Awaited<ReturnType<typeof rpc.health.speciality.get>>['data']
+>['data'][number]

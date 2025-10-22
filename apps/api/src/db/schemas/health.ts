@@ -126,6 +126,7 @@ export const speciality = healthSchema.table(
   {
     id: integer().primaryKey().generatedByDefaultAsIdentity(),
     name: varchar('name', { length: 100 }).notNull(),
+    active: boolean('active').default(true).notNull(),
   },
   (table) => [unique('unique_speciality_name').on(table.name)],
 )

@@ -2,11 +2,11 @@ import db from '@api/db'
 import { PostgresError } from '@api/db/errors'
 import { speciality } from '@api/db/schemas/health'
 import { normalizeText } from '@api/utils/normalize-text'
-import { asc, desc, eq } from 'drizzle-orm'
+import { asc, desc, eq, inArray } from 'drizzle-orm'
 import type { SpecialityModel } from './model'
 
 export async function getSpecialities(
-  params: SpecialityModel.ListSpecialitiesQuery,
+  params: SpecialityModel.GetSpecialitiesQuery,
 ): Promise<SpecialityModel.GetSpecialitiesResponse> {
   const { q = '', page = 0, limit = 10, sortBy = 'name.asc' } = params
 
@@ -25,6 +25,7 @@ export async function getSpecialities(
   const allRows = await db
     .select({ speciality })
     .from(speciality)
+    .where(eq(speciality.active, true))
     .orderBy(orderExpr)
 
   const normalizedQ = normalizeText(q)
@@ -50,7 +51,8 @@ export async function getSpecialities(
 
 export async function getSingleSpeciality(id: number) {
   const data = await db.query.speciality.findFirst({
-    where: (speciality, { eq }) => eq(speciality.id, id),
+    where: (speciality, { and, eq }) =>
+      and(eq(speciality.id, id), eq(speciality.active, true)),
   })
   return data ?? null
 }
@@ -99,4 +101,17 @@ export async function findDuplicateSpeciality(
   const excluded = coincidences.find((s) => s.id !== excludeId)
 
   return excluded || null
+}
+
+export const deleteSpecialities = async (ids: number[]) => {
+  try {
+    await db
+      .update(speciality)
+      .set({ active: false })
+      .where(inArray(speciality.id, ids))
+    return { success: true }
+  } catch (e) {
+    if (e instanceof Error) throw new PostgresError(e.message)
+    throw e
+  }
 }
