@@ -5,6 +5,7 @@ import {
   pgSchema,
   primaryKey,
   text,
+  time,
   timestamp,
   varchar,
 } from 'drizzle-orm/pg-core'
@@ -82,6 +83,26 @@ export const organizationOpportunity = educationSchema.table('opportunity', {
     .notNull()
     .$onUpdateFn(() => new Date()),
   active: boolean().default(true).notNull(),
+})
+export const fair = educationSchema.table('fair', {
+  id: integer('id').primaryKey().generatedByDefaultAsIdentity(),
+  title: varchar('title', { length: 200 }).notNull(),
+  address: text('address').notNull(),
+  regionId: integer('region_id')
+    .notNull()
+    .references(() => region.id, { onDelete: 'cascade' }),
+  createdBy: varchar('created_by', { length: 32 }).references(() => user.id, {
+    onDelete: 'set null',
+  }),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at')
+    .defaultNow()
+    .notNull()
+    .$onUpdateFn(() => new Date()),
+  active: boolean('active').default(true).notNull(),
+  startTime: time('start_time').notNull(),
+  endTime: time('end_time').notNull(),
+  date: date('date').notNull(),
 })
 
 export const scholarship = educationSchema.table('scholarship', {

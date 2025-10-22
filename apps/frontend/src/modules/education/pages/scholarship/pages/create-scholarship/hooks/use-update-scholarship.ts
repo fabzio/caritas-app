@@ -1,12 +1,16 @@
+import authClient from '@frontend/lib/authClient'
 import rpc from '@frontend/lib/rpc'
-import { useMutation } from '@tanstack/react-query'
+import { QueryKeys } from '@frontend/shared/constants/query-keys'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { toast } from 'sonner'
 
-const usePostScholarship = () => {
-  const navigate = useNavigate({ from: '/education/scholarship/form' })
+export const useUpdateScholarship = () => {
+  const navigate = useNavigate()
+
   return useMutation({
     mutationFn: async (params: {
+      id: number
       name: string
       description: string
       requirements: string
@@ -16,15 +20,19 @@ const usePostScholarship = () => {
       organizationId: string
       type: 'ML' | 'PL'
       active?: boolean
-      createdBy: string
+      createdBy?: string
       createdAt?: Date
       updatedAt?: Date
     }) => {
-      const res = await rpc.education.scholarship.post({
+      const cleanBody = {
         ...params,
-        endDate: params.endDate.toISOString(),
-        startDate: params.startDate.toISOString(),
-      })
+        startDate: params.startDate
+          ? params.startDate.toISOString()
+          : undefined,
+        endDate: params.endDate ? params.endDate.toISOString() : undefined,
+      }
+      const { id, ...body } = cleanBody
+      const res = await rpc.education.scholarship({ id: params.id }).patch(body)
       if (res.error) throw res.error
       return res.data
     },
@@ -37,4 +45,3 @@ const usePostScholarship = () => {
     },
   })
 }
-export default usePostScholarship
