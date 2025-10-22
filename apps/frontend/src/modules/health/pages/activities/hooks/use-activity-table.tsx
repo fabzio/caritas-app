@@ -7,7 +7,7 @@ type SortBy = `${string}.${'asc' | 'desc'}`
 
 export const useActivityTable = () => {
   const { filters: rawFilters, setFilters } = useFilters(
-    '/_authenticated/health/activities',
+    '/_authenticated/health/activities/',
   )
 
   const filtersForHook = {
