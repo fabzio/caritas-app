@@ -43,7 +43,8 @@ vi.mock('@hookform/resolvers/zod', () => ({
 }))
 
 vi.mock('@tanstack/react-router', () => ({
-  Link: ({ children }: { children: ReactNode }) => <div>{children}</div>,
+  ...vi.importActual('@tanstack/react-router'),
+  useNavigate: vi.fn(),
 }))
 
 vi.mock('@workspace/ui/components/button', () => ({
