@@ -2,13 +2,7 @@ import { Link } from '@tanstack/react-router'
 import type { ColumnDef } from '@tanstack/react-table'
 import { Button } from '@workspace/ui/components/button'
 import { Checkbox } from '@workspace/ui/components/checkbox'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@workspace/ui/components/dropdown-menu'
-import { ArrowUpDown, MoreHorizontal, Pencil, Trash2 } from 'lucide-react'
+import { ArrowUpDown } from 'lucide-react'
 
 export type Fair = {
   id: number
@@ -49,10 +43,19 @@ export const fairTableColumns: ColumnDef<Fair>[] = [
       <Button
         variant="ghost"
         onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        className="-ml-3"
       >
         Nombre de la feria
         <ArrowUpDown />
+      </Button>
+    ),
+    cell: ({ row }) => (
+      <Button asChild variant="link">
+        <Link
+          to="/education/fair/form"
+          search={{ type: 'edit', id: row.original.id }}
+        >
+          {row.original.title}
+        </Link>
       </Button>
     ),
   },
@@ -86,43 +89,6 @@ export const fairTableColumns: ColumnDef<Fair>[] = [
       return new Intl.DateTimeFormat('es-PE', {
         dateStyle: 'short',
       }).format(date)
-    },
-  },
-  {
-    id: 'actions',
-    header: 'Acciones',
-    cell: ({ row }) => {
-      const getIsSelected = row.getIsSelected()
-      const fairId = row.original.id
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Abrir menú</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem disabled={!getIsSelected}>
-              <Link
-                to="/education/fair/form"
-                className="flex w-full"
-                search={{ id: fairId, type: 'edit' }}
-              >
-                <Pencil className="mr-2 h-4 w-4" />
-                Editar
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              className="text-destructive"
-              disabled={!getIsSelected}
-            >
-              <Trash2 className="mr-2 h-4 w-4" />
-              Eliminar
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      )
     },
   },
 ]

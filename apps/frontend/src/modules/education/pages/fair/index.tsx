@@ -1,9 +1,10 @@
 import { useIsMobile } from '@frontend/hooks/use-mobile'
-import { Link } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
 import { Button } from '@workspace/ui/components/button'
 import { Skeleton } from '@workspace/ui/components/skeleton'
 import { PlusCircle } from 'lucide-react'
 import { useState } from 'react'
+import ActionsButton from './components/actions-button'
 import FairTable from './components/fair-table'
 import SearchFairInput from './components/search-fair-input'
 import { useFairTable } from './hooks/use-fair-table'
@@ -11,6 +12,7 @@ import { useFairTable } from './hooks/use-fair-table'
 export default function FairPage() {
   const isMobile = useIsMobile()
   const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({})
+  const navigate = useNavigate()
 
   const {
     data: fairs,
@@ -21,6 +23,16 @@ export default function FairPage() {
     sortingState,
     setFilters,
   } = useFairTable()
+
+  const selectedRows = Object.keys(rowSelection)
+    .filter((key) => rowSelection[key])
+    .map((key) => Number.parseInt(key, 10))
+
+  const selectedFairs = selectedRows
+    .map((rowIndex) => fairs?.[rowIndex])
+    .filter(Boolean)
+
+  const fairCount = selectedFairs.length
 
   return (
     <div className="w-full p-4">
@@ -37,6 +49,16 @@ export default function FairPage() {
           </div>
         </div>
         <div className="flex items-center gap-2">
+          <ActionsButton
+            onDeleteClick={() => {}}
+            onEditClick={() =>
+              navigate({
+                to: '/education/fair/form',
+                search: { id: selectedFairs[0].id, type: 'edit' },
+              })
+            }
+            selectedCount={fairCount}
+          />
           <Link search={{ type: 'new' }} to="/education/fair/form">
             <Button size={isMobile ? 'sm' : 'default'}>
               <PlusCircle />
