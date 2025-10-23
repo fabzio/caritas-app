@@ -12,7 +12,8 @@ export const useCreateApplication = () => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (props: CreateApplicationProps) => {
-      const { data, error } = await rpc.education.application.post(props)
+      const { data, error } =
+        await rpc.education.scholarship.application.post(props)
       if (error) throw error
       return data
     },

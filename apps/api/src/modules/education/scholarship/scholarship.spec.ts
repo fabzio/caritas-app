@@ -165,10 +165,10 @@ describe('Scholarship Module', () => {
     })
 
     expect(response.status).toBe(200)
-    expect(response.data).toBeInstanceOf(Array)
-    expect(response.data?.length).toBeGreaterThan(0)
+    expect(response.data?.data).toBeInstanceOf(Array)
+    expect(response.data?.data.length).toBeGreaterThan(0)
 
-    const scholarshipNames = response.data?.map((s) => s.name) || []
+    const scholarshipNames = response.data?.data.map((s) => s.name) || []
     expect(scholarshipNames).toContain('Scholarship for Listing')
   })
 

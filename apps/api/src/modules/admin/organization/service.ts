@@ -1,7 +1,6 @@
 import db from '@api/db'
 import { PostgresError } from '@api/db/errors'
 import { organization } from '@api/db/schemas/auth'
-import { withHeaders } from '@elysiajs/openapi'
 import { and, asc, count, desc, eq, ilike, not, or } from 'drizzle-orm'
 import type { OrganizationModel } from './model'
 
