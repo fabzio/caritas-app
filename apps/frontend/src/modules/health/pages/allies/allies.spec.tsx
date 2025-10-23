@@ -12,7 +12,7 @@ vi.mock('./hooks/use-create-ally', () => ({
     isPending: false,
   }),
 }))
-vi.mock('./hooks/use-organization-table', () => ({
+vi.mock('./hooks/use-ally-table', () => ({
   useOrganizationTable: () => ({
     data: [
       {
