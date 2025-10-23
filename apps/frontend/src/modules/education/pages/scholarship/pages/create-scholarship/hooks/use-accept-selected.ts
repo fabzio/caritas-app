@@ -28,7 +28,7 @@ export function useAcceptSelected({
         await acceptAll.mutateAsync({ scholarshipId })
       } else {
         const selectedIds = Object.keys(rowSelection)
-          .map((index) => applicants?.[Number.parseInt(index)]?.id)
+          .map((index) => applicants?.[Number.parseInt(index, 10)]?.id)
           .filter((id): id is number => id !== undefined)
         await acceptBatch.mutateAsync({ ids: selectedIds })
       }

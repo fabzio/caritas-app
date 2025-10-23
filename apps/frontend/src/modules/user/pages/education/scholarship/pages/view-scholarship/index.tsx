@@ -3,27 +3,16 @@ import { Badge } from '@workspace/ui/components/badge'
 import { Button } from '@workspace/ui/components/button'
 import { Card, CardContent } from '@workspace/ui/components/card'
 import { Separator } from '@workspace/ui/components/separator'
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from '@workspace/ui/components/tabs'
-import { ArrowLeftIcon, FileTextIcon, GraduationCapIcon } from 'lucide-react'
-import { useState } from 'react'
-import useScholarshipStore from '../../hooks/use-scholarship-store'
-import ApplicantsTable from './components/applicants-table'
-import ScholarshipGeneralInfo from './components/scholarship-general-info'
+import { ArrowLeftIcon } from 'lucide-react'
+import ScholarshipGeneralInfo from '../../../../../components/scholarship-general-info'
+import useScholarshipStore from '../../../../../hooks/use-scholarship-store'
 
-export default function ViewScholarship() {
-  const { scholarshipId } = useParams({ strict: false })
+export default function ViewScholarshipPage() {
+  const { id } = useParams({ strict: false })
   const navigate = useNavigate()
-  const [activeTab, setActiveTab] = useState('general')
   const { getScholarshipById } = useScholarshipStore()
 
-  const scholarship = getScholarshipById(
-    Number.parseInt(scholarshipId ?? '0', 10),
-  )
+  const scholarship = getScholarshipById(Number.parseInt(id ?? '0', 10))
 
   if (!scholarship) {
     return (
@@ -33,7 +22,7 @@ export default function ViewScholarship() {
             <p className="text-muted-foreground">Beca no encontrada</p>
             <Button
               variant="outline"
-              onClick={() => navigate({ to: '/education/scholarship' })}
+              onClick={() => navigate({ to: '/user/education/scholarship' })}
               className="mt-4"
             >
               <ArrowLeftIcon className="h-4 w-4 mr-2" />
@@ -69,43 +58,16 @@ export default function ViewScholarship() {
         <Separator />
       </div>
 
-      <Tabs
-        value={activeTab}
-        onValueChange={setActiveTab}
-        className="flex flex-1 flex-col gap-4"
-      >
-        <TabsList className="w-fit">
-          <TabsTrigger value="general" className="flex items-center gap-2">
-            <FileTextIcon className="h-4 w-4" />
-            Información General
-          </TabsTrigger>
-          <TabsTrigger value="applicants" className="flex items-center gap-2">
-            <GraduationCapIcon className="h-4 w-4" />
-            Postulantes
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="general" className="mt-0">
-          <Card>
-            <CardContent className="px-6">
-              <ScholarshipGeneralInfo scholarship={scholarshipData} />
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="applicants" className="mt-0">
-          <Card>
-            <CardContent className="px-6">
-              <ApplicantsTable scholarshipId={scholarship.id} />
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+      <Card>
+        <CardContent className="px-6">
+          <ScholarshipGeneralInfo scholarship={scholarshipData} />
+        </CardContent>
+      </Card>
 
       <div className="flex justify-start">
         <Button
           variant="outline"
-          onClick={() => navigate({ to: '/education/scholarship' })}
+          onClick={() => navigate({ to: '/user/education/scholarship' })}
         >
           <ArrowLeftIcon className="h-4 w-4 mr-2" />
           Volver a Becas
