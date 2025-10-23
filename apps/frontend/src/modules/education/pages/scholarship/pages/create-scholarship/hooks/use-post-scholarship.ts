@@ -36,7 +36,7 @@ const usePostScholarship = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [QueryKeys.EDUCATION.FAIR], // Invalida la lista (sin ID)
+        queryKey: [QueryKeys.SCHOLARSHIP], // Invalida la lista (sin ID)
       })
       toast.success('Beca registrada correctamente')
       navigate({ to: '/education/scholarship' })

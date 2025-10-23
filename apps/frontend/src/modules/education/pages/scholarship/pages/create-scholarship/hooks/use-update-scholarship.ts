@@ -40,15 +40,15 @@ export const useUpdateScholarship = () => {
     },
     onSuccess: (data, variables) => {
       queryClient.invalidateQueries({
-        queryKey: [QueryKeys.EDUCATION.FAIR],
+        queryKey: [QueryKeys.SCHOLARSHIP],
       })
 
       queryClient.invalidateQueries({
-        queryKey: [QueryKeys.EDUCATION.FAIR, variables.id],
+        queryKey: [QueryKeys.SCHOLARSHIP, variables.id],
       })
 
-      toast.success('Feria actualizada correctamente')
-      navigate({ to: '/education/fair' }) // Redirige a la lista
+      toast.success('Beca actualizada correctamente')
+      navigate({ to: '/education/scholarship' }) // Redirige a la lista
     },
   })
 }

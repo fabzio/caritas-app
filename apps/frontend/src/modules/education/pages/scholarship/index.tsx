@@ -13,7 +13,7 @@ export default function ScholarshipPage() {
       </div>
       <div>
         <div className="w-full flex justify-end ">
-          <Link to="/education/scholarship/create">
+          <Link to="/education/scholarship/form" search={{ type: 'new' }}>
             <Button className="w-full max-w-xs" size={isMobile ? 'sm' : 'lg'}>
               <PlusCircle />
               Nueva beca
