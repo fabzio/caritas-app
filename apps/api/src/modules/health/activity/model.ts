@@ -66,6 +66,9 @@ export namespace ActivityModel {
   export const userAttentionSchema = t.Object({
     specialityId: t.Integer(),
     specialityName: t.String(),
+    alliedId: t.String(),
+    alliedName: t.String(),
+    alliedParticipationId: t.Integer(),
     hasAttention: t.Boolean(),
     attentionId: t.Nullable(t.Integer()),
     attentionTime: t.Nullable(t.String()),
@@ -118,6 +121,26 @@ export namespace ActivityModel {
     ),
   })
   export type CreateCompleteActivity = typeof createCompleteActivity.static
+
+  export const createAttentionSchema = t.Object({
+    userId: t.String({ minLength: 32, maxLength: 32 }),
+    alliedParticipationId: t.Number(),
+    observations: t.Optional(t.String()),
+    registeredBy: t.String({ minLength: 32, maxLength: 32 }),
+  })
+
+  export type CreateAttention = typeof createAttentionSchema.static
+
+  export const createAttentionResponse = t.Object({
+    id: t.Integer(),
+    userId: t.String({ minLength: 32, maxLength: 32 }),
+    alliedParticipationId: t.Number(),
+    observations: t.Nullable(t.String()),
+    registeredBy: t.String({ minLength: 32, maxLength: 32 }),
+    timestamp: t.Date(),
+  })
+
+  export type CreateAttentionResponse = typeof createAttentionResponse.static
 
   export const attendantActivity = t.Object({
     userId: t.String(),

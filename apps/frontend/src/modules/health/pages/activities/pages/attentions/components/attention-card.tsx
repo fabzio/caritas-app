@@ -2,19 +2,11 @@ import { Card, CardContent } from '@workspace/ui/components/card'
 import { cn } from '@workspace/ui/lib/utils'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
-
-export interface Attention {
-  specialityId: number
-  specialityName: string
-  hasAttention: boolean
-  attentionId: number | null
-  attentionTime: string | null
-  observations: string | null
-}
+import type { UserAttention } from '../hooks/use-user-attentions'
 
 interface AttentionCardProps {
-  attention: Attention
-  onClick?: (attention: Attention) => void
+  attention: UserAttention
+  onClick?: (attention: UserAttention) => void
 }
 
 export default function AttentionCard({
@@ -43,7 +35,18 @@ export default function AttentionCard({
     >
       <CardContent className="p-4">
         <div className="flex justify-between items-center">
-          <p className="font-medium text-base">{attention.specialityName}</p>
+          <div className="flex flex-col gap-1">
+            <p className="font-medium text-base leading-tight">
+              {attention.specialityName}
+            </p>
+            <p
+              className={cn('text-xs text-muted-foreground/80 max-w-[180px]')}
+              title={attention.alliedName}
+            >
+              {attention.alliedName}
+            </p>
+          </div>
+
           {attention.hasAttention && attention.attentionTime ? (
             <p className="text-sm text-muted-foreground">
               {formatTime(attention.attentionTime)}
