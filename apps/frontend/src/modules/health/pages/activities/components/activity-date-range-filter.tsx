@@ -8,7 +8,7 @@ import {
 } from '@workspace/ui/components/popover'
 import { cn } from '@workspace/ui/lib/utils'
 import { format } from 'date-fns'
-import { CalendarIcon } from 'lucide-react'
+import { CalendarIcon, FunnelX } from 'lucide-react'
 import { useCallback, useState } from 'react'
 
 type ActivitySearchFilters = {
@@ -45,7 +45,7 @@ const dateToDateString = (date: Date | undefined): string | undefined => {
   return format(date, 'yyyy-MM-dd')
 }
 
-const ActivityDateRangeFilter = () => {
+const ActivityDateRangeFilter = ({ onClearSearch }) => {
   const { filters, setFilters } = useActivityFilters()
 
   const currentStartDate = dateStringToDate(filters.startDate)
@@ -85,6 +85,26 @@ const ActivityDateRangeFilter = () => {
     [currentStartDate, currentEndDate, setFilters],
   )
 
+  const handleClearFilters = useCallback(() => {
+    const areFiltersActive =
+      !!filters.startDate || !!filters.endDate || !!filters.q
+
+    if (areFiltersActive) {
+      setFilters({
+        startDate: undefined,
+        endDate: undefined,
+        page: 0,
+      })
+
+      if (onClearSearch) {
+        onClearSearch()
+      }
+    }
+  }, [filters.startDate, filters.endDate, filters.q, setFilters, onClearSearch])
+
+  const areFiltersActive =
+    !!filters.startDate || !!filters.endDate || !!filters.q
+
   return (
     <div className="flex flex-col sm:flex-row gap-2 items-end">
       <div className="relative flex flex-col">
@@ -100,7 +120,7 @@ const ActivityDateRangeFilter = () => {
                 !currentStartDate && 'text-muted-foreground',
               )}
             >
-              <CalendarIcon className="mr-2 h-4 w-4" />
+              <CalendarIcon className="mr-1 h-4 w-4" />
               {currentStartDate
                 ? format(currentStartDate, 'dd/MM/yyyy')
                 : 'Desde'}
@@ -114,8 +134,6 @@ const ActivityDateRangeFilter = () => {
                 handleDateChange(date, 'startDate')
                 setIsStartDatePopoverOpen(false)
               }}
-              initialFocus
-              toDate={currentEndDate}
             />
           </PopoverContent>
         </Popover>
@@ -136,7 +154,7 @@ const ActivityDateRangeFilter = () => {
                 !currentEndDate && 'text-muted-foreground',
               )}
             >
-              <CalendarIcon className="mr-2 h-4 w-4" />
+              <CalendarIcon className="mr-1 h-4 w-4" />
               {currentEndDate
                 ? format(currentEndDate, 'dd/MM/yyyy') // Formato dd/MM/yyyy
                 : 'Hasta'}
@@ -150,11 +168,19 @@ const ActivityDateRangeFilter = () => {
                 handleDateChange(date, 'endDate')
                 setIsEndDatePopoverOpen(false)
               }}
-              initialFocus
-              fromDate={currentStartDate}
             />
           </PopoverContent>
         </Popover>
+      </div>
+      <div className="flex flex-col">
+        <Button
+          variant="outline"
+          onClick={handleClearFilters}
+          disabled={!areFiltersActive}
+          title="Limpiar todos los filtros activos"
+        >
+          <FunnelX className="h-4 w-4" />
+        </Button>
       </div>
     </div>
   )

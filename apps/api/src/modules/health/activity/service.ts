@@ -10,19 +10,28 @@ import {
   attention,
   speciality,
 } from '@api/db/schemas/health'
+import { addDays } from 'date-fns' // o similar
 import {
   and,
   asc,
   count,
   desc,
   eq,
+  gt,
   gte,
   ilike,
+  lt,
   lte,
   or,
   type SQL,
 } from 'drizzle-orm'
 import type { ActivityModel } from './model'
+
+const getNextDay = (dateString: string) => {
+  const date = new Date(dateString)
+  const nextDay = addDays(date, 1)
+  return nextDay.toISOString().split('T')[0]
+}
 
 export const createActivity = async (args: ActivityModel.CreateActivity) => {
   try {
@@ -96,12 +105,17 @@ export async function getActivities(
       (sortOrderRaw ?? 'asc').trim().toLowerCase() === 'desc' ? 'desc' : 'asc'
 
     if (startDate) {
-      dateRangeConditions.push(gte(activity.date, startDate))
+      dateRangeConditions.push(gt(activity.date, startDate))
     }
     if (endDate) {
-      dateRangeConditions.push(lte(activity.date, endDate))
+      // 1. Obtén el día siguiente al endDate
+      const nextDay = getNextDay(endDate)
+
+      // 2. Usa MENOR QUE (lt) el inicio del día siguiente
+      // Esto incluye todas las horas del endDate
+      dateRangeConditions.push(lte(activity.date, nextDay))
     }
-    console.log(dateRangeConditions)
+
     const columnsMap = {
       name: activity.name,
       date: activity.date,

@@ -10,7 +10,7 @@ import {
   DialogTitle,
 } from '@workspace/ui/components/dialog'
 import { SquareActivity } from 'lucide-react'
-import { useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import ActionsButton from './components/actions-button'
 import ActivityDateRangeFilter from './components/activity-date-range-filter'
 import { ActivityTable } from './components/activity-table'
@@ -56,6 +56,14 @@ export default function ActivityPage() {
     }
   }
 
+  type ResetFunction = () => void
+  const searchResetRef = useRef<ResetFunction | null>(null)
+  const handleClearSearch = useCallback(() => {
+    if (searchResetRef.current) {
+      searchResetRef.current()
+    }
+  }, [])
+
   return (
     <div className="w-full p-4">
       <header className="mb-6">
@@ -68,12 +76,12 @@ export default function ActivityPage() {
       </header>
 
       <div className="flex justify-between items-center gap-2 mb-4">
-        <div className="flex flex-col sm:flex-row sm:items-center gap-3 w-full">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2 w-full">
           <div className="flex-1 w-full">
-            <SearchActivityInput />
+            <SearchActivityInput onClearRef={searchResetRef} />
           </div>
           <div className="shrink-0">
-            <ActivityDateRangeFilter />
+            <ActivityDateRangeFilter onClearSearch={handleClearSearch} />
           </div>
         </div>
         <div className="flex items-center gap-2">
