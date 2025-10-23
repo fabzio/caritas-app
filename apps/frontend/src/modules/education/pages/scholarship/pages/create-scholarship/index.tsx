@@ -1,5 +1,7 @@
 import { useSession } from '@frontend/hooks/use-session'
+import { QueryKeys } from '@frontend/shared/constants/query-keys'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useQueryClient } from '@tanstack/react-query'
 import { getRouteApi, Link, useSearch } from '@tanstack/react-router'
 import { Button } from '@workspace/ui/components/button'
 import { Calendar } from '@workspace/ui/components/calendar'
@@ -44,6 +46,7 @@ import {
   type FormScholarShipSchema,
   formScholarShipSchema,
 } from './models/scholarship'
+
 export default function CreateScholarship() {
   const viewType = useSearch({
     from: '/_authenticated/education/scholarship/form',
@@ -92,6 +95,7 @@ export default function CreateScholarship() {
     useUpdateScholarship()
 
   const { data: user } = useSession()
+
   const handleSubmit = form.handleSubmit((data) => {
     if (!user || form.getValues('vacancies') == null) return
     if (viewType === 'edit' && loaderData?.id) {
