@@ -10,7 +10,6 @@ import {
   attention,
   speciality,
 } from '@api/db/schemas/health'
-import { addDays } from 'date-fns' // o similar
 import {
   and,
   asc,
@@ -18,19 +17,20 @@ import {
   desc,
   eq,
   gt,
-  gte,
   ilike,
-  lt,
   lte,
   or,
   type SQL,
 } from 'drizzle-orm'
 import type { ActivityModel } from './model'
 
-const getNextDay = (dateString: string) => {
-  const date = new Date(dateString)
-  const nextDay = addDays(date, 1)
-  return nextDay.toISOString().split('T')[0]
+const getNextDayNative = (dateString: string) => {
+  const date = new Date(`${dateString}T00:00:00`)
+  date.setDate(date.getDate() + 1)
+  const year = date.getUTCFullYear()
+  const month = String(date.getUTCMonth() + 1).padStart(2, '0')
+  const day = String(date.getUTCDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
 }
 
 export const createActivity = async (args: ActivityModel.CreateActivity) => {
@@ -108,7 +108,7 @@ export async function getActivities(
       dateRangeConditions.push(gt(activity.date, startDate))
     }
     if (endDate) {
-      const nextDay = getNextDay(endDate)
+      const nextDay = getNextDayNative(endDate)
 
       dateRangeConditions.push(lte(activity.date, nextDay))
     }
