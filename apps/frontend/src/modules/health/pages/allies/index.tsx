@@ -11,10 +11,11 @@ import {
 import { UserPlus } from 'lucide-react'
 import { useState } from 'react'
 import ActionsButton from './components/actions-button'
+import DeleteConfirmationDialog from './components/delete-confirmation-dialog'
 import OrganizationFormDialog from './components/organization-form-dialog'
 import OrganizationTable from './components/organization-table'
 import SearchHealthOrganizationInput from './components/search-organization-input'
-import { useOrganizationTable } from './hooks/use-organization-table'
+import { useOrganizationTable } from './hooks/use-ally-table'
 
 interface FormModalStateType {
   open: boolean
@@ -23,7 +24,7 @@ interface FormModalStateType {
 
 export default function AlliesTableView() {
   const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({})
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const [deleteOpen, setDeleteOpen] = useState(false)
   const [formModal, setFormModal] = useState<FormModalStateType>({
     open: false,
     type: 'new',
@@ -48,8 +49,14 @@ export default function AlliesTableView() {
 
   const allyCount = selectedAllies.length
 
-  const handleDelete = async () => {
-    // TODO: implement delete ally
+  const selectedIds = selectedAllies ? selectedAllies.map((s) => s.id) : []
+  const selectedCount = selectedIds.length
+
+  const handleDelete = () => {
+    setDeleteOpen(true)
+  }
+  const clearSelection = () => {
+    setRowSelection({})
   }
 
   return (
@@ -62,7 +69,7 @@ export default function AlliesTableView() {
         </div>
         <div className="flex items-center gap-2">
           <ActionsButton
-            onDeleteClick={() => setIsDeleteModalOpen(true)}
+            onDeleteClick={() => setDeleteOpen(true)}
             onEditClick={() => setFormModal({ open: true, type: 'edit' })}
             selectedCount={allyCount}
           />
@@ -84,7 +91,7 @@ export default function AlliesTableView() {
           pagination={pagination}
         />
       </div>
-      <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
+      <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>
@@ -113,6 +120,13 @@ export default function AlliesTableView() {
         open={formModal.open}
         onOpenChange={setFormModal}
         initialData={selectedAllies[0] || undefined}
+      />
+      <DeleteConfirmationDialog
+        open={deleteOpen}
+        onOpenChange={setDeleteOpen}
+        selectedCount={selectedCount}
+        ids={selectedIds}
+        clearSelection={clearSelection}
       />
     </div>
   )
