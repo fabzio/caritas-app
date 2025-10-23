@@ -1,4 +1,5 @@
 import rpc from '@frontend/lib/rpc'
+import { QueryKeys } from '@frontend/shared/constants/query-keys'
 import { useQuery } from '@tanstack/react-query'
 
 interface UseActivityParticipantParams {
@@ -11,7 +12,7 @@ export const useActivityParticipant = ({
   userId,
 }: UseActivityParticipantParams) => {
   return useQuery({
-    queryKey: ['activity-participant', activityId, userId],
+    queryKey: [QueryKeys.HEALTH.ACTIVITIES, activityId, userId],
     queryFn: async () => {
       const { data, error } = await rpc.health.activities.participants.get({
         query: {
