@@ -3,6 +3,7 @@ import betterAuth from '@api/modules/auth/middleware'
 import Elysia, { status, t } from 'elysia'
 import { UserModel } from './model'
 import {
+  getBeneficiaries,
   getMemberId,
   getSingleUser,
   getTeamsByIds,
@@ -38,13 +39,19 @@ const user = new Elysia({
       },
     },
   )
+  .get('/beneficiaries', () => getBeneficiaries(), {
+    auth: true,
+    response: {
+      200: UserModel.getBeneficiariesResponse,
+    },
+  })
   .post(
     '',
     async ({ body, request: { headers } }) => {
       const teamIds = Array.from(new Set(body.teamIds))
       const teams = await getTeamsByIds(teamIds)
       if (teams.length !== teamIds.length) throw status(404, 'Team not found')
-      const roles = new Set(teams.map((team) => resolveRole(team.name)))
+      const roles = new Set(teams.map((team) => team.role))
       const existingRoles = await getUserRoles(body.userId, body.organizationId)
       const rolesToAdd = Array.from(roles).filter(
         (role) => !existingRoles.includes(role),
@@ -54,7 +61,7 @@ const user = new Elysia({
           body: {
             userId: body.userId,
             organizationId: body.organizationId,
-            role,
+            role: role as TeamRole,
           },
           headers,
         })
@@ -126,7 +133,7 @@ const user = new Elysia({
       const { role: currRole } = await auth.api.getActiveMemberRole({
         headers: request.headers,
       })
-      const roles = new Set(teams.map((team) => resolveRole(team.name)))
+      const roles = new Set(teams.map((team) => team.role))
       if (currRole.split(',').includes('owner')) roles.add('owner')
       const memberId = await getMemberId(id, organizationId)
       if (!memberId) throw status(404, 'Member not found')
@@ -158,14 +165,4 @@ type TeamRole =
   | 'educationMember'
   | 'admin'
   | 'owner'
-
-const mapTeamToRole: Readonly<Partial<Record<string, TeamRole>>> = {
-  Salud: 'healthMember',
-  Educación: 'educationMember',
-  Administrador: 'admin',
-}
-
-const resolveRole = (teamName: string): TeamRole =>
-  mapTeamToRole[teamName] ?? 'member'
-
 export default user

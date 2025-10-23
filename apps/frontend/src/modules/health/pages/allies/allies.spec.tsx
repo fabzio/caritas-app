@@ -127,6 +127,11 @@ vi.mock('lucide-react', () => ({
   UserPlus: () => <span>+</span>,
 }))
 
+vi.mock('./components/organization-form-dialog', () => ({
+  __esModule: true,
+  default: () => <div data-testid="organization-form-dialog" />,
+}))
+
 describe('AlliesTableView', () => {
   beforeEach(() => {
     vi.clearAllMocks()
@@ -148,7 +153,7 @@ describe('AlliesTableView', () => {
   it('renders new ally button', () => {
     render(<AlliesTableView />)
 
-    expect(screen.getByText('Crear aliado')).toBeTruthy()
+    expect(screen.getByText('Nuevo aliado')).toBeTruthy()
   })
 
   it('delete button is disabled when no rows selected', () => {

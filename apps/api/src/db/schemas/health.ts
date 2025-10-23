@@ -101,7 +101,11 @@ export const activityUser = healthSchema.table(
 export const attention = healthSchema.table('attention', {
   id: integer().primaryKey().generatedByDefaultAsIdentity(),
   observations: text(),
-  timestamp: timestamp().defaultNow().notNull(),
+  timestamp: timestamp({
+    withTimezone: true,
+  })
+    .defaultNow()
+    .notNull(),
   userId: varchar('user_id', { length: 32 })
     .notNull()
     .references(() => user.id, { onDelete: 'cascade' }),

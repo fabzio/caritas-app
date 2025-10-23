@@ -23,6 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@workspace/ui/components/select'
+import { Spinner } from '@workspace/ui/components/spinner'
 import {
   Table,
   TableBody,
@@ -34,6 +35,7 @@ import {
 
 type Props<T> = {
   data: T[]
+  isLoading?: boolean
   columns: ColumnDef<T>[]
   pagination: PaginationState
   paginationOptions: Pick<
@@ -46,10 +48,12 @@ type Props<T> = {
   setRowSelection: OnChangeFn<Record<string, boolean>>
   showPageSizeSelector?: boolean
   pageSizeOptions?: number[]
+  onRowClick?: (row: T) => void
 }
 
 export default function DataTable<T>({
   data,
+  isLoading = false,
   columns,
   pagination,
   paginationOptions,
@@ -59,6 +63,7 @@ export default function DataTable<T>({
   setRowSelection,
   showPageSizeSelector = false,
   pageSizeOptions = [5, 10, 20, 30, 50],
+  onRowClick,
 }: Readonly<Props<T>>) {
   const table = useReactTable({
     data,
@@ -109,6 +114,8 @@ export default function DataTable<T>({
               <TableRow
                 key={row.id}
                 data-state={row.getIsSelected() && 'selected'}
+                onClick={() => onRowClick?.(row.original)}
+                className={onRowClick ? 'cursor-pointer hover:bg-muted/50' : ''}
               >
                 {row.getVisibleCells().map((cell) => (
                   <TableCell key={cell.id}>
@@ -120,7 +127,13 @@ export default function DataTable<T>({
           ) : (
             <TableRow>
               <TableCell colSpan={columns.length} className="text-center">
-                No se encontraron resultados
+                {isLoading ? (
+                  <div className="w-full flex justify-center">
+                    <Spinner />{' '}
+                  </div>
+                ) : (
+                  'No se encontraron resultados'
+                )}
               </TableCell>
             </TableRow>
           )}

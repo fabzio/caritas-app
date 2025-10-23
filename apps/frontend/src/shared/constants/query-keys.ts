@@ -5,6 +5,7 @@ export const QueryKeys = {
   ORGANIZATIONSEDU: 'organizationsEducation',
   ORGANIZATIONSMAJOR: 'organizationsMajor',
   SCHOLARSHIP: 'scholarships',
+  SCHOLARSHIP_APPLICATION: 'scholarship-applications',
   USER_TEAMS: 'teams',
   SETTINGS: {
     ACCOUNTS: 'settings-accounts',
@@ -19,9 +20,11 @@ export const QueryKeys = {
     USERS: 'admin-members',
   },
   EDUCATION: {
+    SCHOLARSHIP: 'scholarships',
     SCHOLARSHIP_RECIPIENTS: 'education-scholarship-recipients',
     FAIR: 'education-fair',
     SCHOLARSHIP_APPLICATION: 'education-scholarship-applications',
+    ORGANIZATIONS: 'education-organizations',
   },
   HEALTH: {
     ACTIVITIES: 'health-activities',
