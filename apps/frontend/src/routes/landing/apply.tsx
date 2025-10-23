@@ -13,14 +13,14 @@ export const Route = createFileRoute('/landing/apply')({
     })
     if (authError) throw authError
 
-    const { data: scholarships, error: scholarshipsError } =
+    const { data: scholarshipsResponse, error: scholarshipsError } =
       await rpc.education.scholarship.get()
     if (scholarshipsError) throw scholarshipsError
 
     return {
       isLoggedIn: !!authData?.user,
       user: authData?.user,
-      scholarships,
+      scholarships: scholarshipsResponse.data,
     }
   },
 })

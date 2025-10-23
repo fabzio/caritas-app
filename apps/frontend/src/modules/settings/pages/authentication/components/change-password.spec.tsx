@@ -42,10 +42,34 @@ describe('ChangePassword component', () => {
 
     await waitFor(() => {
       expect(mutate).toHaveBeenCalledTimes(1)
-      expect(mutate).toHaveBeenCalledWith({
-        currentPassword: 'OldPassword1!',
-        newPassword: 'NewPassword1!',
-      })
+      expect(mutate).toHaveBeenCalledWith(
+        {
+          currentPassword: 'OldPassword1!',
+          newPassword: 'NewPassword1!',
+        },
+        expect.objectContaining({
+          onSuccess: expect.any(Function),
+        }),
+      )
+    })
+
+    const onSuccess = mutate.mock.calls[0][1].onSuccess as () => void
+    onSuccess()
+
+    const currentPasswordField =
+      screen.getByLabelText<HTMLInputElement>(/Contraseña Actual/i)
+    const newPasswordField = screen.getByLabelText<HTMLInputElement>(
+      'Nueva Contraseña',
+      { exact: true },
+    )
+    const confirmPasswordField = screen.getByLabelText<HTMLInputElement>(
+      /Confirmar Nueva Contraseña/i,
+    )
+
+    await waitFor(() => {
+      expect(currentPasswordField.value).toBe('')
+      expect(newPasswordField.value).toBe('')
+      expect(confirmPasswordField.value).toBe('')
     })
   })
 })

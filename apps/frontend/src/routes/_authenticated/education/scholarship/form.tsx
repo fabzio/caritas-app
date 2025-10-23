@@ -14,7 +14,7 @@ export const Route = createFileRoute(
     return await queryClient.ensureQueryData({
       queryKey: [QueryKeys.SCHOLARSHIP, id],
       queryFn: async () => {
-        const { data, error } = await rpc.education
+        const { data } = await rpc.education
           .scholarship({ id: String(id) })
           .get()
         return data || undefined
