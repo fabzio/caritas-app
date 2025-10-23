@@ -2,7 +2,12 @@ import betterAuth from '@api/modules/auth/middleware'
 import Elysia, { status, t } from 'elysia'
 
 import { OrganizationModel } from './model'
-import { getOrganizations, getSingleOrganization } from './service'
+import {
+  findDuplicateOrganizations,
+  getOrganizations,
+  getSingleOrganization,
+  updateOrganization,
+} from './service'
 
 const organization = new Elysia({
   name: 'organization',
@@ -40,6 +45,32 @@ const organization = new Elysia({
       response: {
         200: OrganizationModel.getSingleOrganizationResponse,
         404: t.Literal('Organization not found'),
+      },
+    },
+  )
+  .patch(
+    '/:id',
+    async ({ params, body }) => {
+      const id = String(params.id)
+
+      const existing = await getSingleOrganization({ id })
+      if (!existing) throw status(404, 'No se encontró la especialidad')
+
+      const duplicate = await findDuplicateOrganizations(body.name, id)
+      if (duplicate)
+        throw status(400, `La especialidad "${duplicate.name}" ya existe`)
+
+      const updated = await updateOrganization(id, body)
+      return updated
+    },
+    {
+      auth: true,
+      params: OrganizationModel.getSingleOrganizationQuery,
+      body: OrganizationModel.updateOrganization,
+      response: {
+        200: OrganizationModel.getSingleOrganizationResponse,
+        400: t.String(),
+        404: t.String(),
       },
     },
   )
