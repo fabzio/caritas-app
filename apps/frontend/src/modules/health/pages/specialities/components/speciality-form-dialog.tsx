@@ -28,7 +28,7 @@ import useUpdateSpeciality from '../hooks/use-update-speciality'
 import {
   type FormSpecialitySchema,
   formSpecialitySchema,
-} from '../models/specialityForm'
+} from '../models/speciality-form'
 
 type Props = {
   open: boolean
