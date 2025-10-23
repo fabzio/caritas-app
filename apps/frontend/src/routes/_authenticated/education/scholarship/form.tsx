@@ -19,6 +19,7 @@ export const Route = createFileRoute(
           .get()
         return data || undefined
       },
+      gcTime: 0,
     })
   },
   validateSearch: z.object({

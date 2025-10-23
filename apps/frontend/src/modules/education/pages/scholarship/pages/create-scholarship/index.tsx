@@ -1,5 +1,7 @@
 import { useSession } from '@frontend/hooks/use-session'
+import { QueryKeys } from '@frontend/shared/constants/query-keys'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useQueryClient } from '@tanstack/react-query'
 import { getRouteApi, Link, useSearch } from '@tanstack/react-router'
 import { Button } from '@workspace/ui/components/button'
 import { Calendar } from '@workspace/ui/components/calendar'
@@ -34,7 +36,7 @@ import {
 } from '@workspace/ui/components/select'
 import { Separator } from '@workspace/ui/components/separator'
 import { Textarea } from '@workspace/ui/components/textarea'
-import { format } from 'date-fns'
+import { format,parseISO } from 'date-fns'
 import { CalendarIcon, Loader2, UserPlus } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import useGetOrganization from './hooks/use-get-organization'
@@ -52,6 +54,8 @@ export default function CreateScholarship() {
   const loaderData = getRouteApi(
     '/_authenticated/education/scholarship/form',
   ).useLoaderData()
+  const startDate = new Date(loaderData?.startDate ?? '')
+  const endDate = new Date(loaderData?.endDate ?? '')
 
   const form = useForm<FormScholarShipSchema>({
     resolver: zodResolver(formScholarShipSchema),
@@ -63,10 +67,14 @@ export default function CreateScholarship() {
             requirements: loaderData?.requirements,
             vacancies: loaderData?.vacancies,
             startDate: loaderData?.startDate
-              ? new Date(loaderData.startDate)
+              ? new Date(
+                  startDate.getTime() + startDate.getTimezoneOffset() * 60000,
+                )
               : undefined,
             endDate: loaderData?.endDate
-              ? new Date(loaderData.endDate)
+              ? new Date(
+                  endDate.getTime() + endDate.getTimezoneOffset() * 60000,
+                )
               : undefined,
             organizationId: loaderData?.organizationId
               ? String(loaderData.organizationId)
@@ -92,6 +100,7 @@ export default function CreateScholarship() {
     useUpdateScholarship()
 
   const { data: user } = useSession()
+
   const handleSubmit = form.handleSubmit((data) => {
     if (!user || form.getValues('vacancies') == null) return
     if (viewType === 'edit' && loaderData?.id) {

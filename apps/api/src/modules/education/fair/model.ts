@@ -10,6 +10,7 @@ export namespace FairModel {
   const _getFair = createSelectSchema(fair, {
     date: t.Date(),
   })
+  export type GetFair = typeof _getFair.static
   export const createFair = createInsertSchema(fair)
   export type CreateFair = typeof createFair.static
 
@@ -39,7 +40,7 @@ export namespace FairModel {
   })
   export type ListFairsQuery = typeof listFairsQuery.static
 
-  export const getSingleFairsResponse = _getFair
+  export const getSingleFairsResponse = t.Composite([_getFair, t.Object({})])
   export type GetSingleFairsResponse = typeof getSingleFairsResponse.static
 
   export const getSingleFairsQuery = t.Object({
