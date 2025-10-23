@@ -12,10 +12,12 @@ export function useAcceptAll() {
 
   return useMutation({
     mutationFn: async (input: AcceptAllInput) => {
-      const _body = input.comments ? { comments: input.comments } : {}
-      const { data, error } = await rpc.education.scholarship.application({
-        scholarshipId: input.scholarshipId,
-      })
+      const body = input.comments ? { comments: input.comments } : {}
+      const { data, error } = await rpc.education.scholarship
+        .application({
+          scholarshipId: input.scholarshipId,
+        })
+        .get(body)
 
       if (error) throw error
       return data
