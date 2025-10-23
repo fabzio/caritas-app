@@ -12,6 +12,13 @@ vi.mock('./hooks/use-create-ally', () => ({
     isPending: false,
   }),
 }))
+const mockDeleteAlly = vi.fn()
+vi.mock('./hooks/use-delete-ally', () => ({
+  useDeleteAllies: () => ({
+    mutate: mockDeleteAlly,
+    isPending: false,
+  }),
+}))
 vi.mock('./hooks/use-ally-table', () => ({
   useOrganizationTable: () => ({
     data: [
