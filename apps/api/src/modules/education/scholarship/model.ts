@@ -37,6 +37,11 @@ export namespace ScholarshipModel {
   })
 
   export type Paginated = typeof paginated.static
+  const _getScholarships = createSelectSchema(scholarship)
+  export const getScholarship = t.Array(
+    t.Omit(_getScholarships, ['createdAt', 'updatedAt']),
+  )
+
   export type GetScholarShip = typeof getScholarship.static
 
   export const getSingleScholarshipResponse = _getScholarships
