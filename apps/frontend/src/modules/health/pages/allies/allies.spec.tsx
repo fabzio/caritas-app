@@ -14,7 +14,7 @@ vi.mock('./hooks/use-create-ally', () => ({
 }))
 const mockDeleteAlly = vi.fn()
 vi.mock('./hooks/use-delete-ally', () => ({
-  useDeleteAllies: () => ({
+  default: () => ({
     mutate: mockDeleteAlly,
     isPending: false,
   }),
