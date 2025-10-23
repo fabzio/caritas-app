@@ -446,11 +446,17 @@ export const getUserAttentions = async (
         alliedParticipationId: alliedParticipation.id,
         specialityId: speciality.id,
         specialityName: speciality.name,
+        alliedId: organization.id,
+        alliedName: organization.name,
       })
       .from(alliedParticipation)
       .innerJoin(
         speciality,
         eq(alliedParticipation.specialityId, speciality.id),
+      )
+      .innerJoin(
+        organization,
+        eq(alliedParticipation.alliedId, organization.id),
       )
       .where(
         and(
@@ -486,6 +492,8 @@ export const getUserAttentions = async (
       return {
         specialityId: spec.specialityId,
         specialityName: spec.specialityName,
+        alliedId: spec.alliedId,
+        alliedName: spec.alliedName,
         hasAttention: !!att,
         attentionId: att?.id || null,
         attentionTime: att?.timestamp ? att.timestamp.toISOString() : null,

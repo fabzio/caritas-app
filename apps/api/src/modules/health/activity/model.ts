@@ -66,6 +66,8 @@ export namespace ActivityModel {
   export const userAttentionSchema = t.Object({
     specialityId: t.Integer(),
     specialityName: t.String(),
+    alliedId: t.String(),
+    alliedName: t.String(),
     hasAttention: t.Boolean(),
     attentionId: t.Nullable(t.Integer()),
     attentionTime: t.Nullable(t.String()),
