@@ -43,7 +43,7 @@ import { useUpdateScholarship } from './hooks/use-update-scholarship'
 import {
   type FormScholarShipSchema,
   formScholarShipSchema,
-} from './utils/scholarship'
+} from './models/scholarship'
 export default function CreateScholarship() {
   const viewType = useSearch({
     from: '/_authenticated/education/scholarship/form',
@@ -234,7 +234,9 @@ export default function CreateScholarship() {
                             onChange={(e) => {
                               const value = e.target.value
                               const number =
-                                value === '' ? undefined : parseInt(value, 10)
+                                value === ''
+                                  ? undefined
+                                  : Number.parseInt(value, 10)
                               field.onChange(number)
                             }}
                           />

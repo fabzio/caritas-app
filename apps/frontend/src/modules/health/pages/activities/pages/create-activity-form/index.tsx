@@ -3,14 +3,6 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { Button } from '@workspace/ui/components/button'
 import { Calendar } from '@workspace/ui/components/calendar'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@workspace/ui/components/card'
 import { Checkbox } from '@workspace/ui/components/checkbox'
 import {
   Form,
@@ -34,8 +26,16 @@ import {
   SelectValue,
 } from '@workspace/ui/components/select'
 import { Separator } from '@workspace/ui/components/separator'
+import { Spinner } from '@workspace/ui/components/spinner'
 import { format } from 'date-fns'
-import { CalendarIcon, Loader2, Plus, Trash2 } from 'lucide-react'
+import {
+  CalendarIcon,
+  HeartPlus,
+  Loader2,
+  Plus,
+  Trash2,
+  UserPlus,
+} from 'lucide-react'
 import { useFieldArray, useForm } from 'react-hook-form'
 import {
   useActivityStatuses,
@@ -44,16 +44,13 @@ import {
   useSpecialities,
 } from '../../hooks/use-activity-catalogs'
 import { useCreateCompleteActivity } from '../../hooks/use-create-complete-activity'
-import {
-  type CreateCompleteActivityFormSchema,
-  createCompleteActivitySchema,
-} from './schema'
+import { createCompleteActivitySchema } from '../../models/schema'
 
 export default function CreateActivityForm() {
   const navigate = useNavigate()
   const { data: user } = useSession()
 
-  const form = useForm<CreateCompleteActivityFormSchema>({
+  const form = useForm({
     resolver: zodResolver(createCompleteActivitySchema),
     defaultValues: {
       name: '',
@@ -77,7 +74,7 @@ export default function CreateActivityForm() {
   const { mutate, isPending } = useCreateCompleteActivity()
 
   const handleSubmit = form.handleSubmit((data) => {
-    if (!user || !user.session?.activeOrganizationId) return
+    if (!user?.session?.activeOrganizationId) return
 
     const { durationHours, ...rest } = data
 
@@ -195,30 +192,9 @@ export default function CreateActivityForm() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Duración (horas)*</FormLabel>
-                        <Select
-                          onValueChange={(value) =>
-                            field.onChange(Number(value))
-                          }
-                          value={field.value?.toString()}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Seleccione las horas" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {Array.from({ length: 20 }, (_, i) => i + 1).map(
-                              (hours) => (
-                                <SelectItem
-                                  key={hours}
-                                  value={hours.toString()}
-                                >
-                                  {hours} {hours === 1 ? 'hora' : 'horas'}
-                                </SelectItem>
-                              ),
-                            )}
-                          </SelectContent>
-                        </Select>
+                        <FormControl>
+                          <Input {...field} type="number" />
+                        </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -323,114 +299,164 @@ export default function CreateActivityForm() {
                     </Button>
                   </div>
 
-                  {fields.map((field, index) => (
-                    <div key={field.id} className="border rounded-md">
-                      <div className="pb-3 px-4">
-                        <div className="flex items-center justify-between">
-                          <h4 className="text-base font-medium">
-                            Participante {index + 1}
-                          </h4>
-                          {fields.length > 1 && (
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => remove(index)}
-                            >
-                              <Trash2 className="h-4 w-4 text-destructive" />
-                            </Button>
-                          )}
+                  {fields.map((field, index) => {
+                    const selectedAlliedIds = form
+                      .watch('participants')
+                      .map((p) => p.alliedId)
+                      .filter((id, idx) => idx !== index && id)
+
+                    const availableAllies = allies?.filter(
+                      (ally: { id: string; name: string }) =>
+                        !selectedAlliedIds.includes(ally.id),
+                    )
+
+                    return (
+                      <div key={field.id} className="border rounded-md py-2">
+                        <div className="pb-3 px-4">
+                          <div className="flex items-center justify-between">
+                            <h4 className="text-base font-medium">
+                              Participante {index + 1}
+                            </h4>
+                            {fields.length > 1 && (
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => remove(index)}
+                              >
+                                <Trash2 className="h-4 w-4 text-destructive" />
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                        <div className="space-y-4 px-4 pb-4">
+                          <FormField
+                            control={form.control}
+                            name={`participants.${index}.alliedId`}
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Aliado*</FormLabel>
+                                <Select
+                                  onValueChange={field.onChange}
+                                  value={field.value}
+                                >
+                                  <FormControl>
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="Seleccione un aliado" />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    {availableAllies &&
+                                    availableAllies.length > 0 ? (
+                                      availableAllies?.map(
+                                        (ally: {
+                                          id: string
+                                          name: string
+                                        }) => (
+                                          <SelectItem
+                                            key={ally.id}
+                                            value={ally.id}
+                                          >
+                                            {ally.name}
+                                          </SelectItem>
+                                        ),
+                                      )
+                                    ) : (
+                                      <Link
+                                        to="/health/allies"
+                                        className="text-sm text-muted-foreground"
+                                      >
+                                        <div className="flex flex-col items-center py-1">
+                                          No hay aliados disponibles.
+                                          <Separator />{' '}
+                                          <span className="py-1 flex underline items-center gap-2">
+                                            Crear aliado
+                                            <UserPlus size={16} />
+                                          </span>
+                                        </div>
+                                      </Link>
+                                    )}
+                                  </SelectContent>
+                                </Select>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={form.control}
+                            name={`participants.${index}.specialityIds`}
+                            render={() => (
+                              <FormItem>
+                                <FormLabel>Especialidades*</FormLabel>
+                                <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
+                                  {specialities && specialities.length > 0 ? (
+                                    specialities.map(
+                                      (speciality: {
+                                        id: number
+                                        name: string
+                                      }) => (
+                                        <FormField
+                                          key={speciality.id}
+                                          control={form.control}
+                                          name={`participants.${index}.specialityIds`}
+                                          render={({ field }) => (
+                                            <FormItem className="flex items-center space-x-2 space-y-0">
+                                              <FormControl>
+                                                <Checkbox
+                                                  checked={field.value?.includes(
+                                                    speciality.id,
+                                                  )}
+                                                  onCheckedChange={(
+                                                    checked,
+                                                  ) => {
+                                                    const currentValue =
+                                                      field.value || []
+                                                    if (checked) {
+                                                      field.onChange([
+                                                        ...currentValue,
+                                                        speciality.id,
+                                                      ])
+                                                    } else {
+                                                      field.onChange(
+                                                        currentValue.filter(
+                                                          (id) =>
+                                                            id !==
+                                                            speciality.id,
+                                                        ),
+                                                      )
+                                                    }
+                                                  }}
+                                                />
+                                              </FormControl>
+                                              <FormLabel className="font-normal">
+                                                {speciality.name}
+                                              </FormLabel>
+                                            </FormItem>
+                                          )}
+                                        />
+                                      ),
+                                    )
+                                  ) : (
+                                    <span className="text-sm text-muted-foreground">
+                                      No hay especialidades disponibles. <br />
+                                      <Link to="/health/speciality">
+                                        <span className="underline flex gap-1 items-center">
+                                          Crear especialidades{' '}
+                                          <HeartPlus size={16} />
+                                        </span>
+                                      </Link>
+                                    </span>
+                                  )}
+                                </div>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
                         </div>
                       </div>
-                      <div className="space-y-4 px-4 pb-4">
-                        <FormField
-                          control={form.control}
-                          name={`participants.${index}.alliedId`}
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Aliado*</FormLabel>
-                              <Select
-                                onValueChange={field.onChange}
-                                value={field.value}
-                              >
-                                <FormControl>
-                                  <SelectTrigger>
-                                    <SelectValue placeholder="Seleccione un aliado" />
-                                  </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                  {allies?.map(
-                                    (ally: { id: string; name: string }) => (
-                                      <SelectItem key={ally.id} value={ally.id}>
-                                        {ally.name}
-                                      </SelectItem>
-                                    ),
-                                  )}
-                                </SelectContent>
-                              </Select>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        <FormField
-                          control={form.control}
-                          name={`participants.${index}.specialityIds`}
-                          render={() => (
-                            <FormItem>
-                              <FormLabel>Especialidades*</FormLabel>
-                              <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
-                                {specialities?.map(
-                                  (speciality: {
-                                    id: number
-                                    name: string
-                                  }) => (
-                                    <FormField
-                                      key={speciality.id}
-                                      control={form.control}
-                                      name={`participants.${index}.specialityIds`}
-                                      render={({ field }) => (
-                                        <FormItem className="flex items-center space-x-2 space-y-0">
-                                          <FormControl>
-                                            <Checkbox
-                                              checked={field.value?.includes(
-                                                speciality.id,
-                                              )}
-                                              onCheckedChange={(checked) => {
-                                                const currentValue =
-                                                  field.value || []
-                                                if (checked) {
-                                                  field.onChange([
-                                                    ...currentValue,
-                                                    speciality.id,
-                                                  ])
-                                                } else {
-                                                  field.onChange(
-                                                    currentValue.filter(
-                                                      (id) =>
-                                                        id !== speciality.id,
-                                                    ),
-                                                  )
-                                                }
-                                              }}
-                                            />
-                                          </FormControl>
-                                          <FormLabel className="font-normal">
-                                            {speciality.name}
-                                          </FormLabel>
-                                        </FormItem>
-                                      )}
-                                    />
-                                  ),
-                                )}
-                              </div>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-                    </div>
-                  ))}
+                    )
+                  })}
                 </div>
 
                 <div className="flex justify-between px-0 pt-6">
@@ -438,14 +464,7 @@ export default function CreateActivityForm() {
                     <Link to="/health/activities">Cancelar</Link>
                   </Button>
                   <Button type="submit" disabled={isPending}>
-                    {isPending ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Creando...
-                      </>
-                    ) : (
-                      'Crear Actividad'
-                    )}
+                    {isPending ? <Spinner /> : 'Crear Actividad'}
                   </Button>
                 </div>
               </form>

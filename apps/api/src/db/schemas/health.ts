@@ -29,9 +29,14 @@ export const activity = healthSchema.table('activity', {
   id: integer().primaryKey().generatedByDefaultAsIdentity(),
   name: varchar('name', { length: 100 }).notNull(),
   date: date().notNull(),
-  duration: interval().notNull(),
-  createdAt: timestamp().defaultNow().notNull(),
-  updatedAt: timestamp().defaultNow().notNull(),
+  duration: interval({
+    fields: 'hour',
+  }).notNull(),
+  createdAt: timestamp({ withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp({ withTimezone: true })
+    .defaultNow()
+    .$onUpdate(() => new Date())
+    .notNull(),
   spaceId: varchar('space_id', { length: 32 })
     .notNull()
     .references(() => organization.id, { onDelete: 'cascade' }),
