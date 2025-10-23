@@ -7,7 +7,7 @@ import type {
   PaginationState,
   SortingState,
 } from '@tanstack/react-table'
-import type { Organization } from '../hooks/use-list-organizations'
+import type { Organization } from '../hooks/use-list-ally'
 
 type Props = {
   rowSelection: Record<string, boolean>

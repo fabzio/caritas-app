@@ -1,4 +1,5 @@
 import db from '@api/db'
+import { PostgresError } from '@api/db/errors'
 import { organization } from '@api/db/schemas/auth'
 import { and, asc, count, desc, eq, ilike, not, or } from 'drizzle-orm'
 import type { OrganizationModel } from './model'
@@ -65,10 +66,62 @@ export async function getOrganizations(
     totalPages,
   }
 }
+export async function getOrganizationsSimple(name: string) {
+  const rows = await db
+    .select()
+    .from(organization)
+    .where(ilike(organization.name, `%${name}%`))
+  return {
+    data: rows,
+  }
+}
 
 export async function getSingleOrganization({ id }: { id: string }) {
   const data = await db.query.organization.findFirst({
     where: (organization, { eq }) => eq(organization.id, id),
   })
   return data ?? null
+}
+
+export const updateOrganization = async (
+  id: string,
+  args: OrganizationModel.updateOrganization,
+) => {
+  try {
+    const result = await db
+      .update(organization)
+      .set({ name: args.name })
+      .where(eq(organization.id, id))
+      .returning()
+    return result[0] ?? null
+  } catch (e) {
+    if (e instanceof Error) throw new PostgresError(e.message)
+    throw e
+  }
+}
+
+export async function findDuplicateOrganizations(
+  name: string,
+  organizationId: string,
+) {
+  const { data: coincidences } = await getOrganizationsSimple(name)
+
+  if (!coincidences?.length) return null
+
+  const excluded = coincidences.find((s) => s.id !== organizationId)
+
+  return excluded || null
+}
+
+export const deleteOrganizations = async (ids: string[]) => {
+  try {
+    await db
+      .update(organization)
+      .set({ active: false })
+      .where(inArray(organization.id, ids))
+    return { success: true }
+  } catch (e) {
+    if (e instanceof Error) throw new PostgresError(e.message)
+    throw e
+  }
 }

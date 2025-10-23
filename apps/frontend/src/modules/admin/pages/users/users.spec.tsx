@@ -1,3 +1,4 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { ReactNode } from 'react'
@@ -158,6 +159,13 @@ vi.mock('@workspace/ui/components/button', () => ({
 }))
 
 describe('TableView', () => {
+  const createWrapper = () => {
+    const qc = new QueryClient()
+    return ({ children }: { children: ReactNode }) => (
+      <QueryClientProvider client={qc}>{children}</QueryClientProvider>
+    )
+  }
+
   beforeEach(() => {
     vi.clearAllMocks()
     mockGetSession.mockResolvedValue({
@@ -166,7 +174,7 @@ describe('TableView', () => {
   })
 
   it('renders search input and filters', () => {
-    render(<TableView />)
+    render(<TableView />, { wrapper: createWrapper() })
 
     expect(screen.getByTestId('search-input')).toBeTruthy()
     expect(screen.getByTestId('role-filter')).toBeTruthy()
@@ -175,7 +183,7 @@ describe('TableView', () => {
 
   it('calls setFilters when role filter changes', async () => {
     const user = userEvent.setup()
-    render(<TableView />)
+    render(<TableView />, { wrapper: createWrapper() })
 
     const roleFilter = screen.getByTestId('role-filter')
     await user.selectOptions(roleFilter, 'admin')
@@ -190,7 +198,7 @@ describe('TableView', () => {
 
   it('resets to all when selecting all option', async () => {
     const user = userEvent.setup()
-    render(<TableView />)
+    render(<TableView />, { wrapper: createWrapper() })
 
     const roleFilter = screen.getByTestId('role-filter')
     await user.selectOptions(roleFilter, 'all')
@@ -204,7 +212,7 @@ describe('TableView', () => {
   })
 
   it('displays user count in table', () => {
-    render(<TableView />)
+    render(<TableView />, { wrapper: createWrapper() })
 
     expect(screen.getByText('2 users')).toBeTruthy()
   })

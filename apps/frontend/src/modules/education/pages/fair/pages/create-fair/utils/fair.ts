@@ -1,11 +1,18 @@
-import { da } from 'date-fns/locale'
 import { z } from 'zod'
 
 export const formFairSchema = z
   .object({
-    title: z.string().nonempty('Ingrese el nombre de la feria vocacional'),
+    title: z
+      .string()
+      .max(200, {
+        message: 'El nombre de la feria no debe superar los 200 caracteres',
+      })
+      .nonempty('Ingrese el nombre de la feria vocacional'),
     date: z.date({ message: 'La fecha de la feria es obligatoria' }),
-    address: z.string().nonempty('Ingrese la ubicación de la feria vocacional'),
+    address: z
+      .string()
+      .nonempty('Ingrese la ubicación de la feria vocacional')
+      .max(200, { message: 'La dirección no debe superar los 200 caracteres' }),
     startTime: z.string().nonempty('Ingrese la hora de inicio de la feria'),
     endTime: z.string().nonempty('Ingrese la hora de fin de la feria'),
     regionId: z.number().min(1, { message: 'Debes seleccionar una región' }),

@@ -22,8 +22,19 @@ export const useFairTable = () => {
 
   const columns = useMemo(() => fairTableColumns, [])
 
+  const data =
+    response?.data?.map((fair) => ({
+      ...fair,
+      date:
+        fair.date instanceof Date
+          ? new Date(
+              fair.date.getTime() + fair.date.getTimezoneOffset() * 60000,
+            )
+          : fair.date,
+    })) ?? []
+
   return {
-    data: response?.data,
+    data: data,
     isLoading,
     pagination: response
       ? {

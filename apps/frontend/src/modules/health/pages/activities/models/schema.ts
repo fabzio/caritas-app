@@ -1,0 +1,30 @@
+import { z } from 'zod'
+
+export const participantSchema = z.object({
+  alliedId: z.string().min(1, 'Seleccione un aliado'),
+  specialityIds: z
+    .array(z.number())
+    .min(1, 'Seleccione al menos una especialidad'),
+})
+
+export const createCompleteActivitySchema = z.object({
+  name: z
+    .string()
+    .min(3, 'El nombre debe tener al menos 3 caracteres')
+    .max(100, 'El nombre no puede exceder 100 caracteres')
+    .refine((val) => val.trim().length > 0, 'El nombre no puede estar vacío'),
+  date: z.date({ message: 'La fecha es requerida' }),
+  durationHours: z.coerce
+    .number({ message: 'Seleccione la duración' })
+    .min(1, 'La duración debe ser al menos 1 hora')
+    .max(20, 'La duración no puede exceder 20 horas') as unknown as z.ZodNumber,
+  typeId: z.number({ message: 'Seleccione un tipo de actividad' }),
+  statusId: z.number({ message: 'Seleccione un estado' }),
+  participants: z
+    .array(participantSchema)
+    .min(1, 'Debe agregar al menos un participante'),
+})
+
+export type CreateCompleteActivityFormSchema = z.infer<
+  typeof createCompleteActivitySchema
+>

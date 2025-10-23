@@ -12,7 +12,14 @@ vi.mock('./hooks/use-create-ally', () => ({
     isPending: false,
   }),
 }))
-vi.mock('./hooks/use-organization-table', () => ({
+const mockDeleteAlly = vi.fn()
+vi.mock('./hooks/use-delete-ally', () => ({
+  default: () => ({
+    mutate: mockDeleteAlly,
+    isPending: false,
+  }),
+}))
+vi.mock('./hooks/use-ally-table', () => ({
   useOrganizationTable: () => ({
     data: [
       {
@@ -127,6 +134,11 @@ vi.mock('lucide-react', () => ({
   UserPlus: () => <span>+</span>,
 }))
 
+vi.mock('./components/organization-form-dialog', () => ({
+  __esModule: true,
+  default: () => <div data-testid="organization-form-dialog" />,
+}))
+
 describe('AlliesTableView', () => {
   beforeEach(() => {
     vi.clearAllMocks()
@@ -148,7 +160,7 @@ describe('AlliesTableView', () => {
   it('renders new ally button', () => {
     render(<AlliesTableView />)
 
-    expect(screen.getByText('Crear aliado')).toBeTruthy()
+    expect(screen.getByText('Nuevo aliado')).toBeTruthy()
   })
 
   it('delete button is disabled when no rows selected', () => {

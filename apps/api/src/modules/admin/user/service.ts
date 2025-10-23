@@ -52,7 +52,18 @@ export async function getUsers(
 
   // Get paginated data
   const rows = await db
-    .select({ user: user, role: member.role })
+    .select({
+      user: {
+        id: user.id,
+        name: user.name,
+        surname: user.surname,
+        email: user.email,
+        documentType: user.documentType,
+        documentNumber: user.documentNumber,
+        memberId: member.id,
+      },
+      role: member.role,
+    })
     .from(user)
     .innerJoin(member, eq(user.id, member.userId))
     .where(where)
@@ -95,8 +106,7 @@ export async function getUsers(
       const userRoles = userRolesMap[row.id] || []
       return {
         ...row,
-        role: userRoles.join(',') || null,
-        birthDate: new Date(row.birthDate),
+        role: userRoles.join(',') || undefined,
       }
     }),
     total,
@@ -137,6 +147,7 @@ export const getTeamsByIds = async (teamIds: string[]) => {
     .select({
       id: team.id,
       name: team.name,
+      role: team.role,
     })
     .from(team)
     .where(inArray(team.id, teamIds))
@@ -174,4 +185,21 @@ export const getMemberId = async (userId: string, organizationId: string) => {
     },
   })
   return res ? res.id : null
+}
+
+export async function getBeneficiaries(): Promise<UserModel.GetBeneficiariesResponse> {
+  const rows = await db
+    .select({
+      id: user.id,
+      name: user.name,
+      surname: user.surname,
+      documentType: user.documentType,
+      documentNumber: user.documentNumber,
+      active: user.active,
+    })
+    .from(user)
+    .where(and(eq(user.active, true), eq(user.role, 'user')))
+    .orderBy(asc(user.name))
+
+  return rows
 }

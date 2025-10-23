@@ -1,4 +1,5 @@
 import rpc from '@frontend/lib/rpc'
+import { QueryKeys } from '@frontend/shared/constants/query-keys'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
@@ -11,16 +12,14 @@ export const useDeleteActivities = () => {
         ids,
       })
 
-      if (error) {
-        throw new Error(error.value as string)
-      }
+      if (error) throw error
 
       return data
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['health-activities'] })
+      queryClient.invalidateQueries({ queryKey: [QueryKeys.HEALTH.ACTIVITIES] })
       toast.success(
-        `${data.deletedCount} actividad${data.deletedCount !== 1 ? 'es' : ''} eliminada${data.deletedCount !== 1 ? 's' : ''} correctamente`,
+        `${data.deletedCount} actividad${data.deletedCount === 1 ? '' : 'es'} eliminada${data.deletedCount === 1 ? '' : 's'} correctamente`,
       )
     },
     onError: (error) => {

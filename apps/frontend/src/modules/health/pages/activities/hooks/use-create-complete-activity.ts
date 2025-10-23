@@ -1,4 +1,5 @@
 import rpc from '@frontend/lib/rpc'
+import { QueryKeys } from '@frontend/shared/constants/query-keys'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
@@ -23,18 +24,11 @@ export const useCreateCompleteActivity = () => {
     mutationFn: async (input: CreateCompleteActivityInput) => {
       const { data, error } = await rpc.health.activities.complete.post(input)
 
-      if (error) {
-        const errorMessage =
-          typeof error.value === 'string'
-            ? error.value
-            : error.value?.error || 'Error al crear la actividad'
-        throw new Error(errorMessage)
-      }
-
+      if (error) throw error
       return data
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['health-activities'] })
+      queryClient.invalidateQueries({ queryKey: [QueryKeys.HEALTH.ACTIVITIES] })
       toast.success('Actividad creada exitosamente')
     },
     onError: (error: Error) => {
