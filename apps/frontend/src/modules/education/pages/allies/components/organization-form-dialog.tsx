@@ -116,12 +116,12 @@ export default function OrganizationFormDialog({
           <DialogTitle>
             {viewType === 'edit'
               ? 'Editar Organización'
-              : 'Registrar Nueva Organización'}
+              : 'Registrar Aliado Educativo'}
           </DialogTitle>
           <DialogDescription>
             {viewType === 'edit'
               ? 'Actualiza el nombre de la Organización'
-              : 'Complete la información de la Organización'}
+              : 'Complete la información del Aliado Educativo'}
           </DialogDescription>
         </DialogHeader>
 

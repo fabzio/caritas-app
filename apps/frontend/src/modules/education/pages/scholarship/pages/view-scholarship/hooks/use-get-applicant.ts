@@ -2,16 +2,8 @@ import rpc from '@frontend/lib/rpc'
 import { QueryKeys } from '@frontend/shared/constants/query-keys'
 import { useQuery } from '@tanstack/react-query'
 
-export type Applicant = {
-  id: number
-  name: string
-  email: string
-  applicationDate: string
-  status: 'pending' | 'accepted' | 'rejected'
-}
-
 export function useGetApplicants(scholarshipId: number) {
-  return useQuery<Applicant[]>({
+  return useQuery({
     queryKey: [QueryKeys.EDUCATION.SCHOLARSHIP_APPLICATION, scholarshipId],
     queryFn: async () => {
       if (!scholarshipId || scholarshipId <= 0) {
@@ -23,21 +15,7 @@ export function useGetApplicants(scholarshipId: number) {
       if (error) {
         throw error
       }
-      return data.map(
-        (applicant: {
-          id: number
-          userName: string
-          userEmail: string
-          applicationDate: string
-          status: 'pending' | 'accepted' | 'rejected'
-        }) => ({
-          id: applicant.id,
-          name: applicant.userName,
-          email: applicant.userEmail,
-          applicationDate: applicant.applicationDate,
-          status: applicant.status,
-        }),
-      )
+      return data
     },
     enabled: Boolean(scholarshipId) && scholarshipId > 0,
   })

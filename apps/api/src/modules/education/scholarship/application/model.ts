@@ -11,8 +11,8 @@ export namespace Application {
   export const getApplicantsByScholarshipResponse = t.Array(
     t.Object({
       id: t.Number(),
-      userName: t.String(),
-      userEmail: t.String(),
+      name: t.String(),
+      email: t.String(),
       applicationDate: t.String(),
       status: t.Enum({
         pending: 'pending',

@@ -10,6 +10,7 @@ import {
 } from '@workspace/ui/components/dropdown-menu'
 import { Input } from '@workspace/ui/components/input'
 import { Skeleton } from '@workspace/ui/components/skeleton'
+import debounce from 'debounce'
 import { MoreVertical, PlusCircle, Search } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import ScholarshipTable from './components/scholarship-table'
@@ -18,7 +19,6 @@ import { useScholarshipTable } from './hooks/use-table'
 export default function ScholarshipPage() {
   const isMobile = useIsMobile()
   const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({})
-  const [searchQuery, setSearchQuery] = useState('')
 
   const skeletonKeys = useMemo(
     () =>
@@ -42,10 +42,12 @@ export default function ScholarshipPage() {
     isError,
   } = useScholarshipTable()
 
-  const handleSearchChange = (value: string) => {
-    setSearchQuery(value)
-    setFilters({ name: value, pageIndex: 1 })
-  }
+  const handleSearchChange = debounce(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setFilters({ name: e.target.value })
+    },
+    300,
+  )
 
   const selectedCount = Object.keys(rowSelection).length
   const canEdit = selectedCount === 1
@@ -56,12 +58,14 @@ export default function ScholarshipPage() {
     if (selectedIds.length === 1 && scholarships) {
       const selectedScholarship =
         scholarships[Number.parseInt(selectedIds[0], 10)]
+      //TODO: edit scholarship logic
       console.log('Edit scholarship:', selectedScholarship?.id)
     }
   }
 
   const handleDelete = () => {
     const selectedIds = Object.keys(rowSelection)
+    //TODO: delete scholarship logic
     console.log('Delete scholarships:', selectedIds)
   }
 
@@ -78,8 +82,7 @@ export default function ScholarshipPage() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder="Buscar becas..."
-              value={searchQuery}
-              onChange={(e) => handleSearchChange(e.target.value)}
+              onChange={handleSearchChange}
               className="pl-9"
             />
           </div>
@@ -108,7 +111,12 @@ export default function ScholarshipPage() {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            <Link to="/education/scholarship/form?type=new">
+            <Link
+              to="/education/scholarship/form"
+              search={{
+                type: 'new',
+              }}
+            >
               <Button
                 className="w-full sm:w-auto"
                 size={isMobile ? 'sm' : 'lg'}
@@ -120,20 +128,6 @@ export default function ScholarshipPage() {
           </div>
         </div>
 
-        {isLoading && (
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {skeletonKeys.map((k) => (
-              <Card key={`skeleton-${k}`}>
-                <CardContent className="pt-6 space-y-4">
-                  <Skeleton className="h-6" />
-                  <Skeleton className="h-4" />
-                  <Skeleton className="h-20" />
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
-
         {isError && (
           <Card className="border-destructive">
             <CardContent className="pt-6 text-destructive">
@@ -142,7 +136,7 @@ export default function ScholarshipPage() {
           </Card>
         )}
 
-        {!isLoading && !isError && scholarships && (
+        {!isError && scholarships && (
           <ScholarshipTable
             rowSelection={rowSelection}
             setRowSelection={setRowSelection}

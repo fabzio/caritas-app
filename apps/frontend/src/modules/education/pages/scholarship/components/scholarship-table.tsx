@@ -1,3 +1,4 @@
+import type { ScholarshipFilters } from '@frontend/routes/_authenticated/education/scholarship'
 import DataTable from '@frontend/shared/components/data-table'
 import { stateToSortBy } from '@frontend/shared/utils/sort-by-to-state'
 import { useNavigate } from '@tanstack/react-router'
@@ -9,14 +10,8 @@ import type {
 } from '@tanstack/react-table'
 import type { Scholarship } from '../hooks/use-get-scholarship'
 
-type ScholarshipFilters = {
-  name?: string
-  pageIndex?: number
-  pageSize?: number
-  sortBy?: string
-}
-
 type Props = {
+  isLoading?: boolean
   rowSelection: Record<string, boolean>
   setRowSelection: OnChangeFn<Record<string, boolean>>
   data: Scholarship[]
@@ -37,6 +32,7 @@ export default function ScholarshipTable({
   setRowSelection,
   data,
   columns,
+  isLoading,
   paginationState,
   sortingState,
   setFilters,
@@ -54,6 +50,7 @@ export default function ScholarshipTable({
   return (
     <DataTable
       data={data || []}
+      isLoading={isLoading}
       columns={columns}
       pagination={paginationState}
       sorting={sortingState}

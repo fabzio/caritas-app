@@ -23,6 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@workspace/ui/components/select'
+import { Spinner } from '@workspace/ui/components/spinner'
 import {
   Table,
   TableBody,
@@ -34,6 +35,7 @@ import {
 
 type Props<T> = {
   data: T[]
+  isLoading?: boolean
   columns: ColumnDef<T>[]
   pagination: PaginationState
   paginationOptions: Pick<
@@ -51,6 +53,7 @@ type Props<T> = {
 
 export default function DataTable<T>({
   data,
+  isLoading = false,
   columns,
   pagination,
   paginationOptions,
@@ -124,7 +127,13 @@ export default function DataTable<T>({
           ) : (
             <TableRow>
               <TableCell colSpan={columns.length} className="text-center">
-                No se encontraron resultados
+                {isLoading ? (
+                  <div className="w-full flex justify-center">
+                    <Spinner />{' '}
+                  </div>
+                ) : (
+                  'No se encontraron resultados'
+                )}
               </TableCell>
             </TableRow>
           )}

@@ -90,7 +90,7 @@ export default function OrganizationTableView() {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>
-              {`¿Seguro que desea eliminar ${organizationCount} organizaci${organizationCount !== 1 ? 'ones' : 'ón'}?`}
+              {`¿Seguro que desea eliminar ${organizationCount} organizaci${organizationCount === 1 ? 'ón' : 'ones'}?`}
             </DialogTitle>
             <DialogDescription>
               Esta acción no se puede deshacer.

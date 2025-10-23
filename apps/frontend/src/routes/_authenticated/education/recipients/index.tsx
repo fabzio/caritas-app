@@ -1,4 +1,4 @@
-import authClient from '@frontend/lib/authClient'
+import rpc from '@frontend/lib/rpc'
 import ScholarshipRecipients from '@frontend/modules/education/pages/scholarship-recipients'
 import { QueryKeys } from '@frontend/shared/constants/query-keys'
 import type { Filters } from '@frontend/shared/types/filters'
@@ -14,14 +14,11 @@ export type RecipientFilters = Filters & {
 export const Route = createFileRoute('/_authenticated/education/recipients/')({
   loader: ({ context: { queryClient } }) =>
     queryClient.ensureQueryData({
-      queryKey: [QueryKeys.EDUCATION.SCHOLARSHIP_RECIPIENTS, []],
+      queryKey: [QueryKeys.EDUCATION.SCHOLARSHIP_RECIPIENTS, {}],
       queryFn: async () => {
-        const { data, error } = await authClient.admin.listUsers({
-          query: {
-            limit: 10,
-            offset: 0,
-          },
-        })
+        const { data, error } = await rpc.education.scholarship.recipients.get(
+          {},
+        )
         if (error) throw error
         return data || { members: [], total: 0 }
       },

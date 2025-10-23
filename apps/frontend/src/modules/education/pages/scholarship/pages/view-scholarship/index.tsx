@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from '@tanstack/react-router'
+import { useNavigate } from '@tanstack/react-router'
 import { Badge } from '@workspace/ui/components/badge'
 import { Button } from '@workspace/ui/components/button'
 import { Card, CardContent } from '@workspace/ui/components/card'
@@ -11,19 +11,15 @@ import {
 } from '@workspace/ui/components/tabs'
 import { ArrowLeftIcon, FileTextIcon, GraduationCapIcon } from 'lucide-react'
 import { useState } from 'react'
-import useScholarshipStore from '../../hooks/use-scholarship-store'
 import ApplicantsTable from './components/applicants-table'
 import ScholarshipGeneralInfo from './components/scholarship-general-info'
+import useScholarshipDetail from './hooks/use-scholarship-detail'
 
 export default function ViewScholarship() {
-  const { scholarshipId } = useParams({ strict: false })
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState('general')
-  const { getScholarshipById } = useScholarshipStore()
 
-  const scholarship = getScholarshipById(
-    Number.parseInt(scholarshipId ?? '0', 10),
-  )
+  const { data: scholarship } = useScholarshipDetail()
 
   if (!scholarship) {
     return (
@@ -86,19 +82,15 @@ export default function ViewScholarship() {
         </TabsList>
 
         <TabsContent value="general" className="mt-0">
-          <Card>
-            <CardContent className="px-6">
-              <ScholarshipGeneralInfo scholarship={scholarshipData} />
-            </CardContent>
-          </Card>
+          <div className="px-6">
+            <ScholarshipGeneralInfo scholarship={scholarshipData} />
+          </div>
         </TabsContent>
 
         <TabsContent value="applicants" className="mt-0">
-          <Card>
-            <CardContent className="px-6">
-              <ApplicantsTable scholarshipId={scholarship.id} />
-            </CardContent>
-          </Card>
+          <div className="px-6">
+            <ApplicantsTable scholarshipId={scholarship.id} />
+          </div>
         </TabsContent>
       </Tabs>
 

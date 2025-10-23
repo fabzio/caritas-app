@@ -14,6 +14,7 @@ export default function ScholarshipRecipients() {
   const isMobile = useIsMobile()
 
   const {
+    isLoading,
     data: recipients,
     pagination,
     columns,
@@ -94,6 +95,7 @@ export default function ScholarshipRecipients() {
           </div>
           <div className="px-10">
             <RecipientsTable
+              isLoading={isLoading}
               rowSelection={rowSelection}
               setRowSelection={setRowSelection}
               data={recipients || []}

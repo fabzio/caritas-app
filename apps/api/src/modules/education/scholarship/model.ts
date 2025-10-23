@@ -44,7 +44,15 @@ export namespace ScholarshipModel {
 
   export type GetScholarShip = typeof getScholarship.static
 
-  export const getSingleScholarshipResponse = _getScholarships
+  export const getSingleScholarshipResponse = t.Composite([
+    _getScholarships,
+    t.Object({
+      organization: t.Object({
+        name: t.String(),
+      }),
+    }),
+  ])
+
   export type GetSingleScholarshipResponse =
     typeof getSingleScholarshipResponse.static
 

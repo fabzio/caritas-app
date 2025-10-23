@@ -47,18 +47,28 @@ export const getApplicantsByScholarship = async (args: {
 
     const response = await db.query.scholarshipApplication.findMany({
       where: (app, { eq }) => eq(app.scholarshipId, Number(args.scholarshipId)),
+      columns: {
+        id: true,
+        applicationDate: true,
+        status: true,
+      },
       with: {
-        user: true,
+        user: {
+          columns: {
+            id: true,
+            name: true,
+            surname: true,
+            email: true,
+          },
+        },
       },
     })
     return response.map((app) => {
-      const user = app.user as
-        | { name: string; surname: string; email: string }
-        | undefined
+      const user = app.user
       return {
         id: app.id,
-        userName: user ? `${user.name} ${user.surname}` : '',
-        userEmail: user ? user.email : '',
+        name: user ? `${user.name} ${user.surname}` : '',
+        email: user ? user.email : '',
         applicationDate: app.applicationDate.toISOString(),
         status: app.status,
       }

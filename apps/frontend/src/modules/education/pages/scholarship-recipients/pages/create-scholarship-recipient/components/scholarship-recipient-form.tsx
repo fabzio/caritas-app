@@ -1,3 +1,4 @@
+import { Link } from '@tanstack/react-router'
 import { Button } from '@workspace/ui/components/button'
 import {
   Form,
@@ -14,7 +15,7 @@ import {
   SelectValue,
 } from '@workspace/ui/components/select'
 import { Separator } from '@workspace/ui/components/separator'
-import { UserPlus } from 'lucide-react'
+import { GraduationCap, UserPlus } from 'lucide-react'
 import { useScholarshipRecipientForm } from '../hooks/use-scholarship-recipient-form'
 import BeneficiarySearch from './beneficiary-search'
 
@@ -88,15 +89,34 @@ export default function ScholarshipRecipientForm() {
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    {scholarships.map(
-                      (scholarship: { id: number; name: string }) => (
-                        <SelectItem
-                          key={scholarship.id}
-                          value={String(scholarship.id)}
-                        >
-                          {scholarship.name}
-                        </SelectItem>
-                      ),
+                    {scholarships.length > 0 ? (
+                      scholarships.map(
+                        (scholarship: { id: number; name: string }) => (
+                          <SelectItem
+                            key={scholarship.id}
+                            value={String(scholarship.id)}
+                          >
+                            {scholarship.name}
+                          </SelectItem>
+                        ),
+                      )
+                    ) : (
+                      <Link
+                        to="/education/scholarship/form"
+                        search={{
+                          type: 'new',
+                        }}
+                        className="text-sm text-muted-foreground"
+                      >
+                        <div className="flex flex-col items-center py-1">
+                          No hay becas disponibles.
+                          <Separator />{' '}
+                          <span className="py-1 flex underline items-center gap-2">
+                            Agregar nueva beca
+                            <GraduationCap size={16} />
+                          </span>
+                        </div>
+                      </Link>
                     )}
                   </SelectContent>
                 </Select>

@@ -8,7 +8,7 @@ export const useScholarshipRecipientTable = () => {
   const { filters, setFilters } = useFilters(
     '/_authenticated/education/recipients/',
   )
-  const { data: response } = useScholarshipRecipients({
+  const { data: response, isLoading } = useScholarshipRecipients({
     currentPage: filters.pageIndex,
     pageSize: filters.pageSize,
     filters: filters,
@@ -23,6 +23,7 @@ export const useScholarshipRecipientTable = () => {
   const columns = useMemo(() => scholarshipRecipientTableColumns, [])
 
   return {
+    isLoading,
     data: response?.data,
     pagination: response
       ? {

@@ -21,8 +21,14 @@ export const studentInfo = educationSchema.table('student_info', {
     .references(() => user.id, { onDelete: 'cascade' }),
   guardianEmail: varchar('guardian_email', { length: 254 }).notNull(),
   grade: varchar('grade', { length: 50 }).notNull(),
-  createdAt: timestamp().defaultNow().notNull(),
-  updatedAt: timestamp()
+  createdAt: timestamp({
+    withTimezone: true,
+  })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp({
+    withTimezone: true,
+  })
     .defaultNow()
     .notNull()
     .$onUpdateFn(() => new Date()),
@@ -31,8 +37,14 @@ export const studentInfo = educationSchema.table('student_info', {
 export const organizationMajor = educationSchema.table('organization_major', {
   id: integer().primaryKey().generatedByDefaultAsIdentity(),
   name: varchar('name', { length: 100 }).notNull(),
-  createdAt: timestamp().defaultNow().notNull(),
-  updatedAt: timestamp()
+  createdAt: timestamp({
+    withTimezone: true,
+  })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp({
+    withTimezone: true,
+  })
     .defaultNow()
     .notNull()
     .$onUpdateFn(() => new Date()),
@@ -51,8 +63,14 @@ export const organizationLocation = educationSchema.table(
       .notNull()
       .references(() => region.id, { onDelete: 'cascade' }),
     address: text().notNull(),
-    createdAt: timestamp().defaultNow().notNull(),
-    updatedAt: timestamp()
+    createdAt: timestamp({
+      withTimezone: true,
+    })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp({
+      withTimezone: true,
+    })
       .defaultNow()
       .notNull()
       .$onUpdateFn(() => new Date()),
@@ -95,14 +113,24 @@ export const fair = educationSchema.table('fair', {
   createdBy: varchar('created_by', { length: 32 }).references(() => user.id, {
     onDelete: 'set null',
   }),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-  updatedAt: timestamp('updated_at')
+  createdAt: timestamp('created_at', {
+    withTimezone: true,
+  })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp('updated_at', {
+    withTimezone: true,
+  })
     .defaultNow()
     .notNull()
     .$onUpdateFn(() => new Date()),
   active: boolean('active').default(true).notNull(),
-  startTime: time('start_time').notNull(),
-  endTime: time('end_time').notNull(),
+  startTime: time('start_time', {
+    withTimezone: true,
+  }).notNull(),
+  endTime: time('end_time', {
+    withTimezone: true,
+  }).notNull(),
   date: date('date').notNull(),
 })
 
@@ -117,12 +145,18 @@ export const scholarship = educationSchema.table('scholarship', {
     .references(() => user.id, { onDelete: 'set null' }),
   description: text().notNull(),
   requirements: text().notNull(),
-  createdAt: timestamp().defaultNow().notNull(),
+  createdAt: timestamp({
+    withTimezone: true,
+  })
+    .defaultNow()
+    .notNull(),
   type: varchar('type', {
     length: 2,
     enum: ['ML', 'PL'], // ML: Modular, PL: Plan de estudios
   }).notNull(),
-  updatedAt: timestamp()
+  updatedAt: timestamp({
+    withTimezone: true,
+  })
     .defaultNow()
     .notNull()
     .$onUpdateFn(() => new Date()),
@@ -142,7 +176,11 @@ export const scholarshipApplication = educationSchema.table(
     userId: varchar('user_id', { length: 32 })
       .notNull()
       .references(() => user.id, { onDelete: 'cascade' }),
-    applicationDate: timestamp().defaultNow().notNull(),
+    applicationDate: timestamp({
+      withTimezone: true,
+    })
+      .defaultNow()
+      .notNull(),
     status: varchar('status', {
       length: 20,
       enum: ['pending', 'accepted', 'rejected'],
@@ -153,7 +191,7 @@ export const scholarshipApplication = educationSchema.table(
       () => user.id,
       { onDelete: 'set null' },
     ),
-    reviewDate: timestamp(),
+    reviewDate: timestamp({ withTimezone: true }),
     comments: text(),
   },
 )
@@ -180,8 +218,8 @@ export const scholarshipStudentReport = educationSchema.table(
       onDelete: 'cascade',
     }),
     reasonDetail: text(),
-    createdAt: timestamp().defaultNow().notNull(),
-    updatedAt: timestamp()
+    createdAt: timestamp({ withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp({ withTimezone: true })
       .defaultNow()
       .notNull()
       .$onUpdateFn(() => new Date()),
@@ -191,8 +229,8 @@ export const scholarshipStudentReport = educationSchema.table(
 export const reportReason = educationSchema.table('report_reason', {
   id: integer().primaryKey().generatedByDefaultAsIdentity(),
   name: varchar('name', { length: 100 }).notNull(),
-  createdAt: timestamp().defaultNow().notNull(),
-  updatedAt: timestamp()
+  createdAt: timestamp({ withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp({ withTimezone: true })
     .defaultNow()
     .notNull()
     .$onUpdateFn(() => new Date()),

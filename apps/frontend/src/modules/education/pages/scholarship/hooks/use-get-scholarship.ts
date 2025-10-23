@@ -20,20 +20,15 @@ export type Scholarship = {
   }
 }
 
-export type ScholarshipPaginated = {
-  data: Scholarship[]
-  page: number
-  pageSize: number
-  total: number
-  pageCount: number
-  hasNext: boolean
-}
+export type ScholarshipPaginated = NonNullable<
+  Awaited<ReturnType<typeof rpc.education.scholarship.get>>
+>['data']
 
 // hook para hacer fetch all de scholarships
 // tiene filtrado por nombre y paginación
 const useGetScholarship = (name?: string, page = 1, pageSize = 10) => {
-  return useQuery<ScholarshipPaginated>({
-    queryKey: [QueryKeys.SCHOLARSHIP, { name, page, pageSize }],
+  return useQuery({
+    queryKey: [QueryKeys.EDUCATION.SCHOLARSHIP, { name, page, pageSize }],
     queryFn: async () => {
       const res = await rpc.education.scholarship.get({
         query: { name, page, pageSize },

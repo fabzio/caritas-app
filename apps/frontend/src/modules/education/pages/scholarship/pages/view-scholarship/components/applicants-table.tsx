@@ -32,16 +32,6 @@ export default function ApplicantsTable({ scholarshipId }: Readonly<Props>) {
     onSuccess: handleSuccess,
   })
 
-  if (isLoading) {
-    return (
-      <div className="space-y-4">
-        <Skeleton className="h-8 w-48" />
-        <Skeleton className="h-10 w-full" />
-        <Skeleton className="h-[400px] w-full" />
-      </div>
-    )
-  }
-
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -68,6 +58,7 @@ export default function ApplicantsTable({ scholarshipId }: Readonly<Props>) {
 
       <DataTable
         data={applicants ?? []}
+        isLoading={isLoading}
         columns={applicantsTableColumns}
         pagination={pagination}
         paginationOptions={{

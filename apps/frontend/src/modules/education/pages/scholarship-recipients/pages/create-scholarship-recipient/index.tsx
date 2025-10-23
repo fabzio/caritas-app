@@ -1,4 +1,3 @@
-import { Card, CardContent } from '@workspace/ui/components/card'
 import { Separator } from '@workspace/ui/components/separator'
 import ScholarshipRecipientForm from './components/scholarship-recipient-form'
 
@@ -15,11 +14,9 @@ export default function CreateScholarshipRecipient() {
         <Separator />
       </div>
       <div className="flex justify-center">
-        <Card className="w-full lg:w-3/4">
-          <CardContent>
-            <ScholarshipRecipientForm />
-          </CardContent>
-        </Card>
+        <div className="w-full lg:w-3/4">
+          <ScholarshipRecipientForm />
+        </div>
       </div>
     </div>
   )

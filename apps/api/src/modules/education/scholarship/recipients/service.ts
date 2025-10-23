@@ -99,8 +99,6 @@ export async function getRecipients(
     const column = columns[sortField as keyof typeof columns] ?? user.name
     const orderExpr = sortOrder === 'desc' ? desc(column) : asc(column)
 
-    // Basic conditions
-
     const queryConditions = or(
       ilike(user.name, `%${searchQuery}%`),
       ilike(user.surname, `%${searchQuery}%`),
@@ -109,8 +107,6 @@ export async function getRecipients(
       ilike(user.documentNumber, `%${searchQuery}%`),
     )
     const recipientCondition = eq(scholarshipApplication.status, 'accepted')
-
-    // Select conditions
 
     const scholarshipCondition =
       selectFilters?.scholarshipName && selectFilters.scholarshipName !== 'all'
@@ -121,8 +117,6 @@ export async function getRecipients(
         ? eq(region.name, selectFilters.regionNames)
         : undefined
 
-    // Final where condition
-
     const conditions = []
 
     if (searchQuery) conditions.push(queryConditions)
@@ -132,7 +126,6 @@ export async function getRecipients(
 
     const where = conditions.length > 0 ? and(...conditions) : undefined
 
-    // Pagination
     const [{ total }] = await db
       .select({ total: count() })
       .from(scholarshipApplication)
@@ -142,16 +135,15 @@ export async function getRecipients(
         eq(scholarshipApplication.scholarshipId, scholarship.id),
       )
       .innerJoin(organization, eq(scholarship.organizationId, organization.id))
-      .innerJoin(
+      .leftJoin(
         organizationLocation,
         eq(organizationLocation.organizationId, organization.id),
       )
-      .innerJoin(region, eq(region.id, organizationLocation.regionId))
+      .leftJoin(region, eq(region.id, organizationLocation.regionId))
       .where(where)
 
     const totalPages = Math.ceil(total / limit)
 
-    // Main query
     const rows = await db
       .select(columns)
       .from(scholarshipApplication)
@@ -161,18 +153,21 @@ export async function getRecipients(
         eq(scholarshipApplication.scholarshipId, scholarship.id),
       )
       .innerJoin(organization, eq(scholarship.organizationId, organization.id))
-      .innerJoin(
+      .leftJoin(
         organizationLocation,
         eq(organizationLocation.organizationId, organization.id),
       )
-      .innerJoin(region, eq(region.id, organizationLocation.regionId))
+      .leftJoin(region, eq(region.id, organizationLocation.regionId))
       .where(where)
       .offset(page * limit)
       .limit(limit)
       .orderBy(orderExpr)
 
     return {
-      data: rows,
+      data: rows.map((r) => ({
+        ...r,
+        region: r.region || undefined,
+      })),
       total,
       page,
       limit,

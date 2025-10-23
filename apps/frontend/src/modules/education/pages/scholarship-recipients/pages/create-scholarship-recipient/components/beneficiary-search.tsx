@@ -1,6 +1,7 @@
 import { Button } from '@workspace/ui/components/button'
 import { Input } from '@workspace/ui/components/input'
 import { Skeleton } from '@workspace/ui/components/skeleton'
+import debounce from 'debounce'
 import { Search } from 'lucide-react'
 import { useBeneficiarySearch } from '../hooks/use-beneficiary-search'
 import type { Beneficiary } from '../hooks/use-get-beneficiaries'
@@ -54,6 +55,9 @@ export default function BeneficiarySearch({
       </div>
     )
   }
+  const handleChange = debounce((e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value)
+  }, 300)
 
   return (
     <div className="relative">
@@ -61,8 +65,7 @@ export default function BeneficiarySearch({
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
           placeholder="Buscar por nombre o número de documento..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          onChange={handleChange}
           className="pl-9"
         />
       </div>

@@ -92,6 +92,11 @@ export const getSingleScholarship = async ({ id }: { id: number }) => {
   try {
     const response = await db.query.scholarship.findFirst({
       where: (scholarship, { eq }) => eq(scholarship.id, id),
+      with: {
+        organization: {
+          columns: { name: true },
+        },
+      },
     })
 
     if (!response) return null
@@ -113,10 +118,7 @@ export const PatchScholarship = async (
   try {
     const response = await db
       .update(scholarship)
-      .set({
-        ...args,
-        updatedAt: new Date(), //me acutalizo mi update
-      })
+      .set(args)
       .where(eq(scholarship.id, id)) //para el filtro
       .returning({ id: scholarship.id })
     return response.length
