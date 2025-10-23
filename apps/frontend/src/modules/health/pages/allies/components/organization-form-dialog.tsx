@@ -23,8 +23,8 @@ import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { useCreateAlly } from '../hooks/use-create-ally'
-import useGetAlly from '../hooks/use-get-organization'
-import useUpdateAlly from '../hooks/use-update-organization'
+import useGetAlly from '../hooks/use-get-ally'
+import useUpdateAlly from '../hooks/use-update-ally'
 import { type FormAllySchema, formAllySchema } from '../models/ally'
 
 type Props = {
