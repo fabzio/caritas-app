@@ -54,7 +54,8 @@ export default function ScholarshipPage() {
   const handleEdit = () => {
     const selectedIds = Object.keys(rowSelection)
     if (selectedIds.length === 1 && scholarships) {
-      const selectedScholarship = scholarships[Number.parseInt(selectedIds[0])]
+      const selectedScholarship =
+        scholarships[Number.parseInt(selectedIds[0], 10)]
       console.log('Edit scholarship:', selectedScholarship?.id)
     }
   }
