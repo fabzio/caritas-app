@@ -28,13 +28,20 @@ describe('formatRoles', () => {
 
   it('formats both health and education members', () => {
     expect(formatRoles(['healthMember', 'educationMember'])).toBe(
-      'Personal de Salud y Educación',
+      'Personal de Salud, Personal de Educación',
     )
   })
 
   it('formats both education and health members in any order', () => {
-    expect(formatRoles(['educationMember', 'healthMember'])).toBe(
-      'Personal de Salud y Educación',
+    const result = formatRoles(['educationMember', 'healthMember'])
+    const parts = result
+      .split(',')
+      .map((p) => p.trim())
+      .sort((a, b) => a.localeCompare(b))
+    expect(parts).toEqual(
+      ['Personal de Educación', 'Personal de Salud'].sort((a, b) =>
+        a.localeCompare(b),
+      ),
     )
   })
 

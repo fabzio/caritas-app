@@ -4,7 +4,7 @@ import debounce from 'debounce'
 import { SearchIcon } from 'lucide-react'
 
 export default function SearchRecipients() {
-  const { setFilters } = useFilters('/_authenticated/education/recipients')
+  const { setFilters } = useFilters('/_authenticated/education/recipients/')
   const onChangeFilter = debounce((e: React.ChangeEvent<HTMLInputElement>) => {
     setFilters({ q: e.target.value })
   }, 300)

@@ -18,7 +18,13 @@ import {
   SidebarMenuSubItem,
   SidebarSeparator,
 } from '@workspace/ui/components/sidebar'
-import { Building2, ChevronRight } from 'lucide-react'
+import {
+  Building2,
+  ChevronRight,
+  Church,
+  HeartPlus,
+  School,
+} from 'lucide-react'
 import { toast } from 'sonner'
 import { QueryKeys } from '../constants/query-keys'
 import type { NavItem } from '../types/nav-main'
@@ -172,6 +178,15 @@ function NavMain({ items }: Readonly<Props>) {
                           onClick={() => handleChangeOrganization(org)}
                         >
                           <span>{org.name}</span>
+                          {org.type && (
+                            <span className="ml-auto text-xs italic text-muted-foreground">
+                              {
+                                mapTypeLabel[
+                                  org.type as keyof typeof mapTypeLabel
+                                ]
+                              }
+                            </span>
+                          )}
                         </SidebarMenuSubButton>
                       </SidebarMenuSubItem>
                     ))}
@@ -185,5 +200,10 @@ function NavMain({ items }: Readonly<Props>) {
     </SidebarGroup>
   )
 }
-
+const mapTypeLabel = {
+  caritas: 'Cáritas',
+  health: 'Salud',
+  education: 'Educación',
+  beneficiary: 'Beneficiario',
+}
 export default NavMain

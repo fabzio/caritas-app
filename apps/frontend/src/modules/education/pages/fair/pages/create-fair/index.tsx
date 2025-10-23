@@ -29,7 +29,7 @@ import {
 import { Separator } from '@workspace/ui/components/separator'
 import { Spinner } from '@workspace/ui/components/spinner'
 import { cn } from '@workspace/ui/lib/utils'
-import { format } from 'date-fns'
+import { format, parseISO } from 'date-fns'
 import { CalendarIcon, Check, ChevronsUpDown, Loader2 } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import usePostFair from './hooks/use-post-fair'
@@ -44,14 +44,16 @@ export default function CreateFairPage() {
   const loaderData = getRouteApi(
     '/_authenticated/education/fair/form',
   ).useLoaderData()
-
   const form = useForm<FormFairSchema>({
     resolver: zodResolver(formFairSchema),
     defaultValues:
       viewType === 'edit' && loaderData
         ? {
             title: loaderData.title,
-            date: loaderData.date ? new Date(loaderData.date) : undefined,
+            date: new Date(
+              loaderData.date.getTime() +
+                loaderData.date.getTimezoneOffset() * 60000,
+            ),
             address: loaderData.address,
             startTime: loaderData.startTime,
             endTime: loaderData.endTime,
