@@ -1,6 +1,6 @@
 import { useSession } from '@frontend/hooks/use-session'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Link } from '@tanstack/react-router'
+import { getRouteApi, Link, useSearch } from '@tanstack/react-router'
 import { Button } from '@workspace/ui/components/button'
 import { Calendar } from '@workspace/ui/components/calendar'
 import {
@@ -39,39 +39,75 @@ import { CalendarIcon, Loader2 } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import useGetOrganization from './hooks/use-get-organization'
 import usePostScholarship from './hooks/use-post-scholarship'
+import { useUpdateScholarship } from './hooks/use-update-scholarship'
 import {
   type FormScholarShipSchema,
   formScholarShipSchema,
-} from './utils/scholarship'
+} from './models/scholarship'
 export default function CreateScholarship() {
+  const viewType = useSearch({
+    from: '/_authenticated/education/scholarship/form',
+    select: (search) => search.type,
+  })
+  const loaderData = getRouteApi(
+    '/_authenticated/education/scholarship/form',
+  ).useLoaderData()
+
   const form = useForm<FormScholarShipSchema>({
     resolver: zodResolver(formScholarShipSchema),
-    defaultValues: {
-      name: '',
-      description: '',
-      requirements: '',
-      vacancies: undefined,
-      startDate: undefined,
-      endDate: undefined,
-      organizationId: undefined,
-      type: undefined,
-    },
+    defaultValues:
+      viewType === 'edit'
+        ? {
+            name: loaderData?.name,
+            description: loaderData?.description,
+            requirements: loaderData?.requirements,
+            vacancies: loaderData?.vacancies,
+            startDate: loaderData?.startDate
+              ? new Date(loaderData.startDate)
+              : undefined,
+            endDate: loaderData?.endDate
+              ? new Date(loaderData.endDate)
+              : undefined,
+            organizationId: loaderData?.organizationId
+              ? String(loaderData.organizationId)
+              : undefined,
+            type: loaderData?.type,
+          }
+        : {
+            name: '',
+            description: '',
+            requirements: '',
+            vacancies: undefined,
+            startDate: undefined,
+            endDate: undefined,
+            organizationId: undefined,
+            type: undefined,
+          },
   })
   const today = new Date()
   const { data: organizations, isLoading } = useGetOrganization()
-  const { mutate, isPending } = usePostScholarship()
+  const { mutate: createScholarship, isPending: isPendingCreate } =
+    usePostScholarship()
+  const { mutate: updateScholarship, isPending: isPendingUpdate } =
+    useUpdateScholarship()
+
   const { data: user } = useSession()
   const handleSubmit = form.handleSubmit((data) => {
     if (!user || form.getValues('vacancies') == null) return
-    const params = { ...data, createdBy: user.user.id, active: true }
-    mutate(params)
+    if (viewType === 'edit' && loaderData?.id) {
+      const params = { ...data, id: loaderData.id }
+      updateScholarship(params)
+    } else {
+      const params = { ...data, createdBy: user.user.id, active: true }
+      createScholarship(params)
+    }
   })
 
   return (
     <div className="flex flex-1 flex-col gap-6 p-4">
       <div className="flex flex-col gap-1">
         <h1 className="text-2xl font-semibold text-foreground">
-          Registrar nueva Beca
+          {dependantText.mainTitle[viewType] || 'Crear nueva beca'}
         </h1>
         <span className="text-muted-foreground">
           Complete la información de la beca
@@ -198,7 +234,9 @@ export default function CreateScholarship() {
                             onChange={(e) => {
                               const value = e.target.value
                               const number =
-                                value === '' ? undefined : parseInt(value, 10)
+                                value === ''
+                                  ? undefined
+                                  : Number.parseInt(value, 10)
                               field.onChange(number)
                             }}
                           />
@@ -280,11 +318,14 @@ export default function CreateScholarship() {
                         Cancelar
                       </Button>
                     </Link>
-                    <Button type="submit" disabled={isPending}>
-                      {isPending ? (
+                    <Button
+                      type="submit"
+                      disabled={isPendingCreate || isPendingUpdate}
+                    >
+                      {isPendingCreate || isPendingUpdate ? (
                         <Loader2 className="animate-spin w-2" />
                       ) : (
-                        'Registrar'
+                        dependantText.submit[viewType] || 'Registrar'
                       )}
                     </Button>
                   </CardFooter>
@@ -296,4 +337,14 @@ export default function CreateScholarship() {
       </div>
     </div>
   )
+}
+const dependantText = {
+  mainTitle: {
+    new: 'Crear nueva beca',
+    edit: 'Editar beca',
+  },
+  submit: {
+    new: 'Registrar',
+    edit: 'Guardar Cambios',
+  },
 }

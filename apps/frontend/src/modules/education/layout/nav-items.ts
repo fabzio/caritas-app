@@ -1,5 +1,5 @@
 import type { NavItem } from '@frontend/shared/types/nav-main'
-import { GraduationCap, Layout, UserStar } from 'lucide-react'
+import { Compass, GraduationCap, Layout, UserStar } from 'lucide-react'
 
 const educationNavItems: NavItem[] = [
   {
@@ -18,6 +18,12 @@ const educationNavItems: NavItem[] = [
     title: 'Becados',
     url: '/education/recipients',
     icon: UserStar,
+    groupLabel: 'Educación',
+  },
+  {
+    title: 'Ferias vocacionales',
+    url: '/education/fair',
+    icon: Compass,
     groupLabel: 'Educación',
   },
 ]

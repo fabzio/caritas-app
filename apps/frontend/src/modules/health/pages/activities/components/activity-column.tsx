@@ -1,7 +1,9 @@
 // Asume la importación de tu modelo de datos de actividad (ejemplo de tipado)
 import type { ActivityModel } from '@api/modules/health/activity/model'
+import { Link } from '@tanstack/react-router'
 import type { ColumnDef } from '@tanstack/react-table'
 import { Button } from '@workspace/ui/components/button' // Componente de UI
+import { Checkbox } from '@workspace/ui/components/checkbox' // Componente Checkbox
 import { ArrowUpDown } from 'lucide-react' // Icono de ordenamiento
 import { useMemo } from 'react'
 
@@ -9,6 +11,29 @@ import { useMemo } from 'react'
 type Activity = ActivityModel.GetActivities['data'][number]
 
 const activityTableColumns: ColumnDef<Activity>[] = [
+  {
+    // Columna de selección
+    id: 'select',
+    header: ({ table }) => (
+      <Checkbox
+        checked={
+          table.getIsAllPageRowsSelected() ||
+          (table.getIsSomePageRowsSelected() && 'indeterminate')
+        }
+        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+        aria-label="Seleccionar todos"
+      />
+    ),
+    cell: ({ row }) => (
+      <Checkbox
+        checked={row.getIsSelected()}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        aria-label="Seleccionar fila"
+      />
+    ),
+    enableSorting: false,
+    enableHiding: false,
+  },
   {
     // Columna 1: Nombre de la Actividad
     accessorKey: 'name', // Debe coincidir con el campo de la API para ordenar (e.g., 'name')
@@ -21,7 +46,16 @@ const activityTableColumns: ColumnDef<Activity>[] = [
         <ArrowUpDown className="ml-2 h-4 w-4" />
       </Button>
     ),
-    cell: ({ row }) => row.original.name,
+    cell: ({ row }) => (
+      <Button asChild variant="link">
+        <Link
+          to="/health/activities/$activityId"
+          params={{ activityId: row.original.id.toString() }}
+        >
+          {row.original.name}
+        </Link>
+      </Button>
+    ),
   },
   {
     // Columna 2: Duración de la actividad

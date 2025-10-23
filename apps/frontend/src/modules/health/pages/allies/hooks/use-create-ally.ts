@@ -15,7 +15,7 @@ export const useCreateAlly = () => {
     mutationFn: async (props: CreateAllyProps) => {
       const { data, error } = await authClient.organization.create({
         name: props.name,
-        slug: props.name.toLowerCase().replace(/\s+/g, '-'),
+        slug: props.name.toLowerCase().replaceAll(/\s+/g, '-'),
         type: 'health',
       })
       if (error) throw error
@@ -24,6 +24,9 @@ export const useCreateAlly = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: [QueryKeys.ADMIN.ALLIES],
+      })
+      queryClient.invalidateQueries({
+        queryKey: [QueryKeys.ORGANIZATIONS],
       })
       toast.success('Creado aliado exitosamente')
       navigate({

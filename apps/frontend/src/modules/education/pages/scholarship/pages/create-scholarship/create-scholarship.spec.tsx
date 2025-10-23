@@ -1,7 +1,8 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import type { ReactNode } from 'react'
-import { vi } from 'vitest'
+import { type ReactNode, use } from 'react'
+import { beforeEach, describe, it, vi } from 'vitest'
 import CreateScholarship from './index'
 
 const mockPostScholarship = vi.fn()
@@ -44,6 +45,11 @@ vi.mock('@hookform/resolvers/zod', () => ({
 
 vi.mock('@tanstack/react-router', () => ({
   Link: ({ children }: { children: ReactNode }) => <div>{children}</div>,
+  useSearch: () => ({ type: 'new' }),
+  getRouteApi: () => ({
+    useLoaderData: () => null,
+  }),
+  useNavigate: () => vi.fn(),
 }))
 
 vi.mock('@workspace/ui/components/button', () => ({
@@ -192,7 +198,7 @@ vi.mock('lucide-react', () => ({
   CalendarIcon: () => <span>📅</span>,
   Loader2: () => <span>⏳</span>,
 }))
-
+const queryClient = new QueryClient()
 describe('CreateScholarship', () => {
   beforeEach(() => {
     vi.clearAllMocks()
@@ -204,9 +210,15 @@ describe('CreateScholarship', () => {
   })
 
   it('renders form with all required fields', () => {
-    render(<CreateScholarship />)
+    render(
+      <QueryClientProvider client={queryClient}>
+        <CreateScholarship />
+      </QueryClientProvider>,
+    )
 
-    expect(screen.getByText('Registrar nueva Beca')).toBeTruthy()
+    expect(
+      screen.getByText((content) => content.startsWith('Crear nueva beca')),
+    ).toBeTruthy()
     expect(screen.getByText('Información de la Beca')).toBeTruthy()
     expect(screen.getByText('Nombre de la Beca*')).toBeTruthy()
     expect(screen.getByText('Tipo de beca*')).toBeTruthy()
@@ -219,21 +231,33 @@ describe('CreateScholarship', () => {
   })
 
   it('renders organization options', () => {
-    render(<CreateScholarship />)
+    render(
+      <QueryClientProvider client={queryClient}>
+        <CreateScholarship />
+      </QueryClientProvider>,
+    )
 
     expect(screen.getByText('Organization A')).toBeTruthy()
     expect(screen.getByText('Organization B')).toBeTruthy()
   })
 
   it('renders scholarship type options', () => {
-    render(<CreateScholarship />)
+    render(
+      <QueryClientProvider client={queryClient}>
+        <CreateScholarship />
+      </QueryClientProvider>,
+    )
 
     expect(screen.getByText('Modular')).toBeTruthy()
     expect(screen.getByText('Plan de estudios')).toBeTruthy()
   })
 
   it('has submit button', () => {
-    render(<CreateScholarship />)
+    render(
+      <QueryClientProvider client={queryClient}>
+        <CreateScholarship />
+      </QueryClientProvider>,
+    )
 
     const submitButton = screen.getByText('Registrar')
     expect(submitButton).toBeTruthy()
@@ -241,7 +265,11 @@ describe('CreateScholarship', () => {
   })
 
   it('has cancel button', () => {
-    render(<CreateScholarship />)
+    render(
+      <QueryClientProvider client={queryClient}>
+        <CreateScholarship />
+      </QueryClientProvider>,
+    )
 
     const cancelButton = screen.getByText('Cancelar')
     expect(cancelButton).toBeTruthy()
@@ -250,7 +278,11 @@ describe('CreateScholarship', () => {
 
   it('submits form when clicking submit button', async () => {
     const user = userEvent.setup()
-    render(<CreateScholarship />)
+    render(
+      <QueryClientProvider client={queryClient}>
+        <CreateScholarship />
+      </QueryClientProvider>,
+    )
 
     const submitButton = screen.getByText('Registrar')
     await user.click(submitButton)
@@ -261,13 +293,21 @@ describe('CreateScholarship', () => {
   })
 
   it('renders form with name input field', () => {
-    render(<CreateScholarship />)
+    render(
+      <QueryClientProvider client={queryClient}>
+        <CreateScholarship />
+      </QueryClientProvider>,
+    )
     const nameInputs = screen.getAllByRole('textbox')
     expect(nameInputs.length).toBeGreaterThan(0)
   })
 
   it('renders form with vacancies input field', () => {
-    render(<CreateScholarship />)
+    render(
+      <QueryClientProvider client={queryClient}>
+        <CreateScholarship />
+      </QueryClientProvider>,
+    )
     const numberInputs = screen.getAllByRole('spinbutton')
     expect(numberInputs.length).toBeGreaterThan(0)
   })

@@ -1,4 +1,6 @@
 import authClient from '@frontend/lib/authClient'
+import { QueryKeys } from '@frontend/shared/constants/query-keys'
+import { useQueryClient } from '@tanstack/react-query'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { Button } from '@workspace/ui/components/button'
 import {
@@ -17,16 +19,15 @@ import ActionsButton from './components/actions-button'
 import RoleFilter from './components/role-filter'
 import SearchUserInput from './components/search-user-input'
 import UserTable from './components/user-table'
-import { useBanUser } from './hooks/use-ban-user'
 import { useRemoveUser } from './hooks/use-remove-user'
 import { useUserTable } from './hooks/use-table'
 
 export default function TableView() {
   const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({})
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const queryClient = useQueryClient()
   const { mutateAsync: removeUser, isPending: removeUserIsPending } =
     useRemoveUser()
-  const { mutateAsync: banUser, isPending: banUserIsPending } = useBanUser()
   const {
     data: users,
     pagination,
@@ -79,23 +80,17 @@ export default function TableView() {
       return
     }
 
-    const allUserPromises = selectedUsers.flatMap((user) => [
-      removeUser({ userId: user.id }),
-      banUser({ userId: user.id, banReason: 'User deleted by admin' }),
-    ])
+    const allUserPromises = selectedUsers.map((user) =>
+      removeUser({ userId: user.memberId }),
+    )
 
     const results = await Promise.allSettled(allUserPromises)
-
     let totalSuccessful = 0
 
     for (let i = 0; i < selectedUsers.length; i++) {
-      const removeResult = results[i * 2]
-      const banResult = results[i * 2 + 1]
+      const removeResult = results[i]
 
-      if (
-        removeResult.status === 'fulfilled' &&
-        banResult.status === 'fulfilled'
-      ) {
+      if (removeResult.status === 'fulfilled') {
         totalSuccessful++
       }
     }
@@ -116,6 +111,7 @@ export default function TableView() {
 
     setIsDeleteModalOpen(false)
     resetSelectedRows()
+    queryClient.invalidateQueries({ queryKey: [QueryKeys.ADMIN.USERS] })
   }
 
   const navigate = useNavigate()
@@ -187,7 +183,7 @@ export default function TableView() {
             <Button
               type="button"
               onClick={handleDelete}
-              disabled={removeUserIsPending || banUserIsPending}
+              disabled={removeUserIsPending}
             >
               Aceptar
             </Button>

@@ -5,7 +5,13 @@ import AlliesTableView from './index'
 
 const mockSetFilters = vi.fn()
 const mockNavigate = vi.fn()
-
+const mockCreateAlly = vi.fn()
+vi.mock('./hooks/use-create-ally', () => ({
+  useCreateAlly: () => ({
+    mutate: mockCreateAlly,
+    isPending: false,
+  }),
+}))
 vi.mock('./hooks/use-organization-table', () => ({
   useOrganizationTable: () => ({
     data: [
@@ -81,8 +87,9 @@ vi.mock('./components/actions-button', () => ({
 }))
 
 vi.mock('@workspace/ui/components/dialog', () => ({
-  Dialog: ({ children, open }: { children: ReactNode; open: boolean }) =>
-    open ? <div data-testid="dialog">{children}</div> : null,
+  Dialog: ({ children }: { children: ReactNode }) => (
+    <div data-testid="dialog-container">{children}</div>
+  ),
   DialogContent: ({ children }: { children: ReactNode }) => (
     <div>{children}</div>
   ),
@@ -97,6 +104,7 @@ vi.mock('@workspace/ui/components/dialog', () => ({
   ),
   DialogTitle: ({ children }: { children: ReactNode }) => <div>{children}</div>,
   DialogClose: ({ children }: { children: ReactNode }) => <div>{children}</div>,
+  DialogTrigger: ({ children }: { children: ReactNode }) => <>{children}</>,
 }))
 
 vi.mock('@workspace/ui/components/button', () => ({
@@ -117,6 +125,11 @@ vi.mock('@workspace/ui/components/button', () => ({
 
 vi.mock('lucide-react', () => ({
   UserPlus: () => <span>+</span>,
+}))
+
+vi.mock('./components/organization-form-dialog', () => ({
+  __esModule: true,
+  default: () => <div data-testid="organization-form-dialog" />,
 }))
 
 describe('AlliesTableView', () => {

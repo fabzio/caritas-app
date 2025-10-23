@@ -1,9 +1,10 @@
 import rpc from '@frontend/lib/rpc'
-import { useMutation } from '@tanstack/react-query'
-import { useNavigate } from '@tanstack/react-router'
+import { QueryKeys } from '@frontend/shared/constants/query-keys'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 
 const usePostSpeciality = () => {
-  const navigate = useNavigate({ from: '/health/speciality/create' })
+  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (params: { name: string }) => {
       const res = await rpc.health.speciality.post(params)
@@ -11,10 +12,16 @@ const usePostSpeciality = () => {
       return res.data
     },
     onError: (error) => {
-      console.error(error)
+      toast.error(
+        error?.message ||
+          'Ocurrió un error desconocido al registrar la especialidad',
+      )
     },
     onSuccess: (_) => {
-      navigate({ to: '/health/speciality' })
+      queryClient.invalidateQueries({
+        queryKey: [QueryKeys.SPECIALITY],
+      })
+      toast.success('Especialidad registrada correctamente')
     },
   })
 }
