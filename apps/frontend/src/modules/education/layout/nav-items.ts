@@ -1,11 +1,23 @@
 import type { NavItem } from '@frontend/shared/types/nav-main'
-import { Compass, GraduationCap, Layout, UserStar } from 'lucide-react'
+import {
+  Building2,
+  Compass,
+  GraduationCap,
+  Layout,
+  UserStar,
+} from 'lucide-react'
 
 const educationNavItems: NavItem[] = [
   {
     title: 'General',
     url: '/education',
     icon: Layout,
+    groupLabel: 'Educación',
+  },
+  {
+    title: 'Organizaciones',
+    url: '/education/organization',
+    icon: Building2,
     groupLabel: 'Educación',
   },
   {
