@@ -9,6 +9,7 @@ import {
 import { ActivityModel } from './model'
 import {
   createActivity,
+  createAttention,
   createCompleteActivity,
   deleteActivities,
   getActivities,
@@ -156,6 +157,19 @@ const activityModule = new Elysia({ name: 'activity', prefix: '/activities' })
       401: t.Literal('Unauthorized'),
     },
   })
+  .post(
+    '/attentions',
+    async ({ body }) => status(201, await createAttention(body)),
+    {
+      auth: true,
+      body: ActivityModel.createAttentionSchema,
+      response: {
+        201: ActivityModel.createAttentionResponse,
+        400: t.Object({ error: t.String() }),
+        401: t.Literal('Unauthorized'),
+      },
+    },
+  )
   .patch('/user-rewarded', ({ body }) => setActivityUser(body), {
     auth: true,
     body: ActivityModel.setActivityUserQuery,

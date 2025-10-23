@@ -13,7 +13,7 @@ export const useUserAttentions = ({
   searchQuery = '',
 }: UseUserAttentionsParams) => {
   return useQuery({
-    queryKey: ['user-attentions', activityId, userId, searchQuery],
+    queryKey: ['user-attentions', userId, activityId, searchQuery],
     queryFn: async () => {
       const { data, error } = await rpc.health.activities[
         'user-attentions'

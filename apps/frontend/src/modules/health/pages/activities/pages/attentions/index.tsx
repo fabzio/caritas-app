@@ -16,6 +16,7 @@ import { ArrowLeft, Award, CheckCircle } from 'lucide-react'
 import { useState } from 'react'
 import AttentionCard from './components/attention-card'
 import AttentionDetailsDialog from './components/attention-details-dialog'
+import CreateAttentionDialog from './components/create-attention-dialog'
 import SearchAttentionInput from './components/search-attention-input'
 import { useActivityParticipant } from './hooks/use-activity-participant'
 import { useUpdateActivityUser } from './hooks/use-update-activity-user'
@@ -38,6 +39,10 @@ export default function AttentionsPage() {
     useUpdateActivityUser()
   const [isMarkIncentiveModalOpen, setIsMarkIncentiveModalOpen] =
     useState(false)
+  const [isAttentionDetailsModalOpen, setIsAttentionDetailsModalOpen] =
+    useState(false)
+  const [isCreateAttentionModalOpen, setIsCreateAttentionModalOpen] =
+    useState(false)
   const [selectedAttention, setSelectedAttention] =
     useState<UserAttention | null>(null)
 
@@ -51,9 +56,10 @@ export default function AttentionsPage() {
   const handleAttentionClick = (attention: UserAttention) => {
     if (attention.hasAttention) {
       setSelectedAttention(attention)
+      setIsAttentionDetailsModalOpen(true)
     } else {
-      // TODO: Show modal to register attention
-      console.log('Register attention for:', attention.specialityName)
+      setSelectedAttention(attention)
+      setIsCreateAttentionModalOpen(true)
     }
   }
 
@@ -204,9 +210,17 @@ export default function AttentionsPage() {
         </DialogContent>
       </Dialog>
 
+      <CreateAttentionDialog
+        open={isCreateAttentionModalOpen}
+        onOpenChange={() => setIsCreateAttentionModalOpen((open) => !open)}
+        attention={selectedAttention}
+        userId={userId}
+        participantName={participantName}
+      />
+
       <AttentionDetailsDialog
-        open={!!selectedAttention}
-        onOpenChange={(open) => !open && setSelectedAttention(null)}
+        open={isAttentionDetailsModalOpen}
+        onOpenChange={() => setIsAttentionDetailsModalOpen((open) => !open)}
         specialityName={selectedAttention?.specialityName || ''}
         attentionTime={selectedAttention?.attentionTime || null}
         observations={selectedAttention?.observations || null}

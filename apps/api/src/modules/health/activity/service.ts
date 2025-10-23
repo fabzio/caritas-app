@@ -494,6 +494,7 @@ export const getUserAttentions = async (
         specialityName: spec.specialityName,
         alliedId: spec.alliedId,
         alliedName: spec.alliedName,
+        alliedParticipationId: spec.alliedParticipationId,
         hasAttention: !!att,
         attentionId: att?.id || null,
         attentionTime: att?.timestamp ? att.timestamp.toISOString() : null,
@@ -505,6 +506,36 @@ export const getUserAttentions = async (
   } catch (e) {
     if (e instanceof Error) throw new PostgresError(e.message)
     throw e
+  }
+}
+
+export const createAttention = async (
+  args: ActivityModel.CreateAttention,
+): Promise<ActivityModel.CreateAttentionResponse> => {
+  try {
+    const { userId, alliedParticipationId, observations, registeredBy } = args
+
+    const [newAttention] = await db
+      .insert(attention)
+      .values({
+        userId,
+        alliedParticipationId,
+        observations,
+        registeredBy,
+      })
+      .returning({
+        id: attention.id,
+        userId: attention.userId,
+        alliedParticipationId: attention.alliedParticipationId,
+        observations: attention.observations,
+        registeredBy: attention.registeredBy,
+        timestamp: attention.timestamp,
+      })
+
+    return newAttention
+  } catch (error) {
+    if (error instanceof Error) throw new PostgresError(error.message)
+    throw error
   }
 }
 
