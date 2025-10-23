@@ -53,41 +53,30 @@ const user = new Elysia({
       if (teams.length !== teamIds.length) throw status(404, 'Team not found')
       const roles = new Set(teams.map((team) => team.role))
       const existingRoles = await getUserRoles(body.userId, body.organizationId)
+
       const rolesToAdd = Array.from(roles).filter(
         (role) => !existingRoles.includes(role),
       )
-      for (const role of rolesToAdd)
-        await auth.api.addMember({
-          body: {
-            userId: body.userId,
-            organizationId: body.organizationId,
-            role: role as TeamRole,
-          },
-          headers,
-        })
-      const existingTeamIds = await getUserTeamIds(body.userId)
-      const teamsToRemove = existingTeamIds.filter(
-        (teamId) => !teamIds.includes(teamId),
+      await auth.api.addMember({
+        body: {
+          userId: body.userId,
+          organizationId: body.organizationId,
+          role: rolesToAdd as TeamRole[],
+        },
+        headers,
+      })
+      const teamsToAdd = teamIds
+      await Promise.all(
+        teamsToAdd.map((teamId) =>
+          auth.api.addTeamMember({
+            body: {
+              userId: body.userId,
+              teamId,
+            },
+            headers,
+          }),
+        ),
       )
-      for (const teamId of teamsToRemove)
-        await auth.api.removeTeamMember({
-          body: {
-            userId: body.userId,
-            teamId,
-          },
-          headers,
-        })
-      const teamsToAdd = teamIds.filter(
-        (teamId) => !existingTeamIds.includes(teamId),
-      )
-      for (const teamId of teamsToAdd)
-        await auth.api.addTeamMember({
-          body: {
-            userId: body.userId,
-            teamId,
-          },
-          headers,
-        })
       return { success: true }
     },
     {
@@ -114,22 +103,28 @@ const user = new Elysia({
       const teamsToAdd = uniqueTeamIds.filter(
         (teamId) => !existingTeamIds.includes(teamId),
       )
-      for (const teamId of teamsToRemove)
-        await auth.api.removeTeamMember({
-          body: {
-            userId: id,
-            teamId,
-          },
-          headers: request.headers,
-        })
-      for (const teamId of teamsToAdd)
-        await auth.api.addTeamMember({
-          body: {
-            userId: id,
-            teamId,
-          },
-          headers: request.headers,
-        })
+      await Promise.all(
+        teamsToRemove.map((teamId) =>
+          auth.api.removeTeamMember({
+            body: {
+              userId: id,
+              teamId,
+            },
+            headers: request.headers,
+          }),
+        ),
+      )
+      await Promise.all(
+        teamsToAdd.map((teamId) =>
+          auth.api.addTeamMember({
+            body: {
+              userId: id,
+              teamId,
+            },
+            headers: request.headers,
+          }),
+        ),
+      )
       const { role: currRole } = await auth.api.getActiveMemberRole({
         headers: request.headers,
       })
