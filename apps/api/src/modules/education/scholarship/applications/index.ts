@@ -47,7 +47,7 @@ const scholarshipApplication = new Elysia({
   })
   .patch(
     '/:scholarshipId/accept',
-    ({ body }) => {
+    (ctx) => {
       const args: ScholarshipApplicationModel.AcceptScholarshipApplication = {
         scholarship_id: Number(ctx.params.scholarship_id),
         userId: ctx.session?.userId ?? ctx.user?.id ?? '',
@@ -68,7 +68,7 @@ const scholarshipApplication = new Elysia({
   )
   .patch(
     '/accept-batch',
-    ({ body }) => {
+    (ctx) => {
       const args = {
         ids: ctx.body.ids,
         userId: ctx.session?.userId ?? ctx.user?.id ?? '',

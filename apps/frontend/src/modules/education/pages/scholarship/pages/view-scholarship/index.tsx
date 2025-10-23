@@ -14,7 +14,6 @@ import {
 import { ArrowLeftIcon, FileTextIcon, GraduationCapIcon } from 'lucide-react'
 import { useState } from 'react'
 
-
 export default function ViewScholarship() {
   const { scholarshipId } = useParams({ strict: false })
   const navigate = useNavigate()
@@ -76,7 +75,7 @@ export default function ViewScholarship() {
           <Card>
             <CardContent className="px-6">
               <ApplicantsTable
-                scholarshipId={Number.parseInt(scholarshipId ?? '1')}
+                scholarshipId={Number.parseInt(scholarshipId ?? '1', 10)}
               />
             </CardContent>
           </Card>
