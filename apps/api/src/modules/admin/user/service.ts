@@ -71,42 +71,13 @@ export async function getUsers(
     .limit(limit)
     .orderBy(orderExpr)
 
-  const userIds = rows.map(({ user: row }) => row.id)
-
-  const allMemberships =
-    userIds.length > 0
-      ? await db
-          .select({ userId: member.userId, role: member.role })
-          .from(member)
-          .where(
-            and(
-              eq(member.organizationId, params.organizationId),
-              or(...userIds.map((id) => eq(member.userId, id))),
-            ),
-          )
-      : []
-
-  const userRolesMap = allMemberships.reduce(
-    (acc, membership) => {
-      if (!acc[membership.userId]) {
-        acc[membership.userId] = []
-      }
-      if (!acc[membership.userId].includes(membership.role)) {
-        acc[membership.userId].push(membership.role)
-      }
-      return acc
-    },
-    {} as Record<string, string[]>,
-  )
-
   const totalPages = Math.ceil(total / limit)
 
   return {
-    data: rows.map(({ user: row }) => {
-      const userRoles = userRolesMap[row.id] || []
+    data: rows.map(({ user: row, role }) => {
       return {
         ...row,
-        role: userRoles.join(',') || undefined,
+        role,
       }
     }),
     total,
