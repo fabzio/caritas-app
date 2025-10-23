@@ -1,14 +1,5 @@
 import { getRouteApi, Link, useParams } from '@tanstack/react-router'
 import { Button } from '@workspace/ui/components/button'
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@workspace/ui/components/dialog'
 import { Spinner } from '@workspace/ui/components/spinner'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
@@ -16,10 +7,10 @@ import { ArrowLeft, Award, CheckCircle } from 'lucide-react'
 import { useState } from 'react'
 import AttentionCard from './components/attention-card'
 import AttentionDetailsDialog from './components/attention-details-dialog'
+import ConfirmIncentiveDialog from './components/confirm-incentive-dialog'
 import CreateAttentionDialog from './components/create-attention-dialog'
 import SearchAttentionInput from './components/search-attention-input'
 import { useActivityParticipant } from './hooks/use-activity-participant'
-import { useUpdateActivityUser } from './hooks/use-update-activity-user'
 import {
   type UserAttention,
   useUserAttentions,
@@ -35,8 +26,6 @@ export default function AttentionsPage() {
   })
   const loaderData = routeApi.useLoaderData()
   const [searchQuery, setSearchQuery] = useState('')
-  const { mutate: updateActivityUser, isPending: isPendingUpdate } =
-    useUpdateActivityUser()
   const [isMarkIncentiveModalOpen, setIsMarkIncentiveModalOpen] =
     useState(false)
   const [isAttentionDetailsModalOpen, setIsAttentionDetailsModalOpen] =
@@ -65,15 +54,6 @@ export default function AttentionsPage() {
 
   const handleSearch = (query: string) => {
     setSearchQuery(query)
-  }
-
-  const handleMarkIncentive = () => {
-    updateActivityUser({
-      userId,
-      activityId: Number(activityId),
-      rewarded: true,
-    })
-    setIsMarkIncentiveModalOpen(false)
   }
 
   const getParticipantName = () => {
@@ -178,37 +158,13 @@ export default function AttentionsPage() {
           <div className="space-y-4">{renderAttentionsList()}</div>
         </article>
       </div>
-      <Dialog
+
+      <ConfirmIncentiveDialog
         open={isMarkIncentiveModalOpen}
         onOpenChange={setIsMarkIncentiveModalOpen}
-      >
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>
-              {`¿Seguro que desea marcar el registro de incentivo?`}
-            </DialogTitle>
-            <DialogDescription>
-              Esta acción no se puede deshacer.
-            </DialogDescription>
-          </DialogHeader>
-
-          <DialogFooter>
-            <DialogClose asChild>
-              <Button type="button" variant="outline">
-                Cancelar
-              </Button>
-            </DialogClose>
-
-            <Button
-              type="button"
-              onClick={handleMarkIncentive}
-              disabled={isPendingUpdate}
-            >
-              Aceptar
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+        userId={userId}
+        activityId={activityId}
+      />
 
       <CreateAttentionDialog
         open={isCreateAttentionModalOpen}
