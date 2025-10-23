@@ -14,10 +14,10 @@ export const createCompleteActivitySchema = z.object({
     .max(100, 'El nombre no puede exceder 100 caracteres')
     .refine((val) => val.trim().length > 0, 'El nombre no puede estar vacío'),
   date: z.date({ message: 'La fecha es requerida' }),
-  durationHours: z
+  durationHours: z.coerce
     .number({ message: 'Seleccione la duración' })
     .min(1, 'La duración debe ser al menos 1 hora')
-    .max(20, 'La duración no puede exceder 20 horas'),
+    .max(20, 'La duración no puede exceder 20 horas') as unknown as z.ZodNumber,
   typeId: z.number({ message: 'Seleccione un tipo de actividad' }),
   statusId: z.number({ message: 'Seleccione un estado' }),
   participants: z

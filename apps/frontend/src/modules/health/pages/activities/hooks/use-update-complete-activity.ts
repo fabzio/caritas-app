@@ -1,4 +1,5 @@
 import rpc from '@frontend/lib/rpc'
+import { QueryKeys } from '@frontend/shared/constants/query-keys'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
@@ -21,22 +22,16 @@ export const useUpdateCompleteActivity = (id: string) => {
 
   return useMutation({
     mutationFn: async (input: UpdateCompleteActivityInput) => {
-      const { data, error } =
-        await rpc.health.activities[id].complete.put(input)
+      const { data, error } = await rpc.health
+        .activities({ id })
+        .complete.put(input)
 
-      if (error) {
-        const errorMessage =
-          typeof error.value === 'string'
-            ? error.value
-            : error.value?.error || 'Error al actualizar la actividad'
-        throw new Error(errorMessage)
-      }
+      if (error) throw error
 
       return data
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['health-activities'] })
-      queryClient.invalidateQueries({ queryKey: ['activity', id] })
+      queryClient.invalidateQueries({ queryKey: [QueryKeys.HEALTH.ACTIVITIES] })
       toast.success('Actividad actualizada exitosamente')
     },
     onError: (error: Error) => {

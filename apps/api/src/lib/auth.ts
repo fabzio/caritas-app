@@ -25,7 +25,7 @@ import {
 import { defaultRoles } from 'better-auth/plugins/organization/access'
 import { passkey } from 'better-auth/plugins/passkey'
 import { localization } from 'better-auth-localization'
-import transporter from '../mail'
+import transporter, { SENDER } from '../mail'
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
@@ -205,6 +205,7 @@ export const auth = betterAuth({
           teamName: organization.name,
         })
         await transporter.sendMail({
+          from: SENDER,
           to: email,
           subject: subject,
           html,
@@ -236,6 +237,7 @@ export const auth = betterAuth({
         })()
 
         await transporter.sendMail({
+          from: SENDER,
           to: email,
           subject: subject,
           html,

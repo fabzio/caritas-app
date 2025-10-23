@@ -21,10 +21,17 @@ export const QueryKeys = {
   },
   EDUCATION: {
     SCHOLARSHIP_RECIPIENTS: 'education-scholarship-recipients',
+    FAIR: 'education-fair',
     SCHOLARSHIP_APPLICATION: 'education-scholarship-applications',
   },
   HEALTH: {
     ACTIVITIES: 'health-activities',
+    ACTIVITY: {
+      ALLIES: 'health-activity-allies',
+      STATUSES: 'health-activity-statuses',
+      SPECIALITIES: 'health-activity-specialities',
+      TYPES: 'health-activity-types',
+    },
   },
 } as const
 

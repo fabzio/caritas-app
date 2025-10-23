@@ -108,11 +108,8 @@ export async function getActivities(
       dateRangeConditions.push(gt(activity.date, startDate))
     }
     if (endDate) {
-      // 1. Obtén el día siguiente al endDate
       const nextDay = getNextDay(endDate)
 
-      // 2. Usa MENOR QUE (lt) el inicio del día siguiente
-      // Esto incluye todas las horas del endDate
       dateRangeConditions.push(lte(activity.date, nextDay))
     }
 
@@ -225,7 +222,7 @@ export const deleteActivities = async (
     const result = await db.transaction(async (tx) => {
       return await tx
         .update(activity)
-        .set({ state: false, updatedAt: new Date() })
+        .set({ state: false })
         .where(or(...ids.map((id) => eq(activity.id, id))))
         .returning({ id: activity.id })
     })
@@ -408,7 +405,6 @@ export const updateCompleteActivity = async (
           statusId: activityData.statusId,
           typeId: activityData.typeId,
           userId: activityData.userId,
-          updatedAt: new Date(),
         })
         .where(eq(activity.id, id))
 
@@ -439,7 +435,7 @@ export const getActivityParticipants = async (
 ): Promise<ActivityModel.GetParticipants> => {
   try {
     const { q = '', activityId } = params
-    const searchQuery = q.replace(/\s+/g, ' ').trim()
+    const searchQuery = q.replaceAll(/\s+/g, ' ').trim()
 
     const searchCondition = searchQuery
       ? or(
@@ -484,7 +480,7 @@ export const getUserAttentions = async (
   try {
     const { activityId, userId, q = '' } = params
     const activityIdNum = Number.parseInt(activityId, 10)
-    const searchQuery = q.replace(/\s+/g, ' ').trim()
+    const searchQuery = q.replaceAll(/\s+/g, ' ').trim()
 
     const participatingSpecialities = await db
       .select({

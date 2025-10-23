@@ -4,7 +4,7 @@ import { useNavigate } from '@tanstack/react-router'
 import { toast } from 'sonner'
 
 const usePostScholarship = () => {
-  const navigate = useNavigate({ from: '/education/scholarship/create' })
+  const navigate = useNavigate({ from: '/education/scholarship/form' })
   return useMutation({
     mutationFn: async (params: {
       name: string
