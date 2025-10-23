@@ -175,3 +175,20 @@ export const getMemberId = async (userId: string, organizationId: string) => {
   })
   return res ? res.id : null
 }
+
+export async function getBeneficiaries(): Promise<UserModel.GetBeneficiariesResponse> {
+  const rows = await db
+    .select({
+      id: user.id,
+      name: user.name,
+      surname: user.surname,
+      documentType: user.documentType,
+      documentNumber: user.documentNumber,
+      active: user.active,
+    })
+    .from(user)
+    .where(and(eq(user.active, true), eq(user.role, 'user')))
+    .orderBy(asc(user.name))
+
+  return rows
+}

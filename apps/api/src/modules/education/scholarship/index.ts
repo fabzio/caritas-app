@@ -1,6 +1,6 @@
 import betterAuth from '@api/modules/auth'
 import Elysia, { t } from 'elysia'
-import scholarshipApplication from './applications'
+import application from './application'
 import { ScholarshipModel } from './model'
 import scholarshipRecipients from './recipients'
 import { createScholarship, getScholarships } from './service'
@@ -10,7 +10,7 @@ const scholarship = new Elysia({
   prefix: '/scholarship',
 })
   .use(betterAuth)
-  .use(scholarshipApplication)
+  .use(application)
   .use(scholarshipRecipients)
   .get('', ({ query }) => getScholarships(query), {
     auth: true,

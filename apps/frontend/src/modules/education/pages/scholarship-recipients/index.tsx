@@ -1,3 +1,7 @@
+import { useIsMobile } from '@frontend/hooks/use-mobile'
+import { Link } from '@tanstack/react-router'
+import { Button } from '@workspace/ui/components/button'
+import { PlusCircle } from 'lucide-react'
 import { useState } from 'react'
 import RecipientsTable from './components/recipients-table'
 import SearchRecipients from './components/search-recipients'
@@ -7,6 +11,7 @@ import { useSelectNames } from './hooks/use-select-names'
 
 export default function ScholarshipRecipients() {
   const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({})
+  const isMobile = useIsMobile()
 
   const {
     data: recipients,
@@ -76,6 +81,15 @@ export default function ScholarshipRecipients() {
                 placeholder="Todas las becas"
                 item="beca"
               />
+              <Link to="/education/recipients/create">
+                <Button
+                  className="whitespace-nowrap"
+                  size={isMobile ? 'sm' : 'lg'}
+                >
+                  <PlusCircle />
+                  Agregar becado
+                </Button>
+              </Link>
             </div>
           </div>
           <div className="px-10">

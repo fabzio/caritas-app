@@ -3,6 +3,7 @@ import betterAuth from '@api/modules/auth/middleware'
 import Elysia, { status, t } from 'elysia'
 import { UserModel } from './model'
 import {
+  getBeneficiaries,
   getMemberId,
   getSingleUser,
   getTeamsByIds,
@@ -38,6 +39,12 @@ const user = new Elysia({
       },
     },
   )
+  .get('/beneficiaries', () => getBeneficiaries(), {
+    auth: true,
+    response: {
+      200: UserModel.getBeneficiariesResponse,
+    },
+  })
   .post(
     '',
     async ({ body, request: { headers } }) => {

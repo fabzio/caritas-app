@@ -11,4 +11,8 @@ describe('Scholarship Application Module', () => {
     })
     expect(response.status).toBe(401)
   })
+  it('Should not allow unauthenticated access to GET /:scholarship_id', async () => {
+    const response = await api.application({ scholarship_id: '12' }).get()
+    expect(response.status).toBe(401)
+  })
 })

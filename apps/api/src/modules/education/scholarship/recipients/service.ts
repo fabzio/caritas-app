@@ -19,7 +19,7 @@ export async function createScholarshipRecipient(
     })
 
     if (!userExists) {
-      throw new Error(`User with id ${data.userId} not found`)
+      throw new Error(`Beneficiario no encontrado`)
     }
 
     const scholarshipExists = await db.query.scholarship.findFirst({
@@ -28,7 +28,7 @@ export async function createScholarshipRecipient(
     })
 
     if (!scholarshipExists) {
-      throw new Error(`Scholarship with id ${data.scholarshipId} not found`)
+      throw new Error(`Beca no encontrada`)
     }
 
     const existingApplication = await db.query.scholarshipApplication.findFirst(
@@ -43,9 +43,7 @@ export async function createScholarshipRecipient(
     )
 
     if (existingApplication) {
-      throw new Error(
-        `User already has an application for this scholarship with status: ${existingApplication.status}`,
-      )
+      throw new Error(`El usuario ya ha postulado a dicha oportunidad`)
     }
 
     const [{ id }] = await db.transaction(async (tx) => {
@@ -80,7 +78,7 @@ export async function getRecipients(
       limit = 10,
       sortBy = 'name.asc',
     } = params
-    const searchQuery = q.replace(/\s+/g, ' ').trim()
+    const searchQuery = q.replaceAll(/\s+/g, ' ').trim()
 
     const [sortFieldRaw, sortOrderRaw] = (sortBy ?? 'name.asc').split('.', 2)
     const sortField = (sortFieldRaw ?? 'name').trim()

@@ -1,24 +1,9 @@
 import { Button } from '@workspace/ui/components/button'
 import { Input } from '@workspace/ui/components/input'
+import { Skeleton } from '@workspace/ui/components/skeleton'
 import { Search } from 'lucide-react'
-import { useMemo, useState } from 'react'
-
-export type Beneficiary = {
-  id: string
-  name: string
-  documentNumber: string
-}
-
-const DUMMY_BENEFICIARIES: Beneficiary[] = [
-  { id: 'BEN-001', name: 'María García López', documentNumber: '12345678A' },
-  {
-    id: 'BEN-002',
-    name: 'Carlos Fernández Sánchez',
-    documentNumber: '55667788D',
-  },
-  { id: 'BEN-003', name: 'Laura González Díaz', documentNumber: '99887766E' },
-  { id: 'BEN-004', name: 'Isabel Moreno Castro', documentNumber: '33445566G' },
-]
+import { useBeneficiarySearch } from '../hooks/use-beneficiary-search'
+import type { Beneficiary } from '../hooks/use-get-beneficiaries'
 
 type BeneficiarySearchProps = {
   selectedBeneficiary: Beneficiary | null
@@ -31,35 +16,41 @@ export default function BeneficiarySearch({
   onSelect,
   onClear,
 }: Readonly<BeneficiarySearchProps>) {
-  const [searchQuery, setSearchQuery] = useState('')
-
-  const filteredBeneficiaries = useMemo(() => {
-    if (!searchQuery) return DUMMY_BENEFICIARIES
-    const query = searchQuery.toLowerCase()
-    return DUMMY_BENEFICIARIES.filter(
-      (b) =>
-        b.name.toLowerCase().includes(query) ||
-        b.documentNumber.toLowerCase().includes(query),
-    )
-  }, [searchQuery])
-
-  const handleSelectBeneficiary = (beneficiary: Beneficiary) => {
-    onSelect(beneficiary)
-    setSearchQuery('')
-  }
+  const {
+    searchQuery,
+    setSearchQuery,
+    filteredBeneficiaries,
+    handleSelectBeneficiary,
+    formatDocument,
+    isLoading,
+  } = useBeneficiarySearch({
+    selectedBeneficiary,
+    onSelect,
+    onClear,
+  })
 
   if (selectedBeneficiary) {
     return (
       <div className="flex items-center justify-between rounded-md border p-4">
         <div className="flex flex-col gap-1">
-          <span className="font-medium">{selectedBeneficiary.name}</span>
+          <span className="font-medium">
+            {selectedBeneficiary.name} {selectedBeneficiary.surname}
+          </span>
           <span className="text-sm text-muted-foreground">
-            Documento: {selectedBeneficiary.documentNumber}
+            {formatDocument(selectedBeneficiary)}
           </span>
         </div>
         <Button type="button" variant="ghost" onClick={onClear}>
           Cambiar
         </Button>
+      </div>
+    )
+  }
+
+  if (isLoading) {
+    return (
+      <div className="space-y-2">
+        <Skeleton className="h-10 w-full" />
       </div>
     )
   }
@@ -79,7 +70,7 @@ export default function BeneficiarySearch({
         <div className="absolute z-50 w-full mt-2 rounded-md border bg-popover shadow-md max-h-60 overflow-y-auto">
           {filteredBeneficiaries.length > 0 ? (
             <div className="divide-y">
-              {filteredBeneficiaries.map((beneficiary) => (
+              {filteredBeneficiaries.map((beneficiary: Beneficiary) => (
                 <button
                   key={beneficiary.id}
                   type="button"
@@ -87,9 +78,11 @@ export default function BeneficiarySearch({
                   className="w-full px-4 py-3 text-left hover:bg-muted transition-colors"
                 >
                   <div className="flex flex-col">
-                    <span className="font-medium">{beneficiary.name}</span>
+                    <span className="font-medium">
+                      {beneficiary.name} {beneficiary.surname}
+                    </span>
                     <span className="text-sm text-muted-foreground">
-                      {beneficiary.documentNumber}
+                      {formatDocument(beneficiary)}
                     </span>
                   </div>
                 </button>

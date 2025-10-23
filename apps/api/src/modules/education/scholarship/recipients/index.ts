@@ -8,9 +8,9 @@ import {
 } from './service'
 
 const scholarshipRecipients = new Elysia({
+  name: 'recipients',
   prefix: '/recipients',
 })
-
   .use(betterAuth)
   .get('', ({ query }) => getRecipients(query), {
     query: ScholarshipRecipientModel.listRecipientsQuery,
@@ -25,28 +25,16 @@ const scholarshipRecipients = new Elysia({
   })
   .post(
     '',
-    (context) => {
-      type CreateContext = {
-        body: { scholarshipId: number; userId: string; comments?: string }
-        session?: { userId?: string }
-        user?: { id?: string }
-      }
-      const ctx = context as unknown as CreateContext
-      const reviewedBy = ctx.session?.userId ?? ctx.user?.id ?? ''
+    ({ body, session, user }) => {
+      const reviewedBy = session?.userId ?? user?.id ?? ''
       return createScholarshipRecipient({
-        scholarshipId: ctx.body.scholarshipId,
-        userId: ctx.body.userId,
+        ...body,
         reviewedBy,
-        comments: ctx.body.comments,
       })
     },
     {
       auth: true,
-      body: t.Object({
-        scholarshipId: t.Number(),
-        userId: t.String(),
-        comments: t.Optional(t.String()),
-      }),
+      body: ScholarshipRecipientModel.createScholarshipRecipient,
       response: {
         200: t.Number({
           description: 'ID of the created scholarship recipient',
