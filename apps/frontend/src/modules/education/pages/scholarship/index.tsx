@@ -16,7 +16,7 @@ export default function ScholarshipPage() {
           <Link to="/education/scholarship/create">
             <Button className="w-full max-w-xs" size={isMobile ? 'sm' : 'lg'}>
               <PlusCircle />
-              Registrar nueva beca
+              Nueva beca
             </Button>
           </Link>
         </div>
