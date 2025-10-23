@@ -27,7 +27,11 @@ export default function ActionsButton({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={(e) => e.stopPropagation()}
+        >
           <MoreVertical className="h-4 w-4" />
           <span className="sr-only">Abrir menú</span>
         </Button>

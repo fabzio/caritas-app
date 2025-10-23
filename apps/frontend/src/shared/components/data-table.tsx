@@ -46,6 +46,7 @@ type Props<T> = {
   setRowSelection: OnChangeFn<Record<string, boolean>>
   showPageSizeSelector?: boolean
   pageSizeOptions?: number[]
+  onRowClick?: (row: T) => void
 }
 
 export default function DataTable<T>({
@@ -59,6 +60,7 @@ export default function DataTable<T>({
   setRowSelection,
   showPageSizeSelector = false,
   pageSizeOptions = [5, 10, 20, 30, 50],
+  onRowClick,
 }: Readonly<Props<T>>) {
   const table = useReactTable({
     data,
@@ -109,6 +111,8 @@ export default function DataTable<T>({
               <TableRow
                 key={row.id}
                 data-state={row.getIsSelected() && 'selected'}
+                onClick={() => onRowClick?.(row.original)}
+                className={onRowClick ? 'cursor-pointer hover:bg-muted/50' : ''}
               >
                 {row.getVisibleCells().map((cell) => (
                   <TableCell key={cell.id}>

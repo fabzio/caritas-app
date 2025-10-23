@@ -1,5 +1,6 @@
 import DataTable from '@frontend/shared/components/data-table'
 import { stateToSortBy } from '@frontend/shared/utils/sort-by-to-state'
+import { useNavigate } from '@tanstack/react-router'
 import type {
   ColumnDef,
   OnChangeFn,
@@ -41,6 +42,15 @@ export default function ScholarshipTable({
   setFilters,
   pagination,
 }: Readonly<Props>) {
+  const navigate = useNavigate()
+
+  const handleRowClick = (scholarship: Scholarship) => {
+    navigate({
+      to: '/education/scholarship/$scholarshipId/view',
+      params: { scholarshipId: scholarship.id.toString() },
+    })
+  }
+
   return (
     <DataTable
       data={data || []}
@@ -75,6 +85,7 @@ export default function ScholarshipTable({
       }}
       setRowSelection={setRowSelection}
       rowSelection={rowSelection}
+      onRowClick={handleRowClick}
     />
   )
 }
