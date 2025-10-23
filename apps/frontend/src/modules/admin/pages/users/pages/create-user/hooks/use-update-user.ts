@@ -31,6 +31,9 @@ export const useUpdateUser = () => {
     },
     onSuccess: (_, { userId }) => {
       queryClient.invalidateQueries({ queryKey: [QueryKeys.ADMIN.USERS] })
+      queryClient.invalidateQueries({
+        queryKey: [QueryKeys.ADMIN.USERS, userId],
+      })
       if (session?.user.id === userId)
         queryClient.invalidateQueries({ queryKey: [QueryKeys.ACCESS] })
       toast.success('Modificado el usuario exitosamente')

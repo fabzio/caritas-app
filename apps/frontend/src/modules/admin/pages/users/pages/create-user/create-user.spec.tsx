@@ -18,6 +18,8 @@ const mockUseSearch = vi.fn()
 const mockUseLoaderData = vi.fn()
 const mockUseInvitation = vi.fn()
 
+const mockUseUserDetail = vi.fn()
+
 vi.mock('@frontend/hooks/use-session', () => ({
   useSession: () => ({ data: { user: { id: 'current-user-id', teams: [] } } }),
 }))
@@ -31,6 +33,10 @@ vi.mock('@frontend/hooks/use-invitation', () => ({
 
 vi.mock('./hooks/use-update-user', () => ({
   useUpdateUser: () => ({ mutate: mockUpdateUser }),
+}))
+
+vi.mock('./hooks/use-user-detail', () => ({
+  useUserDetail: (id: string | undefined) => mockUseUserDetail(id),
 }))
 
 vi.mock('./hooks/use-list-teams', () => ({
@@ -53,6 +59,7 @@ vi.mock('@frontend/hooks/use-regions', () => ({
   }),
 }))
 
+// useUserDetail mocked above via mockUseUserDetail
 vi.mock('react-hook-form', () => ({
   useForm: () => ({
     control: {},
@@ -241,8 +248,9 @@ vi.mock('@workspace/ui/components/checkbox', () => ({
 describe('FormView - Create Mode', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    mockUseSearch.mockReturnValue('new')
+    mockUseSearch.mockReturnValue({ id: undefined, type: 'new' })
     mockUseLoaderData.mockReturnValue(null)
+    mockUseUserDetail.mockReturnValue({ data: null })
     const birthDate = new Date('1995-05-05')
     setMockFormValues({
       name: 'Jane',
@@ -306,7 +314,7 @@ describe('FormView - Create Mode', () => {
 describe('FormView - Edit Mode', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    mockUseSearch.mockReturnValue('edit')
+    mockUseSearch.mockReturnValue({ id: 'user-1', type: 'edit' })
     mockUseLoaderData.mockReturnValue({
       id: 'user-1',
       name: 'John',
@@ -321,6 +329,22 @@ describe('FormView - Edit Mode', () => {
       role: 'admin',
       teams: [{ id: 'team-1', name: 'Team A' }],
     })
+    const loader = {
+      id: 'user-1',
+      name: 'John',
+      surname: 'Doe',
+      email: 'john@example.com',
+      phone: '987654321',
+      documentType: 'DNI',
+      documentNumber: '12345678',
+      birthDate: new Date('1990-01-01'),
+      sex: 'M',
+      regionId: 'region-1',
+      role: 'admin',
+      teams: [{ id: 'team-1', name: 'Team A' }],
+    }
+    mockUseLoaderData.mockReturnValue(loader)
+    mockUseUserDetail.mockReturnValue({ data: loader })
     setMockFormValues({
       name: 'John',
       surname: 'Doe',
