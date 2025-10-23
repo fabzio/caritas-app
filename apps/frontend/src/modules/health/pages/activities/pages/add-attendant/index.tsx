@@ -72,7 +72,6 @@ export default function AddAttendantPage() {
   })
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(loaderData)
     if (typeof loaderData?.id !== 'number') return
     addAttendant({
       email: values.email,
@@ -339,22 +338,9 @@ export default function AddAttendantPage() {
               />
             </div>
             <div className="w-full flex gap-2 justify-center">
-              <Link
-                to={
-                  loaderData
-                    ? '/health/activities/$activityId/assistance'
-                    : '/health/activities'
-                }
-                params={{ activityId: loaderData?.id.toString() }}
-              >
-                <Button
-                  type="submit"
-                  className="mt-4"
-                  disabled={isPendingCreate}
-                >
-                  {isPendingCreate ? <Spinner /> : 'Registrar Asistente'}
-                </Button>
-              </Link>
+              <Button type="submit" className="mt-4" disabled={isPendingCreate}>
+                {isPendingCreate ? <Spinner /> : 'Registrar Asistente'}
+              </Button>
               <Link
                 to={
                   loaderData

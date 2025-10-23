@@ -1,4 +1,3 @@
-import { useSession } from '@frontend/hooks/use-session'
 import authClient from '@frontend/lib/authClient'
 import rpc from '@frontend/lib/rpc'
 import { QueryKeys } from '@frontend/shared/constants/query-keys'
@@ -13,16 +12,18 @@ type AddAttendantProps = Parameters<typeof authClient.admin.createUser>[0] & {
 export const useAddAttendant = () => {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
-  const { data: user } = useSession()
   return useMutation({
     mutationFn: async (props: AddAttendantProps) => {
       const { activityId, ...userPayload } = props
       const { data, error } = await authClient.admin.createUser(userPayload)
       if (error) throw error
-      await rpc.health.activities['add-attendant'].post({
+      const { data: result, error: rpcError } = await rpc.health.activities[
+        'add-attendant'
+      ].post({
         userId: data.user.id,
         activityId: activityId,
       })
+      if (rpcError) throw rpcError
     },
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({
@@ -30,7 +31,7 @@ export const useAddAttendant = () => {
       })
       toast.success('Asistente registrado exitosamente')
       navigate({
-        to: '/health/activities/$activityId',
+        to: '/health/activities/$activityId/assistance',
         params: { activityId: variables.activityId.toString() },
       })
     },

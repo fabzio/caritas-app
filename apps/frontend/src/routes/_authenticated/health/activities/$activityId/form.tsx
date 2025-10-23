@@ -8,7 +8,6 @@ export const Route = createFileRoute(
 )({
   loader: async ({ context: { queryClient }, params }) => {
     const activityId = params.activityId
-    console.log('activityId', activityId)
     if (!activityId) return undefined
 
     return await queryClient.ensureQueryData({

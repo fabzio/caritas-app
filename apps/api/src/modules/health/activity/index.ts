@@ -17,6 +17,7 @@ import {
   getActivityById,
   getActivityParticipants,
   getUserAttentions,
+  removeAttendantFromActivity,
   setActivityUser,
   updateCompleteActivity,
 } from './service'
@@ -171,8 +172,23 @@ const activityModule = new Elysia({ name: 'activity', prefix: '/activities' })
     async ({ body }) => status(201, await addAttendantToActivity(body)),
     {
       auth: true,
-      body: ActivityModel.addAttendantActivity,
-      response: { 201: t.Number(), 401: t.Literal('Unauthorized') },
+      body: ActivityModel.attendantActivity,
+      response: {
+        201: ActivityModel.attendantActivity,
+        401: t.Literal('Unauthorized'),
+      },
+    },
+  )
+  .delete(
+    '/remove-attendant',
+    async ({ body }) => await removeAttendantFromActivity(body),
+    {
+      auth: true,
+      body: ActivityModel.attendantActivity,
+      response: {
+        200: ActivityModel.attendantActivity,
+        401: t.Literal('Unauthorized'),
+      },
     },
   )
 
