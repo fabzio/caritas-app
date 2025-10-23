@@ -34,6 +34,7 @@ export const QueryKeys = {
       SPECIALITIES: 'health-activity-specialities',
       TYPES: 'health-activity-types',
     },
+    ADD_ATTENDANT: 'health-activities-add-attendant',
   },
 } as const
 

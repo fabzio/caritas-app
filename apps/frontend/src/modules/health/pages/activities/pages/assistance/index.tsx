@@ -116,10 +116,15 @@ export default function AssistancePage() {
               </Button>
             </Link>
 
-            <Button>
-              <Plus className="h-4 w-4 mr-2" />
-              Registrar asistente
-            </Button>
+            <Link
+              to="/health/activities/$activityId/form"
+              params={{ activityId }}
+            >
+              <Button>
+                <Plus className="h-4 w-4 mr-2" />
+                Registrar asistente
+              </Button>
+            </Link>
           </div>
 
           <div className="mb-6">
