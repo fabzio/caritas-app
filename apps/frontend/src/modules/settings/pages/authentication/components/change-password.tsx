@@ -26,10 +26,17 @@ export default function ChangePassword() {
   })
   const { mutate, isPending } = useChangePassword()
   const onSubmit = form.handleSubmit((data) =>
-    mutate({
-      currentPassword: data.currentPassword,
-      newPassword: data.newPassword,
-    }),
+    mutate(
+      {
+        currentPassword: data.currentPassword,
+        newPassword: data.newPassword,
+      },
+      {
+        onSuccess: () => {
+          form.reset()
+        },
+      },
+    ),
   )
   return (
     <div className="my-4 w-1/2">

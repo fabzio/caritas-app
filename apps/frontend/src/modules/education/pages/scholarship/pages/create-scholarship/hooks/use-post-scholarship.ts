@@ -1,10 +1,13 @@
 import rpc from '@frontend/lib/rpc'
-import { useMutation } from '@tanstack/react-query'
+import { QueryKeys } from '@frontend/shared/constants/query-keys'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { toast } from 'sonner'
 
 const usePostScholarship = () => {
   const navigate = useNavigate({ from: '/education/scholarship/form' })
+  const queryClient = useQueryClient()
+
   return useMutation({
     mutationFn: async (params: {
       name: string
@@ -32,6 +35,9 @@ const usePostScholarship = () => {
       toast.error('Ocurrió un error desconocido al registrar la beca')
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [QueryKeys.SCHOLARSHIP], // Invalida la lista (sin ID)
+      })
       toast.success('Beca registrada correctamente')
       navigate({ to: '/education/scholarship' })
     },

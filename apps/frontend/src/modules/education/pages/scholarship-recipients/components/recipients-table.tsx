@@ -10,6 +10,7 @@ import type {
 import type { Recipient } from '../hooks/use-scholarship'
 
 type Props = {
+  isLoading?: boolean
   rowSelection: Record<string, boolean>
   setRowSelection: OnChangeFn<Record<string, boolean>>
   data: Recipient[]
@@ -25,6 +26,7 @@ type Props = {
   }
 }
 export default function RecipientsTable({
+  isLoading,
   rowSelection,
   setRowSelection,
   data,
@@ -37,6 +39,7 @@ export default function RecipientsTable({
   return (
     <DataTable
       data={data || []}
+      isLoading={isLoading}
       columns={columns}
       pagination={paginationState}
       sorting={sortingState}

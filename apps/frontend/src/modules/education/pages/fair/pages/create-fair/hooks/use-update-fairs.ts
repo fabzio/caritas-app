@@ -1,18 +1,21 @@
 import rpc from '@frontend/lib/rpc'
+import { QueryKeys } from '@frontend/shared/constants/query-keys'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
+import { format } from 'date-fns'
 import { toast } from 'sonner'
-
 export const useUpdateFairs = () => {
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (params: {
       id: number
-      name?: string
-      description?: string
+      title?: string
+      address?: string
       date?: Date
-      location?: string
-      organizationId?: string
+      startTime?: string
+      endTime?: string
+      regionId?: number
       active?: boolean
       createdBy?: string
       createdAt?: Date
@@ -20,7 +23,7 @@ export const useUpdateFairs = () => {
     }) => {
       const cleanBody = {
         ...params,
-        date: params.date ? params.date.toISOString() : undefined,
+        date: params.date ? format(params.date, 'yyyy-MM-dd') : undefined,
       }
       const { id, ...body } = cleanBody
       const res = await rpc.education.fairs({ id: params.id }).patch(body)
@@ -30,7 +33,14 @@ export const useUpdateFairs = () => {
     onError: () => {
       toast.error('Ocurrió un error desconocido al actualizar la feria')
     },
-    onSuccess: () => {
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: [QueryKeys.EDUCATION.FAIR],
+      })
+      queryClient.invalidateQueries({
+        queryKey: [QueryKeys.EDUCATION.FAIR, variables.id],
+      })
+
       toast.success('Feria actualizada correctamente')
       navigate({ to: '/education/fair' })
     },
