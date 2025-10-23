@@ -25,13 +25,6 @@ export function formatRoles(
     return roleNames[filteredRoles[0]] || filteredRoles[0]
   }
 
-  const hasHealthMember = filteredRoles.includes('healthMember')
-  const hasEducationMember = filteredRoles.includes('educationMember')
-
-  if (hasHealthMember && hasEducationMember) {
-    return 'Personal de Salud y Educación'
-  }
-
   const formattedRoles = filteredRoles
     .map((role) => roleNames[role] || role)
     .filter((value, index, self) => self.indexOf(value) === index)

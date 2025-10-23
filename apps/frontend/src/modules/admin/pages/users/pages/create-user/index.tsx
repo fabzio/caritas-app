@@ -49,15 +49,13 @@ import SendInvitation from './components/send-invitation'
 import { useCreateUser } from './hooks/use-create-user'
 import { useListTeams } from './hooks/use-list-teams'
 import { useUpdateUser } from './hooks/use-update-user'
+import { useUserDetail } from './hooks/use-user-detail'
 
 export default function FormView() {
-  const viewType = useSearch({
+  const { id, type: viewType } = useSearch({
     from: '/_authenticated/admin/users/form',
-    select: (search) => search.type,
   })
-  const loaderData = getRouteApi(
-    '/_authenticated/admin/users/form',
-  ).useLoaderData()
+  const { data: loaderData } = useUserDetail(id)
 
   const { data: session } = useSession()
 
@@ -65,33 +63,18 @@ export default function FormView() {
   const { data: teams } = useListTeams()
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues:
-      viewType === 'edit'
-        ? {
-            name: loaderData?.name,
-            surname: loaderData?.surname,
-            email: loaderData?.email,
-            phone: loaderData?.phone,
-            documentType:
-              (loaderData?.documentType as 'DNI' | 'CE' | 'PAS') ?? 'DNI',
-            documentNumber: loaderData?.documentNumber,
-            birthDate: loaderData?.birthDate,
-            sex: loaderData?.sex,
-            regionId: loaderData?.regionId,
-            teamIds: loaderData?.teams?.map((team) => team.id) ?? [],
-          }
-        : {
-            name: '',
-            surname: '',
-            email: '',
-            phone: '',
-            documentType: 'DNI',
-            documentNumber: '',
-            birthDate: undefined,
-            sex: undefined,
-            regionId: undefined,
-            teamIds: [],
-          },
+    defaultValues: {
+      name: loaderData?.name || '',
+      surname: loaderData?.surname || '',
+      email: loaderData?.email || '',
+      phone: loaderData?.phone || '',
+      documentType: (loaderData?.documentType as 'DNI' | 'CE' | 'PAS') ?? 'DNI',
+      documentNumber: loaderData?.documentNumber || '',
+      birthDate: loaderData?.birthDate,
+      sex: loaderData?.sex,
+      regionId: loaderData?.regionId,
+      teamIds: loaderData?.teams?.map((team) => team.id) ?? [],
+    },
   })
 
   const { mutate: createUser, isPending: isPendingCreate } = useCreateUser()

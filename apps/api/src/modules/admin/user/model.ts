@@ -7,15 +7,26 @@ export namespace UserModel {
     birthDate: t.Date(),
   })
   export const getUsersResponse = t.Object({
-    data: t.Array(_getUsers),
+    data: t.Array(
+      t.Composite([
+        t.Pick(_getUsers, [
+          'id',
+          'name',
+          'surname',
+          'email',
+          'documentType',
+          'documentNumber',
+        ]),
+        t.Object({ memberId: t.String() }),
+        t.Object({ role: t.Optional(t.String()) }),
+      ]),
+    ),
     total: t.Integer(),
     page: t.Integer(),
     limit: t.Integer(),
     totalPages: t.Integer(),
   })
   export type GetUsersResponse = typeof getUsersResponse.static
-  export const getUsers = t.Array(_getUsers)
-  export type GetUsers = typeof getUsers.static
   export const listUsersQuery = t.Object({
     organizationId: t.String(),
     q: t.Optional(t.String()),
