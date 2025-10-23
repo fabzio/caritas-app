@@ -1,4 +1,5 @@
 import authClient from '@frontend/lib/authClient'
+import { useQueryClient } from '@tanstack/react-query'
 import { Link, useLocation, useNavigate } from '@tanstack/react-router'
 import {
   Avatar,
@@ -21,6 +22,7 @@ import {
   useSidebar,
 } from '@workspace/ui/components/sidebar.tsx'
 import { ChevronsUpDown, LogOut, Settings } from 'lucide-react'
+import { QueryKeys } from '../constants/query-keys'
 
 type Props = {
   user: {
@@ -33,8 +35,11 @@ function NavUser({ user }: Readonly<Props>) {
   const { isMobile } = useSidebar()
   const navigation = useNavigate()
   const { href } = useLocation()
-
+  const queryClient = useQueryClient()
   const onSignOut = async () => {
+    await queryClient.invalidateQueries({
+      queryKey: [QueryKeys.ACCESS],
+    })
     await authClient.signOut({
       fetchOptions: {
         onSuccess: () => {

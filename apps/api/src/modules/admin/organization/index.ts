@@ -3,6 +3,7 @@ import Elysia, { status, t } from 'elysia'
 
 import { OrganizationModel } from './model'
 import {
+  deleteOrganizations,
   findDuplicateOrganizations,
   getOrganizations,
   getSingleOrganization,
@@ -71,6 +72,25 @@ const organization = new Elysia({
         200: OrganizationModel.getSingleOrganizationResponse,
         400: t.String(),
         404: t.String(),
+      },
+    },
+  )
+  .delete(
+    '/',
+    async ({ body }) => {
+      const { ids } = body
+      if (!ids.length)
+        throw status(400, 'No hay ningún ID de organización para eliminar')
+
+      const deleted = await deleteOrganizations(ids)
+      return deleted
+    },
+    {
+      auth: true,
+      body: OrganizationModel.deleteOrganizations,
+      response: {
+        200: t.Object({ success: t.Boolean() }),
+        400: t.String(),
       },
     },
   )

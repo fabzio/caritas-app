@@ -57,4 +57,9 @@ export namespace OrganizationModel {
     }),
   })
   export type updateOrganization = typeof updateOrganization.static
+
+  export const deleteOrganizations = t.Object({
+    ids: t.Array(t.String({ minimum: 1 })),
+  })
+  export type deleteOrganizations = typeof deleteOrganizations.static
 }

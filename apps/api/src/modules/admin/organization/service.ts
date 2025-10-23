@@ -1,7 +1,6 @@
 import db from '@api/db'
 import { PostgresError } from '@api/db/errors'
 import { organization } from '@api/db/schemas/auth'
-import { withHeaders } from '@elysiajs/openapi'
 import { and, asc, count, desc, eq, ilike, not, or } from 'drizzle-orm'
 import type { OrganizationModel } from './model'
 
@@ -112,4 +111,17 @@ export async function findDuplicateOrganizations(
   const excluded = coincidences.find((s) => s.id !== organizationId)
 
   return excluded || null
+}
+
+export const deleteOrganizations = async (ids: string[]) => {
+  try {
+    await db
+      .update(organization)
+      .set({ active: false })
+      .where(inArray(organization.id, ids))
+    return { success: true }
+  } catch (e) {
+    if (e instanceof Error) throw new PostgresError(e.message)
+    throw e
+  }
 }

@@ -17,6 +17,7 @@ export const Route = createFileRoute('/_authenticated/education/fair/form')({
           .get()
         return data || undefined
       },
+      gcTime: 0,
     })
   },
   validateSearch: z.object({

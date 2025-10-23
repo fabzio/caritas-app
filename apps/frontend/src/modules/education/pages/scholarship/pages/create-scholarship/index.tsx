@@ -1,5 +1,7 @@
 import { useSession } from '@frontend/hooks/use-session'
+import { QueryKeys } from '@frontend/shared/constants/query-keys'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useQueryClient } from '@tanstack/react-query'
 import { getRouteApi, Link, useSearch } from '@tanstack/react-router'
 import { Button } from '@workspace/ui/components/button'
 import { Calendar } from '@workspace/ui/components/calendar'
@@ -34,8 +36,8 @@ import {
 } from '@workspace/ui/components/select'
 import { Separator } from '@workspace/ui/components/separator'
 import { Textarea } from '@workspace/ui/components/textarea'
-import { format } from 'date-fns'
-import { CalendarIcon, Loader2 } from 'lucide-react'
+import { format,parseISO } from 'date-fns'
+import { CalendarIcon, Loader2, UserPlus } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import useGetOrganization from './hooks/use-get-organization'
 import usePostScholarship from './hooks/use-post-scholarship'
@@ -52,6 +54,8 @@ export default function CreateScholarship() {
   const loaderData = getRouteApi(
     '/_authenticated/education/scholarship/form',
   ).useLoaderData()
+  const startDate = new Date(loaderData?.startDate ?? '')
+  const endDate = new Date(loaderData?.endDate ?? '')
 
   const form = useForm<FormScholarShipSchema>({
     resolver: zodResolver(formScholarShipSchema),
@@ -63,10 +67,14 @@ export default function CreateScholarship() {
             requirements: loaderData?.requirements,
             vacancies: loaderData?.vacancies,
             startDate: loaderData?.startDate
-              ? new Date(loaderData.startDate)
+              ? new Date(
+                  startDate.getTime() + startDate.getTimezoneOffset() * 60000,
+                )
               : undefined,
             endDate: loaderData?.endDate
-              ? new Date(loaderData.endDate)
+              ? new Date(
+                  endDate.getTime() + endDate.getTimezoneOffset() * 60000,
+                )
               : undefined,
             organizationId: loaderData?.organizationId
               ? String(loaderData.organizationId)
@@ -92,6 +100,7 @@ export default function CreateScholarship() {
     useUpdateScholarship()
 
   const { data: user } = useSession()
+
   const handleSubmit = form.handleSubmit((data) => {
     if (!user || form.getValues('vacancies') == null) return
     if (viewType === 'edit' && loaderData?.id) {
@@ -116,14 +125,16 @@ export default function CreateScholarship() {
       </div>
       <div>
         <div className=" flex justify-center ">
-          <Card className="w-full lg:w-3/4">
-            <CardHeader>
-              <CardTitle>Información de la Beca</CardTitle>
-              <CardDescription>
+          <div className="w-full lg:w-3/4">
+            <div className="flex flex-col gap-2 mb-4">
+              <h3 className="text-xl font-semibold text-foreground">
+                Información de la Beca
+              </h3>
+              <p className="text-muted-foreground">
                 Complete todos los campos requeridos*
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
+              </p>
+            </div>
+            <div>
               <Form {...form}>
                 <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
                   <FormField
@@ -184,11 +195,27 @@ export default function CreateScholarship() {
                                 Cargando...
                               </SelectItem>
                             )}
-                            {organizations?.map((org) => (
-                              <SelectItem key={org.id} value={String(org.id)}>
-                                {org.name}
-                              </SelectItem>
-                            ))}
+                            {organizations && organizations?.length > 0 ? (
+                              organizations?.map((org) => (
+                                <SelectItem key={org.id} value={String(org.id)}>
+                                  {org.name}
+                                </SelectItem>
+                              ))
+                            ) : (
+                              <Link
+                                to="/education/organization"
+                                className="text-sm text-muted-foreground"
+                              >
+                                <div className="flex flex-col items-center py-1">
+                                  No hay aliados disponibles.
+                                  <Separator />{' '}
+                                  <span className="py-1 flex underline items-center gap-2">
+                                    Crear aliado
+                                    <UserPlus size={16} />
+                                  </span>
+                                </div>
+                              </Link>
+                            )}
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -312,7 +339,7 @@ export default function CreateScholarship() {
                       </FormItem>
                     )}
                   />
-                  <CardFooter className="flex justify-end gap-4 align-center ">
+                  <div className="flex justify-end gap-4 items-center">
                     <Link to="/education/scholarship">
                       <Button variant="outline" type="button">
                         Cancelar
@@ -328,11 +355,11 @@ export default function CreateScholarship() {
                         dependantText.submit[viewType] || 'Registrar'
                       )}
                     </Button>
-                  </CardFooter>
+                  </div>
                 </form>
               </Form>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
       </div>
     </div>

@@ -2,7 +2,7 @@ import type { ColumnDef } from '@tanstack/react-table'
 import { Button } from '@workspace/ui/components/button'
 import { Checkbox } from '@workspace/ui/components/checkbox'
 import { ArrowUpDown } from 'lucide-react'
-import type { Organization } from '../hooks/use-list-organizations'
+import type { Organization } from '../hooks/use-list-ally'
 
 export const OrganizationsTableColumns: ColumnDef<Organization>[] = [
   {
