@@ -1,3 +1,4 @@
+import { auth } from '@api/lib/auth'
 import betterAuth from '@api/modules/auth'
 import Elysia, { status, t } from 'elysia'
 import {
@@ -8,6 +9,7 @@ import {
 } from './catalogs-service'
 import { ActivityModel } from './model'
 import {
+  addAttendantToActivity,
   createActivity,
   createAttention,
   createCompleteActivity,
@@ -16,6 +18,7 @@ import {
   getActivityById,
   getActivityParticipants,
   getUserAttentions,
+  removeAttendantFromActivity,
   setActivityUser,
   updateCompleteActivity,
 } from './service'
@@ -178,5 +181,29 @@ const activityModule = new Elysia({ name: 'activity', prefix: '/activities' })
       401: t.Literal('Unauthorized'),
     },
   })
+  .post(
+    '/add-attendant',
+    async ({ body }) => status(201, await addAttendantToActivity(body)),
+    {
+      auth: true,
+      body: ActivityModel.attendantActivity,
+      response: {
+        201: ActivityModel.attendantActivity,
+        401: t.Literal('Unauthorized'),
+      },
+    },
+  )
+  .delete(
+    '/remove-attendant',
+    async ({ body }) => await removeAttendantFromActivity(body),
+    {
+      auth: true,
+      body: ActivityModel.attendantActivity,
+      response: {
+        200: ActivityModel.attendantActivity,
+        401: t.Literal('Unauthorized'),
+      },
+    },
+  )
 
 export default activityModule

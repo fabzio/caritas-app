@@ -559,3 +559,39 @@ export const setActivityUser = async (
     throw e
   }
 }
+
+export const addAttendantToActivity = async (
+  params: ActivityModel.AttendantActivity,
+) => {
+  const { userId, activityId } = params
+  try {
+    await db.insert(activityUser).values({
+      activityId,
+      userId,
+    })
+    return { userId, activityId }
+  } catch (error) {
+    if (error instanceof Error) throw new PostgresError(error.message)
+    throw error
+  }
+}
+
+export const removeAttendantFromActivity = async (
+  params: ActivityModel.AttendantActivity,
+) => {
+  const { userId, activityId } = params
+  try {
+    await db
+      .delete(activityUser)
+      .where(
+        and(
+          eq(activityUser.activityId, activityId),
+          eq(activityUser.userId, userId),
+        ),
+      )
+    return { userId, activityId }
+  } catch (error) {
+    if (error instanceof Error) throw new PostgresError(error.message)
+    throw error
+  }
+}

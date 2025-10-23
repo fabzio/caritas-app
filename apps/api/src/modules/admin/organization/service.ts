@@ -112,3 +112,16 @@ export async function findDuplicateOrganizations(
 
   return excluded || null
 }
+
+export const deleteOrganizations = async (ids: string[]) => {
+  try {
+    await db
+      .update(organization)
+      .set({ active: false })
+      .where(inArray(organization.id, ids))
+    return { success: true }
+  } catch (e) {
+    if (e instanceof Error) throw new PostgresError(e.message)
+    throw e
+  }
+}
