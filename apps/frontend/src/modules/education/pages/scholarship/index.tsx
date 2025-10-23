@@ -108,7 +108,7 @@ export default function ScholarshipPage() {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            <Link to="/education/scholarship/create">
+            <Link to="/education/scholarship/form?type=new">
               <Button
                 className="w-full sm:w-auto"
                 size={isMobile ? 'sm' : 'lg'}
