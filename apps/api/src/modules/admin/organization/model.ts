@@ -49,4 +49,12 @@ export namespace OrganizationModel {
     logo: t.String(),
   })
   export type CreateOrganization = typeof createOrganization.static
+
+  export const updateOrganization = t.Object({
+    name: t.String({
+      minLength: 1,
+      description: 'Nuevo nombre del aliado',
+    }),
+  })
+  export type updateOrganization = typeof updateOrganization.static
 }
