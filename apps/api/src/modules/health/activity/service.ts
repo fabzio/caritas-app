@@ -521,3 +521,21 @@ export const setActivityUser = async (
     throw e
   }
 }
+
+export const addAttendantToActivity = async ({
+  activityId,
+  userId,
+}: {
+  activityId: number
+  userId: string
+}) => {
+  try {
+    await db.insert(activityUser).values({
+      activityId,
+      userId,
+    })
+  } catch (error) {
+    if (error instanceof Error) throw new PostgresError(error.message)
+    throw error
+  }
+}

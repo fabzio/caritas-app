@@ -118,4 +118,10 @@ export namespace ActivityModel {
     ),
   })
   export type CreateCompleteActivity = typeof createCompleteActivity.static
+
+  export const addAttendantActivity = t.Object({
+    userId: t.String(),
+    activityId: t.Number(),
+  })
+  export type AddAttendantActivity = typeof addAttendantActivity.static
 }

@@ -26,6 +26,7 @@ export const QueryKeys = {
   },
   HEALTH: {
     ACTIVITIES: 'health-activities',
+    ADD_ATTENDANT: 'health-activities-add-attendant',
   },
 } as const
 
