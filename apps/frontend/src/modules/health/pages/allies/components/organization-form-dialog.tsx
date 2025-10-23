@@ -22,10 +22,10 @@ import { Loader2 } from 'lucide-react'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
+import z from 'zod'
 import { useCreateAlly } from '../hooks/use-create-ally'
 import useGetAlly from '../hooks/use-get-ally'
 import useUpdateAlly from '../hooks/use-update-ally'
-import { type FormAllySchema, formAllySchema } from '../models/ally'
 
 type Props = {
   open: boolean
@@ -45,8 +45,8 @@ export default function OrganizationFormDialog({
   const { mutate: create, isPending: isCreating } = useCreateAlly()
   const { mutate: update, isPending: isUpdating } = useUpdateAlly()
 
-  const form = useForm<FormAllySchema>({
-    resolver: zodResolver(formAllySchema),
+  const form = useForm({
+    resolver: zodResolver(formSchema),
     defaultValues: { name: '' },
   })
 
@@ -164,3 +164,9 @@ export default function OrganizationFormDialog({
     </Dialog>
   )
 }
+const formSchema = z.object({
+  name: z
+    .string()
+    .min(2, { message: 'El nombre debe tener al menos 2 caracteres' })
+    .max(50, { message: 'El nombre no puede tener más de 50 caracteres' }),
+})
