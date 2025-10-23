@@ -3,7 +3,6 @@ import { Button } from '@workspace/ui/components/button'
 import { Checkbox } from '@workspace/ui/components/checkbox'
 import { ArrowUpDown } from 'lucide-react'
 import type { Scholarship } from '../hooks/use-get-scholarship'
-import ActionsButton from './actions-button'
 
 export const scholarshipTableColumns: ColumnDef<Scholarship>[] = [
   {
@@ -71,16 +70,5 @@ export const scholarshipTableColumns: ColumnDef<Scholarship>[] = [
       </Button>
     ),
     cell: ({ row }) => row.original.vacancies,
-  },
-  {
-    id: 'actions',
-    header: () => <div>Acciones</div>,
-    cell: ({ row }) => (
-      <ActionsButton
-        scholarshipId={row.original.id}
-        scholarshipName={row.original.name}
-      />
-    ),
-    enableSorting: false,
   },
 ]

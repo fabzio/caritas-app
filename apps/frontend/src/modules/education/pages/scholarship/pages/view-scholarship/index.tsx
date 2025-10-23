@@ -46,8 +46,7 @@ export default function ViewScholarship() {
   }
 
   const scholarshipData = {
-    type:
-      scholarship.type === 'ML' ? 'Material de Lectura' : 'Plan de estudios',
+    type: scholarship.type === 'ML' ? 'Modular' : 'Plan de estudios',
     organization: scholarship.organization?.name || 'N/A',
     vacancies: scholarship.vacancies,
     startDate: new Date(scholarship.startDate).toLocaleDateString('es-ES'),
