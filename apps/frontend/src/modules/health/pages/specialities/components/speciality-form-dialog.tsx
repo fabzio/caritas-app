@@ -22,41 +22,48 @@ import { Loader2 } from 'lucide-react'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import z from 'zod'
-import { useCreateAlly } from '../hooks/use-create-ally'
-import useGetAlly from '../hooks/use-get-ally'
-import useUpdateAlly from '../hooks/use-update-ally'
+import useGetSpeciality from '../hooks/use-get-speciality'
+import usePostSpeciality from '../hooks/use-post-speciality'
+import useUpdateSpeciality from '../hooks/use-update-speciality'
+import {
+  type FormSpecialitySchema,
+  formSpecialitySchema,
+} from '../models/speciality-form'
 
 type Props = {
   open: boolean
-  onOpenChange: (params: { open: boolean; type: 'new' | 'edit' }) => void
-  initialData?: { id?: string }
+  onOpenChange: (open: boolean) => void
+  initialData?: { id?: number }
+  clearSelection?: () => void
 }
 
-export default function OrganizationFormDialog({
+export default function SpecialityFormDialog({
   open,
   onOpenChange,
   initialData,
+  clearSelection,
 }: Readonly<Props>) {
   const viewType = initialData?.id ? 'edit' : 'new'
   const { data: user } = useSession()
 
-  const { data: allyData, isFetching } = useGetAlly(initialData?.id)
-  const { mutate: create, isPending: isCreating } = useCreateAlly()
-  const { mutate: update, isPending: isUpdating } = useUpdateAlly()
+  const { data: specialityData, isFetching } = useGetSpeciality(initialData?.id)
+  const { mutate: createSpeciality, isPending: isCreating } =
+    usePostSpeciality()
+  const { mutate: updateSpeciality, isPending: isUpdating } =
+    useUpdateSpeciality()
 
-  const form = useForm({
-    resolver: zodResolver(formSchema),
+  const form = useForm<FormSpecialitySchema>({
+    resolver: zodResolver(formSpecialitySchema),
     defaultValues: { name: '' },
   })
 
   useEffect(() => {
-    if (allyData) {
-      form.reset({ name: allyData.name })
+    if (specialityData) {
+      form.reset({ name: specialityData.name })
     } else if (!initialData?.id) {
       form.reset({ name: '' })
     }
-  }, [allyData, initialData, form])
+  }, [specialityData, initialData, form])
 
   useEffect(() => {
     if (!open) form.reset({ name: '' })
@@ -66,11 +73,12 @@ export default function OrganizationFormDialog({
     if (!user) return
 
     if (viewType === 'edit' && initialData?.id) {
-      update(
+      updateSpeciality(
         { id: initialData.id, name: data.name },
         {
           onSuccess: () => {
-            onOpenChange({ open: false, type: 'new' })
+            clearSelection?.()
+            onOpenChange(false)
           },
           onError: (error) => {
             const err = error as { status?: number; message?: string }
@@ -79,16 +87,17 @@ export default function OrganizationFormDialog({
         },
       )
     } else {
-      create(data, {
+      createSpeciality(data, {
         onSuccess: () => {
-          onOpenChange({ open: false, type: 'new' })
+          clearSelection?.()
+          onOpenChange(false)
         },
         onError: (error) => {
           const err = error as { status?: number; message?: string }
           if (err.status === 400) {
             form.setError('name', {
               type: 'manual',
-              message: err.message || 'La Organización ya existe',
+              message: err.message || 'La especialidad ya existe',
             })
           } else {
             toast.error(err.message || 'Ocurrió un error')
@@ -102,21 +111,18 @@ export default function OrganizationFormDialog({
   const isLoading = isCreating || isUpdating || isFetching
 
   return (
-    <Dialog
-      open={open}
-      onOpenChange={(flag) => onOpenChange({ open: flag, type: 'new' })}
-    >
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>
             {viewType === 'edit'
-              ? 'Editar Organización'
-              : 'Registrar Nueva Organización'}
+              ? 'Editar Especialidad'
+              : 'Registrar Nueva Especialidad'}
           </DialogTitle>
           <DialogDescription>
             {viewType === 'edit'
-              ? 'Actualiza el nombre de la Organización'
-              : 'Complete la información de la Organización'}
+              ? 'Actualiza el nombre de la especialidad'
+              : 'Complete la información de la especialidad'}
           </DialogDescription>
         </DialogHeader>
 
@@ -132,7 +138,7 @@ export default function OrganizationFormDialog({
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Nombre de la Organización</FormLabel>
+                    <FormLabel>Nombre de la Especialidad</FormLabel>
                     <FormControl>
                       <Input {...field} />
                     </FormControl>
@@ -145,7 +151,7 @@ export default function OrganizationFormDialog({
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => onOpenChange({ open: false, type: 'new' })}
+                  onClick={() => onOpenChange(false)}
                 >
                   Cancelar
                 </Button>
@@ -164,9 +170,3 @@ export default function OrganizationFormDialog({
     </Dialog>
   )
 }
-const formSchema = z.object({
-  name: z
-    .string()
-    .min(2, { message: 'El nombre debe tener al menos 2 caracteres' })
-    .max(50, { message: 'El nombre no puede tener más de 50 caracteres' }),
-})

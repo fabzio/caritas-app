@@ -487,11 +487,17 @@ export const getUserAttentions = async (
         alliedParticipationId: alliedParticipation.id,
         specialityId: speciality.id,
         specialityName: speciality.name,
+        alliedId: organization.id,
+        alliedName: organization.name,
       })
       .from(alliedParticipation)
       .innerJoin(
         speciality,
         eq(alliedParticipation.specialityId, speciality.id),
+      )
+      .innerJoin(
+        organization,
+        eq(alliedParticipation.alliedId, organization.id),
       )
       .where(
         and(
@@ -527,6 +533,9 @@ export const getUserAttentions = async (
       return {
         specialityId: spec.specialityId,
         specialityName: spec.specialityName,
+        alliedId: spec.alliedId,
+        alliedName: spec.alliedName,
+        alliedParticipationId: spec.alliedParticipationId,
         hasAttention: !!att,
         attentionId: att?.id || null,
         attentionTime: att?.timestamp ? att.timestamp.toISOString() : null,
@@ -538,6 +547,36 @@ export const getUserAttentions = async (
   } catch (e) {
     if (e instanceof Error) throw new PostgresError(e.message)
     throw e
+  }
+}
+
+export const createAttention = async (
+  args: ActivityModel.CreateAttention,
+): Promise<ActivityModel.CreateAttentionResponse> => {
+  try {
+    const { userId, alliedParticipationId, observations, registeredBy } = args
+
+    const [newAttention] = await db
+      .insert(attention)
+      .values({
+        userId,
+        alliedParticipationId,
+        observations,
+        registeredBy,
+      })
+      .returning({
+        id: attention.id,
+        userId: attention.userId,
+        alliedParticipationId: attention.alliedParticipationId,
+        observations: attention.observations,
+        registeredBy: attention.registeredBy,
+        timestamp: attention.timestamp,
+      })
+
+    return newAttention
+  } catch (error) {
+    if (error instanceof Error) throw new PostgresError(error.message)
+    throw error
   }
 }
 
@@ -559,5 +598,41 @@ export const setActivityUser = async (
   } catch (e) {
     if (e instanceof Error) throw new PostgresError(e.message)
     throw e
+  }
+}
+
+export const addAttendantToActivity = async (
+  params: ActivityModel.AttendantActivity,
+) => {
+  const { userId, activityId } = params
+  try {
+    await db.insert(activityUser).values({
+      activityId,
+      userId,
+    })
+    return { userId, activityId }
+  } catch (error) {
+    if (error instanceof Error) throw new PostgresError(error.message)
+    throw error
+  }
+}
+
+export const removeAttendantFromActivity = async (
+  params: ActivityModel.AttendantActivity,
+) => {
+  const { userId, activityId } = params
+  try {
+    await db
+      .delete(activityUser)
+      .where(
+        and(
+          eq(activityUser.activityId, activityId),
+          eq(activityUser.userId, userId),
+        ),
+      )
+    return { userId, activityId }
+  } catch (error) {
+    if (error instanceof Error) throw new PostgresError(error.message)
+    throw error
   }
 }

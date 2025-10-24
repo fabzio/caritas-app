@@ -16,7 +16,7 @@ const healthNavItems: NavItem[] = [
   },
   {
     title: 'Especialidades',
-    url: '/health/speciality',
+    url: '/health/specialities',
     icon: HeartPlus,
     groupLabel: 'Salud',
   },
