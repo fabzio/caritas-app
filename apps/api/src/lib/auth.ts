@@ -1,5 +1,4 @@
 /** biome-ignore-all lint/suspicious/noExplicitAny: openapi types */
-
 import { ac, educationMember, healthMember } from '@api/auth/permisions'
 import db from '@api/db'
 import * as schema from '@api/db/schemas/auth'
@@ -25,6 +24,7 @@ import {
 import { defaultRoles } from 'better-auth/plugins/organization/access'
 import { passkey } from 'better-auth/plugins/passkey'
 import { localization } from 'better-auth-localization'
+import { eq } from 'drizzle-orm'
 import transporter, { SENDER } from '../mail'
 
 export const auth = betterAuth({
@@ -157,6 +157,15 @@ export const auth = betterAuth({
     openAPI(),
     passkey(),
     organization({
+      organizationHooks: {
+        afterAcceptInvitation: async ({ invitation: { role }, user }) => {
+          if (role.includes('admin'))
+            await db
+              .update(schema.user)
+              .set({ role: 'admin' })
+              .where(eq(schema.user.id, user.id))
+        },
+      },
       schema: {
         organization: {
           additionalFields: {

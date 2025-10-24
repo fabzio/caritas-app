@@ -19,14 +19,16 @@ export const useUpdateUser = () => {
       const { teamIds, ...userPayload } = props
       const { data, error } = await authClient.admin.updateUser(userPayload)
       if (error) throw error
-      if (teamIds && teamIds.length > 0)
-        await rpc.admin
+      if (teamIds && teamIds.length > 0) {
+        const { error: roleError } = await rpc.admin
           .users({
             id: props.userId as string,
           })
           .patch({
             teamIds,
           })
+        if (roleError) throw roleError
+      }
       return data
     },
     onSuccess: (_, { userId }) => {
