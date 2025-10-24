@@ -43,10 +43,7 @@ import {
   useAllies,
   useSpecialities,
 } from '../../hooks/use-activity-catalogs'
-import {
-  type CreateCompleteActivityFormSchema,
-  createCompleteActivitySchema,
-} from '../create-activity-form/schema'
+import { createCompleteActivitySchema } from '../../models/schema'
 
 export default function ActivityDetailPage() {
   const { activityId } = useParams({
@@ -62,12 +59,15 @@ export default function ActivityDetailPage() {
   const { data: specialities, isLoading: loadingSpecialities } =
     useSpecialities()
 
-  const form = useForm<CreateCompleteActivityFormSchema>({
+  const form = useForm({
     resolver: zodResolver(createCompleteActivitySchema),
     defaultValues: {
-      name: '',
-      durationHours: 2,
-      participants: [{ alliedId: '', specialityIds: [] }],
+      name: activity.name,
+      date: new Date(activity.date),
+      durationHours: Number.parseInt(activity.duration, 10),
+      typeId: activity.typeId,
+      statusId: activity.statusId,
+      participants: activity.participants,
     },
   })
 
