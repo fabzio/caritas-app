@@ -1,7 +1,7 @@
-import type { Speciality } from '@frontend/modules/health/pages/speciality/hooks/use-specialities'
 import type { ColumnDef } from '@tanstack/react-table'
 import { Button } from '@workspace/ui/components/button'
 import { Checkbox } from '@workspace/ui/components/checkbox'
+import type { Speciality } from '../models/speciality'
 
 export const specialityTableColumns: ColumnDef<Speciality>[] = [
   {
