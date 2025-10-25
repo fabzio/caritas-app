@@ -9,7 +9,7 @@ const healthNavItems: NavItem[] = [
     groupLabel: 'Salud',
   },
   {
-    title: 'Aliados',
+    title: 'Organizaciones Aliadas',
     url: '/health/allies',
     icon: Hospital,
     groupLabel: 'Salud',

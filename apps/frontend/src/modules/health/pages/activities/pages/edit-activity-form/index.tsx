@@ -33,11 +33,14 @@ import {
   HeartPlus,
   Loader2,
   Plus,
+  ShieldPlus,
   Trash2,
   UserPlus,
 } from 'lucide-react'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
+import OrganizationFormDialog from '../../../allies/components/organization-form-dialog'
+import SpecialityFormDialog from '../../../specialities/components/speciality-form-dialog'
 import { useActivityById } from '../../hooks/use-activity-by-id'
 import {
   useActivityStatuses,
@@ -48,12 +51,29 @@ import {
 import { useUpdateCompleteActivity } from '../../hooks/use-update-complete-activity'
 import { createCompleteActivitySchema } from '../../models/schema'
 
+type AllyFormState = {
+  open: boolean
+  type: 'new' | 'edit'
+}
 export default function EditActivityForm() {
   const { id } = useParams({
     from: '/_authenticated/health/activities/edit/$id',
   })
   const navigate = useNavigate()
   const { data: user } = useSession()
+
+  // Create new speciality and ally
+  const [isSpecialityFormOpen, setSpecialityFormOpen] = useState(false)
+  const [isAllyFormOpen, setAllyFormOpen] = useState<AllyFormState>({
+    open: false,
+    type: 'new',
+  })
+  const handleNewSpeciality = () => {
+    setSpecialityFormOpen(true)
+  }
+  const handleNewAlly = () => {
+    setAllyFormOpen({ open: true, type: 'new' })
+  }
 
   const { data: activity, isLoading: loadingActivity } = useActivityById(id)
   const { data: activityTypes, isLoading: loadingTypes } = useActivityTypes()
@@ -80,14 +100,16 @@ export default function EditActivityForm() {
     name: 'participants',
   })
 
-  const { mutate, isPending } = useUpdateCompleteActivity(id)
+  const { mutate: update, isPending: isUpdatePending } =
+    useUpdateCompleteActivity(id)
 
   const handleSubmit = form.handleSubmit((data) => {
+    console.log(data)
     if (!user?.session?.activeOrganizationId) return
 
     const { durationHours, ...rest } = data
 
-    mutate(
+    update(
       {
         ...rest,
         duration: `${durationHours} hours`,
@@ -166,10 +188,7 @@ export default function EditActivityForm() {
                           maxLength={100}
                         />
                       </FormControl>
-                      <div className="flex justify-between text-xs text-muted-foreground">
-                        <FormMessage />
-                        <span>{field.value.length}/100</span>
-                      </div>
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
@@ -303,24 +322,13 @@ export default function EditActivityForm() {
                   <div className="flex items-center justify-between">
                     <div>
                       <h3 className="text-lg font-semibold">
-                        Participantes (Aliados y Especialidades)
+                        Participantes (Organizaciones aliadas y Especialidades)
                       </h3>
                       <p className="text-sm text-muted-foreground">
-                        Agregue los aliados que participarán y seleccione sus
-                        especialidades
+                        Agregue las organizaciones aliadas que participarán y
+                        seleccione sus especialidades
                       </p>
                     </div>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() =>
-                        append({ alliedId: '', specialityIds: [] })
-                      }
-                    >
-                      <Plus className="mr-2 h-4 w-4" />
-                      Agregar Participante
-                    </Button>
                   </div>
 
                   {fields.map((field, index) => {
@@ -359,25 +367,24 @@ export default function EditActivityForm() {
                           </div>
                         </div>
                         <div className="space-y-4 px-4 pb-4">
-                          <FormField
-                            control={form.control}
-                            name={`participants.${index}.alliedId`}
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Aliado*</FormLabel>
-                                <Select
-                                  onValueChange={field.onChange}
-                                  value={field.value}
-                                >
-                                  <FormControl>
-                                    <SelectTrigger>
-                                      <SelectValue placeholder="Seleccione un aliado" />
-                                    </SelectTrigger>
-                                  </FormControl>
-                                  <SelectContent>
-                                    {availableAllies &&
-                                    availableAllies.length > 0 ? (
-                                      availableAllies.map(
+                          {availableAllies && availableAllies.length > 0 ? (
+                            <FormField
+                              control={form.control}
+                              name={`participants.${index}.alliedId`}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Aliado*</FormLabel>
+                                  <Select
+                                    onValueChange={field.onChange}
+                                    value={field.value}
+                                  >
+                                    <FormControl>
+                                      <SelectTrigger>
+                                        <SelectValue placeholder="Seleccione un aliado" />
+                                      </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                      {availableAllies?.map(
                                         (ally: {
                                           id: string
                                           name: string
@@ -389,28 +396,18 @@ export default function EditActivityForm() {
                                             {ally.name}
                                           </SelectItem>
                                         ),
-                                      )
-                                    ) : (
-                                      <Link
-                                        to="/health/allies"
-                                        className="text-sm text-muted-foreground"
-                                      >
-                                        <div className="flex flex-col items-center py-1">
-                                          No hay aliados disponibles.
-                                          <Separator />
-                                          <span className="py-1 flex underline items-center gap-2">
-                                            Crear aliado
-                                            <UserPlus size={16} />
-                                          </span>
-                                        </div>
-                                      </Link>
-                                    )}
-                                  </SelectContent>
-                                </Select>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
+                                      )}
+                                    </SelectContent>
+                                  </Select>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          ) : (
+                            <span className="text-sm text-muted-foreground">
+                              No hay organizaciones disponibles.
+                            </span>
+                          )}
 
                           <FormField
                             control={form.control}
@@ -466,13 +463,6 @@ export default function EditActivityForm() {
                                   ) : (
                                     <span className="text-sm text-muted-foreground">
                                       No hay especialidades disponibles.
-                                      <br />
-                                      <Link to="/health/speciality">
-                                        <span className="underline flex gap-1 items-center">
-                                          Crear especialidades
-                                          <HeartPlus size={16} />
-                                        </span>
-                                      </Link>
                                     </span>
                                   )}
                                 </div>
@@ -484,18 +474,53 @@ export default function EditActivityForm() {
                       </div>
                     )
                   })}
+                  <div className="flex gap-4 justify-center flex-wrap">
+                    <Button onClick={handleNewAlly} size="sm" type="button">
+                      Crear organización <ShieldPlus size={16} />
+                    </Button>
+                    <Button
+                      onClick={handleNewSpeciality}
+                      size="sm"
+                      type="button"
+                    >
+                      Crear especialidad <HeartPlus size={16} />
+                    </Button>
+
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() =>
+                        append({ alliedId: '', specialityIds: [] })
+                      }
+                    >
+                      <Plus className="mr-2 h-4 w-4" />
+                      Agregar Participante
+                    </Button>
+                  </div>
                 </div>
 
                 <div className="flex justify-between px-0 pt-6">
                   <Button type="button" variant="outline" asChild>
                     <Link to="/health/activities">Cancelar</Link>
                   </Button>
-                  <Button type="submit" disabled={isPending}>
-                    {isPending ? <Spinner /> : 'Guardar Cambios'}
+                  <Button type="submit" disabled={isUpdatePending}>
+                    {isUpdatePending ? <Spinner /> : 'Guardar Cambios'}
                   </Button>
                 </div>
               </form>
             </Form>
+            <SpecialityFormDialog
+              open={isSpecialityFormOpen}
+              onOpenChange={setSpecialityFormOpen}
+              initialData={undefined}
+              clearSelection={() => {}}
+            />
+            <OrganizationFormDialog
+              open={isAllyFormOpen.open}
+              onOpenChange={setAllyFormOpen}
+              initialData={undefined}
+            />
           </div>
         </div>
       </div>

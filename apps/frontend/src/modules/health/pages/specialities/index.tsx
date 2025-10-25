@@ -59,14 +59,16 @@ export default function Specialities() {
 
   return (
     <div className="w-full p-4">
-      <div className="flex flex-col gap-1">
-        <h1 className="text-2xl font-semibold text-foreground">
-          Administración de especialidades
-        </h1>
-      </div>
+      <header className="mb-6">
+        <h2 className="text-2xl font-bold leading-tight">Especialidades</h2>
+        <p className="text-muted-foreground">
+          Aquí podrá visualizar todas las especialidades por ofrecer en
+          atención.
+        </p>
+      </header>
 
-      <div className="flex justify-between items-center mt-4">
-        <div className="w-1/3">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-3 w-full">
+        <div className="flex-1 w-full">
           <SearchSpecialityInput />
         </div>
 

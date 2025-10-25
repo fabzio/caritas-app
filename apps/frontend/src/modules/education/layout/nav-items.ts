@@ -15,7 +15,7 @@ const educationNavItems: NavItem[] = [
     groupLabel: 'Educación',
   },
   {
-    title: 'Aliados',
+    title: 'Organizaciones Aliadas',
     url: '/education/organization',
     icon: Building2,
     groupLabel: 'Educación',

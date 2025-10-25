@@ -5,7 +5,7 @@ import {
   activityType,
   speciality,
 } from '@api/db/schemas/health'
-import { eq } from 'drizzle-orm'
+import { and, eq } from 'drizzle-orm'
 
 export const getActivityTypes = async () => {
   return await db.select().from(activityType)
@@ -22,9 +22,9 @@ export const getAllieds = async () => {
       name: organization.name,
     })
     .from(organization)
-    .where(eq(organization.type, 'health'))
+    .where(and(eq(organization.type, 'health'), eq(organization.active, true)))
 }
 
 export const getSpecialities = async () => {
-  return await db.select().from(speciality)
+  return await db.select().from(speciality).where(eq(speciality.active, true))
 }

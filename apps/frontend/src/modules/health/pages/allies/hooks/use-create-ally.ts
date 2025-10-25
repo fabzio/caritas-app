@@ -28,10 +28,7 @@ export const useCreateAlly = () => {
       queryClient.invalidateQueries({
         queryKey: [QueryKeys.ORGANIZATIONS],
       })
-      toast.success('Creado aliado exitosamente')
-      navigate({
-        to: '/health/allies',
-      })
+      toast.success('Organización creada exitosamente')
     },
     onError: (error: Error) => {
       toast.error(error.message)

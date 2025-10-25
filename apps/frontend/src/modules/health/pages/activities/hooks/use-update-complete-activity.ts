@@ -22,10 +22,10 @@ export const useUpdateCompleteActivity = (id: string) => {
 
   return useMutation({
     mutationFn: async (input: UpdateCompleteActivityInput) => {
+      console.log(input)
       const { data, error } = await rpc.health
         .activities({ id })
         .complete.put(input)
-
       if (error) throw error
 
       return data
@@ -37,6 +37,7 @@ export const useUpdateCompleteActivity = (id: string) => {
     onError: (error: Error) => {
       console.error('Error completo:', error)
       toast.error(error.message || 'Error al actualizar la actividad')
+      alert('quieto')
     },
   })
 }
