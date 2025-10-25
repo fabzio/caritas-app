@@ -38,9 +38,13 @@ export const activity = healthSchema.table('activity', {
     .defaultNow()
     .$onUpdate(() => new Date())
     .notNull(),
+  spaceId: varchar('space_id', { length: 32 })
+    .notNull()
+    .references(() => organization.id, { onDelete: 'cascade' }),
   regionId: integer('region_id')
     .notNull()
     .references(() => region.id, { onDelete: 'restrict' }),
+  address: varchar('address', { length: 200 }).notNull(),
   statusId: integer()
     .notNull()
     .references(() => activityStatus.id, { onDelete: 'restrict' }),
@@ -63,6 +67,10 @@ export const activityRelations = relations(activity, ({ many, one }) => ({
   type: one(activityType, {
     fields: [activity.typeId],
     references: [activityType.id],
+  }),
+  space: one(organization, {
+    fields: [activity.spaceId],
+    references: [organization.id],
   }),
   region: one(region, {
     fields: [activity.regionId],
