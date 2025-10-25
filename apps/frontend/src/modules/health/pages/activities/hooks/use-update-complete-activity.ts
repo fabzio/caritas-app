@@ -36,7 +36,6 @@ export const useUpdateCompleteActivity = (id: string) => {
     onError: (error: Error) => {
       console.error('Error completo:', error)
       toast.error(error.message || 'Error al actualizar la actividad')
-      alert('quieto')
     },
   })
 }
