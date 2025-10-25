@@ -22,7 +22,6 @@ export const useUpdateCompleteActivity = (id: string) => {
 
   return useMutation({
     mutationFn: async (input: UpdateCompleteActivityInput) => {
-      console.log(input)
       const { data, error } = await rpc.health
         .activities({ id })
         .complete.put(input)
