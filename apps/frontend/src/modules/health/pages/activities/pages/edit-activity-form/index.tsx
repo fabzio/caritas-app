@@ -104,7 +104,6 @@ export default function EditActivityForm() {
     useUpdateCompleteActivity(id)
 
   const handleSubmit = form.handleSubmit((data) => {
-    console.log(data)
     if (!user?.session?.activeOrganizationId) return
 
     const { durationHours, ...rest } = data
