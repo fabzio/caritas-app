@@ -11,7 +11,7 @@ import {
   unique,
   varchar,
 } from 'drizzle-orm/pg-core'
-import { organization, user } from './auth'
+import { organization, region, user } from './auth'
 
 export const healthSchema = pgSchema('health')
 
@@ -41,6 +41,10 @@ export const activity = healthSchema.table('activity', {
   spaceId: varchar('space_id', { length: 32 })
     .notNull()
     .references(() => organization.id, { onDelete: 'cascade' }),
+  regionId: integer('region_id')
+    .notNull()
+    .references(() => region.id, { onDelete: 'restrict' }),
+  address: varchar('address', { length: 200 }).notNull(),
   statusId: integer()
     .notNull()
     .references(() => activityStatus.id, { onDelete: 'restrict' }),
@@ -67,6 +71,10 @@ export const activityRelations = relations(activity, ({ many, one }) => ({
   space: one(organization, {
     fields: [activity.spaceId],
     references: [organization.id],
+  }),
+  region: one(region, {
+    fields: [activity.regionId],
+    references: [region.id],
   }),
   creator: one(user, {
     fields: [activity.userId],
