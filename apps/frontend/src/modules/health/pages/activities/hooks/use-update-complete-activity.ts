@@ -25,7 +25,6 @@ export const useUpdateCompleteActivity = (id: string) => {
       const { data, error } = await rpc.health
         .activities({ id })
         .complete.put(input)
-
       if (error) throw error
 
       return data

@@ -207,7 +207,7 @@ export default function CreateScholarship() {
                                 className="text-sm text-muted-foreground"
                               >
                                 <div className="flex flex-col items-center py-1">
-                                  No hay aliados disponibles.
+                                  No hay organizaciones aliadas disponibles.
                                   <Separator />{' '}
                                   <span className="py-1 flex underline items-center gap-2">
                                     Crear aliado

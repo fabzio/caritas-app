@@ -26,7 +26,7 @@ export const useActivityStatuses = () => {
 
 export const useAllies = () => {
   return useQuery({
-    queryKey: [QueryKeys.HEALTH.ACTIVITY.ALLIES],
+    queryKey: [QueryKeys.ADMIN.ALLIES],
     queryFn: async () => {
       const { data, error } = await rpc.health.activities.allies.get()
       if (error) throw error
@@ -37,7 +37,7 @@ export const useAllies = () => {
 
 export const useSpecialities = () => {
   return useQuery({
-    queryKey: [QueryKeys.HEALTH.ACTIVITY.SPECIALITIES],
+    queryKey: [QueryKeys.HEALTH.SPECIALITIES],
     queryFn: async () => {
       const { data, error } = await rpc.health.activities.specialities.get()
       if (error) throw error

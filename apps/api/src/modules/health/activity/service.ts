@@ -219,7 +219,7 @@ export const createCompleteActivity = async (
     ])
 
     if (allies.length !== alliedIds.length) {
-      throw new Error('Algunos aliados no existen')
+      throw new Error('Algunas organizaciones aliadas no existen')
     }
 
     if (specialities.length !== allSpecialityIds.length) {
@@ -346,7 +346,7 @@ export const updateCompleteActivity = async (
     ])
 
     if (allies.length !== alliedIds.length) {
-      throw new Error('Algunos aliados no existen')
+      throw new Error('Algunas organizaciones aliadas no existen')
     }
 
     if (specialities.length !== allSpecialityIds.length) {
