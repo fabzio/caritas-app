@@ -29,6 +29,7 @@ export const QueryKeys = {
   HEALTH: {
     ACTIVITIES: 'health-activities',
     SPECIALITIES: 'health-specialities',
+    BENEFICIARIES: 'health-beneficiaries',
     ACTIVITY: {
       ALLIES: 'health-activity-allies',
       STATUSES: 'health-activity-statuses',
