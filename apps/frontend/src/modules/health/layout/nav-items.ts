@@ -1,5 +1,11 @@
 import type { NavItem } from '@frontend/shared/types/nav-main'
-import { HeartPlus, Hospital, SquareActivity, Stethoscope } from 'lucide-react'
+import {
+  HeartPlus,
+  Hospital,
+  SquareActivity,
+  Stethoscope,
+  Users,
+} from 'lucide-react'
 
 const healthNavItems: NavItem[] = [
   {
@@ -24,6 +30,12 @@ const healthNavItems: NavItem[] = [
     title: 'Actividades',
     url: '/health/activities',
     icon: SquareActivity,
+    groupLabel: 'Salud',
+  },
+  {
+    title: 'Beneficiarios',
+    url: '/health/beneficiaries',
+    icon: Users,
     groupLabel: 'Salud',
   },
 ]

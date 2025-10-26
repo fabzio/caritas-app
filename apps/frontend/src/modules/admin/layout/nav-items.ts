@@ -9,7 +9,7 @@ const adminNavItems: NavItem[] = [
     groupLabel: 'Administración',
   },
   {
-    title: 'Usuarios',
+    title: 'Personal',
     url: '/admin/users',
     icon: Users,
     groupLabel: 'Administración',
