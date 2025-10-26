@@ -12,11 +12,13 @@ import {
 import { ChevronDown } from 'lucide-react'
 
 type Props = {
+  onDeleteClick: () => void
   onEditClick: () => void
   selectedCount: number
 }
 
 export default function ActionsButton({
+  onDeleteClick,
   onEditClick,
   selectedCount,
 }: Readonly<Props>) {
@@ -30,6 +32,12 @@ export default function ActionsButton({
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuGroup>
+          <DropdownMenuItem
+            onClick={onDeleteClick}
+            disabled={selectedCount === 0}
+          >
+            Eliminar
+          </DropdownMenuItem>
           <DropdownMenuItem
             onClick={onEditClick}
             disabled={selectedCount !== 1}

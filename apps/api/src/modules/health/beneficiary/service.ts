@@ -96,3 +96,21 @@ export async function getSingleHealthBeneficiary(id: string) {
     insuranceType: patientData.insuranceType,
   }
 }
+
+export async function removeHealthBeneficiary(id: string) {
+  const existingUser = await db.query.user.findFirst({
+    where: (user, { eq }) => eq(user.id, id),
+  })
+
+  if (!existingUser) return false
+
+  const existingPatient = await db.query.patientInfo.findFirst({
+    where: (patientInfo, { eq }) => eq(patientInfo.userId, id),
+  })
+
+  if (!existingPatient) return false
+
+  await db.update(user).set({ active: false }).where(eq(user.id, id))
+
+  return true
+}

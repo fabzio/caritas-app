@@ -4,7 +4,11 @@ import betterAuth from '@api/modules/auth/middleware'
 import { eq } from 'drizzle-orm'
 import Elysia, { status, t } from 'elysia'
 import { BeneficiaryModel } from './model'
-import { getHealthBeneficiaries, getSingleHealthBeneficiary } from './service'
+import {
+  getHealthBeneficiaries,
+  getSingleHealthBeneficiary,
+  removeHealthBeneficiary,
+} from './service'
 
 const beneficiary = new Elysia({
   prefix: '/beneficiaries',
@@ -61,6 +65,24 @@ const beneficiary = new Elysia({
       response: {
         200: t.Void(),
         404: t.Literal('Patient info not found'),
+      },
+    },
+  )
+  .delete(
+    ':id',
+    async ({ params: { id } }) => {
+      const removed = await removeHealthBeneficiary(id)
+      if (!removed) throw status(404, 'Beneficiary not found')
+      return { success: true }
+    },
+    {
+      auth: true,
+      params: t.Object({
+        id: t.String(),
+      }),
+      response: {
+        200: t.Object({ success: t.Boolean() }),
+        404: t.Literal('Beneficiary not found'),
       },
     },
   )
