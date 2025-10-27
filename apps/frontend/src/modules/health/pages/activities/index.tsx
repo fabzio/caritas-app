@@ -78,7 +78,7 @@ export default function ActivityPage() {
       <div className="flex justify-between items-center gap-2 mb-4">
         <div className="flex flex-col sm:flex-row sm:items-center gap-2 w-full">
           <div className="flex-1 w-full">
-            <SearchActivityInput onClearRef={handleClearSearch} />
+            <SearchActivityInput />
           </div>
           <div className="shrink-0">
             <ActivityDateRangeFilter onClearSearch={handleClearSearch} />

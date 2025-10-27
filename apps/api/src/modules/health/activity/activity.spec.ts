@@ -21,7 +21,12 @@ describe('Health Activity Module', () => {
 
   describe('Authentication', () => {
     it('Should not allow unauthenticated access', async () => {
-      const response = await api.activities.get({ query: {}, headers: {} })
+      const response = await api.activities.get({
+        query: {
+          selectFilters: undefined,
+        },
+        headers: {},
+      })
       expect(response.status).toBe(401)
     })
   })
@@ -29,7 +34,9 @@ describe('Health Activity Module', () => {
   describe('List Activities', () => {
     it('Should list activities for authenticated user', async () => {
       const response = await api.activities.get({
-        query: {},
+        query: {
+          selectFilters: undefined,
+        },
         headers: {
           cookie: authCookie,
         },
@@ -40,19 +47,26 @@ describe('Health Activity Module', () => {
 
     it('Should support pagination parameters', async () => {
       const response = await api.activities.get({
-        query: { page: 0, limit: 5 },
+        query: {
+          pageIndex: 0,
+          pageSize: 5,
+          selectFilters: undefined,
+        },
         headers: {
           cookie: authCookie,
         },
       })
       expect(response.status).toBe(200)
-      expect(response.data?.page).toBe(0)
-      expect(response.data?.limit).toBe(5)
+      expect(response.data?.pageIndex).toBe(0)
+      expect(response.data?.pageSize).toBe(5)
     })
 
     it('Should support search query', async () => {
       const response = await api.activities.get({
-        query: { q: 'test' },
+        query: {
+          q: 'test',
+          selectFilters: undefined,
+        },
         headers: {
           cookie: authCookie,
         },
@@ -63,7 +77,10 @@ describe('Health Activity Module', () => {
 
     it('Should support sorting', async () => {
       const response = await api.activities.get({
-        query: { sortBy: 'date.desc' },
+        query: {
+          sortBy: 'date.desc',
+          selectFilters: undefined,
+        },
         headers: {
           cookie: authCookie,
         },

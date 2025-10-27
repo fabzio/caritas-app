@@ -23,10 +23,12 @@ export namespace ActivityModel {
     pageIndex: t.Optional(t.Integer({ minimum: 0 })),
     pageSize: t.Optional(t.Integer({ minimum: 1, maximum: 100 })),
     sortBy: t.Optional(t.String()),
-    selectFilters: t.Object({
-      startDate: t.Optional(t.String()),
-      endDate: t.Optional(t.String()),
-    }),
+    selectFilters: t.Optional(
+      t.Object({
+        startDate: t.Optional(t.String()),
+        endDate: t.Optional(t.String()),
+      }),
+    ),
   })
   export type ListActivitiesQuery = typeof listActivitiesQuery.static
 
