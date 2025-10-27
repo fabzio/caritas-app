@@ -18,6 +18,15 @@ export const createCompleteActivitySchema = z.object({
     .number({ message: 'Seleccione la duración' })
     .min(1, 'La duración debe ser al menos 1 hora')
     .max(20, 'La duración no puede exceder 20 horas') as unknown as z.ZodNumber,
+  regionId: z.number({ message: 'Seleccione un distrito' }),
+  address: z
+    .string()
+    .min(1, 'La dirección es requerida')
+    .max(200, 'La dirección no puede exceder 200 caracteres')
+    .refine(
+      (val) => val.trim().length > 0,
+      'La dirección no puede estar vacía',
+    ),
   typeId: z.number({ message: 'Seleccione un tipo de actividad' }),
   statusId: z.number({ message: 'Seleccione un estado' }),
   participants: z

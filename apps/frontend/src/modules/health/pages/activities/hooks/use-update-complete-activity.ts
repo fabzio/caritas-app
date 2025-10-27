@@ -8,6 +8,8 @@ type UpdateCompleteActivityInput = {
   date: Date
   duration: string
   spaceId: string
+  regionId: number
+  address: string
   typeId: number
   statusId: number
   userId: string
@@ -31,6 +33,9 @@ export const useUpdateCompleteActivity = (id: string) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [QueryKeys.HEALTH.ACTIVITIES] })
+      queryClient.invalidateQueries({
+        queryKey: [QueryKeys.HEALTH.ACTIVITY, id],
+      })
       toast.success('Actividad actualizada exitosamente')
     },
     onError: (error: Error) => {
