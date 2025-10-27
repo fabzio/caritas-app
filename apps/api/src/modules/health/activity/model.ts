@@ -13,7 +13,7 @@ export namespace ActivityModel {
     state: t.Boolean(),
     statusName: t.String(),
     typeName: t.String(),
-    spaceName: t.String(),
+    regionName: t.String(),
     creatorName: t.String(),
   })
 
@@ -22,6 +22,9 @@ export namespace ActivityModel {
     page: t.Optional(t.Integer({ minimum: 0 })),
     limit: t.Optional(t.Integer({ minimum: 1, maximum: 100 })),
     sortBy: t.Optional(t.String()),
+    regionIds: t.Optional(t.String()),
+    startDate: t.Optional(t.String()),
+    endDate: t.Optional(t.String()),
   })
   export type ListActivitiesQuery = typeof listActivitiesQuery.static
 
@@ -109,6 +112,8 @@ export namespace ActivityModel {
     duration: t.String(),
     description: t.Optional(t.String({ maxLength: 500 })),
     spaceId: t.String({ minLength: 32, maxLength: 32 }),
+    regionId: t.Integer({ minimum: 1 }),
+    address: t.String({ minLength: 1, maxLength: 200 }),
     statusId: t.Integer({ minimum: 1, maximum: 6 }),
     typeId: t.Integer({ minimum: 1, maximum: 2 }),
     userId: t.String({ minLength: 32, maxLength: 32 }),

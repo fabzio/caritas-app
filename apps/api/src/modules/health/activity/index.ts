@@ -1,4 +1,3 @@
-import { auth } from '@api/lib/auth'
 import betterAuth from '@api/modules/auth'
 import Elysia, { status, t } from 'elysia'
 import {
@@ -17,6 +16,7 @@ import {
   getActivities,
   getActivityById,
   getActivityParticipants,
+  getRegionsWithActivities,
   getUserAttentions,
   removeAttendantFromActivity,
   setActivityUser,
@@ -72,6 +72,8 @@ const activityModule = new Elysia({ name: 'activity', prefix: '/activities' })
           date: t.String(),
           duration: t.String(),
           spaceId: t.String(),
+          regionId: t.Number(),
+          address: t.String(),
           typeId: t.Number(),
           statusId: t.Number(),
           userId: t.String(),
@@ -138,6 +140,13 @@ const activityModule = new Elysia({ name: 'activity', prefix: '/activities' })
     },
   })
   .get('/specialities', () => getSpecialities(), {
+    auth: true,
+    response: {
+      200: t.Array(t.Object({ id: t.Number(), name: t.String() })),
+      401: t.Literal('Unauthorized'),
+    },
+  })
+  .get('/regions', () => getRegionsWithActivities(), {
     auth: true,
     response: {
       200: t.Array(t.Object({ id: t.Number(), name: t.String() })),

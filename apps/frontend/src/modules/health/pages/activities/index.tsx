@@ -13,6 +13,8 @@ import { SquareActivity } from 'lucide-react'
 import { useState } from 'react'
 import ActionsButton from './components/actions-button'
 import { ActivityTable } from './components/activity-table'
+import DateRangeFilter from './components/date-range-filter'
+import RegionFilter from './components/region-filter'
 import SearchActivityInput from './components/search-activity-input'
 import { useActivityTable } from './hooks/use-activity-table'
 import { useDeleteActivities } from './hooks/use-delete-activities'
@@ -71,6 +73,8 @@ export default function ActivityPage() {
           <div className="flex-1 w-full">
             <SearchActivityInput />
           </div>
+          <DateRangeFilter />
+          <RegionFilter />
         </div>
         <div className="flex items-center gap-2">
           <ActionsButton

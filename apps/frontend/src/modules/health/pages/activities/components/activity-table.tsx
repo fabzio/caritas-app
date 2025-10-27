@@ -21,7 +21,7 @@ type Props = {
   columns: ColumnDef<Activity>[]
   paginationState: PaginationState
   sortingState: SortingState
-  setFilters: (filters: any) => void // Usamos 'any' para evitar tipar el useFilters internamente
+  setFilters: (filters: Record<string, unknown>) => void
   pagination?: {
     total: number
     totalPages: number
