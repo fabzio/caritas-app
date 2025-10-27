@@ -9,6 +9,9 @@ const ActivitySearchSchema = z.object({
   page: z.number().default(0),
   limit: z.number().default(10),
   sortBy: z.string().optional(),
+  regionIds: z.string().optional(),
+  startDate: z.string().optional(),
+  endDate: z.string().optional(),
 })
 
 export const Route = createFileRoute('/_authenticated/health/activities/')({
