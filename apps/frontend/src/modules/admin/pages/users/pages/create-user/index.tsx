@@ -72,7 +72,7 @@ export default function FormView() {
       documentNumber: loaderData?.documentNumber || '',
       birthDate: loaderData?.birthDate,
       sex: loaderData?.sex,
-      regionId: loaderData?.regionId,
+      regionId: loaderData?.regionId ?? 0,
       teamIds: loaderData?.teams?.map((team) => team.id) ?? [],
     },
   })
@@ -251,7 +251,7 @@ export default function FormView() {
                           <SelectItem value="CE">
                             Carnet de Extranjería
                           </SelectItem>
-                          <SelectItem value="PASSPORT">Pasaporte</SelectItem>
+                          <SelectItem value="PAS">Pasaporte</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -347,7 +347,7 @@ export default function FormView() {
                   name="regionId"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Región</FormLabel>
+                      <FormLabel>Distrito</FormLabel>
                       <Popover>
                         <PopoverTrigger asChild>
                           <FormControl>
@@ -361,7 +361,7 @@ export default function FormView() {
                               {field.value
                                 ? regions?.find((r) => r.id === field.value)
                                     ?.name
-                                : 'Selecciona una región'}
+                                : 'Selecciona un distrito'}
                               <ChevronsUpDown className="opacity-50" />
                             </Button>
                           </FormControl>
@@ -369,12 +369,12 @@ export default function FormView() {
                         <PopoverContent className="w-full p-0">
                           <Command>
                             <CommandInput
-                              placeholder="Buscar región"
+                              placeholder="Buscar distrito"
                               className="h-9"
                             />
                             <CommandList>
                               <CommandEmpty>
-                                No se encontraron regiones.
+                                No se encontraron distritos.
                               </CommandEmpty>
                               <CommandGroup>
                                 {regionsLoading ? (

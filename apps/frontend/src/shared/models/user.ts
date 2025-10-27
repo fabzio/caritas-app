@@ -41,7 +41,7 @@ export const formUserSchema = z
       error: () => ({ message: 'Debes seleccionar una opción' }),
     }),
     email: z.email({ message: 'El correo electrónico no es válido' }),
-    regionId: z.number().min(1, { message: 'Debes seleccionar una región' }),
+    regionId: z.number().min(1, { message: 'Debes seleccionar un distrito' }),
     token: z.string().optional(),
   })
   .refine((data) => data.password === data.confirmPassword, {
