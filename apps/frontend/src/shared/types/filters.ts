@@ -9,5 +9,7 @@ export type Filters = Partial<
       regionIds?: string
       startDate?: string
       endDate?: string
+      page?: number
+      limit?: number
     }
 >
