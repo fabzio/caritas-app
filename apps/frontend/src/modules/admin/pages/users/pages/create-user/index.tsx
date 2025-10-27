@@ -510,6 +510,69 @@ const formSchema = formUserSchema
   .extend({
     teamIds: z.array(z.string()).min(1, 'Selecciona al menos un equipo'),
   })
+  .superRefine(({ documentNumber, documentType }, ctx) => {
+    const trimmedValue = documentNumber.trim()
+
+    if (documentType === 'DNI') {
+      if (!/^\d+$/.test(trimmedValue)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['documentNumber'],
+          message: 'El DNI solo debe contener números',
+        })
+        return
+      }
+
+      if (trimmedValue.length !== 8) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['documentNumber'],
+          message: 'El DNI debe tener exactamente 8 dígitos',
+        })
+      }
+      return
+    }
+
+    if (documentType === 'CE') {
+      if (!/^\d+$/.test(trimmedValue)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['documentNumber'],
+          message: 'El Carnet de Extranjería solo debe contener números',
+        })
+        return
+      }
+
+      if (trimmedValue.length > 12 || trimmedValue.length < 6) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['documentNumber'],
+          message:
+            'El Carnet de Extranjería debe tener como máximo 12 caracteres y como mínimo 6',
+        })
+      }
+      return
+    }
+
+    if (documentType === 'PAS') {
+      if (!/^[a-zA-Z0-9]+$/.test(trimmedValue)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['documentNumber'],
+          message: 'El Pasaporte solo debe contener caracteres alfanuméricos',
+        })
+        return
+      }
+
+      if (trimmedValue.length !== 12) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['documentNumber'],
+          message: 'El Pasaporte debe tener exactamente 12 caracteres',
+        })
+      }
+    }
+  })
 
 const hasTeamChanges = (
   originalTeams: { id: string }[],
