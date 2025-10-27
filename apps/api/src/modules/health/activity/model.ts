@@ -15,23 +15,26 @@ export namespace ActivityModel {
     typeName: t.String(),
     spaceName: t.String(),
     creatorName: t.String(),
+    district: t.String(),
   })
 
   export const listActivitiesQuery = t.Object({
     q: t.Optional(t.String()),
-    page: t.Optional(t.Integer({ minimum: 0 })),
-    limit: t.Optional(t.Integer({ minimum: 1, maximum: 100 })),
+    pageIndex: t.Optional(t.Integer({ minimum: 0 })),
+    pageSize: t.Optional(t.Integer({ minimum: 1, maximum: 100 })),
     sortBy: t.Optional(t.String()),
-    startDate: t.Optional(t.String()),
-    endDate: t.Optional(t.String()),
+    selectFilters: t.Object({
+      startDate: t.Optional(t.String()),
+      endDate: t.Optional(t.String()),
+    }),
   })
   export type ListActivitiesQuery = typeof listActivitiesQuery.static
 
   export const getActivitiesResponse = t.Object({
     data: t.Array(listActivitySchema),
     total: t.Integer(),
-    page: t.Integer(),
-    limit: t.Integer(),
+    pageIndex: t.Integer(),
+    pageSize: t.Integer(),
     totalPages: t.Integer(),
   })
   export type GetActivities = typeof getActivitiesResponse.static

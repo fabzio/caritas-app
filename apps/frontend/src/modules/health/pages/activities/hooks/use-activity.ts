@@ -24,11 +24,13 @@ export const useActivities = ({
       const { data, error } = await rpc.health.activities.get({
         query: {
           q: filters?.q || '',
-          page: Math.max(0, (currentPage || 1) - 1),
-          limit: pageSize,
+          pageIndex: Math.max(0, (currentPage || 1) - 1),
+          pageSize: pageSize,
           sortBy: filters?.sortBy || 'name.asc',
-          startDate: filters?.startDate,
-          endDate: filters?.endDate,
+          selectFilters: {
+            startDate: filters?.startDate,
+            endDate: filters?.endDate,
+          },
         },
       })
 

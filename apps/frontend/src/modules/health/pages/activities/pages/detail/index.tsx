@@ -1,7 +1,5 @@
-import { zodResolver } from '@hookform/resolvers/zod'
 import { Link, useParams } from '@tanstack/react-router'
 import { Button } from '@workspace/ui/components/button'
-import { Calendar } from '@workspace/ui/components/calendar'
 import {
   Card,
   CardContent,
@@ -9,41 +7,11 @@ import {
   CardHeader,
   CardTitle,
 } from '@workspace/ui/components/card'
-import { Checkbox } from '@workspace/ui/components/checkbox'
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@workspace/ui/components/form'
-import { Input } from '@workspace/ui/components/input'
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@workspace/ui/components/popover'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@workspace/ui/components/select'
 import { Separator } from '@workspace/ui/components/separator'
 import { format } from 'date-fns'
-import { ArrowLeft, Loader2 } from 'lucide-react'
-import { useEffect } from 'react'
-import { useFieldArray, useForm } from 'react-hook-form'
-import { useActivityById } from '../../hooks/use-activity-by-id'
-import {
-  useActivityStatuses,
-  useActivityTypes,
-  useAllies,
-  useSpecialities,
-} from '../../hooks/use-activity-catalogs'
-import { createCompleteActivitySchema } from '../../models/schema'
+import { ArrowLeft, Baby, Loader2, User, UserPlus, Users } from 'lucide-react'
+import { useActivityDetailById } from '../../hooks/use-activity-by-id'
+import { useAllies, useSpecialities } from '../../hooks/use-activity-catalogs'
 
 export default function ActivityDetailPage() {
   const { activityId } = useParams({
@@ -51,76 +19,12 @@ export default function ActivityDetailPage() {
   })
 
   const { data: activity, isLoading: loadingActivity } =
-    useActivityById(activityId)
-  const { data: activityTypes, isLoading: loadingTypes } = useActivityTypes()
-  const { data: activityStatuses, isLoading: loadingStatuses } =
-    useActivityStatuses()
+    useActivityDetailById(activityId)
   const { data: allies, isLoading: loadingAllies } = useAllies()
   const { data: specialities, isLoading: loadingSpecialities } =
     useSpecialities()
 
-  const form = useForm({
-    resolver: zodResolver(createCompleteActivitySchema),
-    defaultValues: {
-      name: activity.name,
-      date: new Date(activity.date),
-      durationHours: Number.parseInt(activity.duration, 10),
-      typeId: activity.typeId,
-      statusId: activity.statusId,
-      participants: activity.participants,
-    },
-  })
-
-  const { fields } = useFieldArray({
-    control: form.control,
-    name: 'participants',
-  })
-
-  const formReset = form.reset
-  const setValue = form.setValue
-
-  useEffect(() => {
-    if (
-      activity &&
-      activityTypes &&
-      activityStatuses &&
-      allies &&
-      specialities
-    ) {
-      const durationMatch = activity.duration.match(/(\d+)/)
-      const hours = durationMatch ? Number.parseInt(durationMatch[1], 10) : 2
-
-      formReset({
-        name: activity.name,
-        date: new Date(activity.date),
-        durationHours: hours,
-        typeId: activity.typeId,
-        statusId: activity.statusId,
-        participants:
-          activity.participants.length > 0
-            ? activity.participants
-            : [{ alliedId: '', specialityIds: [] }],
-      })
-
-      setValue('typeId', activity.typeId)
-      setValue('statusId', activity.statusId)
-    }
-  }, [
-    activity,
-    activityTypes,
-    activityStatuses,
-    allies,
-    specialities,
-    formReset,
-    setValue,
-  ])
-
-  const isLoading =
-    loadingActivity ||
-    loadingTypes ||
-    loadingStatuses ||
-    loadingAllies ||
-    loadingSpecialities
+  const isLoading = loadingActivity || loadingAllies || loadingSpecialities
 
   if (isLoading) {
     return (
@@ -141,6 +45,25 @@ export default function ActivityDetailPage() {
     )
   }
 
+  const getAllyName = (alliedId: string): string => {
+    const ally = allies?.find((a) => a.id === alliedId)
+    return ally?.name || 'Aliado Desconocido'
+  }
+
+  const getSpecialityNames = (ids: number[]): string[] | undefined => {
+    return specialities?.filter((s) => ids.includes(s.id)).map((s) => s.name)
+  }
+
+  const getAge = (date: string | number | Date) => {
+    const today = new Date()
+    const birthDate = new Date(date)
+    let age = today.getFullYear() - birthDate.getFullYear()
+    const month = today.getMonth() - birthDate.getMonth()
+    if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate()))
+      age--
+    return age
+  }
+
   return (
     <div className="flex flex-1 flex-col gap-6 p-4">
       <div className="flex flex-col gap-1">
@@ -150,286 +73,227 @@ export default function ActivityDetailPage() {
         <span className="text-muted-foreground">Detalle de la actividad</span>
         <Separator />
       </div>
-
       <div className="flex justify-center">
-        <Card className="w-full lg:w-3/4">
+        <div className="w-full lg:w-3/4">
+          <div className="flex justify-between items-start sm:items-center gap-4">
+            <Link to="/health/activities">
+              <Button type="button" variant="outline">
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Regresar
+              </Button>
+            </Link>
+            <Button asChild>
+              <Link
+                to="/health/activities/$activityId/assistance"
+                params={{ activityId }}
+              >
+                Ver asistencia
+              </Link>
+            </Button>
+          </div>
+        </div>
+      </div>
+      <div className="flex justify-center">
+        <Card className="w-full lg:w-3/4 pb-0">
           <CardHeader>
-            <CardTitle>Información de la Actividad</CardTitle>
+            <CardTitle>Información General</CardTitle>
           </CardHeader>
           <CardContent>
-            <Form {...form}>
-              <form className="flex flex-col gap-4">
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Nombre de la Actividad</FormLabel>
-                      <FormControl>
-                        <Input {...field} disabled />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-
+            <div className="flex flex-col">
+              <div className="w-full lg:w-10/12 mx-auto">
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                  <FormField
-                    control={form.control}
-                    name="date"
-                    render={({ field }) => (
-                      <FormItem className="flex flex-col">
-                        <FormLabel>Fecha de la Actividad</FormLabel>
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <FormControl>
-                              <Button
-                                disabled
-                                variant="outline"
-                                className="justify-start text-left font-normal"
-                              >
-                                {field.value ? (
-                                  format(field.value, 'PPP')
-                                ) : (
-                                  <span>""</span>
-                                )}
-                              </Button>
-                            </FormControl>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0" align="start">
-                            <Calendar
-                              mode="single"
-                              selected={field.value}
-                              onSelect={field.onChange}
-                            />
-                          </PopoverContent>
-                        </Popover>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="durationHours"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Duración (horas)</FormLabel>
-                        <Select value={field.value?.toString()} disabled>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Seleccione las horas" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {Array.from({ length: 20 }, (_, i) => i + 1).map(
-                              (hours) => (
-                                <SelectItem
-                                  key={hours}
-                                  value={hours.toString()}
-                                >
-                                  {hours} {hours === 1 ? 'hora' : 'horas'}
-                                </SelectItem>
-                              ),
-                            )}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                  <FormField
-                    control={form.control}
-                    name="typeId"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Tipo de Actividad</FormLabel>
-                        <Select disabled value={field.value?.toString()}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Seleccione un tipo" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {activityTypes?.map(
-                              (type: { id: number; name: string }) => (
-                                <SelectItem
-                                  key={type.id}
-                                  value={type.id.toString()}
-                                >
-                                  {type.name}
-                                </SelectItem>
-                              ),
-                            )}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="statusId"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Estado</FormLabel>
-                        <Select disabled value={field.value?.toString()}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Seleccione un estado" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {activityStatuses?.map(
-                              (status: { id: number; name: string }) => (
-                                <SelectItem
-                                  key={status.id}
-                                  value={status.id.toString()}
-                                >
-                                  {status.name}
-                                </SelectItem>
-                              ),
-                            )}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                <Separator className="my-4" />
-
-                <div className="flex flex-col gap-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="text-lg font-semibold">
-                        Participantes (Aliados y Especialidades)
-                      </h3>
-                    </div>
+                  {/* Fecha */}
+                  <div className="space-y-1">
+                    <p className="text-sm  text-muted-foreground">Fecha</p>
+                    <p className="min-h-10 text-sm font-medium">
+                      {activity.date
+                        ? format(new Date(activity.date), 'PPP')
+                        : 'N/A'}
+                    </p>
                   </div>
 
-                  {fields.map((field, index) => (
-                    <Card key={field.id}>
-                      <CardHeader className="pb-3">
-                        <div className="flex items-center justify-between">
-                          <CardTitle className="text-base">
-                            Participante {index + 1}
-                          </CardTitle>
-                        </div>
-                      </CardHeader>
-                      <CardContent className="space-y-4">
-                        <FormField
-                          control={form.control}
-                          name={`participants.${index}.alliedId`}
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Aliado</FormLabel>
-                              <Select disabled value={field.value}>
-                                <FormControl>
-                                  <SelectTrigger>
-                                    <SelectValue placeholder="Seleccione un aliado" />
-                                  </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                  {allies?.map(
-                                    (ally: { id: string; name: string }) => (
-                                      <SelectItem key={ally.id} value={ally.id}>
-                                        {ally.name}
-                                      </SelectItem>
-                                    ),
-                                  )}
-                                </SelectContent>
-                              </Select>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
+                  {/* Duración (horas) */}
+                  <div className="space-y-1">
+                    <p className="text-sm  text-muted-foreground">Duración</p>
+                    <p className="min-h-10 text-sm font-medium">
+                      {Number.parseInt(activity.duration, 10)} horas
+                    </p>
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  {/* Distrito */}
+                  <div className="space-y-1">
+                    <p className="text-sm  text-muted-foreground">Distrito</p>
+                    <p className="min-h-10 text-sm font-medium">
+                      {activity.district}
+                    </p>
+                  </div>
 
-                        <FormField
-                          control={form.control}
-                          name={`participants.${index}.specialityIds`}
-                          render={() => (
-                            <FormItem>
-                              <FormLabel>Especialidades</FormLabel>
-                              <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
-                                {specialities?.map(
-                                  (speciality: {
-                                    id: number
-                                    name: string
-                                  }) => (
-                                    <FormField
-                                      key={speciality.id}
-                                      control={form.control}
-                                      name={`participants.${index}.specialityIds`}
-                                      render={({ field }) => (
-                                        <FormItem className="flex items-center space-x-2 space-y-0">
-                                          <FormControl>
-                                            <Checkbox
-                                              disabled
-                                              checked={field.value?.includes(
-                                                speciality.id,
-                                              )}
-                                              onCheckedChange={(checked) => {
-                                                const currentValue =
-                                                  field.value || []
-                                                if (checked) {
-                                                  field.onChange([
-                                                    ...currentValue,
-                                                    speciality.id,
-                                                  ])
-                                                } else {
-                                                  field.onChange(
-                                                    currentValue.filter(
-                                                      (id) =>
-                                                        id !== speciality.id,
-                                                    ),
-                                                  )
-                                                }
-                                              }}
-                                            />
-                                          </FormControl>
-                                          <FormLabel className="font-normal">
-                                            {speciality.name}
-                                          </FormLabel>
-                                        </FormItem>
-                                      )}
-                                    />
-                                  ),
-                                )}
-                              </div>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </CardContent>
-                    </Card>
-                  ))}
+                  {/* Estado */}
+                  <div className="space-y-1">
+                    <p className="text-sm  text-muted-foreground">Estado</p>
+                    <p className="min-h-10 text-sm font-medium">
+                      {activity.statusName}
+                    </p>
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  {/* Organizacion */}
+                  <div className="space-y-1">
+                    <p className="text-sm  text-muted-foreground">
+                      Organización
+                    </p>
+                    <p className="min-h-10 text-sm font-medium">
+                      {activity.spaceName}
+                    </p>
+                  </div>
+
+                  {/* Tipo */}
+                  <div className="space-y-1">
+                    <p className="text-sm  text-muted-foreground">Tipo</p>
+                    <p className="min-h-10 text-sm font-medium">
+                      {activity.typeName}
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <Separator className="my-4" />
+
+              <div className="flex flex-col gap-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-lg font-semibold">Servicios</h3>
+                  </div>
                 </div>
 
-                <CardFooter className="flex justify-between px-0 pt-6">
-                  <Link to="/health/activities">
-                    <Button type="button" variant="outline">
-                      <ArrowLeft className="h-4 w-4 mr-2" />
-                      Regresar
-                    </Button>
-                  </Link>
-                  <Button asChild>
-                    <Link
-                      to="/health/activities/$activityId/assistance"
-                      params={{ activityId }}
-                    >
-                      Ver asistencia
-                    </Link>
-                  </Button>
-                </CardFooter>
-              </form>
-            </Form>
+                {activity.participants.map((participant) => (
+                  <Card className="gap-3" key={participant.alliedId}>
+                    <CardHeader>
+                      <div className="flex items-center justify-between">
+                        {/* Lado Izquierdo: Título */}
+                        <CardTitle className="text-base">
+                          {getAllyName(participant.alliedId)}
+                        </CardTitle>
+                        <span className="ml-4 h-6 w-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-bold">
+                          {participant.specialityIds.length}
+                        </span>
+                      </div>
+                    </CardHeader>
+
+                    <CardContent className="space-y-2">
+                      <div className="flex flex-col space-y-1">
+                        <div className="flex flex-wrap gap-2">
+                          {getSpecialityNames(participant.specialityIds)?.map(
+                            (name) => (
+                              <span
+                                key={name}
+                                className="inline-flex items-center rounded-full border px-3 py-1 text-sm font-medium bg-primary text-secondary-foreground"
+                              >
+                                {name}
+                              </span>
+                            ),
+                          )}
+                        </div>
+                        {participant.specialityIds.length === 0 && (
+                          <div className="text-sm text-muted-foreground italic">
+                            No se asignaron especialidades.
+                          </div>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+
+              <CardFooter className="flex justify-between px-0 pt-6"></CardFooter>
+            </div>
           </CardContent>
         </Card>
+      </div>
+
+      <div className="flex justify-center pb-4">
+        <div className="w-full lg:w-3/4">
+          <Separator className="mb-3 mt-1" />
+          <div className="flex flex-col gap-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-semibold">Resumen de Asistencia</h3>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <Card className="gap-2">
+                <CardHeader className="flex items-center justify-between">
+                  <CardTitle>Total Asistencia</CardTitle>
+                  <Users className="h-5 w-5 text-muted-foreground" />
+                </CardHeader>
+
+                <CardContent>{activity.attendants?.length}</CardContent>
+              </Card>
+              <Card className="gap-2">
+                <CardHeader className="flex items-center justify-between">
+                  <CardTitle>Mujeres</CardTitle>
+                  <Users className="h-5 w-5 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  {activity.attendants?.filter((u) => u.userSex === 'F').length}
+                </CardContent>
+              </Card>
+            </div>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <Card className="gap-2">
+                <CardHeader className="flex items-center justify-between">
+                  <CardTitle>Varones</CardTitle>
+                  <Users className="h-5 w-5 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  {activity.attendants?.filter((u) => u.userSex === 'M').length}
+                </CardContent>
+              </Card>
+              <Card className="gap-2">
+                <CardHeader className="flex items-center justify-between">
+                  <CardTitle>Menores de 18 años</CardTitle>
+                  <Baby className="h-5 w-5 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  {
+                    activity.attendants?.filter(
+                      (u) => getAge(u.userBirthDate) < 18,
+                    ).length
+                  }
+                </CardContent>
+              </Card>
+            </div>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <Card className="gap-2">
+                <CardHeader className="flex items-center justify-between">
+                  <CardTitle>De 18 a 64 años</CardTitle>
+                  <User className="h-5 w-5 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  {
+                    activity.attendants?.filter((u) => {
+                      const edad = getAge(u.userBirthDate)
+                      return edad >= 18 && edad <= 64
+                    }).length
+                  }
+                </CardContent>
+              </Card>
+              <Card className="gap-2">
+                <CardHeader className="flex items-center justify-between">
+                  <CardTitle>De 65 años a más</CardTitle>
+                  <UserPlus className="h-5 w-5 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  {
+                    activity.attendants?.filter(
+                      (u) => getAge(u.userBirthDate) > 64,
+                    ).length
+                  }
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   )

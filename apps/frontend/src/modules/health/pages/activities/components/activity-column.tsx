@@ -71,7 +71,7 @@ const activityTableColumns: ColumnDef<Activity>[] = [
     cell: ({ row }) => `${row.original.duration} h`,
   },
   {
-    // Columna 3: Tipo de actividad
+    // Columna 4: Tipo de actividad
     accessorKey: 'type',
     header: ({ column }) => (
       <Button
@@ -85,7 +85,7 @@ const activityTableColumns: ColumnDef<Activity>[] = [
     cell: ({ row }) => row.original.typeName,
   },
   {
-    // Columna 4: Organización de la Actividad
+    // Columna 5: Organización de la Actividad
     accessorKey: 'spaceName', // Asume que este campo existe en el modelo
     header: ({ column }) => (
       <Button
@@ -99,7 +99,21 @@ const activityTableColumns: ColumnDef<Activity>[] = [
     cell: ({ row }) => row.original.spaceName,
   },
   {
-    // Columna 5: Fecha de la Actividad
+    // Columna 5: Organización de la Actividad
+    accessorKey: 'district', // Asume que este campo existe en el modelo
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+      >
+        Distrito
+        <ArrowUpDown className="ml-2 h-4 w-4" />
+      </Button>
+    ),
+    cell: ({ row }) => row.original.district,
+  },
+  {
+    // Columna 6: Fecha de la Actividad
     accessorKey: 'date',
     header: ({ column }) => (
       <Button
@@ -113,7 +127,7 @@ const activityTableColumns: ColumnDef<Activity>[] = [
     cell: ({ row }) => new Date(row.original.date).toLocaleDateString(),
   },
   {
-    // Columna 5: Estado de la Actividad
+    // Columna 7: Estado de la Actividad
     accessorKey: 'state',
     header: ({ column }) => (
       <Button

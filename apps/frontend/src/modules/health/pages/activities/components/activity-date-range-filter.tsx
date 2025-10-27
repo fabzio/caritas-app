@@ -1,4 +1,5 @@
 import { useFilters } from '@frontend/hooks/use-filters'
+import type { ActivitySearchSchema } from '@frontend/routes/_authenticated/health/activities'
 import { Button } from '@workspace/ui/components/button'
 import { Calendar } from '@workspace/ui/components/calendar'
 import {
@@ -11,19 +12,10 @@ import { format } from 'date-fns'
 import { CalendarIcon, FunnelX } from 'lucide-react'
 import { useCallback, useState } from 'react'
 
-type ActivitySearchFilters = {
-  q?: string
-  page?: number
-  limit?: number
-  sortBy?: string
-  startDate?: string
-  endDate?: string
-}
-
 const useActivityFilters = () => {
   return useFilters('/_authenticated/health/activities/') as {
-    filters: ActivitySearchFilters
-    setFilters: (f: Partial<ActivitySearchFilters>) => void
+    filters: ActivitySearchSchema
+    setFilters: (f: Partial<ActivitySearchSchema>) => void
   }
 }
 
@@ -40,16 +32,16 @@ const dateStringToDate = (dateString: string | undefined): Date | undefined => {
   return Number.isNaN(date.getTime()) ? undefined : date
 }
 
-const dateToDateString = (date: Date | undefined): string | undefined => {
-  if (!date) return undefined
+const dateToDateString = (date: Date | undefined): string => {
+  if (!date) return ''
   return format(date, 'yyyy-MM-dd')
 }
 
 const ActivityDateRangeFilter = ({ onClearSearch }) => {
   const { filters, setFilters } = useActivityFilters()
 
-  const currentStartDate = dateStringToDate(filters.startDate)
-  const currentEndDate = dateStringToDate(filters.endDate)
+  const currentStartDate = dateStringToDate(filters.selectFilters?.startDate)
+  const currentEndDate = dateStringToDate(filters.selectFilters?.endDate)
 
   const [isStartDatePopoverOpen, setIsStartDatePopoverOpen] = useState(false)
   const [isEndDatePopoverOpen, setIsEndDatePopoverOpen] = useState(false)
@@ -57,19 +49,21 @@ const ActivityDateRangeFilter = ({ onClearSearch }) => {
   const handleDateChange = useCallback(
     (date: Date | undefined, field: 'startDate' | 'endDate') => {
       const dateString = dateToDateString(date)
-
-      const updates: Partial<ActivitySearchFilters> = {
-        [field]: dateString,
-        page: 0,
+      const currentSelectFilters = filters.selectFilters || {
+        startDate: '',
+        endDate: '',
       }
-
+      const newSelectFilters = {
+        ...currentSelectFilters,
+        [field]: dateString,
+      }
       if (
         field === 'startDate' &&
         date &&
         currentEndDate &&
         date > currentEndDate
       ) {
-        updates.endDate = dateString
+        newSelectFilters.endDate = dateString
       }
       if (
         field === 'endDate' &&
@@ -77,33 +71,45 @@ const ActivityDateRangeFilter = ({ onClearSearch }) => {
         currentStartDate &&
         date < currentStartDate
       ) {
-        updates.startDate = dateString
+        newSelectFilters.startDate = dateString
       }
 
+      const updates: Partial<ActivitySearchSchema> = {
+        pageIndex: 0,
+        selectFilters: newSelectFilters,
+      }
       setFilters(updates)
     },
-    [currentStartDate, currentEndDate, setFilters],
+    [currentStartDate, currentEndDate, filters.selectFilters, setFilters],
   )
-
   const handleClearFilters = useCallback(() => {
     const areFiltersActive =
-      !!filters.startDate || !!filters.endDate || !!filters.q
+      !!filters.selectFilters?.startDate ||
+      !!filters.selectFilters?.endDate ||
+      !!filters.q
 
     if (areFiltersActive) {
       setFilters({
-        startDate: undefined,
-        endDate: undefined,
-        page: 0,
+        pageIndex: 0,
+        selectFilters: undefined,
       })
 
       if (onClearSearch) {
         onClearSearch()
       }
     }
-  }, [filters.startDate, filters.endDate, filters.q, setFilters, onClearSearch])
+  }, [
+    filters.selectFilters?.startDate,
+    filters.selectFilters?.endDate,
+    filters.q,
+    setFilters,
+    onClearSearch,
+  ])
 
   const areFiltersActive =
-    !!filters.startDate || !!filters.endDate || !!filters.q
+    !!filters.selectFilters?.startDate ||
+    !!filters.selectFilters?.endDate ||
+    !!filters.q
 
   return (
     <div className="flex flex-col sm:flex-row gap-2 items-end">
@@ -139,8 +145,6 @@ const ActivityDateRangeFilter = ({ onClearSearch }) => {
         </Popover>
       </div>
 
-      {/* Filtro Fecha HASTA */}
-      {/* Aplicamos la misma estructura de alineación */}
       <div className="relative flex flex-col">
         <Popover
           open={isEndDatePopoverOpen}
@@ -155,9 +159,7 @@ const ActivityDateRangeFilter = ({ onClearSearch }) => {
               )}
             >
               <CalendarIcon className="mr-1 h-4 w-4" />
-              {currentEndDate
-                ? format(currentEndDate, 'dd/MM/yyyy') // Formato dd/MM/yyyy
-                : 'Hasta'}
+              {currentEndDate ? format(currentEndDate, 'dd/MM/yyyy') : 'Hasta'}
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0 z-50" align="start">

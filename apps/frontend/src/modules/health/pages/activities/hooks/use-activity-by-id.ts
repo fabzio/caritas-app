@@ -16,3 +16,18 @@ export const useActivityById = (id: string) => {
     },
   })
 }
+
+export const useActivityDetailById = (id: string) => {
+  return useSuspenseQuery({
+    queryKey: [QueryKeys.HEALTH.ACTIVITY, id],
+    queryFn: async () => {
+      const { data, error } = await rpc.health.activities.detail({ id }).get()
+
+      if (error) {
+        throw new Error(error.value as string)
+      }
+
+      return data
+    },
+  })
+}

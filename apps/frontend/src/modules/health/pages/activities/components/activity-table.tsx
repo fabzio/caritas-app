@@ -1,3 +1,4 @@
+import type { ActivitySearchSchema } from '@frontend/routes/_authenticated/health/activities'
 import DataTable from '@frontend/shared/components/data-table'
 import { stateToSortBy } from '@frontend/shared/utils/sort-by-to-state'
 import type {
@@ -21,7 +22,7 @@ type Props = {
   columns: ColumnDef<Activity>[]
   paginationState: PaginationState
   sortingState: SortingState
-  setFilters: (filters: any) => void
+  setFilters: (filters: ActivitySearchSchema) => void
   pagination?: {
     total: number
     totalPages: number
@@ -74,8 +75,8 @@ function ActivityListComponent({
               : pagination
 
           setFilters({
-            page: newPaginationState.pageIndex,
-            limit: newPaginationState.pageSize,
+            pageIndex: newPaginationState.pageIndex,
+            pageSize: newPaginationState.pageSize,
           })
         },
         rowCount: pagination?.total || 0,
