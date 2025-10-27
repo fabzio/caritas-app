@@ -1,7 +1,9 @@
+import { Badge } from '@workspace/ui/components/badge'
 import { Card, CardContent } from '@workspace/ui/components/card'
 import { cn } from '@workspace/ui/lib/utils'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
+import { Clock } from 'lucide-react'
 import type { UserAttention } from '../hooks/use-user-attentions'
 
 interface AttentionCardProps {
@@ -22,6 +24,8 @@ export default function AttentionCard({
       return ''
     }
   }
+
+  const isCompleted = attention.hasAttention && attention.attentionTime
 
   return (
     <Card
@@ -47,12 +51,15 @@ export default function AttentionCard({
             </p>
           </div>
 
-          {attention.hasAttention && attention.attentionTime ? (
+          {isCompleted ? (
             <p className="text-sm text-muted-foreground">
               {formatTime(attention.attentionTime)}
             </p>
           ) : (
-            <p className="text-sm text-muted-foreground">Pendiente</p>
+            <Badge variant="default" className="flex items-center gap-1">
+              <Clock className="w-3.5 h-3.5" />
+              Pendiente
+            </Badge>
           )}
         </div>
       </CardContent>
