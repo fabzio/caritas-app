@@ -1,6 +1,6 @@
 import { QueryKeys } from '@frontend/shared/constants/query-keys'
 import { useQueryClient } from '@tanstack/react-query'
-import { useNavigate } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
 import { Button } from '@workspace/ui/components/button'
 import {
   Dialog,
@@ -108,6 +108,9 @@ export default function TableView() {
             }
             selectedCount={beneficiaryCount}
           />
+          <Link to="/education/beneficiaries/form" search={{ type: 'new' }}>
+            <Button>Nuevo beneficiario</Button>
+          </Link>
         </div>
       </div>
       <div className="mt-4">

@@ -448,7 +448,11 @@ export default function CreateActivityForm() {
                     <Button type="button" onClick={handleNewAlly} size="sm">
                       Crear organización <ShieldPlus size={16} />
                     </Button>
-                    <Button type="button" onClick={handleNewSpeciality} size="sm">
+                    <Button
+                      type="button"
+                      onClick={handleNewSpeciality}
+                      size="sm"
+                    >
                       Crear especialidad <HeartPlus size={16} />
                     </Button>
 

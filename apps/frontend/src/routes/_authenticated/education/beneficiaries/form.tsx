@@ -20,9 +20,14 @@ export const Route = createFileRoute(
       },
     })
   },
-  validateSearch: z.object({
-    id: z.optional(z.string()),
-    type: z.enum(['edit']),
-  }),
+  validateSearch: z
+    .object({
+      id: z.optional(z.string()),
+      type: z.enum(['edit', 'new']),
+    })
+    .refine((value) => (value.type === 'edit' ? Boolean(value.id) : true), {
+      message: 'El identificador es requerido para editar',
+      path: ['id'],
+    }),
   component: FormView,
 })

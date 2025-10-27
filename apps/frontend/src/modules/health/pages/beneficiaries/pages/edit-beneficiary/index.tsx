@@ -40,6 +40,7 @@ import { es } from 'date-fns/locale'
 import { CalendarIcon, Check, ChevronsUpDown, Loader2 } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import z from 'zod'
+import { useCreateBeneficiary } from '../../hooks/use-create-beneficiary'
 import { useUpdateBeneficiary } from '../../hooks/use-update-beneficiary'
 
 export default function FormView() {
@@ -69,9 +70,13 @@ export default function FormView() {
 
   const { mutate: updateBeneficiary, isPending: isPendingUpdate } =
     useUpdateBeneficiary()
+  const { mutate: createBeneficiary, isPending: isPendingCreate } =
+    useCreateBeneficiary()
+
+  const isEdit = viewType === 'edit'
 
   const submitUpdate = (values: z.infer<typeof formSchema>) => {
-    if (!(viewType === 'edit' && loaderData?.id)) return
+    if (!(isEdit && loaderData?.id)) return
     updateBeneficiary({
       userId: loaderData.id,
       data: {
@@ -91,8 +96,30 @@ export default function FormView() {
   }
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    submitUpdate(values)
+    if (isEdit) {
+      submitUpdate(values)
+      return
+    }
+
+    createBeneficiary({
+      email: values.email,
+      name: values.name,
+      role: 'user',
+      password: import.meta.env.DEV ? 'default' : crypto.randomUUID(),
+      data: {
+        surname: values.surname,
+        documentType: values.documentType,
+        documentNumber: values.documentNumber,
+        sex: values.sex,
+        birthDate: values.birthDate,
+        phone: values.phone,
+        regionId: values.regionId,
+      },
+      insuranceType: values.insuranceType,
+    })
   }
+
+  const isSubmitting = isPendingUpdate || isPendingCreate
 
   return (
     <div className="w-full p-4">
@@ -370,8 +397,8 @@ export default function FormView() {
             </div>
 
             <div className="w-full flex gap-2 justify-center">
-              <Button type="submit" className="mt-4" disabled={isPendingUpdate}>
-                {isPendingUpdate ? <Spinner /> : dependantText.submit[viewType]}
+              <Button type="submit" className="mt-4" disabled={isSubmitting}>
+                {isSubmitting ? <Spinner /> : dependantText.submit[viewType]}
               </Button>
               <Link to="/health/beneficiaries">
                 <Button variant="outline" className="mt-4">
@@ -386,14 +413,16 @@ export default function FormView() {
   )
 }
 
-const dependantText: Record<'mainTitle' | 'submit', Record<'edit', string>> = {
+const dependantText = {
   mainTitle: {
     edit: 'Editar beneficiario',
+    new: 'Crear beneficiario',
   },
   submit: {
     edit: 'Guardar Cambios',
+    new: 'Crear Beneficiario',
   },
-}
+} as const
 
 const formSchema = formUserSchema
   .omit({
