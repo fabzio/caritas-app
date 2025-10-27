@@ -8,6 +8,8 @@ type CreateCompleteActivityInput = {
   date: Date
   duration: string
   spaceId: string
+  regionId: number
+  address: string
   typeId: number
   statusId: number
   userId: string

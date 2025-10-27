@@ -86,18 +86,18 @@ const activityTableColumns: ColumnDef<Activity>[] = [
     cell: ({ row }) => row.original.typeName,
   },
   {
-    // Columna 3: Organización de Actividad
-    accessorKey: 'spaceName', // Asume que este campo existe en el modelo
+    // Columna 3: Distrito de Actividad
+    accessorKey: 'regionName', // Campo del backend que contiene el nombre del distrito
     header: ({ column }) => (
       <Button
         variant="ghost"
         onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
       >
-        Organización
+        Distrito
         <ArrowUpDown className="ml-2 h-4 w-4" />
       </Button>
     ),
-    cell: ({ row }) => row.original.spaceName,
+    cell: ({ row }) => row.original.regionName,
   },
   {
     // Columna 4: Fecha de la Actividad

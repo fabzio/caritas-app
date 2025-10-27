@@ -1,6 +1,6 @@
 import db from '@api/db'
 import { PostgresError } from '@api/db/errors'
-import { organization, user } from '@api/db/schemas/auth'
+import { organization, region, user } from '@api/db/schemas/auth'
 import {
   activity,
   activityStatus,
@@ -10,7 +10,7 @@ import {
   attention,
   speciality,
 } from '@api/db/schemas/health'
-import { and, asc, count, desc, eq, ilike, or } from 'drizzle-orm'
+import { and, asc, count, desc, eq, gte, ilike, lte, or } from 'drizzle-orm'
 import type { ActivityModel } from './model'
 
 export const createActivity = async (args: ActivityModel.CreateActivity) => {
@@ -42,13 +42,13 @@ export async function getSingleActivity(
         state: activity.state,
         statusName: activityStatus.name,
         typeName: activityType.name,
-        spaceName: organization.name,
+        regionName: region.name,
         creatorName: user.name,
       })
       .from(activity)
       .innerJoin(activityStatus, eq(activity.statusId, activityStatus.id))
       .innerJoin(activityType, eq(activity.typeId, activityType.id))
-      .innerJoin(organization, eq(activity.spaceId, organization.id))
+      .innerJoin(region, eq(activity.regionId, region.id))
       .innerJoin(user, eq(activity.userId, user.id))
       .where(eq(activity.id, activityIdNum))
       .limit(1)
@@ -69,7 +69,15 @@ export async function getActivities(
   params: ActivityModel.ListActivitiesQuery,
 ): Promise<ActivityModel.GetActivities> {
   try {
-    const { q = '', page = 0, limit = 10, sortBy = 'name.asc' } = params
+    const {
+      q = '',
+      page = 0,
+      limit = 10,
+      sortBy = 'name.asc',
+      regionIds,
+      startDate,
+      endDate,
+    } = params
     const searchQuery = q.replaceAll(/\s+/g, ' ').trim()
 
     const [sortFieldRaw, sortOrderRaw] = (sortBy ?? 'name.asc').split('.', 2)
@@ -82,7 +90,7 @@ export async function getActivities(
       date: activity.date,
       status: activityStatus.name,
       type: activityType.name,
-      space: organization.name,
+      region: region.name,
     } as const
 
     const column =
@@ -94,20 +102,43 @@ export async function getActivities(
           ilike(activity.name, `%${searchQuery}%`),
           ilike(activityStatus.name, `%${searchQuery}%`),
           ilike(activityType.name, `%${searchQuery}%`),
-          ilike(organization.name, `%${searchQuery}%`),
+          ilike(region.name, `%${searchQuery}%`),
           ilike(user.name, `%${searchQuery}%`),
         )
       : undefined
 
-    const where = searchConditions
-      ? and(eq(activity.state, true), searchConditions)
-      : eq(activity.state, true)
+    const regionIdsArray = regionIds
+      ? regionIds.split(',').map((id) => Number.parseInt(id, 10))
+      : []
+
+    const regionConditions =
+      regionIdsArray.length > 0
+        ? or(...regionIdsArray.map((id) => eq(activity.regionId, id)))
+        : undefined
+
+    const dateConditions = []
+    if (startDate) {
+      dateConditions.push(gte(activity.date, startDate))
+    }
+    if (endDate) {
+      dateConditions.push(lte(activity.date, endDate))
+    }
+
+    const conditions = [eq(activity.state, true)]
+    if (searchConditions) conditions.push(searchConditions)
+    if (regionConditions) conditions.push(regionConditions)
+    if (dateConditions.length > 0) {
+      conditions.push(...dateConditions)
+    }
+
+    const where = and(...conditions)
+
     const [{ total }] = await db
       .select({ total: count(activity.id) })
       .from(activity)
       .innerJoin(activityStatus, eq(activity.statusId, activityStatus.id))
       .innerJoin(activityType, eq(activity.typeId, activityType.id))
-      .innerJoin(organization, eq(activity.spaceId, organization.id))
+      .innerJoin(region, eq(activity.regionId, region.id))
       .innerJoin(user, eq(activity.userId, user.id))
       .where(where)
 
@@ -123,13 +154,13 @@ export async function getActivities(
 
         statusName: activityStatus.name,
         typeName: activityType.name,
-        spaceName: organization.name,
+        regionName: region.name,
         creatorName: user.name,
       })
       .from(activity)
       .innerJoin(activityStatus, eq(activity.statusId, activityStatus.id))
       .innerJoin(activityType, eq(activity.typeId, activityType.id))
-      .innerJoin(organization, eq(activity.spaceId, organization.id))
+      .innerJoin(region, eq(activity.regionId, region.id))
       .innerJoin(user, eq(activity.userId, user.id))
       .where(where)
       .offset(page * limit)
@@ -234,6 +265,8 @@ export const createCompleteActivity = async (
           date: activityData.date.toISOString().split('T')[0],
           duration: activityData.duration,
           spaceId: activityData.spaceId,
+          regionId: activityData.regionId,
+          address: activityData.address,
           statusId: activityData.statusId,
           typeId: activityData.typeId,
           userId: activityData.userId,
@@ -269,6 +302,8 @@ export const getActivityById = async (id: number) => {
         date: activity.date,
         duration: activity.duration,
         spaceId: activity.spaceId,
+        regionId: activity.regionId,
+        address: activity.address,
         typeId: activity.typeId,
         statusId: activity.statusId,
         userId: activity.userId,
@@ -361,6 +396,8 @@ export const updateCompleteActivity = async (
           date: activityData.date.toISOString().split('T')[0],
           duration: activityData.duration,
           spaceId: activityData.spaceId,
+          regionId: activityData.regionId,
+          address: activityData.address,
           statusId: activityData.statusId,
           typeId: activityData.typeId,
           userId: activityData.userId,
@@ -590,6 +627,25 @@ export const removeAttendantFromActivity = async (
         ),
       )
     return { userId, activityId }
+  } catch (error) {
+    if (error instanceof Error) throw new PostgresError(error.message)
+    throw error
+  }
+}
+
+export const getRegionsWithActivities = async () => {
+  try {
+    const regions = await db
+      .selectDistinct({
+        id: region.id,
+        name: region.name,
+      })
+      .from(activity)
+      .innerJoin(region, eq(activity.regionId, region.id))
+      .where(eq(activity.state, true))
+      .orderBy(asc(region.name))
+
+    return regions
   } catch (error) {
     if (error instanceof Error) throw new PostgresError(error.message)
     throw error
