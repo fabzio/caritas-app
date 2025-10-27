@@ -90,15 +90,15 @@ export default function FormView() {
     updateUser({
       userId: loaderData.id,
       data: {
-        email: values.email,
-        name: values.name,
-        role: loaderData.role,
-        surname: values.surname,
+        email: values.email.trim(),
+        name: values.name.trim(),
+        role: loaderData.role?.trim(),
+        surname: values.surname.trim(),
         documentType: values.documentType,
-        documentNumber: values.documentNumber,
+        documentNumber: values.documentNumber.trim(),
         sex: values.sex,
         birthDate: values.birthDate,
-        phone: values.phone,
+        phone: values.phone.trim(),
         regionId: values.regionId,
       },
       teamIds: hasTeamChanges(loaderData?.teams ?? [], values.teamIds)
@@ -138,17 +138,17 @@ export default function FormView() {
       submitUpdate(values)
     } else
       createUser({
-        email: values.email,
-        name: values.name,
+        email: values.email.trim(),
+        name: values.name.trim(),
         role: 'admin',
         password: import.meta.env.DEV ? 'default' : crypto.randomUUID(),
         data: {
-          surname: values.surname,
+          surname: values.surname.trim(),
           documentType: values.documentType,
-          documentNumber: values.documentNumber,
+          documentNumber: values.documentNumber.trim(),
           sex: values.sex,
           birthDate: values.birthDate,
-          phone: values.phone,
+          phone: values.phone.trim(),
           regionId: values.regionId,
         },
         teamIds: values.teamIds,
