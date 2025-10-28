@@ -541,12 +541,7 @@ export default function CreateActivityForm() {
                 </div>
               </form>
             </Form>
-            <SpecialityFormDialog
-              open={isSpecialityFormOpen}
-              onOpenChange={setSpecialityFormOpen}
-              initialData={undefined}
-              clearSelection={() => {}}
-            />
+
             <OrganizationFormDialog
               open={isAllyFormOpen.open}
               onOpenChange={setAllyFormOpen}
