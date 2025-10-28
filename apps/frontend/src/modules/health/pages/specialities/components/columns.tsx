@@ -1,7 +1,7 @@
 import type { ColumnDef } from '@tanstack/react-table'
 import { Button } from '@workspace/ui/components/button'
 import { Checkbox } from '@workspace/ui/components/checkbox'
-import type { Speciality } from '../models/speciality'
+import type { Speciality } from '../models/speciality-form'
 
 export const specialityTableColumns: ColumnDef<Speciality>[] = [
   {
