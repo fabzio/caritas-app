@@ -1,4 +1,5 @@
-import DataTable from '@frontend/shared/components/data-table' // La ruta correcta de tu componente genérico
+import DataTable from '@frontend/shared/components/data-table'
+import type { Filters } from '@frontend/shared/types/filters'
 import { stateToSortBy } from '@frontend/shared/utils/sort-by-to-state'
 import type {
   ColumnDef,
@@ -21,7 +22,7 @@ type Props = {
   columns: ColumnDef<Activity>[]
   paginationState: PaginationState
   sortingState: SortingState
-  setFilters: (filters: any) => void // Usamos 'any' para evitar tipar el useFilters internamente
+  setFilters: (filters: Partial<Filters>) => void
   pagination?: {
     total: number
     totalPages: number

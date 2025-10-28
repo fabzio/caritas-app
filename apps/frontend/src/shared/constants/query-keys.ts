@@ -28,6 +28,7 @@ export const QueryKeys = {
   },
   HEALTH: {
     ACTIVITIES: 'health-activities',
+    ACTIVITY_REGIONS: 'health-activity-regions',
     SPECIALITIES: 'health-specialities',
     ACTIVITY: {
       ALLIES: 'health-activity-allies',

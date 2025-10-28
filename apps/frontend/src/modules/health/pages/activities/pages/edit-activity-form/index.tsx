@@ -1,3 +1,4 @@
+import { useRegions } from '@frontend/hooks/use-regions'
 import { useSession } from '@frontend/hooks/use-session'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Link, useNavigate, useParams } from '@tanstack/react-router'
@@ -79,6 +80,7 @@ export default function EditActivityForm() {
   const { data: activityTypes, isLoading: loadingTypes } = useActivityTypes()
   const { data: activityStatuses, isLoading: loadingStatuses } =
     useActivityStatuses()
+  const { data: regions, isLoading: loadingRegions } = useRegions()
   const { data: allies, isLoading: loadingAllies } = useAllies()
   const { data: specialities, isLoading: loadingSpecialities } =
     useSpecialities()
@@ -89,6 +91,8 @@ export default function EditActivityForm() {
       name: activity.name,
       date: new Date(activity.date),
       durationHours: Number.parseInt(activity.duration, 10),
+      regionId: activity.regionId,
+      address: activity.address,
       typeId: activity.typeId,
       statusId: activity.statusId,
       participants: activity.participants,
@@ -127,6 +131,7 @@ export default function EditActivityForm() {
     loadingActivity ||
     loadingTypes ||
     loadingStatuses ||
+    loadingRegions ||
     loadingAllies ||
     loadingSpecialities
 
@@ -309,6 +314,61 @@ export default function EditActivityForm() {
                             )}
                           </SelectContent>
                         </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <FormField
+                    control={form.control}
+                    name="regionId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Distrito*</FormLabel>
+                        <Select
+                          onValueChange={(value) =>
+                            field.onChange(Number(value))
+                          }
+                          value={field.value?.toString()}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Seleccione un distrito" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {regions?.map(
+                              (region: { id: number; name: string }) => (
+                                <SelectItem
+                                  key={region.id}
+                                  value={region.id.toString()}
+                                >
+                                  {region.name}
+                                </SelectItem>
+                              ),
+                            )}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="address"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Dirección*</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            placeholder="Ej: Av. Principal 123, Cercado"
+                            maxLength={200}
+                          />
+                        </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
