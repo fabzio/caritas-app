@@ -1,6 +1,7 @@
 import { Button } from '@workspace/ui/components/button'
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -17,13 +18,11 @@ import {
 } from '@workspace/ui/components/form'
 import { Input } from '@workspace/ui/components/input'
 import { Loader2 } from 'lucide-react'
-import type { useForm } from 'react-hook-form'
-import type { FormSpecialitySchema } from '../models/speciality-form'
+import { useFormContext } from 'react-hook-form'
 
 type Props = {
   open: boolean
   onOpenChange: (open: boolean) => void
-  form: ReturnType<typeof useForm<FormSpecialitySchema>>
   handleSubmit: (e?: React.BaseSyntheticEvent) => Promise<void>
   isLoading: boolean
   viewType: 'new' | 'edit'
@@ -32,12 +31,12 @@ type Props = {
 export default function SpecialityFormDialog({
   open,
   onOpenChange,
-  form,
   handleSubmit,
   isLoading,
   viewType,
 }: Readonly<Props>) {
   const submitLabel = viewType === 'edit' ? 'Guardar Cambios' : 'Registrar'
+  const form = useFormContext()
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -72,13 +71,11 @@ export default function SpecialityFormDialog({
             />
 
             <DialogFooter className="flex justify-end gap-4 pt-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => onOpenChange(false)}
-              >
-                Cancelar
-              </Button>
+              <DialogClose asChild>
+                <Button type="button" variant="outline">
+                  Cancelar
+                </Button>
+              </DialogClose>
               <Button type="submit" disabled={isLoading}>
                 {isLoading ? (
                   <Loader2 className="animate-spin w-4 h-4" />

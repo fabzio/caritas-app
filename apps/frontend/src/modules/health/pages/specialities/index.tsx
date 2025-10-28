@@ -1,7 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '@workspace/ui/components/button'
+import { Form } from '@workspace/ui/components/form'
 import { HeartPlus } from 'lucide-react'
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import ActionsButton from './components/actions-button'
 import DeleteConfirmationDialog from './components/delete-confirmation-dialog'
@@ -22,7 +23,7 @@ export default function Specialities() {
   const [formOpen, setFormOpen] = useState(false)
   const [deleteOpen, setDeleteOpen] = useState(false)
 
-  const modeRef = useRef<'new' | 'edit'>('new')
+  const [mode, setMode] = useState<'new' | 'edit'>('new')
 
   const {
     data: specialities,
@@ -56,7 +57,7 @@ export default function Specialities() {
     useUpdateSpeciality()
 
   const handleSubmit = form.handleSubmit((data) => {
-    if (modeRef.current === 'edit') {
+    if (mode === 'edit') {
       updateSpeciality(
         { id: editSpeciality.id, name: data.name },
         { onSuccess: () => handleFormOpenChange(false) },
@@ -71,13 +72,13 @@ export default function Specialities() {
   const handleDelete = () => setDeleteOpen(true)
 
   const handleEdit = () => {
-    modeRef.current = 'edit'
+    setMode('edit')
     form.reset({ name: editSpeciality.name })
     setFormOpen(true)
   }
 
   const handleNew = () => {
-    modeRef.current = 'new'
+    setMode('new')
     form.reset({ name: '' })
     setFormOpen(true)
   }
@@ -85,7 +86,6 @@ export default function Specialities() {
   const handleFormOpenChange = (open: boolean) => {
     if (!open) {
       form.reset({ name: '' })
-      modeRef.current = 'new'
     }
     setFormOpen(open)
   }
@@ -130,15 +130,15 @@ export default function Specialities() {
           pagination={pagination}
         />
       </div>
-
-      <SpecialityFormDialog
-        open={formOpen}
-        onOpenChange={handleFormOpenChange}
-        form={form}
-        handleSubmit={handleSubmit}
-        isLoading={isCreating || isUpdating}
-        viewType={modeRef.current}
-      />
+      <Form {...form}>
+        <SpecialityFormDialog
+          open={formOpen}
+          onOpenChange={handleFormOpenChange}
+          handleSubmit={handleSubmit}
+          isLoading={isCreating || isUpdating}
+          viewType={mode}
+        />
+      </Form>
 
       <DeleteConfirmationDialog
         open={deleteOpen}
