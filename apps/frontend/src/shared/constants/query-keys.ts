@@ -25,11 +25,13 @@ export const QueryKeys = {
     FAIR: 'education-fair',
     SCHOLARSHIP_APPLICATION: 'education-scholarship-applications',
     ORGANIZATIONS: 'education-organizations',
+    BENEFICIARIES: 'education-beneficiaries',
   },
   HEALTH: {
     ACTIVITIES: 'health-activities',
     ACTIVITY_REGIONS: 'health-activity-regions',
     SPECIALITIES: 'health-specialities',
+    BENEFICIARIES: 'health-beneficiaries',
     ACTIVITY: {
       ALLIES: 'health-activity-allies',
       STATUSES: 'health-activity-statuses',
