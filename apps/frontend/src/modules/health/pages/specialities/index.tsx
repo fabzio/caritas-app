@@ -1,19 +1,21 @@
 import { Button } from '@workspace/ui/components/button'
 import { HeartPlus } from 'lucide-react'
 import { useState } from 'react'
+import SpecialityFormDialog from '../../components/speciality-form-dialog'
 import ActionsButton from './components/actions-button'
 import DeleteConfirmationDialog from './components/delete-confirmation-dialog'
 import SearchSpecialityInput from './components/search-speciality-input'
-import SpecialityFormDialog from './components/speciality-form-dialog'
 import SpecialityTable from './components/speciality-table'
 import { useSpecialityTable } from './hooks/use-table'
-import type { Speciality } from './models/speciality'
+import type { Speciality } from './models/speciality-form'
 
 export default function Specialities() {
   const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({})
   const [formOpen, setFormOpen] = useState(false)
   const [deleteOpen, setDeleteOpen] = useState(false)
-  const [editSelected, setEditSelected] = useState<Speciality | null>(null)
+  const [editingSpeciality, setEditingSpeciality] = useState<Speciality | null>(
+    null,
+  )
 
   const {
     data: specialities,
@@ -32,29 +34,28 @@ export default function Specialities() {
     .map((rowIndex) => specialities?.[rowIndex])
     .filter(Boolean) as Speciality[]
 
-  const selectedIds = selectedSpecialities
-    ? selectedSpecialities.map((s) => s.id)
-    : []
+  const selectedIds = selectedSpecialities.map((s) => s.id)
   const selectedCount = selectedIds.length
+  const editSpeciality = selectedSpecialities[0]
 
-  const clearSelection = () => {
-    setRowSelection({})
-  }
+  const clearSelection = () => setRowSelection({})
 
-  const handleDelete = () => {
-    setDeleteOpen(true)
-  }
+  const handleDelete = () => setDeleteOpen(true)
 
   const handleEdit = () => {
-    const item = selectedSpecialities[0]
-    if (!item) return
-    setEditSelected(item)
+    if (!editSpeciality) return
+    setEditingSpeciality(editSpeciality)
     setFormOpen(true)
   }
 
   const handleNew = () => {
-    setEditSelected(null)
+    setEditingSpeciality(null)
     setFormOpen(true)
+  }
+
+  const handleFormOpenChange = (open: boolean) => {
+    if (!open) setEditingSpeciality(null)
+    setFormOpen(open)
   }
 
   return (
@@ -78,7 +79,6 @@ export default function Specialities() {
             onEditClick={handleEdit}
             selectedCount={selectedCount}
           />
-
           <Button onClick={handleNew}>
             <HeartPlus className="mr-1 w-4 h-4" />
             Nueva especialidad
@@ -98,12 +98,10 @@ export default function Specialities() {
           pagination={pagination}
         />
       </div>
-
       <SpecialityFormDialog
         open={formOpen}
-        onOpenChange={setFormOpen}
-        initialData={editSelected || undefined}
-        clearSelection={clearSelection}
+        onOpenChange={handleFormOpenChange}
+        speciality={editingSpeciality}
       />
 
       <DeleteConfirmationDialog

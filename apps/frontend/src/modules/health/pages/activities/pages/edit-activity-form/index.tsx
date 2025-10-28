@@ -40,8 +40,8 @@ import {
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
-import OrganizationFormDialog from '../../../allies/components/organization-form-dialog'
-import SpecialityFormDialog from '../../../specialities/components/speciality-form-dialog'
+import OrganizationFormDialog from '../../../../components/organization-form-dialog'
+import SpecialityFormDialog from '../../../../components/speciality-form-dialog'
 import { useActivityById } from '../../hooks/use-activity-by-id'
 import {
   useActivityStatuses,
@@ -52,10 +52,6 @@ import {
 import { useUpdateCompleteActivity } from '../../hooks/use-update-complete-activity'
 import { createCompleteActivitySchema } from '../../models/schema'
 
-type AllyFormState = {
-  open: boolean
-  type: 'new' | 'edit'
-}
 export default function EditActivityForm() {
   const { id } = useParams({
     from: '/_authenticated/health/activities/edit/$id',
@@ -64,16 +60,13 @@ export default function EditActivityForm() {
   const { data: user } = useSession()
 
   // Create new speciality and ally
-  const [isSpecialityFormOpen, setSpecialityFormOpen] = useState(false)
-  const [isAllyFormOpen, setAllyFormOpen] = useState<AllyFormState>({
-    open: false,
-    type: 'new',
-  })
+  const [specialityFormOpen, setSpecialityFormOpen] = useState(false)
+  const [organizationFormOpen, setOrganizationFormOpen] = useState(false)
   const handleNewSpeciality = () => {
     setSpecialityFormOpen(true)
   }
   const handleNewAlly = () => {
-    setAllyFormOpen({ open: true, type: 'new' })
+    setOrganizationFormOpen(true)
   }
 
   const { data: activity, isLoading: loadingActivity } = useActivityById(id)
@@ -570,15 +563,12 @@ export default function EditActivityForm() {
               </form>
             </Form>
             <SpecialityFormDialog
-              open={isSpecialityFormOpen}
+              open={specialityFormOpen}
               onOpenChange={setSpecialityFormOpen}
-              initialData={undefined}
-              clearSelection={() => {}}
             />
             <OrganizationFormDialog
-              open={isAllyFormOpen.open}
-              onOpenChange={setAllyFormOpen}
-              initialData={undefined}
+              open={organizationFormOpen}
+              onOpenChange={setOrganizationFormOpen}
             />
           </div>
         </div>
