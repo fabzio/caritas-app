@@ -1,29 +1,21 @@
-import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '@workspace/ui/components/button'
-import { Form } from '@workspace/ui/components/form'
 import { HeartPlus } from 'lucide-react'
 import { useState } from 'react'
-import { useForm } from 'react-hook-form'
+import SpecialityFormDialog from '../../components/speciality-form-dialog'
 import ActionsButton from './components/actions-button'
 import DeleteConfirmationDialog from './components/delete-confirmation-dialog'
 import SearchSpecialityInput from './components/search-speciality-input'
-import SpecialityFormDialog from './components/speciality-form-dialog'
 import SpecialityTable from './components/speciality-table'
-import usePostSpeciality from './hooks/use-post-speciality'
 import { useSpecialityTable } from './hooks/use-table'
-import useUpdateSpeciality from './hooks/use-update-speciality'
-import type { Speciality } from './models/speciality'
-import {
-  type FormSpecialitySchema,
-  formSpecialitySchema,
-} from './models/speciality-form'
+import type { Speciality } from './models/speciality-form'
 
 export default function Specialities() {
   const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({})
   const [formOpen, setFormOpen] = useState(false)
   const [deleteOpen, setDeleteOpen] = useState(false)
-
-  const [mode, setMode] = useState<'new' | 'edit'>('new')
+  const [editingSpeciality, setEditingSpeciality] = useState<Speciality | null>(
+    null,
+  )
 
   const {
     data: specialities,
@@ -46,47 +38,23 @@ export default function Specialities() {
   const selectedCount = selectedIds.length
   const editSpeciality = selectedSpecialities[0]
 
-  const form = useForm<FormSpecialitySchema>({
-    resolver: zodResolver(formSpecialitySchema),
-    defaultValues: { name: '' },
-  })
-
-  const { mutate: createSpeciality, isPending: isCreating } =
-    usePostSpeciality()
-  const { mutate: updateSpeciality, isPending: isUpdating } =
-    useUpdateSpeciality()
-
-  const handleSubmit = form.handleSubmit((data) => {
-    if (mode === 'edit') {
-      updateSpeciality(
-        { id: editSpeciality.id, name: data.name },
-        { onSuccess: () => handleFormOpenChange(false) },
-      )
-    } else {
-      createSpeciality(data, { onSuccess: () => handleFormOpenChange(false) })
-    }
-  })
-
   const clearSelection = () => setRowSelection({})
 
   const handleDelete = () => setDeleteOpen(true)
 
   const handleEdit = () => {
-    setMode('edit')
-    form.reset({ name: editSpeciality.name })
+    if (!editSpeciality) return
+    setEditingSpeciality(editSpeciality)
     setFormOpen(true)
   }
 
   const handleNew = () => {
-    setMode('new')
-    form.reset({ name: '' })
+    setEditingSpeciality(null)
     setFormOpen(true)
   }
 
   const handleFormOpenChange = (open: boolean) => {
-    if (!open) {
-      form.reset({ name: '' })
-    }
+    if (!open) setEditingSpeciality(null)
     setFormOpen(open)
   }
 
@@ -130,15 +98,11 @@ export default function Specialities() {
           pagination={pagination}
         />
       </div>
-      <Form {...form}>
-        <SpecialityFormDialog
-          open={formOpen}
-          onOpenChange={handleFormOpenChange}
-          handleSubmit={handleSubmit}
-          isLoading={isCreating || isUpdating}
-          viewType={mode}
-        />
-      </Form>
+      <SpecialityFormDialog
+        open={formOpen}
+        onOpenChange={handleFormOpenChange}
+        speciality={editingSpeciality}
+      />
 
       <DeleteConfirmationDialog
         open={deleteOpen}

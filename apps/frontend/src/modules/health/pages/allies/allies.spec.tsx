@@ -134,7 +134,7 @@ vi.mock('lucide-react', () => ({
   UserPlus: () => <span>+</span>,
 }))
 
-vi.mock('./components/organization-form-dialog', () => ({
+vi.mock('../../components/organization-form-dialog', () => ({
   __esModule: true,
   default: () => <div data-testid="organization-form-dialog" />,
 }))

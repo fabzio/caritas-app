@@ -5,3 +5,4 @@ export const formAllySchema = z.object({
 })
 
 export type FormAllySchema = z.infer<typeof formAllySchema>
+export type Ally = FormAllySchema & { id: string }
