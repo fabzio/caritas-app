@@ -18,3 +18,4 @@ export const formSpecialitySchema = z.object({
 })
 
 export type FormSpecialitySchema = z.infer<typeof formSpecialitySchema>
+export type Speciality = FormSpecialitySchema & { id: number }

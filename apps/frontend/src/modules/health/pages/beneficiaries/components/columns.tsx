@@ -1,9 +1,11 @@
+import { Link } from '@tanstack/react-router'
 import type { ColumnDef } from '@tanstack/react-table'
 import { Button } from '@workspace/ui/components/button'
 import { Checkbox } from '@workspace/ui/components/checkbox'
-import type { Speciality } from '../models/speciality-form'
+import { ArrowUpDown } from 'lucide-react'
+import type { Beneficiary } from '../hooks/use-list-beneficiaries'
 
-export const specialityTableColumns: ColumnDef<Speciality>[] = [
+export const beneficiaryTableColumns: ColumnDef<Beneficiary>[] = [
   {
     id: 'select',
     header: ({ table }) => (
@@ -25,15 +27,38 @@ export const specialityTableColumns: ColumnDef<Speciality>[] = [
     ),
   },
   {
-    accessorKey: 'speciality',
+    accessorKey: 'document',
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+      >
+        Documento
+        <ArrowUpDown />
+      </Button>
+    ),
+    cell: ({ row }) => (
+      <Button asChild variant="link">
+        <Link
+          to="/health/beneficiaries/form"
+          search={{ type: 'edit', id: row.original.id }}
+        >
+          {`${row.original.documentType} - ${row.original.documentNumber}`}
+        </Link>
+      </Button>
+    ),
+  },
+  {
+    accessorKey: 'user',
     header: ({ column }) => (
       <Button
         variant="ghost"
         onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
       >
         Nombre
+        <ArrowUpDown />
       </Button>
     ),
-    cell: ({ row }) => row.original.name,
+    cell: ({ row }) => `${row.original.name} ${row.original.surname}`,
   },
 ]

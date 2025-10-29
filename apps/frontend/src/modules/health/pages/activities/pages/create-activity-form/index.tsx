@@ -41,8 +41,8 @@ import {
 } from 'lucide-react'
 import { useState } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
-import OrganizationFormDialog from '../../../allies/components/organization-form-dialog'
-import SpecialityFormDialog from '../../../specialities/components/speciality-form-dialog'
+import OrganizationFormDialog from '../../../../components/organization-form-dialog'
+import SpecialityFormDialog from '../../../../components/speciality-form-dialog'
 import {
   useActivityStatuses,
   useActivityTypes,
@@ -57,16 +57,13 @@ export default function CreateActivityForm() {
   const { data: user } = useSession()
 
   // Create new speciality and ally
-  const [isSpecialityFormOpen, setSpecialityFormOpen] = useState(false)
-  const [isAllyFormOpen, setAllyFormOpen] = useState({
-    open: false,
-    type: 'new',
-  })
+  const [specialityFormOpen, setSpecialityFormOpen] = useState(false)
+  const [organizationFormOpen, setOrganizationFormOpen] = useState(false)
   const handleNewSpeciality = () => {
     setSpecialityFormOpen(true)
   }
   const handleNewAlly = () => {
-    setAllyFormOpen({ open: true, type: 'new' })
+    setOrganizationFormOpen(true)
   }
 
   const form = useForm({
@@ -506,11 +503,17 @@ export default function CreateActivityForm() {
                     )
                   })}
                   <div className="flex gap-4 justify-center flex-wrap">
-                    <Button type="button" onClick={handleNewAlly} size="sm">
+                    <Button
+                      variant="ghost"
+                      type="button"
+                      onClick={handleNewAlly}
+                      size="sm"
+                    >
                       Crear organización <ShieldPlus size={16} />
                     </Button>
                     <Button
                       type="button"
+                      variant="ghost"
                       onClick={handleNewSpeciality}
                       size="sm"
                     >
@@ -541,11 +544,13 @@ export default function CreateActivityForm() {
                 </div>
               </form>
             </Form>
-
+            <SpecialityFormDialog
+              open={specialityFormOpen}
+              onOpenChange={setSpecialityFormOpen}
+            />
             <OrganizationFormDialog
-              open={isAllyFormOpen.open}
-              onOpenChange={setAllyFormOpen}
-              initialData={undefined}
+              open={organizationFormOpen}
+              onOpenChange={setOrganizationFormOpen}
             />
           </div>
         </div>
