@@ -5,8 +5,8 @@ export const formSpecialitySchema = z.object({
     .string()
     .nonempty('El nombre es obligatorio')
     .trim()
-    .refine((val) => val.length > 0, {
-      message: 'El nombre no puede contener solo espacios',
+    .refine((val) => val.length > 1, {
+      message: 'El nombre ndebe tener al menos 2 caracteres',
     })
     .refine((val) => !/^\d+$/.test(val), {
       message: 'El nombre no puede contener solo números',
