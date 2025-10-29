@@ -293,7 +293,7 @@ export const createCompleteActivity = async (
   }
 }
 
-export const getActivityDeatilById = async (id: number) => {
+export const getActivityDetailById = async (id: number) => {
   try {
     const [activityData] = await db
       .select({
@@ -304,6 +304,7 @@ export const getActivityDeatilById = async (id: number) => {
         state: activity.state,
         statusName: activityStatus.name,
         typeName: activityType.name,
+        address: activity.address,
         spaceName: organization.name,
         creatorName: user.name,
         regionName: region.name,

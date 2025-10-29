@@ -15,7 +15,7 @@ import {
   deleteActivities,
   getActivities,
   getActivityById,
-  getActivityDeatilById,
+  getActivityDetailById,
   getActivityParticipants,
   getRegionsWithActivities,
   getUserAttentions,
@@ -58,7 +58,7 @@ const activityModule = new Elysia({ name: 'activity', prefix: '/activities' })
       const id = Number(params.id)
       if (Number.isNaN(id)) throw status(400, 'Invalid id')
       try {
-        return await getActivityDeatilById(id)
+        return await getActivityDetailById(id)
       } catch (e) {
         if (e instanceof Error) throw status(404, e.message)
         throw e
@@ -77,6 +77,7 @@ const activityModule = new Elysia({ name: 'activity', prefix: '/activities' })
           statusName: t.String(),
           creatorName: t.String(),
           regionName: t.String(),
+          address: t.String(),
           state: t.Boolean(),
           participants: t.Array(
             t.Object({

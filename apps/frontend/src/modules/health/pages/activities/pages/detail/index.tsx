@@ -121,6 +121,24 @@ export default function ActivityDetailPage() {
                   </div>
                 </div>
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  {/* Organizacion */}
+                  <div className="space-y-1">
+                    <p className="text-sm  text-muted-foreground">
+                      Organización
+                    </p>
+                    <p className="min-h-10 text-sm font-medium">
+                      {activity.spaceName}
+                    </p>
+                  </div>
+                  {/* Tipo */}
+                  <div className="space-y-1">
+                    <p className="text-sm  text-muted-foreground">Tipo</p>
+                    <p className="min-h-10 text-sm font-medium">
+                      {activity.typeName}
+                    </p>
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   {/* Distrito */}
                   <div className="space-y-1">
                     <p className="text-sm  text-muted-foreground">Distrito</p>
@@ -137,22 +155,12 @@ export default function ActivityDetailPage() {
                     </p>
                   </div>
                 </div>
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                  {/* Organizacion */}
+                <div className="grid grid-cols-1 gap-4">
+                  {/* Dirección */}
                   <div className="space-y-1">
-                    <p className="text-sm  text-muted-foreground">
-                      Organización
-                    </p>
+                    <p className="text-sm  text-muted-foreground">Dirección</p>
                     <p className="min-h-10 text-sm font-medium">
-                      {activity.spaceName}
-                    </p>
-                  </div>
-
-                  {/* Tipo */}
-                  <div className="space-y-1">
-                    <p className="text-sm  text-muted-foreground">Tipo</p>
-                    <p className="min-h-10 text-sm font-medium">
-                      {activity.typeName}
+                      {activity.address}
                     </p>
                   </div>
                 </div>
