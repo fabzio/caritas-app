@@ -61,7 +61,9 @@ export default function Specialities() {
   return (
     <div className="w-full p-4">
       <header className="mb-6">
-        <h2 className="text-2xl font-bold leading-tight">Especialidades</h2>
+        <h2 className="text-2xl font-bold leading-tight">
+          Administración de Especialidades
+        </h2>
         <p className="text-muted-foreground">
           Aquí podrá visualizar todas las especialidades por ofrecer en
           atención.
