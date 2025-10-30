@@ -118,11 +118,13 @@ export default function TableView() {
 
   return (
     <div className="w-full p-4">
-      <div className="flex justify-between items-center gap-2">
-        <div className="flex flex-col sm:flex-row sm:items-center gap-3 w-full">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+        <div className="w-full">
           <div className="flex-1 w-full">
             <SearchUserInput />
           </div>
+        </div>
+        <div className="flex items-center gap-2">
           <div className="sm:w-auto w-full">
             <RoleFilter
               value={roleFilter}
@@ -130,8 +132,6 @@ export default function TableView() {
               roles={uniqueRoles}
             />
           </div>
-        </div>
-        <div className="flex items-center gap-2">
           <ActionsButton
             onDeleteClick={() => setIsDeleteModalOpen(true)}
             onEditClick={() =>
