@@ -87,6 +87,8 @@ export default function CreateScholarship() {
           },
   })
   const today = new Date()
+  const maxDate = new Date(today.getTime())
+  maxDate.setFullYear(today.getFullYear() + 2)
   const [organizationFormOpen, setOrganizationFormOpen] = useState(false)
 
   const { data: organizations, isLoading } = useGetOrganization()
@@ -329,6 +331,10 @@ export default function CreateScholarship() {
                               mode="single"
                               selected={field.value}
                               onSelect={field.onChange}
+                              toYear={maxDate.getFullYear()}
+                              disabled={{
+                                before: today,
+                              }}
                             />
                           </PopoverContent>
                         </Popover>
