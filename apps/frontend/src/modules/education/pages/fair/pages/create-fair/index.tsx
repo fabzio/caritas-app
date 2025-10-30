@@ -29,7 +29,7 @@ import {
 import { Separator } from '@workspace/ui/components/separator'
 import { Spinner } from '@workspace/ui/components/spinner'
 import { cn } from '@workspace/ui/lib/utils'
-import { format, parseISO } from 'date-fns'
+import { format, parseISO, startOfDay } from 'date-fns'
 import { CalendarIcon, Check, ChevronsUpDown, Loader2 } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import usePostFair from './hooks/use-post-fair'
@@ -45,7 +45,7 @@ export default function CreateFairPage() {
   const loaderData = getRouteApi(
     '/_authenticated/education/fair/form',
   ).useLoaderData()
-  console.log('Loader Data:', loaderData)
+
   const form = useForm<FormFairSchema>({
     resolver: zodResolver(formFairSchema),
     defaultValues:
@@ -70,7 +70,10 @@ export default function CreateFairPage() {
             regionId: undefined,
           },
   })
-  const today = new Date()
+  const today = startOfDay(new Date())
+  const maxDate = new Date(today.getTime())
+  maxDate.setFullYear(today.getFullYear() + 2)
+  console.log('Max Date:', maxDate)
   const { data: districts, isLoading } = useRegions()
   const { mutate: createFair, isPending: isPendingCreate } = usePostFair()
   const { mutate: updateFair, isPending: isPendingUpdate } = useUpdateFairs()
@@ -230,8 +233,10 @@ export default function CreateFairPage() {
                               mode="single"
                               selected={field.value}
                               onSelect={field.onChange}
+                              toYear={maxDate.getFullYear()}
                               disabled={{
                                 before: today,
+                                after: maxDate,
                               }}
                             />
                           </PopoverContent>
