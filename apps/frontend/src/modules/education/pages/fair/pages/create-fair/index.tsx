@@ -35,6 +35,7 @@ import { useForm } from 'react-hook-form'
 import usePostFair from './hooks/use-post-fair'
 import { useUpdateFairs } from './hooks/use-update-fairs'
 import { type FormFairSchema, formFairSchema } from './utils/fair'
+import formatTime from './utils/formatTime'
 
 export default function CreateFairPage() {
   const viewType = useSearch({
@@ -44,6 +45,7 @@ export default function CreateFairPage() {
   const loaderData = getRouteApi(
     '/_authenticated/education/fair/form',
   ).useLoaderData()
+  console.log('Loader Data:', loaderData)
   const form = useForm<FormFairSchema>({
     resolver: zodResolver(formFairSchema),
     defaultValues:
@@ -55,8 +57,8 @@ export default function CreateFairPage() {
                 loaderData.date.getTimezoneOffset() * 60000,
             ),
             address: loaderData.address,
-            startTime: loaderData.startTime,
-            endTime: loaderData.endTime,
+            startTime: formatTime(loaderData.startTime),
+            endTime: formatTime(loaderData.endTime),
             regionId: loaderData.regionId,
           }
         : {
