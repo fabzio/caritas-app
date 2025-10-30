@@ -1,6 +1,7 @@
 import db from '@api/db'
 import { PostgresError } from '@api/db/errors'
 import { scholarship } from '@api/db/schemas/education'
+import { normalizeText } from '@api/utils/normalize-text'
 import { eq, ilike, sql } from 'drizzle-orm'
 import type { ScholarshipModel } from './model'
 
@@ -10,7 +11,29 @@ type GetParams = {
   page?: number // página actual
   pageSize?: number // elementos por página
 }
+export const findDuplicateScholarship = async (
+  name: string,
+  excludeId?: number,
+) => {
+  const response = await db
+    .select({ scholarship })
+    .from(scholarship)
+    .where(eq(scholarship.active, true))
 
+  const allRows = response.map((s) => s.scholarship)
+
+  if (!allRows?.length) return null
+
+  const coincidences = allRows.filter(
+    (s) => normalizeText(s.name) === normalizeText(name),
+  )
+
+  if (!coincidences.length) return null
+
+  const excluded = coincidences.find((s) => s.id !== excludeId)
+
+  return excluded || null
+}
 export const createScholarship = async (
   args: ScholarshipModel.CreateScholarship,
 ) => {
