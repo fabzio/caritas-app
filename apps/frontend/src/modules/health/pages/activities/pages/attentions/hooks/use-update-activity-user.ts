@@ -1,4 +1,5 @@
 import rpc from '@frontend/lib/rpc'
+import { QueryKeys } from '@frontend/shared/constants/query-keys'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
@@ -21,9 +22,8 @@ export const useUpdateActivityUser = () => {
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({
         queryKey: [
-          'activity-participant',
+          QueryKeys.HEALTH.ACTIVITIES,
           variables.activityId.toString(),
-          variables.userId,
         ],
       })
       toast.success('Incentivo marcado correctamente')

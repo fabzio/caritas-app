@@ -59,12 +59,16 @@ export default function ScholarshipRecipients() {
     <div className="flex flex-1 flex-col gap-6 p-4">
       <div className="w-full flex gap-8">
         <div className="flex flex-1 flex-col">
-          <div>
-            <h2 className="text-lg font-semibold">Becados</h2>
-            <p>Aquí podrás visualizar a todos los alumnos becados.</p>
-          </div>
-          <div className="flex flex-row justify-between pt-4 pb-2">
-            <div className="flex-1 px-10">
+          <header className="mb-6">
+            <h2 className="text-2xl font-bold leading-tight">
+              Administración de becados
+            </h2>
+            <p className="text-muted-foreground">
+              Aquí podrá visualizar todos los beneficiarios registrados.
+            </p>
+          </header>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div className="flex-1">
               <SearchRecipients />
             </div>
             <div className="flex flex-row gap-4 px-10">
@@ -93,7 +97,7 @@ export default function ScholarshipRecipients() {
               </Link>
             </div>
           </div>
-          <div className="px-10">
+          <div className="">
             <RecipientsTable
               isLoading={isLoading}
               rowSelection={rowSelection}

@@ -93,14 +93,17 @@ export default function FairPage() {
 
   return (
     <div className="w-full p-4">
-      <div className="flex flex-col gap-1 mb-6">
-        <h1 className="text-2xl font-semibold text-foreground">
-          Gestión de Ferias Vocacionales
-        </h1>
-      </div>
+      <header className="mb-6">
+        <h2 className="text-2xl font-bold leading-tight">
+          Administración de Ferias Vocacionales
+        </h2>
+        <p className="text-muted-foreground">
+          Aquí podrá visualizar todas las ferias vocacionales registradas.
+        </p>
+      </header>
 
-      <div className="flex justify-between items-center gap-2">
-        <div className="flex flex-col sm:flex-row sm:items-center gap-3 w-full">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+        <div className="w-full">
           <div className="flex-1 w-full">
             <SearchFairInput />
           </div>
@@ -112,9 +115,9 @@ export default function FairPage() {
             selectedCount={fairCount}
           />
           <Link search={{ type: 'new' }} to="/education/fair/form">
-            <Button size={isMobile ? 'sm' : 'default'}>
+            <Button size={'default'}>
               <PlusCircle />
-              {!isMobile && 'Nueva feria'}
+              {'Nueva feria'}
             </Button>
           </Link>
         </div>

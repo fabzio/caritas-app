@@ -56,8 +56,16 @@ export default function OrganizationTableView() {
 
   return (
     <div className="w-full p-4">
-      <div className="flex justify-between items-center gap-2">
-        <div className="flex flex-col sm:flex-row sm:items-center gap-3 w-full">
+      <header className="mb-6">
+        <h2 className="text-2xl font-bold leading-tight">
+          Administración de organizaciones aliadas
+        </h2>
+        <p className="text-muted-foreground">
+          Aquí podrá visualizar todas las organizaciones aliadas de educación.
+        </p>
+      </header>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+        <div className="w-full">
           <div className="flex-1 w-full">
             <SearchHealthOrganizationInput />
           </div>
