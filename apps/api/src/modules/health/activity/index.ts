@@ -1,4 +1,3 @@
-import { auth } from '@api/lib/auth'
 import betterAuth from '@api/modules/auth'
 import Elysia, { status, t } from 'elysia'
 import {
@@ -16,6 +15,7 @@ import {
   getActivities,
   getActivityById,
   getActivityParticipants,
+  getExistentUsers,
   getUserAttentions,
   removeAttendantFromActivity,
   setActivityUser,
@@ -169,13 +169,24 @@ const activityModule = new Elysia({ name: 'activity', prefix: '/activities' })
   })
   .post(
     '/add-attendant',
-    async ({ body }) => status(201, await addAttendantToActivity(body)),
+    async ({ body }) => {
+      try {
+        return status(201, await addAttendantToActivity(body))
+      } catch (error) {
+        if (error instanceof Error) {
+          throw status(400, { error: error.message })
+        }
+        throw status(500, { error: 'Ocurrió un error desconocido' })
+      }
+    },
     {
       auth: true,
       body: ActivityModel.attendantActivity,
       response: {
         201: ActivityModel.attendantActivity,
+        400: t.Object({ error: t.String() }),
         401: t.Literal('Unauthorized'),
+        500: t.Object({ error: t.String() }),
       },
     },
   )
@@ -191,5 +202,13 @@ const activityModule = new Elysia({ name: 'activity', prefix: '/activities' })
       },
     },
   )
+  .get('/existent-users', ({ query }) => getExistentUsers(query), {
+    auth: true,
+    query: ActivityModel.listExistentUsersQuery,
+    response: {
+      200: ActivityModel.existentUser,
+      401: t.Literal('Unauthorized'),
+    },
+  })
 
 export default activityModule

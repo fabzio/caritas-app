@@ -38,11 +38,24 @@ import { Spinner } from '@workspace/ui/components/spinner'
 import { cn } from '@workspace/ui/lib/utils'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
-import { CalendarIcon, Check, ChevronsUpDown, Loader2 } from 'lucide-react'
+import {
+  CalendarIcon,
+  Check,
+  ChevronsUpDown,
+  Eraser,
+  Loader2,
+} from 'lucide-react'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import type z from 'zod'
+import { AutoComplete } from './components/autocomplete'
 import { useAddAttendant } from './hooks/use-add-attendant'
+import { useAddExistentUser } from './hooks/use-add-existent-user'
 import { useUpdateAttendant } from './hooks/use-edit-attendant'
+import {
+  type ExistentUsers,
+  useExistentUsers,
+} from './hooks/use-list-users-autocomplete'
 
 export default function AddAttendantPage() {
   const loaderData = getRouteApi(
@@ -58,6 +71,8 @@ export default function AddAttendantPage() {
   const { data: userData } = useUserDetail(id)
 
   const { mutate: addAttendant, isPending: isPendingCreate } = useAddAttendant()
+  const { mutate: addExistentUser, isPending: isPendingAddExistent } =
+    useAddExistentUser()
   const { mutate: updateAttendant, isPending: isPendingUpdate } =
     useUpdateAttendant()
 
@@ -108,6 +123,11 @@ export default function AddAttendantPage() {
     if (typeof loaderData?.id !== 'number') return
     if (viewType === 'edit' && userData?.id) {
       submitUpdate(values)
+    } else if (foundUser) {
+      addExistentUser({
+        userId: foundUser.id,
+        activityId: loaderData.id,
+      })
     } else {
       addAttendant({
         email: values.email,
@@ -126,6 +146,31 @@ export default function AddAttendantPage() {
         activityId: loaderData.id,
       })
     }
+  }
+
+  const documentType = form.watch('documentType')
+  const documentNumber = form.watch('documentNumber')
+  const { data: existentUsers, isLoading: existentUsersLoading } =
+    useExistentUsers({
+      documentNumber,
+      documentType,
+      activityId: loaderData?.id as number,
+    })
+
+  const [foundUser, setFoundUser] = useState<ExistentUsers | null>(null)
+  const handleClearFields = () => {
+    form.reset({
+      name: '',
+      surname: '',
+      email: '',
+      phone: '',
+      documentType: 'DNI',
+      documentNumber: '',
+      birthDate: undefined,
+      sex: undefined,
+      regionId: undefined,
+    })
+    setFoundUser(null)
   }
 
   return (
@@ -150,7 +195,11 @@ export default function AddAttendantPage() {
                   <FormItem>
                     <FormLabel>Nombre</FormLabel>
                     <FormControl>
-                      <Input placeholder="John" {...field} />
+                      <Input
+                        placeholder="John"
+                        {...field}
+                        disabled={foundUser !== null}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -163,7 +212,11 @@ export default function AddAttendantPage() {
                   <FormItem>
                     <FormLabel>Apellido</FormLabel>
                     <FormControl>
-                      <Input placeholder="Doe" {...field} />
+                      <Input
+                        placeholder="Doe"
+                        {...field}
+                        disabled={foundUser !== null}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -182,6 +235,7 @@ export default function AddAttendantPage() {
                         type="email"
                         placeholder="john.doe@example.com"
                         {...field}
+                        disabled={foundUser !== null}
                       />
                     </FormControl>
                     <FormMessage />
@@ -195,7 +249,12 @@ export default function AddAttendantPage() {
                   <FormItem>
                     <FormLabel>Teléfono</FormLabel>
                     <FormControl>
-                      <Input type="tel" placeholder="987 654 321" {...field} />
+                      <Input
+                        type="tel"
+                        placeholder="987 654 321"
+                        {...field}
+                        disabled={foundUser !== null}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -212,6 +271,7 @@ export default function AddAttendantPage() {
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
+                      disabled={foundUser !== null}
                     >
                       <FormControl>
                         <SelectTrigger className="w-full">
@@ -233,15 +293,66 @@ export default function AddAttendantPage() {
               <FormField
                 control={form.control}
                 name="documentNumber"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Número de Documento</FormLabel>
-                    <FormControl>
-                      <Input placeholder="12345678" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                render={({ field }) => {
+                  const selectedUser = existentUsers?.data.find(
+                    (u) => u.documentNumber === field.value,
+                  )
+                  return viewType === 'new' ? (
+                    <FormItem className="flex flex-col">
+                      <FormLabel>Número de Documento</FormLabel>
+                      <div className="flex flex-row w-full gap-2">
+                        <div className="flex-1">
+                          <AutoComplete
+                            options={existentUsers?.data ?? []}
+                            emptyMessage="No se encontraron beneficiarios."
+                            isLoading={existentUsersLoading}
+                            placeholder="Buscar o ingresar número de documento"
+                            value={selectedUser}
+                            nonSelectedValue={field.value}
+                            onValueChange={(user) => {
+                              field.onChange(user.documentNumber)
+                              setFoundUser(user)
+                              form.setValue('name', user.name)
+                              form.setValue('surname', user.surname)
+                              form.setValue('email', user.email)
+                              form.setValue('phone', user.phone)
+                              form.setValue('sex', user.sex)
+                              form.setValue('regionId', user.regionId)
+                              form.setValue('birthDate', user.birthDate)
+                            }}
+                            onInputChange={(val) => {
+                              field.onChange(val)
+                            }}
+                            disabled={foundUser !== null}
+                          />
+                        </div>
+                        <Button
+                          variant="outline"
+                          type="button"
+                          onClick={handleClearFields}
+                          disabled={!foundUser}
+                        >
+                          <Eraser /> Limpiar
+                        </Button>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  ) : (
+                    <FormField
+                      control={form.control}
+                      name="documentNumber"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Número de Documento</FormLabel>
+                          <FormControl>
+                            <Input placeholder="12345678" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )
+                }}
               />
             </div>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -260,6 +371,7 @@ export default function AddAttendantPage() {
                               'pl-3 text-left font-normal',
                               !field.value && 'text-muted-foreground',
                             )}
+                            disabled={foundUser !== null}
                           >
                             {field.value ? (
                               format(field.value, 'PPP', { locale: es })
@@ -294,7 +406,8 @@ export default function AddAttendantPage() {
                     <FormLabel>Sexo</FormLabel>
                     <Select
                       onValueChange={field.onChange}
-                      defaultValue={field.value}
+                      value={field.value}
+                      disabled={foundUser !== null}
                     >
                       <FormControl>
                         <SelectTrigger className="w-full">
@@ -327,6 +440,7 @@ export default function AddAttendantPage() {
                               'w-full justify-between',
                               !field.value && 'text-muted-foreground',
                             )}
+                            disabled={foundUser !== null}
                           >
                             {field.value
                               ? regions?.find((r) => r.id === field.value)?.name
@@ -335,7 +449,7 @@ export default function AddAttendantPage() {
                           </Button>
                         </FormControl>
                       </PopoverTrigger>
-                      <PopoverContent className="w-full p-0">
+                      <PopoverContent className="w-full p-0" align="start">
                         <Command>
                           <CommandInput
                             placeholder="Buscar región"
@@ -383,9 +497,11 @@ export default function AddAttendantPage() {
               <Button
                 type="submit"
                 className="mt-4"
-                disabled={isPendingCreate || isPendingUpdate}
+                disabled={
+                  isPendingCreate || isPendingUpdate || isPendingAddExistent
+                }
               >
-                {isPendingCreate || isPendingUpdate ? (
+                {isPendingCreate || isPendingUpdate || isPendingAddExistent ? (
                   <Spinner />
                 ) : (
                   dependantText.submit[viewType]

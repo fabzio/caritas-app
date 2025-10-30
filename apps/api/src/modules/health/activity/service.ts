@@ -10,7 +10,7 @@ import {
   attention,
   speciality,
 } from '@api/db/schemas/health'
-import { and, asc, count, desc, eq, ilike, or } from 'drizzle-orm'
+import { and, asc, count, desc, eq, ilike, ne, or } from 'drizzle-orm'
 import type { ActivityModel } from './model'
 
 export const createActivity = async (args: ActivityModel.CreateActivity) => {
@@ -526,6 +526,20 @@ export const addAttendantToActivity = async (
 ) => {
   const { userId, activityId } = params
   try {
+    const existentUser = await db
+      .select()
+      .from(activityUser)
+      .where(
+        and(
+          eq(activityUser.activityId, activityId),
+          eq(activityUser.userId, userId),
+        ),
+      )
+
+    if (existentUser.length > 0) {
+      throw new Error('El beneficiario ya es asistente de la actividad')
+    }
+
     await db.insert(activityUser).values({
       activityId,
       userId,
@@ -554,5 +568,65 @@ export const removeAttendantFromActivity = async (
   } catch (error) {
     if (error instanceof Error) throw new PostgresError(error.message)
     throw error
+  }
+}
+
+export const getExistentUsers = async (
+  params: ActivityModel.ListExistentUsersQuery,
+): Promise<ActivityModel.ExistentUser> => {
+  try {
+    const { documentType = '', documentNumber = '', activityId } = params
+    const conditions = []
+    if (documentType) {
+      conditions.push(eq(user.documentType, documentType))
+    }
+    if (documentNumber) {
+      conditions.push(and(ilike(user.documentNumber, `%${documentNumber}%`)))
+    }
+
+    const existentAttendants = await db
+      .select({ userId: activityUser.userId })
+      .from(activityUser)
+      .where(eq(activityUser.activityId, activityId))
+
+    const existentAttendantIds = new Set(
+      existentAttendants.map((att) => att.userId),
+    )
+
+    if (existentAttendantIds.size > 0) {
+      conditions.push(
+        ...Array.from(existentAttendantIds).map((id) => ne(user.id, id)),
+      )
+    }
+
+    const where = conditions.length > 0 ? and(...conditions) : undefined
+
+    const users = await db
+      .select({
+        id: user.id,
+        name: user.name,
+        surname: user.surname,
+        documentType: user.documentType,
+        documentNumber: user.documentNumber,
+        email: user.email,
+        phone: user.phone,
+        birthDate: user.birthDate,
+        sex: user.sex,
+        regionId: user.regionId,
+      })
+      .from(user)
+      .orderBy(asc(user.name))
+      .limit(5)
+      .where(where)
+
+    return {
+      data: users.map((u) => ({
+        ...u,
+        birthDate: new Date(u.birthDate),
+      })),
+    }
+  } catch (e) {
+    if (e instanceof Error) throw new PostgresError(e.message)
+    throw e
   }
 }
