@@ -1,4 +1,5 @@
 import { useSession } from '@frontend/hooks/use-session'
+import OrganizationFormDialog from '@frontend/modules/health/components/organization-form-dialog'
 import { QueryKeys } from '@frontend/shared/constants/query-keys'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQueryClient } from '@tanstack/react-query'
@@ -38,6 +39,7 @@ import { Separator } from '@workspace/ui/components/separator'
 import { Textarea } from '@workspace/ui/components/textarea'
 import { format, parseISO } from 'date-fns'
 import { CalendarIcon, Loader2, UserPlus } from 'lucide-react'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import useGetOrganization from './hooks/use-get-organization'
 import usePostScholarship from './hooks/use-post-scholarship'
@@ -93,6 +95,8 @@ export default function CreateScholarship() {
           },
   })
   const today = new Date()
+  const [organizationFormOpen, setOrganizationFormOpen] = useState(false)
+
   const { data: organizations, isLoading } = useGetOrganization()
   const { mutate: createScholarship, isPending: isPendingCreate } =
     usePostScholarship()
@@ -111,6 +115,9 @@ export default function CreateScholarship() {
       createScholarship(params)
     }
   })
+  const handleNewAlly = () => {
+    setOrganizationFormOpen(true)
+  }
 
   return (
     <div className="flex flex-1 flex-col gap-6 p-4">
@@ -202,19 +209,16 @@ export default function CreateScholarship() {
                                 </SelectItem>
                               ))
                             ) : (
-                              <Link
-                                to="/education/organization"
-                                className="text-sm text-muted-foreground"
-                              >
-                                <div className="flex flex-col items-center py-1">
-                                  No hay organizaciones aliadas disponibles.
-                                  <Separator />{' '}
-                                  <span className="py-1 flex underline items-center gap-2">
-                                    Crear aliado
+                              <div className="flex flex-col items-center py-1 gap-2">
+                                No hay organizaciones aliadas disponibles.
+                                <Separator />{' '}
+                                <Button onClick={handleNewAlly}>
+                                  <span className="py-1 flex underline it(trueems-center gap-2">
+                                    Crear organización aliada
                                     <UserPlus size={16} />
                                   </span>
-                                </div>
-                              </Link>
+                                </Button>
+                              </div>
                             )}
                           </SelectContent>
                         </Select>
@@ -362,6 +366,11 @@ export default function CreateScholarship() {
           </div>
         </div>
       </div>
+      {/* Modal para crear/editar organizaciones */}
+      <OrganizationFormDialog
+        open={organizationFormOpen}
+        onOpenChange={setOrganizationFormOpen}
+      />
     </div>
   )
 }

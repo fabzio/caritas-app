@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query'
 
 const useGetOrganization = () => {
   return useQuery({
-    queryKey: [QueryKeys.ORGANIZATIONSEDU],
+    queryKey: [QueryKeys.ORGANIZATIONS],
     queryFn: async () => {
       const res = await rpc.education.organization.get()
       if (res.error) throw res.error
