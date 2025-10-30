@@ -98,7 +98,7 @@ export default function FairPage() {
           Administración de Ferias Vocacionales
         </h2>
         <p className="text-muted-foreground">
-          Aquí podrá visualizar todas las ferias vocacionales registrados.
+          Aquí podrá visualizar todas las ferias vocacionales registradas.
         </p>
       </header>
 

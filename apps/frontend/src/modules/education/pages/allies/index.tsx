@@ -61,7 +61,7 @@ export default function OrganizationTableView() {
           Administración de organizaciones aliadas
         </h2>
         <p className="text-muted-foreground">
-          Aquí podrá visualizar todas los organizaciones aliadas de educación.
+          Aquí podrá visualizar todas las organizaciones aliadas de educación.
         </p>
       </header>
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">

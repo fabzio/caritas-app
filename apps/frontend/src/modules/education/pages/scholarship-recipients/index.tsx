@@ -64,7 +64,7 @@ export default function ScholarshipRecipients() {
               Administración de becados
             </h2>
             <p className="text-muted-foreground">
-              Aquí podrá visualizar todao los beneficiarios registrados.
+              Aquí podrá visualizar todos los beneficiarios registrados.
             </p>
           </header>
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
