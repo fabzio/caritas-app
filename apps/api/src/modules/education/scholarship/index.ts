@@ -5,6 +5,7 @@ import { ScholarshipModel } from './model'
 import scholarshipRecipients from './recipients'
 import {
   createScholarship,
+  findDuplicateScholarship,
   getScholarships,
   getSingleScholarship,
   PatchScholarship,
@@ -45,19 +46,37 @@ const scholarship = new Elysia({
       },
     },
   )
-  .post('', ({ body }) => createScholarship(body), {
-    auth: true,
-    body: ScholarshipModel.createScholarship,
-    response: {
-      200: t.Number({
-        description: 'ID of the created scholarship',
-      }),
-      401: t.Literal('Unauthorized'),
+  .post(
+    '',
+    async ({ body }) => {
+      const duplicate = await findDuplicateScholarship(body.name)
+      if (duplicate) throw status(400, `La beca "${duplicate.name}" ya existe`)
+      return createScholarship(body)
     },
-  })
+    {
+      auth: true,
+      body: ScholarshipModel.createScholarship,
+      response: {
+        200: t.Number({
+          description: 'ID of the created scholarship',
+        }),
+        401: t.Literal('Unauthorized'),
+      },
+    },
+  )
   .patch(
     '/:id',
-    async ({ params, body }) => await PatchScholarship(Number(params.id), body),
+    async ({ params, body }) => {
+      const id = Number(params.id)
+      const existing = await getSingleScholarship({ id })
+      if (!existing) throw status(404, 'No se encontró la especialidad')
+      if (body.name) {
+        const duplicate = await findDuplicateScholarship(body.name, id)
+        if (duplicate)
+          throw status(400, `La especialidad "${duplicate.name}" ya existe`)
+      }
+      return PatchScholarship(Number(params.id), body)
+    },
     {
       auth: true,
       params: ScholarshipModel.getSingleScholarshipQuery,

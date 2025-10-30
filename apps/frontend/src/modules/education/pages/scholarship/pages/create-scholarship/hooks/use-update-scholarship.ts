@@ -35,7 +35,8 @@ export const useUpdateScholarship = () => {
       if (res.error) throw res.error
       return res.data
     },
-    onError: () => {
+    onError: (error) => {
+      console.log(error.message)
       toast.error('Ocurrió un error desconocido al registrar la beca')
     },
     onSuccess: (data, variables) => {
