@@ -7,14 +7,6 @@ import { getRouteApi, Link, useSearch } from '@tanstack/react-router'
 import { Button } from '@workspace/ui/components/button'
 import { Calendar } from '@workspace/ui/components/calendar'
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@workspace/ui/components/card'
-import {
   Form,
   FormControl,
   FormField,
@@ -38,7 +30,7 @@ import {
 import { Separator } from '@workspace/ui/components/separator'
 import { Textarea } from '@workspace/ui/components/textarea'
 import { format, parseISO } from 'date-fns'
-import { CalendarIcon, Loader2, UserPlus } from 'lucide-react'
+import { CalendarIcon, Loader2, ShieldPlus, UserPlus } from 'lucide-react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import useGetOrganization from './hooks/use-get-organization'
@@ -226,6 +218,7 @@ export default function CreateScholarship() {
                       </FormItem>
                     )}
                   />
+
                   <FormField
                     control={form.control}
                     name="description"
@@ -370,6 +363,7 @@ export default function CreateScholarship() {
       <OrganizationFormDialog
         open={organizationFormOpen}
         onOpenChange={setOrganizationFormOpen}
+        type="education"
       />
     </div>
   )
