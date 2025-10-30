@@ -293,6 +293,97 @@ export const createCompleteActivity = async (
   }
 }
 
+export const getActivityDetailById = async (id: number) => {
+  try {
+    const [activityData] = await db
+      .select({
+        id: activity.id,
+        name: activity.name,
+        date: activity.date,
+        duration: activity.duration,
+        state: activity.state,
+        statusName: activityStatus.name,
+        typeName: activityType.name,
+        address: activity.address,
+        spaceName: organization.name,
+        creatorName: user.name,
+        regionName: region.name,
+      })
+      .from(activity)
+      .innerJoin(activityStatus, eq(activity.statusId, activityStatus.id))
+      .innerJoin(activityType, eq(activity.typeId, activityType.id))
+      .innerJoin(organization, eq(activity.spaceId, organization.id))
+      .innerJoin(user, eq(activity.userId, user.id))
+      .innerJoin(region, eq(region.id, activity.regionId))
+      .where(eq(activity.id, id))
+      .limit(1)
+
+    if (!activityData) {
+      throw new Error('Actividad no encontrada')
+    }
+
+    const attendants = await db
+      .select({
+        userId: activityUser.userId,
+        userName: user.name,
+        userBirthDate: user.birthDate,
+        userSex: user.sex,
+        district: region.name,
+      })
+      .from(activityUser)
+      .innerJoin(user, eq(activityUser.userId, user.id))
+      .innerJoin(region, eq(user.regionId, region.id))
+      .where(eq(activityUser.activityId, id))
+
+    const attendantsList = attendants.map((u) => ({
+      ...u,
+      userBirthDate: new Date(u.userBirthDate as unknown as string | Date)
+        .toISOString()
+        .split('T')[0],
+    }))
+
+    const participations = await db
+      .select({
+        alliedId: alliedParticipation.alliedId,
+        specialityId: alliedParticipation.specialityId,
+      })
+      .from(alliedParticipation)
+      .where(eq(alliedParticipation.activityId, id))
+
+    const participantsMap = new Map<
+      string,
+      { alliedId: string; specialityIds: number[] }
+    >()
+
+    for (const p of participations) {
+      if (!participantsMap.has(p.alliedId)) {
+        participantsMap.set(p.alliedId, {
+          alliedId: p.alliedId,
+          specialityIds: [],
+        })
+      }
+      const participant = participantsMap.get(p.alliedId)
+      if (participant) {
+        participant.specialityIds.push(p.specialityId)
+      }
+    }
+
+    const result = {
+      ...activityData,
+      date: new Date(activityData.date as unknown as string | Date)
+        .toISOString()
+        .split('T')[0],
+      participants: Array.from(participantsMap.values()),
+      attendants: attendantsList,
+    }
+
+    return result
+  } catch (error) {
+    if (error instanceof Error) throw new PostgresError(error.message)
+    throw error
+  }
+}
+
 export const getActivityById = async (id: number) => {
   try {
     const [activityData] = await db
