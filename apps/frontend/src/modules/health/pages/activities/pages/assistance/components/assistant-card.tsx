@@ -1,4 +1,4 @@
-import { getRouteApi, Link } from '@tanstack/react-router'
+import { getRouteApi, useNavigate } from '@tanstack/react-router'
 import { Button } from '@workspace/ui/components/button'
 import { Card, CardContent } from '@workspace/ui/components/card'
 import {
@@ -12,7 +12,7 @@ import {
 } from '@workspace/ui/components/dialog'
 import { useState } from 'react'
 import { useRemoveAttendant } from '../hooks/use-remove-attendant'
-import AssistantOptions from './assistant-options'
+import AssistantOptionsButtons from './assistant-options-buttons'
 
 export interface Assistant {
   id: string
@@ -42,14 +42,25 @@ export default function AssistantCard({
     removeAttendant({ userId: assistant.id, activityId: loaderData.id })
     setIsDeleteModalOpen(false)
   }
+
+  const navigate = useNavigate()
+  const handleEdit = () => {
+    navigate({
+      to: '/health/activities/$activityId/form',
+      params: {
+        activityId: loaderData.id.toString(),
+      },
+      search: { id: assistant.id, type: 'edit' },
+    })
+  }
   return (
     <>
       <Card
         className="cursor-pointer hover:shadow-md transition-shadow"
         onClick={() => onClick?.(assistant)}
       >
-        <CardContent className="p-4">
-          <div className="flex flex-row justify-between items-center">
+        <CardContent className="px-4 py-0">
+          <div className="flex flex-col items-start gap-4 md:flex-row md:justify-between md:items-center md:gap-2">
             <div className="space-y-1">
               <p className="font-medium text-lg">{assistant.name}</p>
               <p className="text-sm text-muted-foreground">
@@ -57,8 +68,9 @@ export default function AssistantCard({
               </p>
             </div>
             <div>
-              <AssistantOptions
+              <AssistantOptionsButtons
                 onDeleteClick={() => setIsDeleteModalOpen(true)}
+                onEditClick={handleEdit}
               />
             </div>
           </div>

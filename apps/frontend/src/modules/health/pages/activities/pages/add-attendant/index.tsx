@@ -1,7 +1,8 @@
 import { useRegions } from '@frontend/hooks/use-regions'
+import { useUserDetail } from '@frontend/modules/admin/pages/users/pages/create-user/hooks/use-user-detail'
 import { formUserSchema } from '@frontend/shared/models/user'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { getRouteApi, Link } from '@tanstack/react-router'
+import { getRouteApi, Link, useSearch } from '@tanstack/react-router'
 import { Button } from '@workspace/ui/components/button'
 import { Calendar } from '@workspace/ui/components/calendar'
 import {
@@ -41,13 +42,24 @@ import { CalendarIcon, Check, ChevronsUpDown, Loader2 } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import type z from 'zod'
 import { useAddAttendant } from './hooks/use-add-attendant'
+import { useUpdateAttendant } from './hooks/use-edit-attendant'
 
 export default function AddAttendantPage() {
   const loaderData = getRouteApi(
     '/_authenticated/health/activities/$activityId/form',
   ).useLoaderData()
+  const formattedDate = loaderData?.date
+    ? format(new Date(loaderData.date), 'PPP', { locale: es })
+    : ''
+
+  const { id, type: viewType } = useSearch({
+    from: '/_authenticated/health/activities/$activityId/form',
+  })
+  const { data: userData } = useUserDetail(id)
 
   const { mutate: addAttendant, isPending: isPendingCreate } = useAddAttendant()
+  const { mutate: updateAttendant, isPending: isPendingUpdate } =
+    useUpdateAttendant()
 
   const formSchema = formUserSchema.omit({
     password: true,
@@ -59,26 +71,26 @@ export default function AddAttendantPage() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: '',
-      surname: '',
-      email: '',
-      phone: '',
-      documentType: 'DNI',
-      documentNumber: '',
-      birthDate: undefined,
-      sex: undefined,
-      regionId: undefined,
+      name: userData?.name || '',
+      surname: userData?.surname || '',
+      email: userData?.email || '',
+      phone: userData?.phone || '',
+      documentType: (userData?.documentType as 'DNI' | 'CE' | 'PAS') ?? 'DNI',
+      documentNumber: userData?.documentNumber || '',
+      birthDate: userData?.birthDate,
+      sex: userData?.sex,
+      regionId: userData?.regionId,
     },
   })
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  const submitUpdate = (values: z.infer<typeof formSchema>) => {
     if (typeof loaderData?.id !== 'number') return
-    addAttendant({
-      email: values.email,
-      name: values.name,
-      role: 'user',
-      password: import.meta.env.DEV ? 'default' : crypto.randomUUID(),
+    if (!(viewType === 'edit' && userData?.id)) return
+    updateAttendant({
+      userId: userData.id,
       data: {
+        email: values.email,
+        name: values.name,
         surname: values.surname,
         documentType: values.documentType,
         documentNumber: values.documentNumber,
@@ -87,14 +99,44 @@ export default function AddAttendantPage() {
         phone: values.phone,
         regionId: values.regionId,
       },
+      teamIds: undefined,
       activityId: loaderData.id,
     })
+  }
+
+  function onSubmit(values: z.infer<typeof formSchema>) {
+    if (typeof loaderData?.id !== 'number') return
+    if (viewType === 'edit' && userData?.id) {
+      submitUpdate(values)
+    } else {
+      addAttendant({
+        email: values.email,
+        name: values.name,
+        role: 'user',
+        password: import.meta.env.DEV ? 'default' : crypto.randomUUID(),
+        data: {
+          surname: values.surname,
+          documentType: values.documentType,
+          documentNumber: values.documentNumber,
+          sex: values.sex,
+          birthDate: values.birthDate,
+          phone: values.phone,
+          regionId: values.regionId,
+        },
+        activityId: loaderData.id,
+      })
+    }
   }
 
   return (
     <div className="w-full p-4">
       <div className="mt-4 w-full md:w-3/5 mx-auto">
-        <h1 className="text-2xl font-medium">Registrar Asistente</h1>
+        <h1 className="text-2xl font-medium">
+          {dependantText.mainTitle[viewType]}
+        </h1>
+        <h2 className="text-lg font-light">
+          {loaderData?.name} - {formattedDate}
+        </h2>
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
@@ -338,8 +380,16 @@ export default function AddAttendantPage() {
               />
             </div>
             <div className="w-full flex gap-2 justify-center">
-              <Button type="submit" className="mt-4" disabled={isPendingCreate}>
-                {isPendingCreate ? <Spinner /> : 'Registrar Asistente'}
+              <Button
+                type="submit"
+                className="mt-4"
+                disabled={isPendingCreate || isPendingUpdate}
+              >
+                {isPendingCreate || isPendingUpdate ? (
+                  <Spinner />
+                ) : (
+                  dependantText.submit[viewType]
+                )}
               </Button>
               <Link
                 to={
@@ -359,4 +409,15 @@ export default function AddAttendantPage() {
       </div>
     </div>
   )
+}
+
+const dependantText = {
+  mainTitle: {
+    new: 'Registrar Asistente',
+    edit: 'Editar Asistente',
+  },
+  submit: {
+    new: 'Registrar Asistente',
+    edit: 'Guardar Cambios',
+  },
 }
