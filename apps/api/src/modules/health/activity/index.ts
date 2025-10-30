@@ -15,6 +15,7 @@ import {
   deleteActivities,
   getActivities,
   getActivityById,
+  getActivityDetailById,
   getActivityParticipants,
   getRegionsWithActivities,
   getUserAttentions,
@@ -51,6 +52,55 @@ const activityModule = new Elysia({ name: 'activity', prefix: '/activities' })
       401: t.Literal('Unauthorized'),
     },
   })
+  .get(
+    '/detail/:id',
+    async ({ params }) => {
+      const id = Number(params.id)
+      if (Number.isNaN(id)) throw status(400, 'Invalid id')
+      try {
+        return await getActivityDetailById(id)
+      } catch (e) {
+        if (e instanceof Error) throw status(404, e.message)
+        throw e
+      }
+    },
+    {
+      auth: true,
+      response: {
+        200: t.Object({
+          id: t.Number(),
+          name: t.String(),
+          date: t.String(),
+          duration: t.String(),
+          spaceName: t.String(),
+          typeName: t.String(),
+          statusName: t.String(),
+          creatorName: t.String(),
+          regionName: t.String(),
+          address: t.String(),
+          state: t.Boolean(),
+          participants: t.Array(
+            t.Object({
+              alliedId: t.String(),
+              specialityIds: t.Array(t.Number()),
+            }),
+          ),
+          attendants: t.Array(
+            t.Object({
+              userId: t.String(),
+              userName: t.String(),
+              userBirthDate: t.String(),
+              userSex: t.String(),
+              district: t.String(),
+            }),
+          ),
+        }),
+        400: t.Object({ error: t.String() }),
+        404: t.Object({ error: t.String() }),
+        401: t.Literal('Unauthorized'),
+      },
+    },
+  )
   .get(
     '/:id',
     async ({ params }) => {
