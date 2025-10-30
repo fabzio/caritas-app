@@ -19,6 +19,7 @@ import { Route as AuthResetPasswordRouteImport } from './routes/auth/reset-passw
 import { Route as AuthRegisterRouteImport } from './routes/auth/register'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
 import { Route as AuthForgotPasswordRouteImport } from './routes/auth/forgot-password'
+import { Route as AuthErrorRouteImport } from './routes/auth/error'
 import { Route as AuthenticatedUserRouteImport } from './routes/_authenticated/user'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedOrganizationRouteImport } from './routes/_authenticated/organization'
@@ -113,6 +114,11 @@ const AuthLoginRoute = AuthLoginRouteImport.update({
 const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
   id: '/forgot-password',
   path: '/forgot-password',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthErrorRoute = AuthErrorRouteImport.update({
+  id: '/error',
+  path: '/error',
   getParentRoute: () => AuthRoute,
 } as any)
 const AuthenticatedUserRoute = AuthenticatedUserRouteImport.update({
@@ -394,6 +400,7 @@ export interface FileRoutesByFullPath {
   '/organization': typeof AuthenticatedOrganizationRouteWithChildren
   '/settings': typeof AuthenticatedSettingsRouteWithChildren
   '/user': typeof AuthenticatedUserRouteWithChildren
+  '/auth/error': typeof AuthErrorRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
@@ -444,6 +451,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/beneficiary': typeof AuthenticatedBeneficiaryRoute
+  '/auth/error': typeof AuthErrorRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
@@ -503,6 +511,7 @@ export interface FileRoutesById {
   '/_authenticated/organization': typeof AuthenticatedOrganizationRouteWithChildren
   '/_authenticated/settings': typeof AuthenticatedSettingsRouteWithChildren
   '/_authenticated/user': typeof AuthenticatedUserRouteWithChildren
+  '/auth/error': typeof AuthErrorRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
@@ -562,6 +571,7 @@ export interface FileRouteTypes {
     | '/organization'
     | '/settings'
     | '/user'
+    | '/auth/error'
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/register'
@@ -612,6 +622,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/beneficiary'
+    | '/auth/error'
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/register'
@@ -670,6 +681,7 @@ export interface FileRouteTypes {
     | '/_authenticated/organization'
     | '/_authenticated/settings'
     | '/_authenticated/user'
+    | '/auth/error'
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/register'
@@ -796,6 +808,13 @@ declare module '@tanstack/react-router' {
       path: '/forgot-password'
       fullPath: '/auth/forgot-password'
       preLoaderRoute: typeof AuthForgotPasswordRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/auth/error': {
+      id: '/auth/error'
+      path: '/error'
+      fullPath: '/auth/error'
+      preLoaderRoute: typeof AuthErrorRouteImport
       parentRoute: typeof AuthRoute
     }
     '/_authenticated/user': {
@@ -1321,6 +1340,7 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
 )
 
 interface AuthRouteChildren {
+  AuthErrorRoute: typeof AuthErrorRoute
   AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
   AuthLoginRoute: typeof AuthLoginRoute
   AuthRegisterRoute: typeof AuthRegisterRoute
@@ -1330,6 +1350,7 @@ interface AuthRouteChildren {
 }
 
 const AuthRouteChildren: AuthRouteChildren = {
+  AuthErrorRoute: AuthErrorRoute,
   AuthForgotPasswordRoute: AuthForgotPasswordRoute,
   AuthLoginRoute: AuthLoginRoute,
   AuthRegisterRoute: AuthRegisterRoute,

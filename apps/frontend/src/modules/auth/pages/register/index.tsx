@@ -8,7 +8,7 @@ import {
 } from '@frontend/shared/models/user'
 import { zodResolver } from '@hookform/resolvers/zod'
 import type { TurnstileInstance } from '@marsidev/react-turnstile'
-import { Link } from '@tanstack/react-router'
+import { Link, useSearch } from '@tanstack/react-router'
 import { Button } from '@workspace/ui/components/button'
 import { Calendar } from '@workspace/ui/components/calendar'
 import {
@@ -52,16 +52,31 @@ import { useForm } from 'react-hook-form'
 import { useRegister } from './hooks/use-register'
 
 export default function Register() {
+  const { email, name } = useSearch({ from: '/auth/register' })
+  const normalizedName = (name ?? '').trim()
+  const nameParts = normalizedName ? normalizedName.split(/\s+/) : []
+  let suggestedSurname = ''
+  if (nameParts.length > 2) {
+    suggestedSurname = nameParts.slice(-2).join(' ')
+  } else if (nameParts.length === 2) {
+    suggestedSurname = nameParts[1]
+  }
+  let suggestedName = ''
+  if (nameParts.length > 2) {
+    suggestedName = nameParts.slice(0, -2).join(' ')
+  } else if (nameParts.length >= 1) {
+    suggestedName = nameParts[0]
+  }
   const ref = useRef<TurnstileInstance>(null)
   const form = useForm<FormUserSchema>({
     resolver: zodResolver(formUserSchema),
     defaultValues: {
-      name: '',
-      surname: '',
+      name: suggestedName,
+      surname: suggestedSurname,
       documentType: 'DNI',
       documentNumber: '',
       phone: '',
-      email: '',
+      email: email ?? '',
       password: '',
       birthDate: undefined,
       regionId: undefined,
