@@ -72,18 +72,22 @@ export default function ScholarshipPage() {
   return (
     <div className="flex flex-1 flex-col gap-6 p-4">
       <div className="flex flex-col gap-1">
-        <h1 className="text-2xl font-semibold text-foreground">
-          Administración de becas
-        </h1>
+        <header className="mb-6">
+          <h2 className="text-2xl font-bold leading-tight">
+            Administración de becas
+          </h2>
+          <p className="text-muted-foreground">
+            Aquí podrá visualizar todas las becas registradas.
+          </p>
+        </header>
       </div>
       <div>
         <div className="w-full flex flex-col sm:flex-row gap-4 justify-between mb-6">
-          <div className="relative flex-1 max-w-sm">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <div className="relative flex-1">
+            {/* <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" /> */}
             <Input
               placeholder="Buscar becas..."
               onChange={handleSearchChange}
-              className="pl-9"
             />
           </div>
           <div className="flex gap-2">

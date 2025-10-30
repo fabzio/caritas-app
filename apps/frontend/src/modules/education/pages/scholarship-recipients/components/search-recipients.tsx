@@ -10,10 +10,10 @@ export default function SearchRecipients() {
   }, 300)
   return (
     <>
-      <SearchIcon className="absolute ml-3 mt-2.5 h-5 w-5" />
+      {/* <SearchIcon className="absolute ml-3 mt-2 h-5 w-5" /> */}
       <Input
         placeholder="Buscar becado por nombre o nro. de documento..."
-        className="w-1/3 pl-10"
+        // className="pl-10"
         inputMode="search"
         onChange={onChangeFilter}
       />
