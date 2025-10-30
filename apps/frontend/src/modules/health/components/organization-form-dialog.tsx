@@ -41,6 +41,7 @@ type Props = {
   onOpenChange: (open: boolean) => void
   ally?: Ally | null
   onCompleted?: (params: { action: 'create' | 'update'; ally: Ally }) => void
+  type?: 'health' | 'education'
 }
 
 export default function OrganizationFormDialog({
@@ -48,13 +49,16 @@ export default function OrganizationFormDialog({
   onOpenChange,
   ally,
   onCompleted,
+  type = 'health',
 }: Readonly<Props>) {
   const form = useForm<FormAllySchema>({
     resolver: zodResolver(formAllySchema),
     defaultValues: { name: '' },
   })
 
-  const { mutateAsync: createAlly, isPending: isCreating } = useCreateAlly()
+  const { mutateAsync: createAlly, isPending: isCreating } = useCreateAlly({
+    type,
+  })
   const { mutateAsync: updateAlly, isPending: isUpdating } = useUpdateAlly()
 
   const isEditMode = Boolean(ally?.id)

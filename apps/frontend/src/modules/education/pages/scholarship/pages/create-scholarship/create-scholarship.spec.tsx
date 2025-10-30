@@ -7,7 +7,6 @@ import CreateScholarship from './index'
 
 const mockPostScholarship = vi.fn()
 const mockUseSession = vi.fn()
-
 vi.mock('./hooks/use-post-scholarship', () => ({
   default: () => ({ mutate: mockPostScholarship, isPending: false }),
 }))
@@ -197,6 +196,8 @@ vi.mock('date-fns', () => ({
 vi.mock('lucide-react', () => ({
   CalendarIcon: () => <span>📅</span>,
   Loader2: () => <span>⏳</span>,
+  XIcon: () => <span>❌</span>,
+  UserPlus: () => <span>👤+</span>,
 }))
 const queryClient = new QueryClient()
 describe('CreateScholarship', () => {

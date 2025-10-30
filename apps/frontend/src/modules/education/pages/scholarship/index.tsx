@@ -1,5 +1,5 @@
 import { useIsMobile } from '@frontend/hooks/use-mobile'
-import { Link } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
 import { Button } from '@workspace/ui/components/button'
 import { Card, CardContent } from '@workspace/ui/components/card'
 import {
@@ -15,11 +15,10 @@ import { MoreVertical, PlusCircle, Search } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import ScholarshipTable from './components/scholarship-table'
 import { useScholarshipTable } from './hooks/use-table'
-
 export default function ScholarshipPage() {
   const isMobile = useIsMobile()
   const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({})
-
+  const navigate = useNavigate()
   const skeletonKeys = useMemo(
     () =>
       Array.from(
@@ -58,7 +57,13 @@ export default function ScholarshipPage() {
     if (selectedIds.length === 1 && scholarships) {
       const selectedScholarship =
         scholarships[Number.parseInt(selectedIds[0], 10)]
-      //TODO: edit scholarship logic
+      navigate({
+        to: '/education/scholarship/form',
+        search: {
+          type: 'edit',
+          id: selectedScholarship.id,
+        },
+      })
       console.log('Edit scholarship:', selectedScholarship?.id)
     }
   }
