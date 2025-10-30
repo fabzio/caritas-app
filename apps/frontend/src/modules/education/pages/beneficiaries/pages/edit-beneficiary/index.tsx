@@ -485,11 +485,12 @@ const formSchema = formUserSchema
     }
 
     if (documentType === 'CE') {
-      if (!/^\d+$/.test(trimmedValue)) {
+      if (!/^[a-zA-Z0-9]+$/.test(trimmedValue)) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           path: ['documentNumber'],
-          message: 'El Carnet de Extranjería solo debe contener números',
+          message:
+            'El Carnet de Extranjería solo debe contener caracteres alfanuméricos',
         })
         return
       }
