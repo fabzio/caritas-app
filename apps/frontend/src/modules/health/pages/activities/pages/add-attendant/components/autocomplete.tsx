@@ -45,7 +45,7 @@ export const AutoComplete = ({
   const inputRef = useRef<HTMLInputElement>(null)
 
   const [isOpen, setOpen] = useState(false)
-  const [selected, setSelected] = useState<ExistentUsers>(
+  const [selected, setSelected] = useState<ExistentUsers | undefined>(
     value as ExistentUsers,
   )
   const [nonSelected, setNonSelected] = useState<string>(
@@ -105,7 +105,7 @@ export const AutoComplete = ({
     setInputValue(val)
     setNonSelected(val)
     onInputChange?.(val)
-    setSelected(undefined as unknown as ExistentUsers)
+    setSelected(undefined)
   }
 
   return (
