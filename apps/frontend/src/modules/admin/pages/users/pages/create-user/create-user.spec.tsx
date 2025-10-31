@@ -386,6 +386,7 @@ describe('FormView - Edit Mode', () => {
       expect(mockUpdateUser).toHaveBeenCalledWith({
         userId: 'user-1',
         data: {
+          id: 'user-1',
           email: 'john@example.com',
           name: 'John',
           role: 'admin',
