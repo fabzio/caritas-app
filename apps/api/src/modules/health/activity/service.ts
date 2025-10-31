@@ -10,7 +10,19 @@ import {
   attention,
   speciality,
 } from '@api/db/schemas/health'
-import { and, asc, count, desc, eq, gte, ilike, lte, ne, or } from 'drizzle-orm'
+import {
+  and,
+  asc,
+  count,
+  desc,
+  eq,
+  gte,
+  ilike,
+  lte,
+  ne,
+  notInArray,
+  or,
+} from 'drizzle-orm'
 import type { ActivityModel } from './model'
 
 export const createActivity = async (args: ActivityModel.CreateActivity) => {
@@ -780,9 +792,7 @@ export const getExistentUsers = async (
     )
 
     if (existentAttendantIds.size > 0) {
-      conditions.push(
-        ...Array.from(existentAttendantIds).map((id) => ne(user.id, id)),
-      )
+      conditions.push(notInArray(user.id, Array.from(existentAttendantIds)))
     }
 
     const where = conditions.length > 0 ? and(...conditions) : undefined

@@ -6,6 +6,7 @@ import {
   CommandList,
 } from '@workspace/ui/components/command'
 import { Skeleton } from '@workspace/ui/components/skeleton'
+import { cn } from '@workspace/ui/lib/utils'
 import { type ClassValue, clsx } from 'clsx'
 import { Command as CommandPrimitive } from 'cmdk'
 import { Check } from 'lucide-react'
@@ -25,10 +26,6 @@ type AutoCompleteProps = {
   isLoading?: boolean
   disabled?: boolean
   placeholder?: string
-}
-
-function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
 }
 
 export const AutoComplete = ({

@@ -527,7 +527,7 @@ export default function AddAttendantPage() {
   )
 }
 
-const dependantText = {
+const dependentText = {
   mainTitle: {
     new: 'Registrar Asistente',
     edit: 'Editar Asistente',
