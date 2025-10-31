@@ -346,6 +346,7 @@ describe('FormView - Edit Mode', () => {
     mockUseLoaderData.mockReturnValue(loader)
     mockUseUserDetail.mockReturnValue({ data: loader })
     setMockFormValues({
+      id: 'user-1',
       name: 'John',
       surname: 'Doe',
       email: 'john@example.com',
