@@ -247,7 +247,6 @@ describe('Health Beneficiary FormView', () => {
         role: 'user',
         password: 'default',
         data: {
-          id: 'beneficiary-1',
           surname: 'Doe',
           documentType: 'DNI',
           documentNumber: '12345678',
