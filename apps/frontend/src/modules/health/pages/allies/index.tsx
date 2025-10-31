@@ -10,25 +10,19 @@ import {
 } from '@workspace/ui/components/dialog'
 import { UserPlus } from 'lucide-react'
 import { useState } from 'react'
+import OrganizationFormDialog from '../../components/organization-form-dialog'
 import ActionsButton from './components/actions-button'
 import DeleteConfirmationDialog from './components/delete-confirmation-dialog'
-import OrganizationFormDialog from './components/organization-form-dialog'
 import OrganizationTable from './components/organization-table'
 import SearchHealthOrganizationInput from './components/search-organization-input'
 import { useOrganizationTable } from './hooks/use-ally-table'
-
-interface FormModalStateType {
-  open: boolean
-  type: 'new' | 'edit'
-}
+import type { Organization } from './hooks/use-list-ally'
 
 export default function AlliesTableView() {
   const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({})
   const [deleteOpen, setDeleteOpen] = useState(false)
-  const [formModal, setFormModal] = useState<FormModalStateType>({
-    open: false,
-    type: 'new',
-  })
+  const [formOpen, setFormOpen] = useState(false)
+  const [editingAlly, setEditingAlly] = useState<Organization | null>(null)
 
   const {
     data: allies,
@@ -45,7 +39,10 @@ export default function AlliesTableView() {
 
   const selectedAllies = selectedRows
     .map((rowIndex) => allies?.[rowIndex])
-    .filter((ally): ally is NonNullable<typeof ally> => Boolean(ally))
+    .filter(
+      (ally): ally is NonNullable<typeof ally> =>
+        ally !== undefined && ally !== null,
+    )
 
   const allyCount = selectedAllies.length
 
@@ -59,10 +56,37 @@ export default function AlliesTableView() {
     setRowSelection({})
   }
 
+  const handleEdit = () => {
+    const ally = selectedAllies[0]
+    if (!ally) return
+    setEditingAlly(ally)
+    setFormOpen(true)
+  }
+
+  const handleNew = () => {
+    setEditingAlly(null)
+    setFormOpen(true)
+  }
+
+  const handleFormOpenChange = (open: boolean) => {
+    if (!open) setEditingAlly(null)
+    setFormOpen(open)
+  }
+
   return (
     <div className="w-full p-4">
-      <div className="flex justify-between items-center gap-2">
-        <div className="flex flex-col sm:flex-row sm:items-center gap-3 w-full">
+      <header className="mb-6">
+        <h2 className="text-2xl font-bold leading-tight">
+          Administración de Organizaciones Aliadas
+        </h2>
+        <p className="text-muted-foreground">
+          Aquí podrá visualizar todas las organizaciones aliadas de servicios de
+          salud.
+        </p>
+      </header>
+
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+        <div className="w-full">
           <div className="flex-1 w-full">
             <SearchHealthOrganizationInput />
           </div>
@@ -70,10 +94,10 @@ export default function AlliesTableView() {
         <div className="flex items-center gap-2">
           <ActionsButton
             onDeleteClick={() => setDeleteOpen(true)}
-            onEditClick={() => setFormModal({ open: true, type: 'edit' })}
+            onEditClick={handleEdit}
             selectedCount={allyCount}
           />
-          <Button onClick={() => setFormModal({ open: true, type: 'new' })}>
+          <Button onClick={handleNew}>
             <UserPlus />
             Nuevo aliado
           </Button>
@@ -95,7 +119,7 @@ export default function AlliesTableView() {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>
-              {`¿Seguro que desea eliminar ${allyCount} organizaci${allyCount !== 1 ? 'ones' : 'ón'}?`}
+              {`¿Seguro que desea eliminar ${allyCount} organizaci${allyCount === 1 ? 'ón' : 'ones'}?`}
             </DialogTitle>
             <DialogDescription>
               Esta acción no se puede deshacer.
@@ -115,11 +139,10 @@ export default function AlliesTableView() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      {/* Modal para crear/editar */}
       <OrganizationFormDialog
-        open={formModal.open}
-        onOpenChange={setFormModal}
-        initialData={selectedAllies[0] || undefined}
+        open={formOpen}
+        onOpenChange={handleFormOpenChange}
+        ally={editingAlly ?? undefined}
       />
       <DeleteConfirmationDialog
         open={deleteOpen}

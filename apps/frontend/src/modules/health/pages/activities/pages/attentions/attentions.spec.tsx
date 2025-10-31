@@ -9,6 +9,8 @@ const mockUseLoaderData = vi.fn()
 const mockUseActivityParticipant = vi.fn()
 const mockUseUserAttentions = vi.fn()
 const mockUpdateActivityUser = vi.fn()
+const mockUseSession = vi.fn()
+const mockCreateAttention = vi.fn()
 
 vi.mock('@tanstack/react-router', () => ({
   useParams: (opts?: unknown) => mockUseParams(opts),
@@ -41,6 +43,17 @@ vi.mock('./hooks/use-user-attentions', () => ({
 vi.mock('./hooks/use-update-activity-user', () => ({
   useUpdateActivityUser: () => ({
     mutate: mockUpdateActivityUser,
+    isPending: false,
+  }),
+}))
+
+vi.mock('@frontend/hooks/use-session', () => ({
+  useSession: () => mockUseSession(),
+}))
+
+vi.mock('./hooks/use-create-attention', () => ({
+  useCreateAttention: () => ({
+    mutate: mockCreateAttention,
     isPending: false,
   }),
 }))
@@ -173,6 +186,13 @@ describe('AttentionsPage', () => {
         name: 'John',
         surname: 'Doe',
         rewarded: false,
+      },
+    })
+    mockUseSession.mockReturnValue({
+      data: {
+        user: {
+          id: 'session-user',
+        },
       },
     })
   })

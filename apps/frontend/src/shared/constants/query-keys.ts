@@ -4,8 +4,8 @@ export const QueryKeys = {
   ORGANIZATIONS: 'organizations',
   ORGANIZATIONSEDU: 'organizationsEducation',
   ORGANIZATIONSMAJOR: 'organizationsMajor',
+  SCHOLARSHIP: 'scholarships',
   SCHOLARSHIP_APPLICATION: 'scholarship-applications',
-  SPECIALITY: 'speciality',
   USER_TEAMS: 'teams',
   SETTINGS: {
     ACCOUNTS: 'settings-accounts',
@@ -25,9 +25,14 @@ export const QueryKeys = {
     FAIR: 'education-fair',
     SCHOLARSHIP_APPLICATION: 'education-scholarship-applications',
     ORGANIZATIONS: 'education-organizations',
+    BENEFICIARIES: 'education-beneficiaries',
   },
   HEALTH: {
     ACTIVITIES: 'health-activities',
+    ACTIVITY_DETAIL: 'health-activity-detail',
+    ACTIVITY_REGIONS: 'health-activity-regions',
+    SPECIALITIES: 'health-specialities',
+    BENEFICIARIES: 'health-beneficiaries',
     ACTIVITY: {
       ALLIES: 'health-activity-allies',
       STATUSES: 'health-activity-statuses',

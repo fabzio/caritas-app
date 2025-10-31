@@ -14,7 +14,7 @@ export namespace ActivityModel {
     state: t.Boolean(),
     statusName: t.String(),
     typeName: t.String(),
-    spaceName: t.String(),
+    regionName: t.String(),
     creatorName: t.String(),
   })
 
@@ -23,6 +23,9 @@ export namespace ActivityModel {
     page: t.Optional(t.Integer({ minimum: 0 })),
     limit: t.Optional(t.Integer({ minimum: 1, maximum: 100 })),
     sortBy: t.Optional(t.String()),
+    regionIds: t.Optional(t.String()),
+    startDate: t.Optional(t.String()),
+    endDate: t.Optional(t.String()),
   })
   export type ListActivitiesQuery = typeof listActivitiesQuery.static
 
@@ -67,6 +70,9 @@ export namespace ActivityModel {
   export const userAttentionSchema = t.Object({
     specialityId: t.Integer(),
     specialityName: t.String(),
+    alliedId: t.String(),
+    alliedName: t.String(),
+    alliedParticipationId: t.Integer(),
     hasAttention: t.Boolean(),
     attentionId: t.Nullable(t.Integer()),
     attentionTime: t.Nullable(t.String()),
@@ -107,6 +113,8 @@ export namespace ActivityModel {
     duration: t.String(),
     description: t.Optional(t.String({ maxLength: 500 })),
     spaceId: t.String({ minLength: 32, maxLength: 32 }),
+    regionId: t.Integer({ minimum: 1 }),
+    address: t.String({ minLength: 1, maxLength: 200 }),
     statusId: t.Integer({ minimum: 1, maximum: 6 }),
     typeId: t.Integer({ minimum: 1, maximum: 2 }),
     userId: t.String({ minLength: 32, maxLength: 32 }),
@@ -119,6 +127,26 @@ export namespace ActivityModel {
     ),
   })
   export type CreateCompleteActivity = typeof createCompleteActivity.static
+
+  export const createAttentionSchema = t.Object({
+    userId: t.String({ minLength: 32, maxLength: 32 }),
+    alliedParticipationId: t.Number(),
+    observations: t.Optional(t.String()),
+    registeredBy: t.String({ minLength: 32, maxLength: 32 }),
+  })
+
+  export type CreateAttention = typeof createAttentionSchema.static
+
+  export const createAttentionResponse = t.Object({
+    id: t.Integer(),
+    userId: t.String({ minLength: 32, maxLength: 32 }),
+    alliedParticipationId: t.Number(),
+    observations: t.Nullable(t.String()),
+    registeredBy: t.String({ minLength: 32, maxLength: 32 }),
+    timestamp: t.Date(),
+  })
+
+  export type CreateAttentionResponse = typeof createAttentionResponse.static
 
   export const attendantActivity = t.Object({
     userId: t.String(),

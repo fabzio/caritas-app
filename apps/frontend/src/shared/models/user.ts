@@ -12,14 +12,17 @@ export const formUserSchema = z
     confirmPassword: z.string(),
     name: z
       .string()
+      .trim()
       .min(2, { message: 'El nombre debe tener al menos 2 caracteres' })
       .max(50, { message: 'El nombre no puede tener más de 50 caracteres' }),
     surname: z
       .string()
+      .trim()
       .min(2, { message: 'El apellido debe tener al menos 2 caracteres' })
       .max(50, { message: 'El apellido no puede tener más de 50 caracteres' }),
     phone: z
       .string()
+      .trim()
       .min(7, { message: 'El teléfono debe tener al menos 7 dígitos' })
       .max(12, { message: 'El teléfono no puede tener más de 12 dígitos' })
       .regex(/^[0-9]+$/, { message: 'El teléfono solo debe contener números' }),
@@ -41,7 +44,7 @@ export const formUserSchema = z
       error: () => ({ message: 'Debes seleccionar una opción' }),
     }),
     email: z.email({ message: 'El correo electrónico no es válido' }),
-    regionId: z.number().min(1, { message: 'Debes seleccionar una región' }),
+    regionId: z.number().min(1, { message: 'Debes seleccionar un distrito' }),
     token: z.string().optional(),
   })
   .refine((data) => data.password === data.confirmPassword, {

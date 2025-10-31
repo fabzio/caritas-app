@@ -8,9 +8,10 @@ import {
   primaryKey,
   text,
   timestamp,
+  unique,
   varchar,
 } from 'drizzle-orm/pg-core'
-import { organization, user } from './auth'
+import { organization, region, user } from './auth'
 
 export const healthSchema = pgSchema('health')
 
@@ -40,6 +41,10 @@ export const activity = healthSchema.table('activity', {
   spaceId: varchar('space_id', { length: 32 })
     .notNull()
     .references(() => organization.id, { onDelete: 'cascade' }),
+  regionId: integer('region_id')
+    .notNull()
+    .references(() => region.id, { onDelete: 'restrict' }),
+  address: varchar('address', { length: 200 }).notNull(),
   statusId: integer()
     .notNull()
     .references(() => activityStatus.id, { onDelete: 'restrict' }),
@@ -66,6 +71,10 @@ export const activityRelations = relations(activity, ({ many, one }) => ({
   space: one(organization, {
     fields: [activity.spaceId],
     references: [organization.id],
+  }),
+  region: one(region, {
+    fields: [activity.regionId],
+    references: [region.id],
   }),
   creator: one(user, {
     fields: [activity.userId],
@@ -129,7 +138,12 @@ export const alliedParticipation = healthSchema.table('allied_participation', {
     .references(() => speciality.id, { onDelete: 'cascade' }),
 })
 
-export const speciality = healthSchema.table('speciality', {
-  id: integer().primaryKey().generatedByDefaultAsIdentity(),
-  name: varchar('name', { length: 100 }).notNull(),
-})
+export const speciality = healthSchema.table(
+  'speciality',
+  {
+    id: integer().primaryKey().generatedByDefaultAsIdentity(),
+    name: varchar('name', { length: 100 }).notNull(),
+    active: boolean('active').default(true).notNull(),
+  },
+  (table) => [unique('unique_speciality_name').on(table.name)],
+)

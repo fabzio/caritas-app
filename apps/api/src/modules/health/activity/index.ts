@@ -10,12 +10,15 @@ import { ActivityModel } from './model'
 import {
   addAttendantToActivity,
   createActivity,
+  createAttention,
   createCompleteActivity,
   deleteActivities,
   getActivities,
   getActivityById,
+  getActivityDetailById,
   getActivityParticipants,
   getExistentUsers,
+  getRegionsWithActivities,
   getUserAttentions,
   removeAttendantFromActivity,
   setActivityUser,
@@ -51,6 +54,55 @@ const activityModule = new Elysia({ name: 'activity', prefix: '/activities' })
     },
   })
   .get(
+    '/detail/:id',
+    async ({ params }) => {
+      const id = Number(params.id)
+      if (Number.isNaN(id)) throw status(400, 'Invalid id')
+      try {
+        return await getActivityDetailById(id)
+      } catch (e) {
+        if (e instanceof Error) throw status(404, e.message)
+        throw e
+      }
+    },
+    {
+      auth: true,
+      response: {
+        200: t.Object({
+          id: t.Number(),
+          name: t.String(),
+          date: t.String(),
+          duration: t.String(),
+          spaceName: t.String(),
+          typeName: t.String(),
+          statusName: t.String(),
+          creatorName: t.String(),
+          regionName: t.String(),
+          address: t.String(),
+          state: t.Boolean(),
+          participants: t.Array(
+            t.Object({
+              alliedId: t.String(),
+              specialityIds: t.Array(t.Number()),
+            }),
+          ),
+          attendants: t.Array(
+            t.Object({
+              userId: t.String(),
+              userName: t.String(),
+              userBirthDate: t.String(),
+              userSex: t.String(),
+              district: t.String(),
+            }),
+          ),
+        }),
+        400: t.Object({ error: t.String() }),
+        404: t.Object({ error: t.String() }),
+        401: t.Literal('Unauthorized'),
+      },
+    },
+  )
+  .get(
     '/:id',
     async ({ params }) => {
       const id = Number(params.id)
@@ -71,6 +123,8 @@ const activityModule = new Elysia({ name: 'activity', prefix: '/activities' })
           date: t.String(),
           duration: t.String(),
           spaceId: t.String(),
+          regionId: t.Number(),
+          address: t.String(),
           typeId: t.Number(),
           statusId: t.Number(),
           userId: t.String(),
@@ -143,6 +197,13 @@ const activityModule = new Elysia({ name: 'activity', prefix: '/activities' })
       401: t.Literal('Unauthorized'),
     },
   })
+  .get('/regions', () => getRegionsWithActivities(), {
+    auth: true,
+    response: {
+      200: t.Array(t.Object({ id: t.Number(), name: t.String() })),
+      401: t.Literal('Unauthorized'),
+    },
+  })
   .get('/participants', ({ query }) => getActivityParticipants(query), {
     auth: true,
     query: ActivityModel.listParticipantsQuery,
@@ -159,6 +220,19 @@ const activityModule = new Elysia({ name: 'activity', prefix: '/activities' })
       401: t.Literal('Unauthorized'),
     },
   })
+  .post(
+    '/attentions',
+    async ({ body }) => status(201, await createAttention(body)),
+    {
+      auth: true,
+      body: ActivityModel.createAttentionSchema,
+      response: {
+        201: ActivityModel.createAttentionResponse,
+        400: t.Object({ error: t.String() }),
+        401: t.Literal('Unauthorized'),
+      },
+    },
+  )
   .patch('/user-rewarded', ({ body }) => setActivityUser(body), {
     auth: true,
     body: ActivityModel.setActivityUserQuery,

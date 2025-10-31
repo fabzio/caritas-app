@@ -25,6 +25,9 @@ export const useActivities = ({
           page: Math.max(0, (currentPage || 1) - 1),
           limit: pageSize,
           sortBy: filters?.sortBy || 'name.asc',
+          regionIds: filters?.regionIds,
+          startDate: filters?.startDate,
+          endDate: filters?.endDate,
         },
       })
 

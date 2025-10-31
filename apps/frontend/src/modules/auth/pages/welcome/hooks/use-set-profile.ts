@@ -32,6 +32,11 @@ export const useSetProfile = () => {
         if (!grade || !guardianEmail) {
           throw new Error('Student profile requires grade and guardian email')
         }
+        if (userData.user.email === guardianEmail) {
+          throw new Error(
+            'El correo del apoderado no puede ser el mismo que el del estudiante',
+          )
+        }
         studentInfo = {
           grade,
           guardianEmail,

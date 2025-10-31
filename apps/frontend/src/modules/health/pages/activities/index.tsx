@@ -13,6 +13,8 @@ import { SquareActivity } from 'lucide-react'
 import { useState } from 'react'
 import ActionsButton from './components/actions-button'
 import { ActivityTable } from './components/activity-table'
+import DateRangeFilter from './components/date-range-filter'
+import RegionFilter from './components/region-filter'
 import SearchActivityInput from './components/search-activity-input'
 import { useActivityTable } from './hooks/use-activity-table'
 import { useDeleteActivities } from './hooks/use-delete-activities'
@@ -59,7 +61,7 @@ export default function ActivityPage() {
     <div className="w-full p-4">
       <header className="mb-6">
         <h2 className="text-2xl font-bold leading-tight">
-          Actividades de Salud
+          Administración de Actividades de Salud
         </h2>
         <p className="text-muted-foreground">
           Aquí podrá visualizar todas las actividades de salud.
@@ -71,19 +73,23 @@ export default function ActivityPage() {
           <div className="flex-1 w-full">
             <SearchActivityInput />
           </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <ActionsButton
-            onDeleteClick={() => setIsDeleteModalOpen(true)}
-            onEditClick={handleEdit}
-            selectedCount={activityCount}
-          />
-          <Link to="/health/activities/form">
-            <Button>
-              <SquareActivity />
-              Nueva actividad
-            </Button>
-          </Link>
+          <div className="flex w-auto gap-1">
+            <DateRangeFilter />
+            <RegionFilter />
+          </div>
+          <div className="flex items-center gap-2">
+            <ActionsButton
+              onDeleteClick={() => setIsDeleteModalOpen(true)}
+              onEditClick={handleEdit}
+              selectedCount={activityCount}
+            />
+            <Link to="/health/activities/form">
+              <Button>
+                <SquareActivity />
+                Nueva actividad
+              </Button>
+            </Link>
+          </div>
         </div>
       </div>
 

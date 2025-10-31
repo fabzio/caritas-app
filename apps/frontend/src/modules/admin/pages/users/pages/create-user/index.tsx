@@ -72,7 +72,7 @@ export default function FormView() {
       documentNumber: loaderData?.documentNumber || '',
       birthDate: loaderData?.birthDate,
       sex: loaderData?.sex,
-      regionId: loaderData?.regionId,
+      regionId: loaderData?.regionId ?? 0,
       teamIds: loaderData?.teams?.map((team) => team.id) ?? [],
     },
   })
@@ -90,15 +90,15 @@ export default function FormView() {
     updateUser({
       userId: loaderData.id,
       data: {
-        email: values.email,
-        name: values.name,
-        role: loaderData.role,
-        surname: values.surname,
+        email: values.email.trim(),
+        name: values.name.trim(),
+        role: loaderData.role?.trim(),
+        surname: values.surname.trim(),
         documentType: values.documentType,
-        documentNumber: values.documentNumber,
+        documentNumber: values.documentNumber.trim(),
         sex: values.sex,
         birthDate: values.birthDate,
-        phone: values.phone,
+        phone: values.phone.trim(),
         regionId: values.regionId,
       },
       teamIds: hasTeamChanges(loaderData?.teams ?? [], values.teamIds)
@@ -138,17 +138,17 @@ export default function FormView() {
       submitUpdate(values)
     } else
       createUser({
-        email: values.email,
-        name: values.name,
+        email: values.email.trim(),
+        name: values.name.trim(),
         role: 'admin',
         password: import.meta.env.DEV ? 'default' : crypto.randomUUID(),
         data: {
-          surname: values.surname,
+          surname: values.surname.trim(),
           documentType: values.documentType,
-          documentNumber: values.documentNumber,
+          documentNumber: values.documentNumber.trim(),
           sex: values.sex,
           birthDate: values.birthDate,
-          phone: values.phone,
+          phone: values.phone.trim(),
           regionId: values.regionId,
         },
         teamIds: values.teamIds,
@@ -251,7 +251,7 @@ export default function FormView() {
                           <SelectItem value="CE">
                             Carnet de Extranjería
                           </SelectItem>
-                          <SelectItem value="PASSPORT">Pasaporte</SelectItem>
+                          <SelectItem value="PAS">Pasaporte</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -347,7 +347,7 @@ export default function FormView() {
                   name="regionId"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Región</FormLabel>
+                      <FormLabel>Distrito</FormLabel>
                       <Popover>
                         <PopoverTrigger asChild>
                           <FormControl>
@@ -361,7 +361,7 @@ export default function FormView() {
                               {field.value
                                 ? regions?.find((r) => r.id === field.value)
                                     ?.name
-                                : 'Selecciona una región'}
+                                : 'Selecciona un distrito'}
                               <ChevronsUpDown className="opacity-50" />
                             </Button>
                           </FormControl>
@@ -369,12 +369,12 @@ export default function FormView() {
                         <PopoverContent className="w-full p-0">
                           <Command>
                             <CommandInput
-                              placeholder="Buscar región"
+                              placeholder="Buscar distrito"
                               className="h-9"
                             />
                             <CommandList>
                               <CommandEmpty>
-                                No se encontraron regiones.
+                                No se encontraron distritos.
                               </CommandEmpty>
                               <CommandGroup>
                                 {regionsLoading ? (
@@ -509,6 +509,70 @@ const formSchema = formUserSchema
   })
   .extend({
     teamIds: z.array(z.string()).min(1, 'Selecciona al menos un equipo'),
+  })
+  .superRefine(({ documentNumber, documentType }, ctx) => {
+    const trimmedValue = documentNumber.trim()
+
+    if (documentType === 'DNI') {
+      if (!/^\d+$/.test(trimmedValue)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['documentNumber'],
+          message: 'El DNI solo debe contener números',
+        })
+        return
+      }
+
+      if (trimmedValue.length !== 8) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['documentNumber'],
+          message: 'El DNI debe tener exactamente 8 dígitos',
+        })
+      }
+      return
+    }
+
+    if (documentType === 'CE') {
+      if (!/^[a-zA-Z0-9]+$/.test(trimmedValue)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['documentNumber'],
+          message:
+            'El Carnet de Extranjería solo debe contener caracteres alfanuméricos',
+        })
+        return
+      }
+
+      if (trimmedValue.length > 12 || trimmedValue.length < 6) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['documentNumber'],
+          message:
+            'El Carnet de Extranjería debe tener como máximo 12 caracteres y como mínimo 6',
+        })
+      }
+      return
+    }
+
+    if (documentType === 'PAS') {
+      if (!/^[a-zA-Z0-9]+$/.test(trimmedValue)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['documentNumber'],
+          message: 'El Pasaporte solo debe contener caracteres alfanuméricos',
+        })
+        return
+      }
+
+      if (trimmedValue.length !== 12) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['documentNumber'],
+          message: 'El Pasaporte debe tener exactamente 12 caracteres',
+        })
+      }
+    }
   })
 
 const hasTeamChanges = (

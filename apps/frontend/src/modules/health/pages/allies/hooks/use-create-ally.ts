@@ -7,8 +7,10 @@ import { toast } from 'sonner'
 type CreateAllyProps = {
   name: string
 }
-
-export const useCreateAlly = () => {
+type useCreateAllyProps = {
+  type: 'health' | 'education'
+}
+export const useCreateAlly = ({ type }: useCreateAllyProps) => {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   return useMutation({
@@ -16,7 +18,7 @@ export const useCreateAlly = () => {
       const { data, error } = await authClient.organization.create({
         name: props.name,
         slug: props.name.toLowerCase().replaceAll(/\s+/g, '-'),
-        type: 'health',
+        type: type,
       })
       if (error) throw error
       return data
@@ -28,10 +30,7 @@ export const useCreateAlly = () => {
       queryClient.invalidateQueries({
         queryKey: [QueryKeys.ORGANIZATIONS],
       })
-      toast.success('Creado aliado exitosamente')
-      navigate({
-        to: '/health/allies',
-      })
+      toast.success('Organización creada exitosamente')
     },
     onError: (error: Error) => {
       toast.error(error.message)

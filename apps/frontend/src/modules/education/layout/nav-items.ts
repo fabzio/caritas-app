@@ -5,6 +5,7 @@ import {
   GraduationCap,
   Layout,
   UserStar,
+  Users,
 } from 'lucide-react'
 
 const educationNavItems: NavItem[] = [
@@ -15,7 +16,7 @@ const educationNavItems: NavItem[] = [
     groupLabel: 'Educación',
   },
   {
-    title: 'Aliados',
+    title: 'Organizaciones Aliadas',
     url: '/education/organization',
     icon: Building2,
     groupLabel: 'Educación',
@@ -36,6 +37,12 @@ const educationNavItems: NavItem[] = [
     title: 'Ferias vocacionales',
     url: '/education/fair',
     icon: Compass,
+    groupLabel: 'Educación',
+  },
+  {
+    title: 'Beneficiarios',
+    url: '/education/beneficiaries',
+    icon: Users,
     groupLabel: 'Educación',
   },
 ]

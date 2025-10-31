@@ -15,6 +15,9 @@ export const useActivityTable = () => {
     pageIndex: (rawFilters.page ?? 0) + 1,
     pageSize: rawFilters.limit ?? 10,
     sortBy: (rawFilters.sortBy || 'name.asc') as SortBy,
+    regionIds: rawFilters.regionIds,
+    startDate: rawFilters.startDate,
+    endDate: rawFilters.endDate,
   }
 
   const { data: response, isLoading } = useActivities({
@@ -23,6 +26,9 @@ export const useActivityTable = () => {
     filters: {
       q: filtersForHook.q,
       sortBy: filtersForHook.sortBy,
+      regionIds: filtersForHook.regionIds,
+      startDate: filtersForHook.startDate,
+      endDate: filtersForHook.endDate,
     },
   })
 
