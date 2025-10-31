@@ -42,6 +42,7 @@ const main = async () => {
     .use(adminModule)
     .use(healthModule)
     .use(educationModule)
+    .get('', () => 'Caritas API is running 🚀')
     .listen(env.PORT)
 }
 const app = main()

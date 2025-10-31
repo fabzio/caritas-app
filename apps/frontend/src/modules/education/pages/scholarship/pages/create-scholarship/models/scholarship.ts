@@ -36,7 +36,8 @@ export const formScholarShipSchema = z
     organizationId: z.string({ message: 'Escoja la organización' }),
     vacancies: z
       .number({ error: 'Debe ingresar un número' })
-      .min(1, { message: 'Las vacantes deben ser al menos 1' })
+      .min(1, { message: 'Ingrese un número válido de vacantes' })
+      .max(9999, { message: 'Ingrese un número válido de vacantes' })
       .refine((v) => v !== undefined, {
         message: 'Las vacantes son obligatorias',
       }),
