@@ -67,18 +67,18 @@ export default function ScholarshipRecipients() {
               Aquí podrá visualizar todos los beneficiarios registrados.
             </p>
           </header>
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
             <div className="flex-1">
               <SearchRecipients />
             </div>
             <div className="flex flex-row gap-4 px-10">
-              <SelectFilters
+              {/* <SelectFilters
                 value={regionFilter}
                 onValueChange={handleRegionFilterChange}
                 valueList={regionNames}
                 item="región"
                 placeholder="Todas las regiones"
-              />
+              /> */}
               <SelectFilters
                 value={scholarshipFilter}
                 onValueChange={handleScholarshipFilterChange}
