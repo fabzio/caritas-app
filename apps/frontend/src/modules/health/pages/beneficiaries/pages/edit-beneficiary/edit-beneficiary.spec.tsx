@@ -247,6 +247,7 @@ describe('Health Beneficiary FormView', () => {
         role: 'user',
         password: 'default',
         data: {
+          id: 'beneficiary-1',
           surname: 'Doe',
           documentType: 'DNI',
           documentNumber: '12345678',
@@ -290,6 +291,7 @@ describe('Health Beneficiary FormView', () => {
       expect(mockUpdateBeneficiary).toHaveBeenCalledWith({
         userId: 'beneficiary-1',
         data: {
+          id: 'beneficiary-1',
           email: 'john@example.com',
           name: 'John',
           role: 'user',
