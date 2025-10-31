@@ -177,7 +177,7 @@ export default function AddAttendantPage() {
     <div className="w-full p-4">
       <div className="mt-4 w-full md:w-3/5 mx-auto">
         <h1 className="text-2xl font-medium">
-          {dependantText.mainTitle[viewType]}
+          {dependentText.mainTitle[viewType]}
         </h1>
         <h2 className="text-lg font-light">
           {loaderData?.name} - {formattedDate}
@@ -504,7 +504,7 @@ export default function AddAttendantPage() {
                 {isPendingCreate || isPendingUpdate || isPendingAddExistent ? (
                   <Spinner />
                 ) : (
-                  dependantText.submit[viewType]
+                  dependentText.submit[viewType]
                 )}
               </Button>
               <Link
