@@ -53,44 +53,6 @@ export default function FairPage() {
     })
   }
 
-  const handleDelete = async () => {
-    if (!selectedFairs.length) {
-      setIsDeleteModalOpen(false)
-      return
-    }
-
-    const results = await Promise.allSettled(
-      selectedFairs.map((fair) =>
-        removeFair({
-          fairId: fair.id,
-        }),
-      ),
-    )
-
-    let totalSuccessful = 0
-
-    for (const result of results) {
-      if (result.status === 'fulfilled') totalSuccessful++
-    }
-
-    const totalFailed = selectedFairs.length - totalSuccessful
-
-    if (totalSuccessful > 0) {
-      toast.success(
-        `${totalSuccessful} de ${selectedFairs.length} feria(s) eliminadas correctamente.`,
-      )
-    }
-
-    if (totalFailed > 0) {
-      toast.error(
-        `Atención: Falló el procesamiento de ${totalFailed} feria(s).`,
-      )
-    }
-
-    setIsDeleteModalOpen(false)
-    resetSelectedRows()
-  }
-
   return (
     <div className="w-full p-4">
       <header className="mb-6">
