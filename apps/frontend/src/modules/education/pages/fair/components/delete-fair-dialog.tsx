@@ -8,6 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@workspace/ui/components/dialog'
+import useDeleteFairs from '../hooks/use-delete-fair'
 
 interface DeleteConfirmationDialogProps {
   readonly open: boolean
@@ -24,7 +25,9 @@ export default function DeleteConfirmationDialog({
   ids,
   clearSelection,
 }: DeleteConfirmationDialogProps) {
+  const { mutateAsync: deleteFairs, isPending } = useDeleteFairs()
   const handleConfirmDelete = async () => {
+    deleteFairs({ ids })
     onOpenChange(false)
     clearSelection?.()
   }
@@ -51,7 +54,11 @@ export default function DeleteConfirmationDialog({
             </Button>
           </DialogClose>
 
-          <Button type="button" onClick={handleConfirmDelete}>
+          <Button
+            type="button"
+            onClick={handleConfirmDelete}
+            disabled={isPending}
+          >
             Aceptar
           </Button>
         </DialogFooter>
