@@ -51,4 +51,9 @@ export namespace FairModel {
   const _updateFair = createUpdateSchema(fair)
   export const updateFair = _updateFair
   export type UpdateFair = typeof updateFair.static
+
+  export const deleteFairs = t.Object({
+    ids: t.Array(t.Integer({ minimum: 1 })),
+  })
+  export type DeleteFairs = typeof deleteFairs.static
 }

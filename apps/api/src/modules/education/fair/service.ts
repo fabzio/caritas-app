@@ -2,7 +2,7 @@ import db from '@api/db'
 import { PostgresError } from '@api/db/errors'
 import { region } from '@api/db/schemas/auth'
 import { fair } from '@api/db/schemas/education'
-import { and, asc, count, desc, eq, ilike, or } from 'drizzle-orm'
+import { and, asc, count, desc, eq, ilike, inArray, or } from 'drizzle-orm'
 import type { FairModel } from './model'
 
 export async function getFairs(
@@ -130,6 +130,15 @@ export const patchFair = async (id: number, args: FairModel.UpdateFair) => {
       .where(eq(fair.id, id))
       .returning({ id: fair.id })
     return response.length
+  } catch (e) {
+    if (e instanceof Error) throw new PostgresError(e.message)
+    throw e
+  }
+}
+export const deleteFairs = async (ids: number[]) => {
+  try {
+    await db.update(fair).set({ active: false }).where(inArray(fair.id, ids))
+    return { success: true }
   } catch (e) {
     if (e instanceof Error) throw new PostgresError(e.message)
     throw e

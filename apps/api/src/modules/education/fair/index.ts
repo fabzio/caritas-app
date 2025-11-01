@@ -1,7 +1,13 @@
 import betterAuth from '@api/modules/auth/middleware'
 import Elysia, { status, t } from 'elysia'
 import { FairModel } from './model'
-import { createFair, getFairs, getSingleFair, patchFair } from './service'
+import {
+  createFair,
+  deleteFairs,
+  getFairs,
+  getSingleFair,
+  patchFair,
+} from './service'
 
 const fair = new Elysia({
   name: 'fair',
@@ -57,5 +63,23 @@ const fair = new Elysia({
       },
     },
   )
-
+  .delete(
+    '',
+    async ({ body }) => {
+      const { ids } = body
+      if (!ids.length) {
+        throw status(400, 'No hay ningún ID de feria para eliminar')
+      }
+      const deleted = await deleteFairs(ids)
+      return deleted
+    },
+    {
+      auth: true,
+      body: FairModel.deleteFairs,
+      response: {
+        200: t.Object({ success: t.Boolean() }),
+        400: t.String(),
+      },
+    },
+  )
 export default fair

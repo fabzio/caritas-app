@@ -95,7 +95,7 @@ const scholarship = new Elysia({
     async ({ body }) => {
       const { ids } = body
       if (!ids.length)
-        throw status(400, 'No hay ningún ID de especialidad para eliminar')
+        throw status(400, 'No hay ningún ID de beca para eliminar')
       const deleted = await deleteScholarships(ids)
       return deleted
     },
