@@ -66,4 +66,9 @@ export namespace ScholarshipModel {
     t.Omit(_getScholarships, ['id', 'createdAt', 'updatedAt', 'createdBy']),
   )
   export type UpdateScholarship = typeof updateScholarship.static
+
+  export const deleteScholarships = t.Object({
+    ids: t.Array(t.Integer({ minimum: 1 })),
+  })
+  export type DeleteScholarships = typeof deleteScholarships.static
 }

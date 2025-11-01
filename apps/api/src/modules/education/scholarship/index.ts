@@ -5,6 +5,7 @@ import { ScholarshipModel } from './model'
 import scholarshipRecipients from './recipients'
 import {
   createScholarship,
+  deleteScholarships,
   findDuplicateScholarship,
   getScholarships,
   getSingleScholarship,
@@ -86,6 +87,24 @@ const scholarship = new Elysia({
           description: 'Number of updated rows',
         }),
         404: t.Literal('Scholarship not found'),
+      },
+    },
+  )
+  .delete(
+    '',
+    async ({ body }) => {
+      const { ids } = body
+      if (!ids.length)
+        throw status(400, 'No hay ningún ID de especialidad para eliminar')
+      const deleted = await deleteScholarships(ids)
+      return deleted
+    },
+    {
+      auth: true,
+      body: ScholarshipModel.deleteScholarships,
+      response: {
+        200: t.Object({ success: t.Boolean() }),
+        400: t.String(),
       },
     },
   )

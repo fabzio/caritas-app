@@ -2,7 +2,7 @@ import db from '@api/db'
 import { PostgresError } from '@api/db/errors'
 import { scholarship } from '@api/db/schemas/education'
 import { normalizeText } from '@api/utils/normalize-text'
-import { eq, ilike, sql } from 'drizzle-orm'
+import { and, eq, ilike, inArray, sql } from 'drizzle-orm'
 import type { ScholarshipModel } from './model'
 
 // para la paginación
@@ -56,7 +56,11 @@ export const getScholarships = async ({
 }: GetParams): Promise<ScholarshipModel.Paginated> => {
   try {
     // con filtrado por nombre
-    const where = name ? ilike(scholarship.name, `%${name}%`) : undefined
+    const baseWhere = eq(scholarship.active, true)
+    // si hay filtro por nombre, se combina
+    const where = name
+      ? and(baseWhere, ilike(scholarship.name, `%${name}%`))
+      : baseWhere
     const offset = (page - 1) * pageSize
 
     let total = 0
@@ -145,6 +149,19 @@ export const PatchScholarship = async (
       .where(eq(scholarship.id, id)) //para el filtro
       .returning({ id: scholarship.id })
     return response.length
+  } catch (e) {
+    if (e instanceof Error) throw new PostgresError(e.message)
+    throw e
+  }
+}
+
+export const deleteScholarships = async (ids: number[]) => {
+  try {
+    await db
+      .update(scholarship)
+      .set({ active: false })
+      .where(inArray(scholarship.id, ids))
+    return { success: true }
   } catch (e) {
     if (e instanceof Error) throw new PostgresError(e.message)
     throw e

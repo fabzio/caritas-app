@@ -296,6 +296,7 @@ export default function CreateScholarship() {
                               mode="single"
                               selected={field.value}
                               onSelect={field.onChange}
+                              toYear={maxDate.getFullYear()}
                               disabled={{
                                 before: today,
                               }}
