@@ -6,7 +6,7 @@ import { PlusCircle } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import ActionsButton from './components/actions-button'
-import DeleteFairDialog from './components/delete-fair-dialog.tsx'
+import DeleteConfirmationDialog from './components/delete-fair-dialog.tsx'
 import FairTable from './components/fair-table'
 import SearchFairInput from './components/search-fair-input'
 import { useFairTable } from './hooks/use-fair-table'
@@ -142,12 +142,12 @@ export default function FairPage() {
           />
         )}
       </div>
-      <DeleteFairDialog
+      <DeleteConfirmationDialog
         open={isDeleteModalOpen}
         onOpenChange={setIsDeleteModalOpen}
-        count={fairCount}
-        onConfirm={handleDelete}
-        isLoading={removeFairIsPending}
+        selectedCount={fairCount}
+        ids={selectedFairs.map((fair) => fair.id)}
+        clearSelection={resetSelectedRows}
       />
     </div>
   )

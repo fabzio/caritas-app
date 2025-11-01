@@ -8,32 +8,39 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@workspace/ui/components/dialog'
-import { Spinner } from '@workspace/ui/components/spinner'
 
-type Props = {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  count: number
-  onConfirm: () => void
-  isLoading: boolean
+interface DeleteConfirmationDialogProps {
+  readonly open: boolean
+  readonly onOpenChange: (open: boolean) => void
+  readonly selectedCount: number
+  readonly ids: number[]
+  readonly clearSelection?: () => void
 }
 
-export default function DeleteFairDialog({
+export default function DeleteConfirmationDialog({
   open,
   onOpenChange,
-  count,
-  onConfirm,
-  isLoading,
-}: Readonly<Props>) {
+  selectedCount,
+  ids,
+  clearSelection,
+}: DeleteConfirmationDialogProps) {
+  const handleConfirmDelete = async () => {
+    onOpenChange(false)
+    clearSelection?.()
+  }
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>
-            {`¿Seguro que desea eliminar ${count} feria${count === 1 ? '' : 's'}?`}
+            {`¿Seguro que desea eliminar ${selectedCount} beca${
+              selectedCount > 1 ? 's' : ''
+            }?`}
           </DialogTitle>
           <DialogDescription>
-            Esta acción no se puede deshacer.
+            Esta acción no se puede deshacer. Las becas serán marcadas como
+            inactivas.
           </DialogDescription>
         </DialogHeader>
 
@@ -44,13 +51,8 @@ export default function DeleteFairDialog({
             </Button>
           </DialogClose>
 
-          <Button
-            type="button"
-            variant="destructive"
-            onClick={onConfirm}
-            disabled={isLoading}
-          >
-            {isLoading ? <Spinner /> : 'Eliminar'}
+          <Button type="button" onClick={handleConfirmDelete}>
+            Aceptar
           </Button>
         </DialogFooter>
       </DialogContent>
