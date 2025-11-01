@@ -1,6 +1,6 @@
 import db from '@api/db'
 import { PostgresError } from '@api/db/errors'
-import { scholarship } from '@api/db/schemas/education'
+import { scholarship, scholarshipApplication } from '@api/db/schemas/education'
 import { normalizeText } from '@api/utils/normalize-text'
 import { eq, ilike, sql } from 'drizzle-orm'
 import type { ScholarshipModel } from './model'
@@ -145,6 +145,36 @@ export const PatchScholarship = async (
       .where(eq(scholarship.id, id)) //para el filtro
       .returning({ id: scholarship.id })
     return response.length
+  } catch (e) {
+    if (e instanceof Error) throw new PostgresError(e.message)
+    throw e
+  }
+}
+
+export const getAvailableScholarships = async () => {
+  try {
+    // Becas activas y dentro de la fecha
+    const candidates = await db.query.scholarship.findMany({
+      where: sql`${scholarship.active} = true AND ${scholarship.startDate} <= current_date AND ${scholarship.endDate} >= current_date`,
+      columns: { id: true, name: true, vacancies: true },
+    })
+
+    // Para cada beca se cuenta las aplicaciones aceptadas y se filtra las que aún tienen cupo
+    const results: Array<{ id: number; name: string }> = []
+    for (const c of candidates) {
+      const [countRow] = await db
+        .select({ total: sql<number>`count(*)` })
+        .from(scholarshipApplication)
+        .where(
+          sql`${scholarshipApplication.scholarshipId} = ${c.id} AND ${scholarshipApplication.status} = 'accepted'`,
+        )
+
+      const accepted = Number(countRow?.total ?? 0)
+      const remaining = (c.vacancies ?? 0) - accepted
+      if (remaining > 0) results.push({ id: c.id, name: c.name })
+    }
+
+    return results
   } catch (e) {
     if (e instanceof Error) throw new PostgresError(e.message)
     throw e

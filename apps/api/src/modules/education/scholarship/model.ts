@@ -66,4 +66,9 @@ export namespace ScholarshipModel {
     t.Omit(_getScholarships, ['id', 'createdAt', 'updatedAt', 'createdBy']),
   )
   export type UpdateScholarship = typeof updateScholarship.static
+
+  export const getAvailableScholarships = t.Array(
+    t.Pick(_select, ['id', 'name']),
+  )
+  export type GetAvailableScholarships = typeof getAvailableScholarships.static
 }
