@@ -37,15 +37,11 @@ export default function ApplicantsTable({ scholarshipId }: Readonly<Props>) {
     )
   }, [applicants, searchTerm])
 
-  const selectedRows = Object.keys(rowSelection)
-    .filter((key) => rowSelection[key])
-    .map((key) => Number.parseInt(key, 10))
-
-  const selectedApplicants = selectedRows
-    .map((rowIndex) => filteredApplicants?.[rowIndex])
-    .filter((a): a is NonNullable<typeof a> => a !== undefined && a !== null)
-
-  const selectedIds = selectedApplicants.map((a) => a.id)
+  const selectedIds = useMemo(() => {
+    return Object.keys(rowSelection)
+      .map((index) => filteredApplicants?.[Number(index)]?.id)
+      .filter((id): id is number => id !== undefined)
+  }, [rowSelection, filteredApplicants])
 
   const handleAccept = async () => {
     if (!selectedIds.length) {

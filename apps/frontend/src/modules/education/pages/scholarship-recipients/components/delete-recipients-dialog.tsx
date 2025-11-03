@@ -42,7 +42,7 @@ export default function DeleteRecipientsDialog({
         <DialogHeader>
           <DialogTitle>
             {`¿Seguro que desea dar de baja ${selectedCount} becado${
-              ids.length === 1 ? '' : 's'
+              selectedCount === 1 ? '' : 's'
             }?`}
           </DialogTitle>
           <DialogDescription>
