@@ -1,6 +1,7 @@
 import rpc from '@frontend/lib/rpc'
 import { QueryKeys } from '@frontend/shared/constants/query-keys'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 
 interface RemoveAttendantProps {
   userId: string
@@ -24,14 +25,12 @@ export const useRemoveAttendant = () => {
       return data
     },
 
-    onSuccess: (_data, variables) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [
-          QueryKeys.HEALTH.ACTIVITIES,
-          variables.activityId,
-          variables.userId,
-        ],
+        queryKey: [QueryKeys.HEALTH.ACTIVITIES],
+        refetchType: 'all',
       })
+      toast.success('Asistente eliminado correctamente.')
     },
   })
 }
