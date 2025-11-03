@@ -29,12 +29,13 @@ import {
 import { Separator } from '@workspace/ui/components/separator'
 import { Spinner } from '@workspace/ui/components/spinner'
 import { cn } from '@workspace/ui/lib/utils'
-import { format, parseISO } from 'date-fns'
+import { format, parseISO, startOfDay } from 'date-fns'
 import { CalendarIcon, Check, ChevronsUpDown, Loader2 } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import usePostFair from './hooks/use-post-fair'
 import { useUpdateFairs } from './hooks/use-update-fairs'
 import { type FormFairSchema, formFairSchema } from './utils/fair'
+import formatTime from './utils/formatTime'
 
 export default function CreateFairPage() {
   const viewType = useSearch({
@@ -44,6 +45,7 @@ export default function CreateFairPage() {
   const loaderData = getRouteApi(
     '/_authenticated/education/fair/form',
   ).useLoaderData()
+
   const form = useForm<FormFairSchema>({
     resolver: zodResolver(formFairSchema),
     defaultValues:
@@ -55,8 +57,8 @@ export default function CreateFairPage() {
                 loaderData.date.getTimezoneOffset() * 60000,
             ),
             address: loaderData.address,
-            startTime: loaderData.startTime,
-            endTime: loaderData.endTime,
+            startTime: formatTime(loaderData.startTime),
+            endTime: formatTime(loaderData.endTime),
             regionId: loaderData.regionId,
           }
         : {
@@ -68,7 +70,10 @@ export default function CreateFairPage() {
             regionId: undefined,
           },
   })
-  const today = new Date()
+  const today = startOfDay(new Date())
+  const maxDate = new Date(today.getTime())
+  maxDate.setFullYear(today.getFullYear() + 2)
+  console.log('Max Date:', maxDate)
   const { data: districts, isLoading } = useRegions()
   const { mutate: createFair, isPending: isPendingCreate } = usePostFair()
   const { mutate: updateFair, isPending: isPendingUpdate } = useUpdateFairs()
@@ -228,8 +233,10 @@ export default function CreateFairPage() {
                               mode="single"
                               selected={field.value}
                               onSelect={field.onChange}
+                              toYear={maxDate.getFullYear()}
                               disabled={{
                                 before: today,
+                                after: maxDate,
                               }}
                             />
                           </PopoverContent>

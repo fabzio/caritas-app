@@ -4,6 +4,7 @@ export const formFairSchema = z
   .object({
     title: z
       .string()
+      .trim()
       .max(200, {
         message: 'El nombre de la feria no debe superar los 200 caracteres',
       })
@@ -20,6 +21,7 @@ export const formFairSchema = z
     date: z.date({ message: 'La fecha de la feria es obligatoria' }),
     address: z
       .string()
+      .trim()
       .nonempty('Ingrese la ubicación de la feria vocacional')
       .max(200, { message: 'La dirección no debe superar los 200 caracteres' })
       .refine((val) => val.length > 0, {
