@@ -238,7 +238,7 @@ describe('Health Beneficiary FormView', () => {
 
     render(<FormView />)
 
-    await user.click(screen.getByText('Crear Beneficiario'))
+    await user.click(screen.getByText('Registrar Beneficiario'))
 
     await waitFor(() => {
       expect(mockCreateBeneficiary).toHaveBeenCalledWith({

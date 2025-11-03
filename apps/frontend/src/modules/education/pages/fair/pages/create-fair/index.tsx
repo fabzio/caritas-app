@@ -300,11 +300,11 @@ export default function CreateFairPage() {
 }
 const dependantText = {
   mainTitle: {
-    new: 'Crear nueva Feria Vocacional',
+    new: 'Registrar nueva Feria Vocacional',
     edit: 'Editar Feria Vocacional',
   },
   submit: {
-    new: 'Crear feria',
+    new: 'Registrar feria',
     edit: 'Guardar Cambios',
   },
 }

@@ -442,11 +442,11 @@ export default function FormView() {
 const dependantText = {
   mainTitle: {
     edit: 'Editar beneficiario',
-    new: 'Crear beneficiario',
+    new: 'Registrar beneficiario',
   },
   submit: {
     edit: 'Guardar Cambios',
-    new: 'Crear Beneficiario',
+    new: 'Registrar Beneficiario',
   },
 } as const
 

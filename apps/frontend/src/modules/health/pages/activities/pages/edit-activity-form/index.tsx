@@ -528,14 +528,14 @@ export default function EditActivityForm() {
                   })}
                   <div className="flex gap-4 justify-center flex-wrap">
                     <Button onClick={handleNewAlly} type="button" size="sm">
-                      Crear organización <ShieldPlus size={16} />
+                      Registrar organización <ShieldPlus size={16} />
                     </Button>
                     <Button
                       onClick={handleNewSpeciality}
                       size="sm"
                       type="button"
                     >
-                      Crear especialidad <HeartPlus size={16} />
+                      Registrar especialidad <HeartPlus size={16} />
                     </Button>
 
                     <Button
