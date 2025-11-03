@@ -91,6 +91,7 @@ export async function getRecipients(
       documentType: user.documentType,
       documentNumber: user.documentNumber,
       region: region.name,
+      id: scholarshipApplication.id,
       status: scholarshipApplication.status,
       scholarshipName: scholarship.name,
       organizationName: organization.name,
