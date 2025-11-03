@@ -7,11 +7,9 @@ import {
 } from '@workspace/ui/components/command'
 import { Skeleton } from '@workspace/ui/components/skeleton'
 import { cn } from '@workspace/ui/lib/utils'
-import { type ClassValue, clsx } from 'clsx'
 import { Command as CommandPrimitive } from 'cmdk'
 import { Check } from 'lucide-react'
 import { type KeyboardEvent, useCallback, useRef, useState } from 'react'
-import { twMerge } from 'tailwind-merge'
 import type { ExistentUsers } from '../hooks/use-list-users-autocomplete'
 
 export type Option = Record<'value' | 'label', string> & Record<string, string>

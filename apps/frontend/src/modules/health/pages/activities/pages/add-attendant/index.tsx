@@ -47,7 +47,7 @@ import {
 } from 'lucide-react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
-import type z from 'zod'
+import z from 'zod'
 import { AutoComplete } from './components/autocomplete'
 import { useAddAttendant } from './hooks/use-add-attendant'
 import { useAddExistentUser } from './hooks/use-add-existent-user'
@@ -75,11 +75,6 @@ export default function AddAttendantPage() {
     useAddExistentUser()
   const { mutate: updateAttendant, isPending: isPendingUpdate } =
     useUpdateAttendant()
-
-  const formSchema = formUserSchema.omit({
-    password: true,
-    confirmPassword: true,
-  })
 
   const { data: regions, isLoading: regionsLoading } = useRegions()
 
@@ -172,6 +167,8 @@ export default function AddAttendantPage() {
     })
     setFoundUser(null)
   }
+  console.log('Document Number:', form.getValues('documentNumber'))
+  console.log('Document Type:', form.getValues('documentType'))
 
   return (
     <div className="w-full p-4">
@@ -283,7 +280,7 @@ export default function AddAttendantPage() {
                         <SelectItem value="CE">
                           Carnet de Extranjería
                         </SelectItem>
-                        <SelectItem value="PASSPORT">Pasaporte</SelectItem>
+                        <SelectItem value="PAS">Pasaporte</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -537,3 +534,73 @@ const dependentText = {
     edit: 'Guardar Cambios',
   },
 }
+
+const formSchema = formUserSchema
+  .omit({
+    password: true,
+    confirmPassword: true,
+  })
+  .superRefine(({ documentNumber, documentType }, ctx) => {
+    const trimmedValue = documentNumber.trim()
+
+    if (documentType === 'DNI') {
+      if (!/^\d+$/.test(trimmedValue)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['documentNumber'],
+          message: 'El DNI solo debe contener números',
+        })
+        return
+      }
+
+      if (trimmedValue.length !== 8) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['documentNumber'],
+          message: 'El DNI debe tener exactamente 8 dígitos',
+        })
+      }
+      return
+    }
+
+    if (documentType === 'CE') {
+      if (!/^[a-zA-Z0-9]+$/.test(trimmedValue)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['documentNumber'],
+          message:
+            'El Carnet de Extranjería solo debe contener caracteres alfanuméricos',
+        })
+        return
+      }
+
+      if (trimmedValue.length > 12 || trimmedValue.length < 6) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['documentNumber'],
+          message:
+            'El Carnet de Extranjería debe tener como máximo 12 caracteres y como mínimo 6',
+        })
+      }
+      return
+    }
+
+    if (documentType === 'PAS') {
+      if (!/^[a-zA-Z0-9]+$/.test(trimmedValue)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['documentNumber'],
+          message: 'El Pasaporte solo debe contener caracteres alfanuméricos',
+        })
+        return
+      }
+
+      if (trimmedValue.length !== 12) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['documentNumber'],
+          message: 'El Pasaporte debe tener exactamente 12 caracteres',
+        })
+      }
+    }
+  })
