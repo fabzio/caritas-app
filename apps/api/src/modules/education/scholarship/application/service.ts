@@ -108,3 +108,33 @@ export const acceptApplications = async (
     throw e
   }
 }
+
+export async function rejectScholarshipRecipients(
+  args: Application.RejectRecipientsBody & { userId: string },
+) {
+  try {
+    if (!args.userId) throw new PostgresError('El revisor es obligatorio')
+    if (!args.ids?.length)
+      throw new PostgresError('Debe seleccionar al menos una aplicación')
+
+    const result = await db.transaction(async (tx) => {
+      const updated = await tx
+        .update(scholarshipApplication)
+        .set({
+          status: 'rejected',
+          reviewedBy: args.userId,
+          reviewDate: new Date(),
+          comments: args.comments ?? null,
+        })
+        .where(inArray(scholarshipApplication.id, args.ids))
+        .returning({ id: scholarshipApplication.id })
+
+      return updated.map((u) => u.id)
+    })
+
+    return result
+  } catch (e) {
+    if (e instanceof Error) throw new PostgresError(e.message)
+    throw e
+  }
+}
