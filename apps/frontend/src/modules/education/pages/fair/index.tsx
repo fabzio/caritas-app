@@ -10,15 +10,12 @@ import DeleteConfirmationDialog from './components/delete-fair-dialog.tsx'
 import FairTable from './components/fair-table'
 import SearchFairInput from './components/search-fair-input'
 import { useFairTable } from './hooks/use-fair-table'
-import { useRemoveFair } from './hooks/use-remove-fair.ts'
 
 export default function FairPage() {
   const isMobile = useIsMobile()
   const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({})
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const navigate = useNavigate()
-  const { mutateAsync: removeFair, isPending: removeFairIsPending } =
-    useRemoveFair()
 
   const {
     data: fairs,
