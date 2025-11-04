@@ -37,7 +37,7 @@ export default function DeleteConfirmationDialog({
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>
-            {`¿Seguro que desea eliminar ${selectedCount} beca${
+            {`¿Seguro que desea eliminar ${selectedCount} feria${
               selectedCount > 1 ? 's' : ''
             }?`}
           </DialogTitle>
