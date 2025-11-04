@@ -4,6 +4,7 @@ import { FairModel } from './model'
 import {
   createFair,
   deleteFairs,
+  findDuplicateFair,
   getFairs,
   getSingleFair,
   patchFair,
@@ -38,31 +39,78 @@ const fair = new Elysia({
       },
     },
   )
-  .post('', ({ body }) => createFair(body), {
-    auth: true,
-    body: FairModel.createFair,
-    response: {
-      200: t.Number({
-        description: 'ID of the created fair',
-      }),
-      401: t.Literal('Unauthorized'),
+  .post(
+    '',
+    async ({ body }) => {
+      const duplicate = await findDuplicateFair(
+        body.title,
+        body.regionId,
+        new Date(body.date),
+        body.startTime,
+        body.endTime,
+      )
+
+      if (duplicate) {
+        throw status(
+          400,
+          `Ya existe una feria vocacional llamada "${duplicate.title}" en el mismo distrito, fecha y horario.`,
+        )
+      }
+
+      return createFair(body)
     },
-  })
+    {
+      auth: true,
+      body: FairModel.createFair,
+      response: {
+        200: t.Number({ description: 'ID of the created fair' }),
+        400: t.String(),
+        401: t.Literal('Unauthorized'),
+      },
+    },
+  )
   .patch(
     '/:id',
-    async ({ params, body }) => await patchFair(Number(params.id), body),
+    async ({ params, body }) => {
+      const id = Number(params.id)
+      if (
+        body.title &&
+        body.regionId &&
+        body.date &&
+        body.startTime &&
+        body.endTime
+      ) {
+        const duplicate = await findDuplicateFair(
+          body.title,
+          Number(body.regionId),
+          new Date(body.date),
+          body.startTime,
+          body.endTime,
+          id,
+        )
+
+        if (duplicate) {
+          throw status(
+            400,
+            `Ya existe una feria vocacional llamada "${duplicate.title}" en el mismo distrito, fecha y horario.`,
+          )
+        }
+      }
+
+      return await patchFair(id, body)
+    },
     {
       auth: true,
       params: FairModel.getSingleFairsQuery,
       body: FairModel.updateFair,
       response: {
-        200: t.Number({
-          description: 'Number of updated rows',
-        }),
+        200: t.Number({ description: 'Number of updated rows' }),
+        400: t.String(),
         404: t.Literal('Fair not found'),
       },
     },
   )
+
   .delete(
     '',
     async ({ body }) => {

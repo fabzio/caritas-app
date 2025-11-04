@@ -25,12 +25,15 @@ const usePostFair = () => {
         ...params,
         date: format(params.date, 'yyyy-MM-dd'),
       })
-      if (res.error) throw res.error
+      if (res.error)
+        throw new Error(
+          res.error.message || 'Error al registrar la feria vocacional',
+        )
       return res.data
     },
-    onError: () => {
+    onError: (error: Error) => {
       toast.error(
-        'Ocurrió un error desconocido al registrar la feria vocacional',
+        error.message || 'Ocurrió un error al registrar la feria vocacional',
       )
     },
     onSuccess: () => {

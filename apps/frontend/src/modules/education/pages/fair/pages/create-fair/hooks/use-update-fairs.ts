@@ -27,11 +27,16 @@ export const useUpdateFairs = () => {
       }
       const { id, ...body } = cleanBody
       const res = await rpc.education.fairs({ id: params.id }).patch(body)
-      if (res.error) throw res.error
+      if (res.error)
+        throw new Error(
+          res.error.message || 'Error al registrar la feria vocacional',
+        )
       return res.data
     },
-    onError: () => {
-      toast.error('Ocurrió un error desconocido al actualizar la feria')
+    onError: (error: Error) => {
+      toast.error(
+        error.message || 'Ocurrió un error al registrar la feria vocacional',
+      )
     },
     onSuccess: (data, variables) => {
       queryClient.invalidateQueries({

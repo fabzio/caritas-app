@@ -2,8 +2,55 @@ import db from '@api/db'
 import { PostgresError } from '@api/db/errors'
 import { region } from '@api/db/schemas/auth'
 import { fair } from '@api/db/schemas/education'
+import { normalizeText } from '@api/utils/normalize-text'
 import { and, asc, count, desc, eq, ilike, inArray, or } from 'drizzle-orm'
 import type { FairModel } from './model'
+export const findDuplicateFair = async (
+  title?: string,
+  regionId?: number,
+  date?: Date,
+  startTime?: string,
+  endTime?: string,
+  excludeId?: number,
+) => {
+  if (!title || !regionId || !date || !startTime || !endTime) return null
+
+  const existingFairs = await db
+    .select({ fair })
+    .from(fair)
+    .where(
+      and(
+        eq(fair.active, true),
+        eq(fair.regionId, regionId),
+        eq(fair.date, date.toISOString().slice(0, 10)),
+      ),
+    )
+
+  if (!existingFairs?.length) return null
+
+  const normalizedTitle = normalizeText(title)
+
+  const duplicates = existingFairs
+    .map((r) => r.fair)
+    .filter((f) => {
+      const sameTitle = normalizeText(f.title) === normalizedTitle
+      const sameDay =
+        f.date instanceof Date && date instanceof Date
+          ? f.date.toISOString().slice(0, 10) ===
+            date.toISOString().slice(0, 10)
+          : false
+
+      const overlapsTime =
+        typeof f.startTime === 'string' &&
+        typeof f.endTime === 'string' &&
+        f.startTime <= endTime &&
+        f.endTime >= startTime
+
+      return sameTitle && sameDay && overlapsTime && f.id !== excludeId
+    })
+
+  return duplicates.length > 0 ? duplicates[0] : null
+}
 
 export async function getFairs(
   params: FairModel.ListFairsQuery,
