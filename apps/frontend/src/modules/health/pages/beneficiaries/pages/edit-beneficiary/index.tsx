@@ -80,6 +80,7 @@ export default function FormView() {
     updateBeneficiary({
       userId: loaderData.id,
       data: {
+        id: loaderData.id,
         email: values.email.trim(),
         name: values.name.trim(),
         role: 'user',
