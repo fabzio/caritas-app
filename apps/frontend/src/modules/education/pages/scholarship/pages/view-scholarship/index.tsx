@@ -45,8 +45,8 @@ export default function ViewScholarship() {
     type: scholarship.type === 'ML' ? 'Modular' : 'Plan de estudios',
     organization: scholarship.organization?.name || 'N/A',
     vacancies: scholarship.vacancies,
-    startDate: new Date(scholarship.startDate).toLocaleDateString('es-ES'),
-    endDate: new Date(scholarship.endDate).toLocaleDateString('es-ES'),
+    startDate: scholarship.startDate,
+    endDate: scholarship.endDate,
     description: scholarship.description,
     requirements: scholarship.requirements,
   }
