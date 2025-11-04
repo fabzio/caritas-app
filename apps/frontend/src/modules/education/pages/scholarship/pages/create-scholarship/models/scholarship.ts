@@ -37,7 +37,9 @@ export const formScholarShipSchema = z
     vacancies: z.coerce
       .number({ error: 'Debe ingresar un número' })
       .min(1, { message: 'Ingrese un número válido de vacantes' })
-      .max(9999, { message: 'Ingrese un número válido de vacantes' })
+      .max(9999, {
+        message: 'Ingrese un número válido de vacantes, no mayor a 9999',
+      })
       .refine((v) => v !== undefined, {
         message: 'Las vacantes son obligatorias',
       }) as unknown as z.ZodNumber,
