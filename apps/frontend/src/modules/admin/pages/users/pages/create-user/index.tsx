@@ -458,6 +458,11 @@ export default function FormView() {
               </div>
 
               <div className="w-full flex gap-2 justify-center">
+                <Link to="/admin/users">
+                  <Button variant="outline" className="mt-4">
+                    Cancelar
+                  </Button>
+                </Link>
                 <Button
                   type="submit"
                   className="mt-4"
@@ -469,11 +474,6 @@ export default function FormView() {
                     dependantText.submit[viewType]
                   )}
                 </Button>
-                <Link to="/admin/users">
-                  <Button variant="outline" className="mt-4">
-                    Cancelar
-                  </Button>
-                </Link>
               </div>
             </form>
           </Form>
