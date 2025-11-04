@@ -79,7 +79,7 @@ export default function CreateScholarship() {
             name: '',
             description: '',
             requirements: '',
-            vacancies: undefined,
+            vacancies: 10,
             startDate: undefined,
             endDate: undefined,
             organizationId: undefined,
@@ -254,18 +254,9 @@ export default function CreateScholarship() {
                       <FormItem>
                         <FormLabel>Vacantes Disponibles*</FormLabel>
                         <FormControl>
-                          <Input
-                            {...field}
-                            type="number"
-                            onChange={(e) => {
-                              const value = e.target.value
-                              const number =
-                                value === ''
-                                  ? undefined
-                                  : Number.parseInt(value, 10)
-                              field.onChange(number)
-                            }}
-                          />
+                          <FormControl>
+                            <Input {...field} type="number" />
+                          </FormControl>
                         </FormControl>
                         <FormMessage />
                       </FormItem>
