@@ -65,6 +65,16 @@ export default function ViewScholarship() {
         <Separator />
       </div>
 
+      <div className="flex justify-start">
+        <Button
+          variant="outline"
+          onClick={() => navigate({ to: '/education/scholarship' })}
+        >
+          <ArrowLeftIcon className="h-4 w-4 mr-2" />
+          Regresar
+        </Button>
+      </div>
+
       <Tabs
         value={activeTab}
         onValueChange={setActiveTab}
@@ -93,16 +103,6 @@ export default function ViewScholarship() {
           </div>
         </TabsContent>
       </Tabs>
-
-      <div className="flex justify-start">
-        <Button
-          variant="outline"
-          onClick={() => navigate({ to: '/education/scholarship' })}
-        >
-          <ArrowLeftIcon className="h-4 w-4 mr-2" />
-          Volver a Becas
-        </Button>
-      </div>
     </div>
   )
 }
