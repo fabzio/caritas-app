@@ -50,7 +50,10 @@ const scholarship = new Elysia({
   .post(
     '',
     async ({ body }) => {
-      const duplicate = await findDuplicateScholarship(body.name)
+      const duplicate = await findDuplicateScholarship(
+        body.name,
+        body.organizationId,
+      )
       if (duplicate) throw status(400, `La beca "${duplicate.name}" ya existe`)
       return createScholarship(body)
     },
@@ -72,7 +75,11 @@ const scholarship = new Elysia({
       const existing = await getSingleScholarship({ id })
       if (!existing) throw status(404, 'No se encontró la especialidad')
       if (body.name) {
-        const duplicate = await findDuplicateScholarship(body.name, id)
+        const duplicate = await findDuplicateScholarship(
+          body.name,
+          body.organizationId,
+          id,
+        )
         if (duplicate)
           throw status(400, `La especialidad "${duplicate.name}" ya existe`)
       }

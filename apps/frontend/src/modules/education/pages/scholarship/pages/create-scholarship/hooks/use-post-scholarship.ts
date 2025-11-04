@@ -28,11 +28,12 @@ const usePostScholarship = () => {
         endDate: params.endDate.toISOString(),
         startDate: params.startDate.toISOString(),
       })
-      if (res.error) throw res.error
+      if (res.error)
+        throw new Error(res.error.message || 'Error al registrar la beca')
       return res.data
     },
-    onError: () => {
-      toast.error('Ocurrió un error desconocido al registrar la beca')
+    onError: (error: Error) => {
+      toast.error(error.message || 'Ocurrió un error al registrar la beca')
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
