@@ -1,7 +1,7 @@
 ARG VITE_API_URL=https://caritas.dev.fabzio.ip-ddns.com
 ARG VITE_GOOGLE_CLIENT_ID=381831022349-oc421cd5jg888jnlces6lvnkmq0brkp3.apps.googleusercontent.com
 ARG VITE_CLOUDFLARE_TURNSTILE_SITE_KEY=0x4AAAAAAB3NCsVLdXRV7O1H
-FROM oven/bun:1.3.0-slim AS base
+FROM oven/bun:1.3.1-slim AS base
 FROM base AS builder
 WORKDIR /app
 RUN bun i -g turbo@2.5.8
