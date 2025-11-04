@@ -8,7 +8,9 @@ import { toast } from 'sonner'
 import ActionsButton from './components/actions-button'
 import DeleteFairDialog from './components/delete-fair-dialog.tsx'
 import FairTable from './components/fair-table'
+import RegionFilter from './components/region-filter'
 import SearchFairInput from './components/search-fair-input'
+import StatusFilter from './components/status-filter'
 import { useFairTable } from './hooks/use-fair-table'
 import { useRemoveFair } from './hooks/use-remove-fair.ts'
 
@@ -103,9 +105,13 @@ export default function FairPage() {
       </header>
 
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-        <div className="w-full">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 w-full">
           <div className="flex-1 w-full">
             <SearchFairInput />
+          </div>
+          <div className="flex w-auto gap-1">
+            <RegionFilter />
+            <StatusFilter />
           </div>
         </div>
         <div className="flex items-center gap-2">

@@ -4,7 +4,10 @@ import { QueryKeys } from '@frontend/shared/constants/query-keys'
 import type { Filters } from '@frontend/shared/types/filters'
 import { createFileRoute } from '@tanstack/react-router'
 
-export type FairsFilters = Filters
+export type FairsFilters = Filters & {
+  district?: string
+  status?: string
+}
 
 export const Route = createFileRoute('/_authenticated/education/fair/')({
   loader: async ({ context: { queryClient } }) =>

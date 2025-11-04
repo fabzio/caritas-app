@@ -1,16 +1,8 @@
 import { useFilters } from '@frontend/hooks/use-filters'
 import { Input } from '@workspace/ui/components/input'
-import { Search } from 'lucide-react'
 
 export default function SearchFairInput() {
   const { filters, setFilters } = useFilters('/_authenticated/education/fair/')
-
-  const handleSearchChange = (value: string) => {
-    setFilters({
-      q: value || undefined,
-      pageIndex: 1,
-    })
-  }
 
   return (
     <div className="relative flex-1">
@@ -20,7 +12,14 @@ export default function SearchFairInput() {
         placeholder="Buscar ferias vocacionales..."
         // className="pl-9"
         value={filters.q || ''}
-        onChange={(e) => handleSearchChange(e.target.value)}
+        onChange={(e) =>
+          ((value: string) => {
+            setFilters({
+              q: value || undefined,
+              pageIndex: 1,
+            })
+          })(e.target.value)
+        }
       />
     </div>
   )

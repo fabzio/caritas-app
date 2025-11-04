@@ -2,8 +2,25 @@ import db from '@api/db'
 import { PostgresError } from '@api/db/errors'
 import { region } from '@api/db/schemas/auth'
 import { fair } from '@api/db/schemas/education'
-import { and, asc, count, desc, eq, ilike, or } from 'drizzle-orm'
+import { and, asc, count, desc, eq, ilike, inArray, or, sql } from 'drizzle-orm'
 import type { FairModel } from './model'
+
+function calculateFairStatus(
+  fairDate: Date,
+  startTime: string,
+  endTime: string,
+): 'upcoming' | 'ongoing' | 'finished' {
+  const now = new Date()
+  const currentTime = now.toTimeString().slice(0, 8)
+  const currentDate = now.toISOString().split('T')[0]
+  const fairDateStr = fairDate.toISOString().split('T')[0]
+
+  if (fairDateStr > currentDate) return 'upcoming'
+  if (fairDateStr < currentDate) return 'finished'
+  if (currentTime < startTime) return 'upcoming'
+  if (currentTime > endTime) return 'finished'
+  return 'ongoing'
+}
 
 export async function getFairs(
   params: FairModel.ListFairsQuery,
@@ -12,6 +29,7 @@ export async function getFairs(
     q = '',
     district,
     date,
+    status: statusFilter,
     page = 0,
     limit = 10,
     sortBy = 'date.desc',
@@ -34,10 +52,33 @@ export async function getFairs(
   const searchCondition = q ? or(ilike(fair.title, `%${q}%`)) : undefined
 
   const districtCondition = district
-    ? eq(fair.regionId, Number(district))
+    ? inArray(
+        region.name,
+        district.split(',').map((d) => d.trim()),
+      )
     : undefined
 
   const dateCondition = date ? eq(fair.date, date) : undefined
+
+  const statusFilters = statusFilter?.split(',').map((s) => s.trim()) ?? []
+  let statusCondition: ReturnType<typeof sql> | undefined
+
+  if (statusFilters.length > 0) {
+    const conditions = statusFilters.map((status) => {
+      if (status === 'upcoming') {
+        return sql`(${fair.date} > CURRENT_DATE OR (${fair.date} = CURRENT_DATE AND ${fair.startTime} > CURRENT_TIME))`
+      }
+      if (status === 'ongoing') {
+        return sql`(${fair.date} = CURRENT_DATE AND ${fair.startTime} <= CURRENT_TIME AND ${fair.endTime} >= CURRENT_TIME)`
+      }
+      if (status === 'finished') {
+        return sql`(${fair.date} < CURRENT_DATE OR (${fair.date} = CURRENT_DATE AND ${fair.endTime} < CURRENT_TIME))`
+      }
+      return sql`FALSE`
+    })
+
+    statusCondition = conditions.length > 0 ? or(...conditions) : undefined
+  }
 
   const activeCondition = eq(fair.active, true)
 
@@ -46,6 +87,7 @@ export async function getFairs(
     searchCondition,
     districtCondition,
     dateCondition,
+    statusCondition,
   )
 
   try {
@@ -79,6 +121,11 @@ export async function getFairs(
       data: rows.map((row) => ({
         ...row,
         date: new Date(row.date),
+        status: calculateFairStatus(
+          new Date(row.date),
+          row.startTime,
+          row.endTime,
+        ),
       })),
       total,
       page,
