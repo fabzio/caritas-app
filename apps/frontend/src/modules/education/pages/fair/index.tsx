@@ -109,19 +109,25 @@ export default function FairPage() {
           <div className="flex-1 w-full">
             <SearchFairInput />
           </div>
-          <div className="flex w-auto gap-1">
+          <div className={`flex ${isMobile ? 'w-full' : 'w-auto'} gap-2`}>
             <RegionFilter />
             <StatusFilter />
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <ActionsButton
-            onDeleteClick={() => setIsDeleteModalOpen(true)}
-            onEditClick={handleEdit}
-            selectedCount={fairCount}
-          />
-          <Link search={{ type: 'new' }} to="/education/fair/form">
-            <Button size={'default'}>
+        <div className={`flex items-center gap-2 ${isMobile ? 'w-full' : ''}`}>
+          <div className={isMobile ? 'w-1/2' : ''}>
+            <ActionsButton
+              onDeleteClick={() => setIsDeleteModalOpen(true)}
+              onEditClick={handleEdit}
+              selectedCount={fairCount}
+            />
+          </div>
+          <Link
+            search={{ type: 'new' }}
+            to="/education/fair/form"
+            className={isMobile ? 'w-1/2' : ''}
+          >
+            <Button size={'default'} className={isMobile ? 'w-full' : ''}>
               <PlusCircle />
               {'Nueva feria'}
             </Button>

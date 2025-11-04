@@ -1,4 +1,5 @@
 import { useFilters } from '@frontend/hooks/use-filters'
+import { useIsMobile } from '@frontend/hooks/use-mobile'
 import { Badge } from '@workspace/ui/components/badge'
 import { Button } from '@workspace/ui/components/button'
 import { Checkbox } from '@workspace/ui/components/checkbox'
@@ -16,6 +17,7 @@ export default function RegionFilter() {
   const { filters, setFilters } = useFilters('/_authenticated/education/fair/')
   const { regions } = useFairFilterOptions()
   const [open, setOpen] = useState(false)
+  const isMobile = useIsMobile()
 
   const selectedDistricts = filters.district ? filters.district.split(',') : []
 
@@ -43,7 +45,10 @@ export default function RegionFilter() {
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button variant="outline" className="gap-2">
+        <Button
+          variant="outline"
+          className={`gap-2 ${isMobile ? 'flex-1' : ''}`}
+        >
           <MapPin className="h-4 w-4" />
           Distrito
           {selectedDistricts.length > 0 && (
