@@ -19,7 +19,6 @@ import {
   gte,
   ilike,
   lte,
-  ne,
   notInArray,
   or,
 } from 'drizzle-orm'
@@ -705,20 +704,6 @@ export const addAttendantToActivity = async (
 ) => {
   const { userId, activityId } = params
   try {
-    const existentUser = await db
-      .select()
-      .from(activityUser)
-      .where(
-        and(
-          eq(activityUser.activityId, activityId),
-          eq(activityUser.userId, userId),
-        ),
-      )
-
-    if (existentUser.length > 0) {
-      throw new Error('El beneficiario ya es asistente de la actividad')
-    }
-
     await db.insert(activityUser).values({
       activityId,
       userId,
@@ -781,19 +766,7 @@ export const getExistentUsers = async (
     if (documentNumber) {
       conditions.push(and(ilike(user.documentNumber, `%${documentNumber}%`)))
     }
-
-    const existentAttendants = await db
-      .select({ userId: activityUser.userId })
-      .from(activityUser)
-      .where(eq(activityUser.activityId, activityId))
-
-    const existentAttendantIds = new Set(
-      existentAttendants.map((att) => att.userId),
-    )
-
-    if (existentAttendantIds.size > 0) {
-      conditions.push(notInArray(user.id, Array.from(existentAttendantIds)))
-    }
+    conditions.push(eq(user.active, true), eq(user.role, 'user'))
 
     const where = conditions.length > 0 ? and(...conditions) : undefined
 
@@ -825,4 +798,21 @@ export const getExistentUsers = async (
     if (e instanceof Error) throw new PostgresError(e.message)
     throw e
   }
+}
+
+export async function findDuplicateAttendant(
+  userId: string,
+  activityId: number,
+) {
+  const existentUsers = await db
+    .select()
+    .from(activityUser)
+    .where(
+      and(
+        eq(activityUser.activityId, activityId),
+        eq(activityUser.userId, userId),
+      ),
+    )
+
+  return existentUsers.length > 0
 }

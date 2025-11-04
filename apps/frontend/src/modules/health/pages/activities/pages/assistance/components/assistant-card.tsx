@@ -96,7 +96,6 @@ export default function AssistantCard({
 
             <Button
               type="button"
-              variant="destructive"
               onClick={handleDelete}
               disabled={removeAttendantIsPending}
             >

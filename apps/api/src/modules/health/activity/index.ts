@@ -13,6 +13,7 @@ import {
   createAttention,
   createCompleteActivity,
   deleteActivities,
+  findDuplicateAttendant,
   getActivities,
   getActivityById,
   getActivityDetailById,
@@ -244,13 +245,17 @@ const activityModule = new Elysia({ name: 'activity', prefix: '/activities' })
   .post(
     '/add-attendant',
     async ({ body }) => {
-      try {
-        return status(201, await addAttendantToActivity(body))
-      } catch (error) {
-        if (error instanceof Error) {
-          throw status(400, { error: error.message })
-        }
-        throw status(500, { error: 'Ocurrió un error desconocido' })
+      const duplicate = await findDuplicateAttendant(
+        body.userId,
+        body.activityId,
+      )
+      if (duplicate)
+        throw status(
+          400,
+          `El beneficiario ya se encuentra registrado en esta actividad.`,
+        )
+      else {
+        addAttendantToActivity(body)
       }
     },
     {

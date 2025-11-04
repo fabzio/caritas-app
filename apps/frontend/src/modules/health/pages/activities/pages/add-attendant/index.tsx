@@ -167,8 +167,6 @@ export default function AddAttendantPage() {
     })
     setFoundUser(null)
   }
-  console.log('Document Number:', form.getValues('documentNumber'))
-  console.log('Document Type:', form.getValues('documentType'))
 
   return (
     <div className="w-full p-4">
