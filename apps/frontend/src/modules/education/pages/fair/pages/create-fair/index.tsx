@@ -132,7 +132,7 @@ export default function CreateFairPage() {
                     name="regionId"
                     render={({ field }) => (
                       <FormItem className="col-span-1">
-                        <FormLabel>Distrito</FormLabel>
+                        <FormLabel>Distrito*</FormLabel>
 
                         <Popover>
                           <PopoverTrigger asChild>
@@ -213,7 +213,7 @@ export default function CreateFairPage() {
                     name="date"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Fecha de la feria</FormLabel>
+                        <FormLabel>Fecha de la feria*</FormLabel>
                         <Popover>
                           <PopoverTrigger asChild>
                             <FormControl>
@@ -250,7 +250,7 @@ export default function CreateFairPage() {
                     name="startTime"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Hora de inicio de la feria</FormLabel>
+                        <FormLabel>Hora de inicio de la feria*</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
@@ -267,7 +267,7 @@ export default function CreateFairPage() {
                     name="endTime"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Hora de finalización de la feria</FormLabel>
+                        <FormLabel>Hora de finalización de la feria*</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
