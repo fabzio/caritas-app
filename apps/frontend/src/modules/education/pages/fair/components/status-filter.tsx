@@ -11,13 +11,13 @@ import {
 import { Separator } from '@workspace/ui/components/separator'
 import { CalendarClock, X } from 'lucide-react'
 import { useState } from 'react'
-import { useFairFilterOptions } from '../hooks/use-fair-filter-options'
+import { useFairStatus } from '../hooks/use-fair-status'
 
 type FairStatus = 'upcoming' | 'ongoing' | 'finished'
 
 export default function StatusFilter() {
   const { filters, setFilters } = useFilters('/_authenticated/education/fair/')
-  const { statuses } = useFairFilterOptions()
+  const { data: statuses = [] } = useFairStatus()
   const [open, setOpen] = useState(false)
   const isMobile = useIsMobile()
 
@@ -42,7 +42,7 @@ export default function StatusFilter() {
   }
 
   const selectedStatusesData = statuses.filter((s) =>
-    selectedStatuses.includes(s.value),
+    selectedStatuses.includes(s.value as FairStatus),
   )
 
   if (!statuses.length) return null
@@ -86,11 +86,15 @@ export default function StatusFilter() {
                   key={status.value}
                   type="button"
                   className="flex items-center gap-2 p-2 rounded-md hover:bg-accent cursor-pointer w-full text-left"
-                  onClick={() => handleToggleStatus(status.value)}
+                  onClick={() => handleToggleStatus(status.value as FairStatus)}
                 >
                   <Checkbox
-                    checked={selectedStatuses.includes(status.value)}
-                    onCheckedChange={() => handleToggleStatus(status.value)}
+                    checked={selectedStatuses.includes(
+                      status.value as FairStatus,
+                    )}
+                    onCheckedChange={() =>
+                      handleToggleStatus(status.value as FairStatus)
+                    }
                   />
                   <span className="text-sm flex-1">{status.label}</span>
                 </button>
@@ -119,7 +123,7 @@ export default function StatusFilter() {
                       className="h-auto p-0.5 hover:bg-transparent"
                       onClick={(e) => {
                         e.preventDefault()
-                        handleToggleStatus(status.value)
+                        handleToggleStatus(status.value as FairStatus)
                       }}
                     >
                       <X className="h-3 w-3" />

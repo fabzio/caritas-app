@@ -11,11 +11,11 @@ import {
 import { Separator } from '@workspace/ui/components/separator'
 import { MapPin, X } from 'lucide-react'
 import { useState } from 'react'
-import { useFairFilterOptions } from '../hooks/use-fair-filter-options'
+import { useFairRegions } from '../hooks/use-fair-regions'
 
 export default function RegionFilter() {
   const { filters, setFilters } = useFilters('/_authenticated/education/fair/')
-  const { regions } = useFairFilterOptions()
+  const { data: regions = [] } = useFairRegions()
   const [open, setOpen] = useState(false)
   const isMobile = useIsMobile()
 

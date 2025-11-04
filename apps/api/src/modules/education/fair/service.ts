@@ -5,11 +5,13 @@ import { fair } from '@api/db/schemas/education'
 import { and, asc, count, desc, eq, ilike, inArray, or, sql } from 'drizzle-orm'
 import type { FairModel } from './model'
 
+type FairStatus = 'upcoming' | 'ongoing' | 'finished'
+
 function calculateFairStatus(
   fairDate: Date,
   startTime: string,
   endTime: string,
-): 'upcoming' | 'ongoing' | 'finished' {
+): FairStatus {
   const now = new Date()
   const currentTime = now.toTimeString().slice(0, 8)
   const currentDate = now.toISOString().split('T')[0]
@@ -66,13 +68,13 @@ export async function getFairs(
   if (statusFilters.length > 0) {
     const conditions = statusFilters.map((status) => {
       if (status === 'upcoming') {
-        return sql`(${fair.date} > CURRENT_DATE OR (${fair.date} = CURRENT_DATE AND ${fair.startTime} > CURRENT_TIME))`
+        return sql`(${fair.date} > (CURRENT_TIMESTAMP AT TIME ZONE 'America/Lima')::date OR (${fair.date} = (CURRENT_TIMESTAMP AT TIME ZONE 'America/Lima')::date AND ${fair.startTime} > (CURRENT_TIMESTAMP AT TIME ZONE 'America/Lima')::time))`
       }
       if (status === 'ongoing') {
-        return sql`(${fair.date} = CURRENT_DATE AND ${fair.startTime} <= CURRENT_TIME AND ${fair.endTime} >= CURRENT_TIME)`
+        return sql`(${fair.date} = (CURRENT_TIMESTAMP AT TIME ZONE 'America/Lima')::date AND ${fair.startTime} <= (CURRENT_TIMESTAMP AT TIME ZONE 'America/Lima')::time AND ${fair.endTime} > (CURRENT_TIMESTAMP AT TIME ZONE 'America/Lima')::time)`
       }
       if (status === 'finished') {
-        return sql`(${fair.date} < CURRENT_DATE OR (${fair.date} = CURRENT_DATE AND ${fair.endTime} < CURRENT_TIME))`
+        return sql`(${fair.date} < (CURRENT_TIMESTAMP AT TIME ZONE 'America/Lima')::date OR (${fair.date} = (CURRENT_TIMESTAMP AT TIME ZONE 'America/Lima')::date AND ${fair.endTime} <= (CURRENT_TIMESTAMP AT TIME ZONE 'America/Lima')::time))`
       }
       return sql`FALSE`
     })
@@ -180,5 +182,61 @@ export const patchFair = async (id: number, args: FairModel.UpdateFair) => {
   } catch (e) {
     if (e instanceof Error) throw new PostgresError(e.message)
     throw e
+  }
+}
+
+export const getFairRegions = async () => {
+  try {
+    const regions = await db
+      .selectDistinct({
+        id: region.id,
+        name: region.name,
+      })
+      .from(fair)
+      .innerJoin(region, eq(fair.regionId, region.id))
+      .where(eq(fair.active, true))
+      .orderBy(asc(region.name))
+
+    return regions
+  } catch (error) {
+    if (error instanceof Error) throw new PostgresError(error.message)
+    throw error
+  }
+}
+
+export const getFairStatus = async () => {
+  try {
+    const activeFairs = await db
+      .select({
+        date: fair.date,
+        startTime: fair.startTime,
+        endTime: fair.endTime,
+      })
+      .from(fair)
+      .where(eq(fair.active, true))
+
+    const statusesSet = new Set<FairStatus>()
+
+    for (const fairData of activeFairs) {
+      const status = calculateFairStatus(
+        new Date(fairData.date),
+        fairData.startTime,
+        fairData.endTime,
+      )
+      statusesSet.add(status)
+    }
+
+    const allStatuses = [
+      { value: 'upcoming', label: 'Próxima' },
+      { value: 'ongoing', label: 'En curso' },
+      { value: 'finished', label: 'Finalizada' },
+    ]
+
+    return allStatuses.filter((status) =>
+      statusesSet.has(status.value as FairStatus),
+    )
+  } catch (error) {
+    if (error instanceof Error) throw new PostgresError(error.message)
+    throw error
   }
 }
