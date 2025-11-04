@@ -42,7 +42,7 @@ export default function DeleteConfirmationDialog({
             }?`}
           </DialogTitle>
           <DialogDescription>
-            Esta acción no se puede deshacer. Las becas serán marcadas como
+            Esta acción no se puede deshacer. Las ferias serán marcadas como
             inactivas.
           </DialogDescription>
         </DialogHeader>

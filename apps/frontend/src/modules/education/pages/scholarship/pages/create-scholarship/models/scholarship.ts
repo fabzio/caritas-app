@@ -40,7 +40,7 @@ export const formScholarShipSchema = z
       .max(9999, { message: 'Ingrese un número válido de vacantes' })
       .refine((v) => v !== undefined, {
         message: 'Las vacantes son obligatorias',
-      }),
+      }) as unknown as z.ZodNumber,
   })
   .refine((data) => data.startDate < data.endDate, {
     message: 'La fecha de inicio debe ser anterior a la fecha de fin',
