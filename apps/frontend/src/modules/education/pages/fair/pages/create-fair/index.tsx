@@ -147,7 +147,7 @@ export default function CreateFairPage() {
                                 {field.value
                                   ? districts?.find((d) => d.id === field.value)
                                       ?.name
-                                  : 'Selecciona tu distrito'}
+                                  : 'Selecciona un distrito'}
                                 <ChevronsUpDown className="opacity-50" />
                               </Button>
                             </FormControl>
