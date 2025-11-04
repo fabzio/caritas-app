@@ -4,7 +4,7 @@ ARG VITE_CLOUDFLARE_TURNSTILE_SITE_KEY=0x4AAAAAAB3NCsVLdXRV7O1H
 FROM oven/bun:1.3.0-slim AS base
 FROM base AS builder
 WORKDIR /app
-RUN bun i -g turbo@^2
+RUN bun i -g turbo@2.5.8
 COPY . .
 
 RUN turbo prune frontend --docker
