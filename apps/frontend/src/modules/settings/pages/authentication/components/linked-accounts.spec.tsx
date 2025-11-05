@@ -6,13 +6,19 @@ import LinkedAccounts from './linked-accounts'
 const mutate = vi.fn()
 const useLinkedAccountsMock = vi.fn()
 
-vi.mock('@frontend/modules/settings/hooks/use-link-google', () => ({
-  useLinkGoogle: () => ({ mutate }),
-}))
+vi.mock(
+  '@frontend/modules/settings/pages/authentication/hooks/use-link-google',
+  () => ({
+    useLinkGoogle: () => ({ mutate }),
+  }),
+)
 
-vi.mock('@frontend/modules/settings/hooks/use-linked-accounts', () => ({
-  useLinkedAccounts: (opts?: unknown) => useLinkedAccountsMock(opts),
-}))
+vi.mock(
+  '@frontend/modules/settings/pages/authentication/hooks/use-linked-accounts',
+  () => ({
+    useLinkedAccounts: (opts?: unknown) => useLinkedAccountsMock(opts),
+  }),
+)
 
 describe('LinkedAccounts component', () => {
   beforeEach(() => {

@@ -14,6 +14,12 @@ vi.mock('@tanstack/react-router', () => ({
   useSearch: (opts?: unknown) => useSearchMock(opts),
 }))
 
+vi.mock('@frontend/shared/components/password-strength-bar', () => ({
+  default: ({ password }: { password: string }) => (
+    <div data-testid="password-strength-bar" data-password={password} />
+  ),
+}))
+
 describe('ResetPassword page', () => {
   beforeEach(() => {
     vi.clearAllMocks()

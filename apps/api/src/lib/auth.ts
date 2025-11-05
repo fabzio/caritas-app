@@ -140,7 +140,6 @@ export const auth = betterAuth({
       },
       update: {
         async before(user) {
-          console.log(user)
           const [sameDocument, samePhone, sameEmail] = await Promise.all([
             db.query.user.findFirst({
               where: (u, { eq, and, ne }) =>
