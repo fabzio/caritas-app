@@ -117,7 +117,7 @@ export default function CreateScholarship() {
     <div className="flex flex-1 flex-col gap-6 p-4">
       <div className="flex flex-col gap-1">
         <h1 className="text-2xl font-semibold text-foreground">
-          {dependantText.mainTitle[viewType] || 'Crear nueva beca'}
+          {dependantText.mainTitle[viewType] || 'Registrar nueva beca'}
         </h1>
         <span className="text-muted-foreground">
           Complete la información de la beca
@@ -207,8 +207,8 @@ export default function CreateScholarship() {
                                 No hay organizaciones aliadas disponibles.
                                 <Separator />{' '}
                                 <Button onClick={handleNewAlly}>
-                                  <span className="py-1 flex underline it(trueems-center gap-2">
-                                    Crear organización aliada
+                                  <span className="py-1 flex underline items-center gap-2">
+                                    Registrar organización aliada
                                     <UserPlus size={16} />
                                   </span>
                                 </Button>
@@ -376,7 +376,7 @@ export default function CreateScholarship() {
 }
 const dependantText = {
   mainTitle: {
-    new: 'Crear nueva beca',
+    new: 'Registrar nueva beca',
     edit: 'Editar beca',
   },
   submit: {

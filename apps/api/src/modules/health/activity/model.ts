@@ -1,5 +1,6 @@
+import { user } from '@api/db/schemas/auth'
 import { activity } from '@api/db/schemas/health'
-import { createInsertSchema } from 'drizzle-typebox'
+import { createInsertSchema, createSelectSchema } from 'drizzle-typebox'
 import { t } from 'elysia'
 
 export namespace ActivityModel {
@@ -152,4 +153,34 @@ export namespace ActivityModel {
     activityId: t.Number(),
   })
   export type AttendantActivity = typeof attendantActivity.static
+
+  export const listExistentUsersQuery = t.Object({
+    documentNumber: t.Optional(t.String()),
+    documentType: t.Optional(t.String()),
+    activityId: t.Integer(),
+  })
+  export type ListExistentUsersQuery = typeof listExistentUsersQuery.static
+
+  const _getUsers = createSelectSchema(user, {
+    birthDate: t.Date(),
+  })
+  export const existentUser = t.Object({
+    data: t.Array(
+      t.Composite([
+        t.Pick(_getUsers, [
+          'id',
+          'name',
+          'surname',
+          'email',
+          'phone',
+          'documentType',
+          'documentNumber',
+          'birthDate',
+          'sex',
+          'regionId',
+        ]),
+      ]),
+    ),
+  })
+  export type ExistentUser = typeof existentUser.static
 }

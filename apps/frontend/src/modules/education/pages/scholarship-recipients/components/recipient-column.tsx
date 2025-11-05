@@ -1,9 +1,30 @@
 import type { ColumnDef } from '@tanstack/react-table'
 import { Button } from '@workspace/ui/components/button'
+import { Checkbox } from '@workspace/ui/components/checkbox'
 import { ArrowUpDown } from 'lucide-react'
 import type { Recipient } from '../hooks/use-scholarship'
 
 export const scholarshipRecipientTableColumns: ColumnDef<Recipient>[] = [
+  {
+    id: 'select',
+    header: ({ table }) => (
+      <Checkbox
+        checked={
+          table.getIsAllPageRowsSelected() ||
+          (table.getIsSomePageRowsSelected() && 'indeterminate')
+        }
+        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+      />
+    ),
+    cell: ({ row }) => (
+      <Checkbox
+        checked={row.getIsSelected()}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
+      />
+    ),
+    enableSorting: false,
+    enableHiding: false,
+  },
   {
     accessorKey: 'user',
     header: ({ column }) => (
@@ -61,17 +82,18 @@ export const scholarshipRecipientTableColumns: ColumnDef<Recipient>[] = [
     ),
     cell: ({ row }) => row.original.organizationName,
   },
-  // {
-  //   accessorKey: 'region',
-  //   header: ({ column }) => (
-  //     <Button
-  //       variant="ghost"
-  //       onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-  //     >
-  //       Región
-  //       <ArrowUpDown />
-  //     </Button>
-  //   ),
-  //   cell: ({ row }) => row.original.region,
-  // },
+  {
+    accessorKey: 'region',
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+      >
+        Distrito
+        <ArrowUpDown />
+      </Button>
+    ),
+    cell: ({ row }) =>
+      row.original.region ? row.original.region : 'Sin distrito asignado',
+  },
 ]

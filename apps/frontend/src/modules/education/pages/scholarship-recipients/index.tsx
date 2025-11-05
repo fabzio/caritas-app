@@ -3,6 +3,7 @@ import { Link } from '@tanstack/react-router'
 import { Button } from '@workspace/ui/components/button'
 import { PlusCircle } from 'lucide-react'
 import { useState } from 'react'
+import DeleteRecipientsDialog from './components/delete-recipients-dialog'
 import RecipientsTable from './components/recipients-table'
 import SearchRecipients from './components/search-recipients'
 import SelectFilters from './components/select-filters'
@@ -12,6 +13,7 @@ import { useSelectNames } from './hooks/use-select-names'
 export default function ScholarshipRecipients() {
   const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({})
   const isMobile = useIsMobile()
+  const [openRejectDialog, setOpenRejectDialog] = useState(false)
 
   const {
     isLoading,
@@ -23,6 +25,16 @@ export default function ScholarshipRecipients() {
     setFilters,
     filters,
   } = useScholarshipRecipientTable()
+
+  const selectedRows = Object.keys(rowSelection)
+    .filter((key) => rowSelection[key])
+    .map((key) => Number.parseInt(key, 10))
+
+  const selectedRecipients = selectedRows
+    .map((rowIndex) => recipients?.[rowIndex])
+    .filter((r): r is NonNullable<typeof r> => r !== undefined && r !== null)
+
+  const selectedIds = selectedRecipients.map((r) => r.id)
 
   const { data: selectNames } = useSelectNames()
   const scholarshipNames = selectNames?.scholarshipNames ?? []
@@ -55,6 +67,7 @@ export default function ScholarshipRecipients() {
     })
   }
 
+
   return (
     <div className="flex flex-1 flex-col gap-6 p-4">
       <div className="w-full flex gap-8">
@@ -72,13 +85,13 @@ export default function ScholarshipRecipients() {
               <SearchRecipients />
             </div>
             <div className="flex flex-row gap-4 px-10">
-              {/* <SelectFilters
+              <SelectFilters
                 value={regionFilter}
                 onValueChange={handleRegionFilterChange}
                 valueList={regionNames}
-                item="región"
-                placeholder="Todas las regiones"
-              /> */}
+                item="distrito"
+                placeholder="Todos los distritos"
+              />
               <SelectFilters
                 value={scholarshipFilter}
                 onValueChange={handleScholarshipFilterChange}
@@ -86,6 +99,15 @@ export default function ScholarshipRecipients() {
                 placeholder="Todas las becas"
                 item="beca"
               />
+              <Button
+                variant="outline"
+                onClick={() => setOpenRejectDialog(true)}
+                disabled={selectedIds.length === 0}
+                className="whitespace-nowrap border-destructive text-destructive hover:bg-destructive hover:text-white dark:hover:bg-destructive/80"
+                size={isMobile ? 'sm' : 'lg'}
+              >
+                Dar de baja
+              </Button>
               <Link to="/education/recipients/create">
                 <Button
                   className="whitespace-nowrap"
@@ -108,6 +130,13 @@ export default function ScholarshipRecipients() {
               sortingState={sortingState}
               setFilters={setFilters}
               pagination={pagination}
+            />
+            <DeleteRecipientsDialog
+              open={openRejectDialog}
+              onOpenChange={setOpenRejectDialog}
+              selectedCount={selectedIds.length}
+              ids={selectedIds}
+              clearSelection={() => setRowSelection({})}
             />
           </div>
         </div>

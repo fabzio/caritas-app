@@ -10,7 +10,17 @@ import {
   attention,
   speciality,
 } from '@api/db/schemas/health'
-import { and, asc, count, desc, eq, gte, ilike, lte, or } from 'drizzle-orm'
+import {
+  and,
+  asc,
+  count,
+  desc,
+  eq,
+  gte,
+  ilike,
+  lte,
+  or,
+} from 'drizzle-orm'
 import type { ActivityModel } from './model'
 
 export const createActivity = async (args: ActivityModel.CreateActivity) => {
@@ -741,4 +751,67 @@ export const getRegionsWithActivities = async () => {
     if (error instanceof Error) throw new PostgresError(error.message)
     throw error
   }
+}
+
+export const getExistentUsers = async (
+  params: ActivityModel.ListExistentUsersQuery,
+): Promise<ActivityModel.ExistentUser> => {
+  try {
+    const { documentType = '', documentNumber = '' } = params
+    const conditions = []
+    if (documentType) {
+      conditions.push(eq(user.documentType, documentType))
+    }
+    if (documentNumber) {
+      conditions.push(ilike(user.documentNumber, `%${documentNumber}%`))
+    }
+    conditions.push(eq(user.active, true), eq(user.role, 'user'))
+
+    const where = conditions.length > 0 ? and(...conditions) : undefined
+
+    const users = await db
+      .select({
+        id: user.id,
+        name: user.name,
+        surname: user.surname,
+        documentType: user.documentType,
+        documentNumber: user.documentNumber,
+        email: user.email,
+        phone: user.phone,
+        birthDate: user.birthDate,
+        sex: user.sex,
+        regionId: user.regionId,
+      })
+      .from(user)
+      .orderBy(asc(user.name))
+      .limit(5)
+      .where(where)
+
+    return {
+      data: users.map((u) => ({
+        ...u,
+        birthDate: new Date(u.birthDate),
+      })),
+    }
+  } catch (e) {
+    if (e instanceof Error) throw new PostgresError(e.message)
+    throw e
+  }
+}
+
+export async function findDuplicateAttendant(
+  userId: string,
+  activityId: number,
+) {
+  const existentUsers = await db
+    .select()
+    .from(activityUser)
+    .where(
+      and(
+        eq(activityUser.activityId, activityId),
+        eq(activityUser.userId, userId),
+      ),
+    )
+
+  return existentUsers.length > 0
 }

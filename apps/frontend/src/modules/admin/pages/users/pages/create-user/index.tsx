@@ -90,6 +90,7 @@ export default function FormView() {
     updateUser({
       userId: loaderData.id,
       data: {
+        id: loaderData.id,
         email: values.email.trim(),
         name: values.name.trim(),
         role: loaderData.role?.trim(),
@@ -493,11 +494,11 @@ export default function FormView() {
 
 const dependantText = {
   mainTitle: {
-    new: 'Crear nuevo usuario',
+    new: 'Registrar nuevo usuario',
     edit: 'Editar un usuario',
   },
   submit: {
-    new: 'Crear Usuario',
+    new: 'Registrar Usuario',
     edit: 'Guardar Cambios',
   },
 }

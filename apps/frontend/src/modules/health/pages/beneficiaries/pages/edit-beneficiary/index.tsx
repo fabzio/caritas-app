@@ -80,6 +80,7 @@ export default function FormView() {
     updateBeneficiary({
       userId: loaderData.id,
       data: {
+        id: loaderData.id,
         email: values.email.trim(),
         name: values.name.trim(),
         role: 'user',
@@ -416,11 +417,11 @@ export default function FormView() {
 const dependantText = {
   mainTitle: {
     edit: 'Editar beneficiario',
-    new: 'Crear beneficiario',
+    new: 'Registrar beneficiario',
   },
   submit: {
     edit: 'Guardar Cambios',
-    new: 'Crear Beneficiario',
+    new: 'Registrar Beneficiario',
   },
 } as const
 
