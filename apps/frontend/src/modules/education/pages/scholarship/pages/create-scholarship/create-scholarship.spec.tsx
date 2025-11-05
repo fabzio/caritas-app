@@ -217,7 +217,7 @@ describe('CreateScholarship', () => {
     )
 
     expect(
-      screen.getByText((content) => content.startsWith('Crear nueva beca')),
+      screen.getByText((content) => content.startsWith('Registrar nueva beca')),
     ).toBeTruthy()
     expect(screen.getByText('Información de la Beca')).toBeTruthy()
     expect(screen.getByText('Nombre de la Beca*')).toBeTruthy()

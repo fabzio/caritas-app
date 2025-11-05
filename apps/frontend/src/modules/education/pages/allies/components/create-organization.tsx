@@ -59,7 +59,7 @@ export default function CreateOrganization({ viewType }: Readonly<Props>) {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button>
-          <UserPlus /> Crear organización
+          <UserPlus /> Registrar organización
         </Button>
       </DialogTrigger>
       <DialogContent>
@@ -107,11 +107,11 @@ const formSchema = z.object({
 
 const dependantText = {
   mainTitle: {
-    new: 'Crear nueva organización',
+    new: 'Registrar nueva organización',
     edit: 'Editar una organización',
   },
   submit: {
-    new: 'Crear Organización',
+    new: 'Registrar Organización',
     edit: 'Guardar Cambios',
   },
 }
