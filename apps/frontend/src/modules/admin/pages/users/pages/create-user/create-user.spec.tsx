@@ -346,6 +346,7 @@ describe('FormView - Edit Mode', () => {
     mockUseLoaderData.mockReturnValue(loader)
     mockUseUserDetail.mockReturnValue({ data: loader })
     setMockFormValues({
+      id: 'user-1',
       name: 'John',
       surname: 'Doe',
       email: 'john@example.com',
@@ -385,6 +386,7 @@ describe('FormView - Edit Mode', () => {
       expect(mockUpdateUser).toHaveBeenCalledWith({
         userId: 'user-1',
         data: {
+          id: 'user-1',
           email: 'john@example.com',
           name: 'John',
           role: 'admin',

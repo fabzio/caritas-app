@@ -90,6 +90,7 @@ export default function FormView() {
     updateUser({
       userId: loaderData.id,
       data: {
+        id: loaderData.id,
         email: values.email.trim(),
         name: values.name.trim(),
         role: loaderData.role?.trim(),

@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { type ReactNode, use } from 'react'
+import type { ReactNode } from 'react'
 import { beforeEach, describe, it, vi } from 'vitest'
 import CreateScholarship from './index'
 
@@ -9,6 +9,22 @@ const mockPostScholarship = vi.fn()
 const mockUseSession = vi.fn()
 vi.mock('./hooks/use-post-scholarship', () => ({
   default: () => ({ mutate: mockPostScholarship, isPending: false }),
+}))
+
+vi.mock('@frontend/modules/health/components/organization-form-dialog', () => ({
+  default: ({
+    open,
+    onOpenChange,
+  }: {
+    open: boolean
+    onOpenChange: (flag: boolean) => void
+  }) => (
+    <div data-open={open}>
+      <button type="button" onClick={() => onOpenChange(!open)}>
+        toggle
+      </button>
+    </div>
+  ),
 }))
 
 vi.mock('./hooks/use-get-organization', () => ({
@@ -82,9 +98,7 @@ vi.mock('@workspace/ui/components/textarea', () => ({
 }))
 
 vi.mock('@workspace/ui/components/form', () => ({
-  Form: ({ children, ...props }: { children: ReactNode }) => (
-    <form {...props}>{children}</form>
-  ),
+  Form: ({ children }: { children: ReactNode }) => <div>{children}</div>,
   FormControl: ({ children }: { children: ReactNode }) => <div>{children}</div>,
   FormField: ({
     render,
@@ -114,23 +128,8 @@ vi.mock('@workspace/ui/components/form', () => ({
 }))
 
 vi.mock('@workspace/ui/components/select', () => ({
-  Select: ({
-    children,
-    onValueChange,
-    defaultValue,
-  }: {
-    children: ReactNode
-    onValueChange: (v: string) => void
-    defaultValue?: string
-  }) => (
-    <div>
-      <select
-        onChange={(e) => onValueChange(e.target.value)}
-        defaultValue={defaultValue}
-      >
-        {children}
-      </select>
-    </div>
+  Select: ({ children }: { children: ReactNode }) => (
+    <div data-role="select">{children}</div>
   ),
   SelectTrigger: ({ children }: { children: ReactNode }) => (
     <div>{children}</div>
@@ -148,9 +147,9 @@ vi.mock('@workspace/ui/components/select', () => ({
     value: string
     disabled?: boolean
   }) => (
-    <option value={value} disabled={disabled}>
+    <div data-value={value} data-disabled={disabled}>
       {children}
-    </option>
+    </div>
   ),
 }))
 
@@ -274,7 +273,7 @@ describe('CreateScholarship', () => {
 
     const cancelButton = screen.getByText('Cancelar')
     expect(cancelButton).toBeTruthy()
-    expect(cancelButton.getAttribute('data-variant')).toBe('outline')
+    expect(cancelButton.dataset.variant).toBe('outline')
   })
 
   it('submits form when clicking submit button', async () => {

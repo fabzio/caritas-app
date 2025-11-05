@@ -290,6 +290,7 @@ describe('Health Beneficiary FormView', () => {
       expect(mockUpdateBeneficiary).toHaveBeenCalledWith({
         userId: 'beneficiary-1',
         data: {
+          id: 'beneficiary-1',
           email: 'john@example.com',
           name: 'John',
           role: 'user',

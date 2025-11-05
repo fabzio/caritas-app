@@ -23,14 +23,12 @@ export const useCreateBeneficiary = () => {
       if (error) throw error
 
       const userId = data.user.id
-      const { error: welcomeError } = await rpc.auth.welcome.user.post({
+      const { error: studentError } = await rpc.auth.info.student.post({
         userId,
-        studentInfo: {
-          grade,
-          guardianEmail,
-        },
+        grade,
+        guardianEmail,
       })
-      if (welcomeError) throw welcomeError
+      if (studentError) throw studentError
       return { userId }
     },
     onSuccess: () => {

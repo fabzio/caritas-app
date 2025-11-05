@@ -2,6 +2,7 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { ReactNode } from 'react'
 import { vi } from 'vitest'
+import { z } from 'zod'
 import FormView from './index'
 
 type FormValues = Record<string, unknown>
@@ -28,6 +29,23 @@ vi.mock('../../hooks/use-update-beneficiary', () => ({
   useUpdateBeneficiary: () => ({
     mutate: mockUpdateBeneficiary,
     isPending: false,
+  }),
+}))
+
+vi.mock('@frontend/shared/models/user', () => ({
+  formUserSchema: z.object({
+    password: z.string().optional(),
+    confirmPassword: z.string().optional(),
+    name: z.string(),
+    surname: z.string(),
+    email: z.string(),
+    phone: z.string(),
+    documentType: z.enum(['DNI', 'CE', 'PAS']),
+    documentNumber: z.string(),
+    birthDate: z.date().optional(),
+    sex: z.enum(['M', 'F']).optional(),
+    regionId: z.number(),
+    token: z.string().optional(),
   }),
 }))
 
@@ -293,6 +311,7 @@ describe('Education Beneficiary FormView', () => {
       expect(mockUpdateBeneficiary).toHaveBeenCalledWith({
         userId: 'beneficiary-2',
         data: {
+          id: 'beneficiary-2',
           email: 'luis@example.com',
           name: 'Luis',
           role: 'user',
