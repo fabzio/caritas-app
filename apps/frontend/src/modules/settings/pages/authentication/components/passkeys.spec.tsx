@@ -7,17 +7,26 @@ const addMutate = vi.fn()
 const removeMutate = vi.fn()
 const useListPasskeysMock = vi.fn()
 
-vi.mock('@frontend/modules/settings/hooks/use-add-passkey', () => ({
-  useAddPasskey: () => ({ mutate: addMutate }),
-}))
+vi.mock(
+  '@frontend/modules/settings/pages/authentication/hooks/use-add-passkey',
+  () => ({
+    useAddPasskey: () => ({ mutate: addMutate }),
+  }),
+)
 
-vi.mock('@frontend/modules/settings/hooks/use-remove-passkey', () => ({
-  useRemovePasskey: () => ({ mutate: removeMutate }),
-}))
+vi.mock(
+  '@frontend/modules/settings/pages/authentication/hooks/use-remove-passkey',
+  () => ({
+    useRemovePasskey: () => ({ mutate: removeMutate }),
+  }),
+)
 
-vi.mock('@frontend/modules/settings/hooks/use-list-passkeys', () => ({
-  useListPasskeys: (opts?: unknown) => useListPasskeysMock(opts),
-}))
+vi.mock(
+  '@frontend/modules/settings/pages/authentication/hooks/use-list-passkeys',
+  () => ({
+    useListPasskeys: (opts?: unknown) => useListPasskeysMock(opts),
+  }),
+)
 
 describe('Passkeys component', () => {
   beforeEach(() => {
