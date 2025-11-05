@@ -1,6 +1,5 @@
 import { useFilters } from '@frontend/hooks/use-filters'
 import { Input } from '@workspace/ui/components/input'
-import { Search } from 'lucide-react'
 
 export default function SearchFairInput() {
   const { filters, setFilters } = useFilters('/_authenticated/education/fair/')

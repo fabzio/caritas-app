@@ -269,8 +269,8 @@ describe('FormView - Create Mode', () => {
   it('renders form in create mode', () => {
     render(<FormView />)
 
-    expect(screen.getByText('Crear nuevo usuario')).toBeTruthy()
-    expect(screen.getByText('Crear Usuario')).toBeTruthy()
+    expect(screen.getByText('Registrar nuevo usuario')).toBeTruthy()
+    expect(screen.getByText('Registrar Usuario')).toBeTruthy()
   })
 
   it('has all required fields', () => {
@@ -287,7 +287,7 @@ describe('FormView - Create Mode', () => {
     const user = userEvent.setup()
     render(<FormView />)
 
-    const submitButton = screen.getByText('Crear Usuario')
+    const submitButton = screen.getByText('Registrar Usuario')
     await user.click(submitButton)
 
     await waitFor(() => {
@@ -346,6 +346,7 @@ describe('FormView - Edit Mode', () => {
     mockUseLoaderData.mockReturnValue(loader)
     mockUseUserDetail.mockReturnValue({ data: loader })
     setMockFormValues({
+      id: 'user-1',
       name: 'John',
       surname: 'Doe',
       email: 'john@example.com',
@@ -385,6 +386,7 @@ describe('FormView - Edit Mode', () => {
       expect(mockUpdateUser).toHaveBeenCalledWith({
         userId: 'user-1',
         data: {
+          id: 'user-1',
           email: 'john@example.com',
           name: 'John',
           role: 'admin',

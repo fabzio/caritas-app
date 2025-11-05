@@ -9,6 +9,7 @@ type GetFairsParams = {
     q?: string
     district?: string
     date?: string
+    status?: string
     sortBy?: string
     pageIndex?: number
     pageSize?: number
@@ -30,6 +31,7 @@ export const useGetFairs = ({
           q: filters?.q,
           district: filters?.district,
           date: filters?.date,
+          status: filters?.status,
           sortBy: filters?.sortBy,
         },
       })

@@ -103,7 +103,7 @@ export const auth = betterAuth({
     user: {
       create: {
         async before(user) {
-          const [sameDocument, samePhone] = await Promise.all([
+          const [sameDocument, samePhone, sameEmail] = await Promise.all([
             db.query.user.findFirst({
               where: (u, { eq, and }) =>
                 and(
@@ -116,12 +116,74 @@ export const auth = betterAuth({
               where: (u, { eq }) => eq(u.phone, user.phone as string),
               columns: { id: true },
             }),
+            db.query.user.findFirst({
+              where: (u, { eq }) => eq(u.email, user.email as string),
+              columns: { id: true },
+            }),
           ])
 
-          if (samePhone || sameDocument)
+          if (sameEmail)
             throw new APIError('CONFLICT', {
-              message: 'Documento o teléfono ya registrado',
+              message: 'El email ya está registrado',
             })
+
+          if (samePhone)
+            throw new APIError('CONFLICT', {
+              message: 'Teléfono ya registrado',
+            })
+
+          if (sameDocument)
+            throw new APIError('CONFLICT', {
+              message: 'Documento ya registrado',
+            })
+        },
+      },
+      update: {
+        async before(user) {
+          const [sameDocument, samePhone, sameEmail] = await Promise.all([
+            db.query.user.findFirst({
+              where: (u, { eq, and, ne }) =>
+                and(
+                  eq(u.documentNumber, user.documentNumber as string),
+                  eq(u.documentType, user.documentType as string),
+                  ne(u.id, user.id as string),
+                ),
+              columns: { id: true },
+            }),
+            db.query.user.findFirst({
+              where: (u, { eq, and, ne }) =>
+                and(
+                  eq(u.phone, user.phone as string),
+                  ne(u.id, user.id as string),
+                ),
+              columns: { id: true },
+            }),
+            db.query.user.findFirst({
+              where: (u, { eq, and, ne }) =>
+                and(
+                  eq(u.email, user.email as string),
+                  ne(u.id, user.id as string),
+                ),
+              columns: { id: true },
+            }),
+          ])
+
+          if (sameEmail)
+            throw new APIError('CONFLICT', {
+              message: 'El nuevo email ya le pertenece a otro usuario',
+            })
+
+          if (samePhone)
+            throw new APIError('CONFLICT', {
+              message: 'El nuevo teléfono ya le pertenece a otro usuario',
+            })
+
+          if (sameDocument)
+            throw new APIError('CONFLICT', {
+              message: 'El nuevo documento ya le pertenece a otro usuario',
+            })
+
+          return { data: user }
         },
       },
     },

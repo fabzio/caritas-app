@@ -4,6 +4,7 @@ import { t } from 'elysia'
 
 export namespace ScholarshipRecipientModel {
   const listScholarshipRecipients = t.Object({
+    id: t.Integer(),
     name: t.String(),
     surname: t.String(),
     documentType: t.Nullable(t.String()),

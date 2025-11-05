@@ -238,7 +238,7 @@ describe('Health Beneficiary FormView', () => {
 
     render(<FormView />)
 
-    await user.click(screen.getByText('Crear Beneficiario'))
+    await user.click(screen.getByText('Registrar Beneficiario'))
 
     await waitFor(() => {
       expect(mockCreateBeneficiary).toHaveBeenCalledWith({
@@ -290,6 +290,7 @@ describe('Health Beneficiary FormView', () => {
       expect(mockUpdateBeneficiary).toHaveBeenCalledWith({
         userId: 'beneficiary-1',
         data: {
+          id: 'beneficiary-1',
           email: 'john@example.com',
           name: 'John',
           role: 'user',

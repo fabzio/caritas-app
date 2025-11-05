@@ -14,12 +14,14 @@ import { ChevronDown } from 'lucide-react'
 
 type Props = {
   onAcceptClick: () => void
+  onRejectClick: () => void
   selectedCount: number
   loading?: boolean
 }
 
 export default function ActionsButton({
   onAcceptClick,
+  onRejectClick,
   selectedCount,
   loading = false,
 }: Readonly<Props>) {
@@ -37,6 +39,9 @@ export default function ActionsButton({
         <DropdownMenuGroup>
           <DropdownMenuItem onClick={onAcceptClick} disabled={isDisabled}>
             {loading ? 'Aceptando...' : 'Aceptar'}
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={onRejectClick} disabled={isDisabled}>
+            {loading ? 'Rechazando...' : 'Rechazar'}
           </DropdownMenuItem>
           <DropdownMenuSub>
             <DropdownMenuSubTrigger>Exportar</DropdownMenuSubTrigger>
