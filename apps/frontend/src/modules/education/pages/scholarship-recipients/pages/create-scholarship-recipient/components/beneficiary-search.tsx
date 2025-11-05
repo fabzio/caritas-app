@@ -3,6 +3,7 @@ import { Input } from '@workspace/ui/components/input'
 import { Skeleton } from '@workspace/ui/components/skeleton'
 import debounce from 'debounce'
 import { Search } from 'lucide-react'
+import { type ChangeEvent, useMemo, useState } from 'react'
 import { useBeneficiarySearch } from '../hooks/use-beneficiary-search'
 import type { Beneficiary } from '../hooks/use-get-beneficiaries'
 
@@ -17,8 +18,9 @@ export default function BeneficiarySearch({
   onSelect,
   onClear,
 }: Readonly<BeneficiarySearchProps>) {
+  const [isFocused, setIsFocused] = useState(false)
+
   const {
-    searchQuery,
     setSearchQuery,
     filteredBeneficiaries,
     handleSelectBeneficiary,
@@ -29,6 +31,19 @@ export default function BeneficiarySearch({
     onSelect,
     onClear,
   })
+
+  const handleChange = useMemo(
+    () =>
+      debounce((e: ChangeEvent<HTMLInputElement>) => {
+        setSearchQuery(e.target.value)
+      }, 300),
+    [setSearchQuery],
+  )
+
+  const handleSelect = (beneficiary: Beneficiary) => {
+    handleSelectBeneficiary(beneficiary)
+    setIsFocused(false)
+  }
 
   if (selectedBeneficiary) {
     return (
@@ -55,9 +70,6 @@ export default function BeneficiarySearch({
       </div>
     )
   }
-  const handleChange = debounce((e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value)
-  }, 300)
 
   return (
     <div className="relative">
@@ -66,10 +78,12 @@ export default function BeneficiarySearch({
         <Input
           placeholder="Buscar por nombre o número de documento..."
           onChange={handleChange}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setTimeout(() => setIsFocused(false), 200)}
           className="pl-9"
         />
       </div>
-      {searchQuery && (
+      {isFocused && (
         <div className="absolute z-50 w-full mt-2 rounded-md border bg-popover shadow-md max-h-60 overflow-y-auto">
           {filteredBeneficiaries.length > 0 ? (
             <div className="divide-y">
@@ -77,7 +91,10 @@ export default function BeneficiarySearch({
                 <button
                   key={beneficiary.id}
                   type="button"
-                  onClick={() => handleSelectBeneficiary(beneficiary)}
+                  onMouseDown={(e) => {
+                    e.preventDefault()
+                    handleSelect(beneficiary)
+                  }}
                   className="w-full px-4 py-3 text-left hover:bg-muted transition-colors"
                 >
                   <div className="flex flex-col">
