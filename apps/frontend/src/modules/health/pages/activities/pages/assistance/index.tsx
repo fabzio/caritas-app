@@ -118,6 +118,7 @@ export default function AssistancePage() {
 
             <Link
               to="/health/activities/$activityId/form"
+              search={{ type: 'new' }}
               params={{ activityId }}
             >
               <Button>

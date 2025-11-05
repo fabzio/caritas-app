@@ -67,6 +67,7 @@ export default function ScholarshipRecipients() {
     })
   }
 
+
   return (
     <div className="flex flex-1 flex-col gap-6 p-4">
       <div className="w-full flex gap-8">
@@ -84,13 +85,13 @@ export default function ScholarshipRecipients() {
               <SearchRecipients />
             </div>
             <div className="flex flex-row gap-4 px-10">
-              {/* <SelectFilters
+              <SelectFilters
                 value={regionFilter}
                 onValueChange={handleRegionFilterChange}
                 valueList={regionNames}
-                item="región"
-                placeholder="Todas las regiones"
-              /> */}
+                item="distrito"
+                placeholder="Todos los distritos"
+              />
               <SelectFilters
                 value={scholarshipFilter}
                 onValueChange={handleScholarshipFilterChange}
