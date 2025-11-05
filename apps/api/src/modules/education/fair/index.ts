@@ -1,13 +1,44 @@
 import betterAuth from '@api/modules/auth/middleware'
 import Elysia, { status, t } from 'elysia'
 import { FairModel } from './model'
-import { createFair, getFairs, getSingleFair, patchFair } from './service'
+import {
+  createFair,
+  getFairRegions,
+  getFairStatus,
+  getFairs,
+  getSingleFair,
+  patchFair,
+} from './service'
 
 const fair = new Elysia({
   name: 'fair',
   prefix: '/fairs',
 })
   .use(betterAuth)
+  .get('/regions', () => getFairRegions(), {
+    auth: true,
+    response: {
+      200: t.Array(
+        t.Object({
+          id: t.Number(),
+          name: t.String(),
+        }),
+      ),
+      401: t.Literal('Unauthorized'),
+    },
+  })
+  .get('/status', () => getFairStatus(), {
+    auth: true,
+    response: {
+      200: t.Array(
+        t.Object({
+          value: t.String(),
+          label: t.String(),
+        }),
+      ),
+      401: t.Literal('Unauthorized'),
+    },
+  })
   .get('/', ({ query }) => getFairs(query), {
     auth: true,
     query: FairModel.listFairsQuery,

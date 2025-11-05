@@ -1,3 +1,4 @@
+import { useIsMobile } from '@frontend/hooks/use-mobile'
 import { Button } from '@workspace/ui/components/button'
 import {
   DropdownMenu,
@@ -19,10 +20,12 @@ export default function ActionsButton({
   onEditClick,
   selectedCount,
 }: Readonly<Props>) {
+  const isMobile = useIsMobile()
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline">
+        <Button variant="outline" className={isMobile ? 'w-full' : ''}>
           Acciones
           <ChevronDown />
         </Button>

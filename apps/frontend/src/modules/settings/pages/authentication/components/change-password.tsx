@@ -1,4 +1,4 @@
-import { useChangePassword } from '@frontend/modules/settings/hooks/use-change-password'
+import { useChangePassword } from '@frontend/modules/settings/pages/authentication/hooks/use-change-password'
 import PasswordStrengthBar from '@frontend/shared/components/password-strength-bar'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '@workspace/ui/components/button'

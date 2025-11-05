@@ -86,11 +86,11 @@ export default function OrganizationFormView() {
 
 const dependantText = {
   mainTitle: {
-    new: 'Crear nueva organización',
+    new: 'Registrar nueva organización',
     edit: 'Editar una organización',
   },
   submit: {
-    new: 'Crear Organización',
+    new: 'Registrar Organización',
     edit: 'Guardar Cambios',
   },
 }

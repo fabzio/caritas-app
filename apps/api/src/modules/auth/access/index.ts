@@ -1,4 +1,4 @@
-import Elysia from 'elysia'
+import Elysia, { t } from 'elysia'
 import betterAuth from '../middleware'
 import { getUserOrganizationsRoles, getUserRole } from './service'
 
@@ -55,6 +55,22 @@ const access = new Elysia({}).use(betterAuth).get(
   },
   {
     auth: true,
+    response: {
+      200: t.Object({
+        admin: t.Boolean(),
+        health: t.Object({
+          admin: t.Boolean(),
+          organization: t.Boolean(),
+          user: t.Boolean(),
+        }),
+        education: t.Object({
+          admin: t.Boolean(),
+          organization: t.Boolean(),
+          user: t.Boolean(),
+        }),
+        beneficiary: t.Boolean(),
+      }),
+    },
   },
 )
 

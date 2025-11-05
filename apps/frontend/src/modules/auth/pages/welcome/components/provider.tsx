@@ -4,12 +4,12 @@ import z from 'zod'
 import {
   organizationFormSchema,
   organizationTypeFormSchema,
-} from '../models/organization'
+} from '../../../../../shared/models/organization'
 import {
   patientFormSchema,
   personFormSchema,
   studentFormSchema,
-} from '../models/person'
+} from '../../../../../shared/models/person'
 
 export const { Stepper: OrgStepper, useStepper: useOrgStepper } = defineStepper(
   {

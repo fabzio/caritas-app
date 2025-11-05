@@ -494,11 +494,11 @@ export default function FormView() {
 
 const dependantText = {
   mainTitle: {
-    new: 'Crear nuevo usuario',
+    new: 'Registrar nuevo usuario',
     edit: 'Editar un usuario',
   },
   submit: {
-    new: 'Crear Usuario',
+    new: 'Registrar Usuario',
     edit: 'Guardar Cambios',
   },
 }

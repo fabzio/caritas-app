@@ -59,7 +59,7 @@ export default function CreateAlly({ viewType }: Readonly<Props>) {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button>
-          <UserPlus /> Crear aliado
+          <UserPlus /> Registrar aliado
         </Button>
       </DialogTrigger>
       <DialogContent>
@@ -107,11 +107,11 @@ const formSchema = z.object({
 
 const dependantText = {
   mainTitle: {
-    new: 'Crear nuevo aliado',
+    new: 'Registrar nuevo aliado',
     edit: 'Editar un aliado',
   },
   submit: {
-    new: 'Crear Aliado',
+    new: 'Registrar Aliado',
     edit: 'Guardar Cambios',
   },
 }
