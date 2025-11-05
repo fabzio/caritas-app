@@ -30,4 +30,10 @@ export namespace Application {
     comments: t.Optional(t.String()),
   })
   export type AcceptApplicationsBody = typeof acceptApplicationsBody.static
+
+  export const rejectRecipientsBody = t.Object({
+    ids: t.Array(t.Number()),
+    comments: t.Optional(t.String()),
+  })
+  export type RejectRecipientsBody = typeof rejectRecipientsBody.static
 }

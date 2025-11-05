@@ -269,8 +269,8 @@ describe('FormView - Create Mode', () => {
   it('renders form in create mode', () => {
     render(<FormView />)
 
-    expect(screen.getByText('Crear nuevo usuario')).toBeTruthy()
-    expect(screen.getByText('Crear Usuario')).toBeTruthy()
+    expect(screen.getByText('Registrar nuevo usuario')).toBeTruthy()
+    expect(screen.getByText('Registrar Usuario')).toBeTruthy()
   })
 
   it('has all required fields', () => {
@@ -287,7 +287,7 @@ describe('FormView - Create Mode', () => {
     const user = userEvent.setup()
     render(<FormView />)
 
-    const submitButton = screen.getByText('Crear Usuario')
+    const submitButton = screen.getByText('Registrar Usuario')
     await user.click(submitButton)
 
     await waitFor(() => {

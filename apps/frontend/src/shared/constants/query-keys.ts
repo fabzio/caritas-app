@@ -9,6 +9,8 @@ export const QueryKeys = {
   USER_TEAMS: 'teams',
   SETTINGS: {
     ACCOUNTS: 'settings-accounts',
+    STUDENT_PROFILE: 'student-profile',
+    PATIENT_PROFILE: 'patient-profile',
     PASSKEYS: 'settings-passkeys',
     INVITATIONS: 'settings-invitations',
   },

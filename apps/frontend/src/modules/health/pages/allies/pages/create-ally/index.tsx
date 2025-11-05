@@ -86,11 +86,11 @@ export default function AllyFormView() {
 
 const dependantText = {
   mainTitle: {
-    new: 'Crear nuevo aliado',
+    new: 'Registrar nuevo aliado',
     edit: 'Editar un aliado',
   },
   submit: {
-    new: 'Crear Aliado',
+    new: 'Registrar Aliado',
     edit: 'Guardar Cambios',
   },
 }
