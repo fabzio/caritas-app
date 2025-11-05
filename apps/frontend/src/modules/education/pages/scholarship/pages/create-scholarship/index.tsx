@@ -207,7 +207,7 @@ export default function CreateScholarship() {
                                 No hay organizaciones aliadas disponibles.
                                 <Separator />{' '}
                                 <Button onClick={handleNewAlly}>
-                                  <span className="py-1 flex underline it(trueems-center gap-2">
+                                  <span className="py-1 flex underline items-center gap-2">
                                     Registrar organización aliada
                                     <UserPlus size={16} />
                                   </span>
