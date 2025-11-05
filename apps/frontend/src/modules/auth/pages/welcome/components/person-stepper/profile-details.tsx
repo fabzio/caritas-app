@@ -14,7 +14,11 @@ import {
   SelectValue,
 } from '@workspace/ui/components/select'
 import { useFormContext } from 'react-hook-form'
-import type { PatientForm, PersonForm, StudentForm } from '../../models/person'
+import type {
+  PatientForm,
+  PersonForm,
+  StudentForm,
+} from '../../../../../../shared/models/person'
 
 export default function ProfileDetailsForm() {
   const form = useFormContext<PersonForm & StudentForm & PatientForm>()

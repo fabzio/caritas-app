@@ -5,9 +5,12 @@ import ChangePassword from './change-password'
 
 const mutate = vi.fn()
 
-vi.mock('@frontend/modules/settings/hooks/use-change-password', () => ({
-  useChangePassword: () => ({ mutate }),
-}))
+vi.mock(
+  '@frontend/modules/settings/pages/authentication/hooks/use-change-password',
+  () => ({
+    useChangePassword: () => ({ mutate }),
+  }),
+)
 
 vi.mock('@frontend/shared/components/password-strength-bar', () => ({
   __esModule: true,

@@ -10,7 +10,7 @@ import {
 import { Label } from '@workspace/ui/components/label'
 import { HeartHandshake, School } from 'lucide-react'
 import { useFormContext } from 'react-hook-form'
-import type { PersonForm } from '../../models/person'
+import type { PersonForm } from '../../../../../../shared/models/person'
 
 export default function PersonProfileForm() {
   const form = useFormContext<PersonForm>()
