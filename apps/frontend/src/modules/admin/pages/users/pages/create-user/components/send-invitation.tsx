@@ -140,7 +140,7 @@ export default function SendInvitation() {
         </Form>
         <DialogFooter>
           <DialogClose asChild>
-            <Button variant="secondary">Cancelar</Button>
+            <Button variant="outline">Cancelar</Button>
           </DialogClose>
           <Button disabled={isPending} onClick={handleSubmit}>
             {isPending ? <Spinner /> : 'Enviar invitación'}
