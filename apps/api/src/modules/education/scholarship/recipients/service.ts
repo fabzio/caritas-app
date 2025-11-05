@@ -43,7 +43,22 @@ export async function createScholarshipRecipient(
     )
 
     if (existingApplication) {
-      throw new Error(`El usuario ya ha postulado a dicha oportunidad`)
+      if (existingApplication.status === 'accepted') {
+        throw new Error(`El usuario ya es un becado de esta oportunidad`)
+      }
+
+      const [{ id }] = await db
+        .update(scholarshipApplication)
+        .set({
+          status: 'accepted',
+          reviewedBy: data.reviewedBy,
+          reviewDate: new Date(),
+          comments: data.comments ?? null,
+        })
+        .where(eq(scholarshipApplication.id, existingApplication.id))
+        .returning({ id: scholarshipApplication.id })
+
+      return id
     }
 
     const [{ id }] = await db.transaction(async (tx) => {
@@ -91,6 +106,7 @@ export async function getRecipients(
       documentType: user.documentType,
       documentNumber: user.documentNumber,
       region: region.name,
+      id: scholarshipApplication.id,
       status: scholarshipApplication.status,
       scholarshipName: scholarship.name,
       organizationName: organization.name,
