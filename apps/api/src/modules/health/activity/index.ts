@@ -255,7 +255,7 @@ const activityModule = new Elysia({ name: 'activity', prefix: '/activities' })
           `El beneficiario ya se encuentra registrado en esta actividad.`,
         )
       else {
-        addAttendantToActivity(body)
+        return status(201, await addAttendantToActivity(body))
       }
     },
     {

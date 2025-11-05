@@ -19,7 +19,6 @@ import {
   gte,
   ilike,
   lte,
-  notInArray,
   or,
 } from 'drizzle-orm'
 import type { ActivityModel } from './model'
@@ -758,13 +757,13 @@ export const getExistentUsers = async (
   params: ActivityModel.ListExistentUsersQuery,
 ): Promise<ActivityModel.ExistentUser> => {
   try {
-    const { documentType = '', documentNumber = '', activityId } = params
+    const { documentType = '', documentNumber = '' } = params
     const conditions = []
     if (documentType) {
       conditions.push(eq(user.documentType, documentType))
     }
     if (documentNumber) {
-      conditions.push(and(ilike(user.documentNumber, `%${documentNumber}%`)))
+      conditions.push(ilike(user.documentNumber, `%${documentNumber}%`))
     }
     conditions.push(eq(user.active, true), eq(user.role, 'user'))
 

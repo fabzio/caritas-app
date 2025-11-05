@@ -55,7 +55,6 @@ export default function ScholarshipRecipients() {
     })
   }
 
-  console.log('Recipients data:', recipients)
 
   return (
     <div className="flex flex-1 flex-col gap-6 p-4">

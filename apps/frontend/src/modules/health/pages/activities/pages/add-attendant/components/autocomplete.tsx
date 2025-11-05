@@ -43,9 +43,6 @@ export const AutoComplete = ({
   const [selected, setSelected] = useState<ExistentUsers | undefined>(
     value as ExistentUsers,
   )
-  const [nonSelected, setNonSelected] = useState<string>(
-    nonSelectedValue as string,
-  )
   const [inputValue, setInputValue] = useState<string>(
     value?.documentNumber || '',
   )
