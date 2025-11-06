@@ -50,10 +50,7 @@ export const formFairSchema = z
       )
       .min(1, 'Debe haber al menos una organización'),
   })
-  .refine((data) => data.regionId === undefined, {
-    message: 'La hora de inicio debe ser anterior a la hora de fin',
-    path: ['regionId'],
-  })
+
   .refine((data) => data.startTime < data.endTime, {
     message: 'La hora de inicio debe ser anterior a la hora de fin',
     path: ['endTime'],
