@@ -1,5 +1,5 @@
 import { ScholarshipCard } from '@frontend/modules/user/components/scolarship-card'
-import useGetScholarship from '@frontend/modules/user/hooks/use-get-scholarship'
+import useGetScholarship from '@frontend/modules/user/pages/education/scholarship/pages/view-scholarship/hooks/use-get-scholarship'
 import { Button } from '@workspace/ui/components/button'
 import { Card, CardContent } from '@workspace/ui/components/card'
 import { Input } from '@workspace/ui/components/input'
@@ -79,7 +79,7 @@ export default function ScholarshipPage() {
     useState<string>('all')
   const [currentPage, setCurrentPage] = useState(1)
   const [isFilterOpen, setIsFilterOpen] = useState(false)
-  const pageSize = 3
+  const pageSize = 9
   const { data, isLoading, isError } = useGetScholarship(
     nameFilter,
     currentPage,

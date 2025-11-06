@@ -1,4 +1,5 @@
 import rpc from '@frontend/lib/rpc'
+import { QueryKeys } from '@frontend/shared/constants/query-keys'
 import type { Filters } from '@frontend/shared/types/filters'
 import { useQuery } from '@tanstack/react-query'
 
@@ -17,7 +18,7 @@ export const useActivities = ({
   filters,
 }: UseActivitiesParams) => {
   return useQuery({
-    queryKey: ['health-activities', filters],
+    queryKey: [QueryKeys.HEALTH.ACTIVITIES, filters],
     queryFn: async () => {
       const { data, error } = await rpc.health.activities.get({
         query: {

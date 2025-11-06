@@ -1,4 +1,5 @@
 import type { ColumnDef } from '@tanstack/react-table'
+import { Badge } from '@workspace/ui/components/badge'
 import { Button } from '@workspace/ui/components/button'
 import { Checkbox } from '@workspace/ui/components/checkbox'
 import { ArrowUpDown } from 'lucide-react'
@@ -25,19 +26,6 @@ export const scholarshipTableColumns: ColumnDef<Scholarship>[] = [
         onClick={(e) => e.stopPropagation()}
       />
     ),
-  },
-  {
-    accessorKey: 'id',
-    header: ({ column }) => (
-      <Button
-        variant="ghost"
-        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-      >
-        Número
-        <ArrowUpDown />
-      </Button>
-    ),
-    cell: ({ row }) => row.original.id,
   },
   {
     accessorKey: 'name',
@@ -70,5 +58,22 @@ export const scholarshipTableColumns: ColumnDef<Scholarship>[] = [
       </Button>
     ),
     cell: ({ row }) => row.original.vacancies,
+  },
+  {
+    accessorKey: 'active',
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+      >
+        Estado
+        <ArrowUpDown />
+      </Button>
+    ),
+    cell: ({ row }) => (
+      <Badge variant={row.original.active ? 'default' : 'secondary'}>
+        {row.original.active ? 'Activa' : 'Inactiva'}
+      </Badge>
+    ),
   },
 ]
