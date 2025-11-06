@@ -15,7 +15,8 @@ export namespace ActivityModel {
     statusName: t.String(),
     typeName: t.String(),
     regionName: t.String(),
-    creatorName: t.String(),
+    creatorName: t.Optional(t.String()),
+    registered: t.Optional(t.Boolean()),
   })
 
   export const listActivitiesQuery = t.Object({
@@ -26,6 +27,14 @@ export namespace ActivityModel {
     regionIds: t.Optional(t.String()),
     startDate: t.Optional(t.String()),
     endDate: t.Optional(t.String()),
+    user: t.Optional(
+      t.Enum({
+        active: 'active',
+        participated: 'participated',
+        notParticipated: 'notParticipated',
+        canceled: 'canceled',
+      }),
+    ),
   })
   export type ListActivitiesQuery = typeof listActivitiesQuery.static
 

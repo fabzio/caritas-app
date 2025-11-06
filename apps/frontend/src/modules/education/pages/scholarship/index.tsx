@@ -10,7 +10,7 @@ import {
 } from '@workspace/ui/components/dropdown-menu'
 import { Input } from '@workspace/ui/components/input'
 import debounce from 'debounce'
-import { MoreVertical, PlusCircle, Search } from 'lucide-react'
+import { ChevronDown, MoreVertical, PlusCircle, Search } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import DeleteConfirmationDialog from './components/delete-confirmation-dialog'
 import ScholarshipTable from './components/scholarship-table'
@@ -38,8 +38,8 @@ export default function ScholarshipPage() {
     columns,
     paginationState,
     sortingState,
+    filters,
     setFilters,
-    isLoading,
     isError,
   } = useScholarshipTable()
 
@@ -103,13 +103,38 @@ export default function ScholarshipPage() {
           <div className="flex gap-2">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
+                <Button variant="outline" size={isMobile ? 'sm' : 'lg'}>
+                  {filters.active === undefined
+                    ? 'Todas'
+                    : filters.active
+                      ? 'Activas'
+                      : 'Inactivas'}
+                  <ChevronDown />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem
+                  onClick={() => setFilters({ active: undefined })}
+                >
+                  Todas
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setFilters({ active: true })}>
+                  Activas
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setFilters({ active: false })}>
+                  Inactivas
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
                 <Button
                   variant="outline"
                   size={isMobile ? 'sm' : 'lg'}
                   disabled={selectedCount === 0}
                 >
-                  <MoreVertical />
                   Acciones
+                  <ChevronDown />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
@@ -136,7 +161,7 @@ export default function ScholarshipPage() {
                 size={isMobile ? 'sm' : 'lg'}
               >
                 <PlusCircle />
-                Registrar nueva beca
+                Nueva beca
               </Button>
             </Link>
           </div>

@@ -5,7 +5,7 @@ import { Card, CardContent } from '@workspace/ui/components/card'
 import { Separator } from '@workspace/ui/components/separator'
 import { ArrowLeftIcon } from 'lucide-react'
 import ScholarshipGeneralInfo from '../../../../../components/scholarship-general-info'
-import useScholarshipStore from '../../../../../hooks/use-scholarship-store'
+import useScholarshipStore from './hooks/use-scholarship-store'
 
 export default function ViewScholarshipPage() {
   const { id } = useParams({ strict: false })

@@ -2,7 +2,7 @@ import type { ValidRoutes } from './valid-routes'
 
 export type NavItem = {
   title: string
-  url: ValidRoutes
+  url?: ValidRoutes
   icon?: React.ElementType
   groupLabel?: string
   items?: {
