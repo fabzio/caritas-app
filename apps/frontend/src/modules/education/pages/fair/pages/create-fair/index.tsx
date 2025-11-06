@@ -1,5 +1,6 @@
 import { useRegions } from '@frontend/hooks/use-regions'
 import { useSession } from '@frontend/hooks/use-session'
+import OrganizationFormDialog from '@frontend/modules/health/components/organization-form-dialog'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { getRouteApi, Link, useSearch } from '@tanstack/react-router'
 import { Button } from '@workspace/ui/components/button'
@@ -26,16 +27,33 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@workspace/ui/components/popover'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@workspace/ui/components/select'
 import { Separator } from '@workspace/ui/components/separator'
 import { Spinner } from '@workspace/ui/components/spinner'
 import { cn } from '@workspace/ui/lib/utils'
-import { format, parseISO } from 'date-fns'
-import { CalendarIcon, Check, ChevronsUpDown, Loader2 } from 'lucide-react'
-import { useForm } from 'react-hook-form'
+import { format, startOfDay } from 'date-fns'
+import {
+  CalendarIcon,
+  Check,
+  ChevronsUpDown,
+  Loader2,
+  Plus,
+  ShieldPlus,
+  Trash2,
+} from 'lucide-react'
+import { useState } from 'react'
+import { useFieldArray, useForm } from 'react-hook-form'
+import useGetOrganization from '../../../scholarship/pages/create-scholarship/hooks/use-get-organization'
 import usePostFair from './hooks/use-post-fair'
 import { useUpdateFairs } from './hooks/use-update-fairs'
 import { type FormFairSchema, formFairSchema } from './utils/fair'
-
+import formatTime from './utils/formatTime'
 export default function CreateFairPage() {
   const viewType = useSearch({
     from: '/_authenticated/education/fair/form',
@@ -44,6 +62,7 @@ export default function CreateFairPage() {
   const loaderData = getRouteApi(
     '/_authenticated/education/fair/form',
   ).useLoaderData()
+
   const form = useForm<FormFairSchema>({
     resolver: zodResolver(formFairSchema),
     defaultValues:
@@ -55,9 +74,12 @@ export default function CreateFairPage() {
                 loaderData.date.getTimezoneOffset() * 60000,
             ),
             address: loaderData.address,
-            startTime: loaderData.startTime,
-            endTime: loaderData.endTime,
+            startTime: formatTime(loaderData.startTime),
+            endTime: formatTime(loaderData.endTime),
             regionId: loaderData.regionId,
+            organizations: loaderData.organizations.map((org) => ({
+              organizationId: org.id,
+            })),
           }
         : {
             title: '',
@@ -65,22 +87,39 @@ export default function CreateFairPage() {
             address: '',
             startTime: '08:30:00',
             endTime: '08:30:00',
-            regionId: undefined,
+            regionId: 0,
+            organizations: [{ organizationId: '' }],
           },
   })
-  const today = new Date()
+  const { fields, remove } = useFieldArray({
+    control: form.control,
+    name: 'organizations',
+  })
+  const [organizationFormOpen, setOrganizationFormOpen] = useState(false)
+  const handleNewAlly = () => {
+    setOrganizationFormOpen(true)
+  }
+  const today = startOfDay(new Date())
+  const maxDate = new Date(today.getTime())
+  maxDate.setFullYear(today.getFullYear() + 2)
   const { data: districts, isLoading } = useRegions()
+  const { data: organizations } = useGetOrganization()
   const { mutate: createFair, isPending: isPendingCreate } = usePostFair()
   const { mutate: updateFair, isPending: isPendingUpdate } = useUpdateFairs()
   const { data: user } = useSession()
   const handleSubmit = form.handleSubmit((data) => {
     if (!user) return
+    const payload = {
+      ...data,
+      date: data.date,
+      createdBy: user.user.id,
+      active: true,
+    }
+    console.log(payload)
     if (viewType === 'edit' && loaderData?.id) {
-      const params = { ...data, id: loaderData.id }
-      updateFair(params)
+      updateFair({ ...payload, id: loaderData.id })
     } else {
-      const params = { ...data, createdBy: user.user.id, active: true }
-      createFair(params)
+      createFair(payload)
     }
   })
 
@@ -127,7 +166,7 @@ export default function CreateFairPage() {
                     name="regionId"
                     render={({ field }) => (
                       <FormItem className="col-span-1">
-                        <FormLabel>Distrito</FormLabel>
+                        <FormLabel>Distrito*</FormLabel>
 
                         <Popover>
                           <PopoverTrigger asChild>
@@ -142,7 +181,7 @@ export default function CreateFairPage() {
                                 {field.value
                                   ? districts?.find((d) => d.id === field.value)
                                       ?.name
-                                  : 'Selecciona tu distrito'}
+                                  : 'Selecciona un distrito'}
                                 <ChevronsUpDown className="opacity-50" />
                               </Button>
                             </FormControl>
@@ -208,7 +247,7 @@ export default function CreateFairPage() {
                     name="date"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Fecha de la feria</FormLabel>
+                        <FormLabel>Fecha de la feria*</FormLabel>
                         <Popover>
                           <PopoverTrigger asChild>
                             <FormControl>
@@ -228,8 +267,10 @@ export default function CreateFairPage() {
                               mode="single"
                               selected={field.value}
                               onSelect={field.onChange}
+                              toYear={maxDate.getFullYear()}
                               disabled={{
                                 before: today,
+                                after: maxDate,
                               }}
                             />
                           </PopoverContent>
@@ -243,7 +284,7 @@ export default function CreateFairPage() {
                     name="startTime"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Hora de inicio de la feria</FormLabel>
+                        <FormLabel>Hora de inicio de la feria*</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
@@ -260,7 +301,7 @@ export default function CreateFairPage() {
                     name="endTime"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Hora de finalización de la feria</FormLabel>
+                        <FormLabel>Hora de finalización de la feria*</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
@@ -272,6 +313,107 @@ export default function CreateFairPage() {
                       </FormItem>
                     )}
                   />
+                  {/* --- Organizaciones Participantes --- */}
+                  <div className="border-t pt-4 mt-6">
+                    <h3 className="text-lg font-medium mb-2">
+                      Organizaciones participantes
+                    </h3>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Agregue las organizaciones que participarán en esta feria
+                      vocacional.
+                    </p>
+                    {fields.map((field, index) => {
+                      const selectedIds = form
+                        .watch('organizations')
+                        .map((o) => o.organizationId)
+                        .filter((id, idx) => idx !== index && id)
+
+                      const availableOrgs = organizations?.filter(
+                        (o: { id: string; name: string }) =>
+                          !selectedIds.includes(o.id),
+                      )
+
+                      return (
+                        <div
+                          key={field.id}
+                          className="border rounded-md py-3 px-4 mb-4"
+                        >
+                          <div className="flex items-center justify-between mb-3">
+                            <h4 className="text-base font-medium">
+                              Organización {index + 1}
+                            </h4>
+                            {fields.length > 1 && (
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => remove(index)}
+                              >
+                                <Trash2 className="h-4 w-4 text-destructive" />
+                              </Button>
+                            )}
+                          </div>
+
+                          <FormField
+                            control={form.control}
+                            name={`organizations.${index}.organizationId`}
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Organización*</FormLabel>
+                                <Select
+                                  onValueChange={field.onChange}
+                                  value={field.value}
+                                >
+                                  <FormControl>
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="Seleccione una organización" />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    {availableOrgs?.map(
+                                      (org: { id: string; name: string }) => (
+                                        <SelectItem key={org.id} value={org.id}>
+                                          {org.name}
+                                        </SelectItem>
+                                      ),
+                                    )}
+                                  </SelectContent>
+                                </Select>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                      )
+                    })}
+
+                    <div className="flex gap-4 justify-center flex-wrap">
+                      <Button
+                        variant="ghost"
+                        type="button"
+                        onClick={handleNewAlly}
+                        size="sm"
+                      >
+                        Crear organización <ShieldPlus size={16} />
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        onClick={() => {
+                          const current = form.getValues('organizations') || []
+                          form.setValue('organizations', [
+                            ...current,
+                            { organizationId: '' },
+                          ])
+                        }}
+                        size="sm"
+                      >
+                        <Plus className="mr-2 h-4 w-4" />
+                        Agregar Organización
+                      </Button>
+                    </div>
+                  </div>
+
                   <footer className="flex justify-end gap-4 items-center">
                     <Link to="/education/fair">
                       <Button variant="outline" type="button">
@@ -291,6 +433,11 @@ export default function CreateFairPage() {
                   </footer>
                 </form>
               </Form>
+              <OrganizationFormDialog
+                open={organizationFormOpen}
+                onOpenChange={setOrganizationFormOpen}
+                type="education"
+              />
             </div>
           </div>
         </div>

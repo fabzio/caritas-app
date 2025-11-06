@@ -2,7 +2,7 @@ import db from '@api/db'
 import { PostgresError } from '@api/db/errors'
 import { scholarship } from '@api/db/schemas/education'
 import { normalizeText } from '@api/utils/normalize-text'
-import { eq, ilike, sql } from 'drizzle-orm'
+import { and, eq, ilike, inArray, sql } from 'drizzle-orm'
 import type { ScholarshipModel } from './model'
 
 type GetParams = {
@@ -13,24 +13,25 @@ type GetParams = {
 }
 export const findDuplicateScholarship = async (
   name: string,
+  organizationId?: string,
   excludeId?: number,
 ) => {
   const response = await db
     .select({ scholarship })
     .from(scholarship)
-    .where(eq(scholarship.active, true))
+    .where(ilike(scholarship.name, name))
 
   const allRows = response.map((s) => s.scholarship)
 
   if (!allRows?.length) return null
 
   const coincidences = allRows.filter(
-    (s) => normalizeText(s.name) === normalizeText(name),
+    (s) => normalizeText(s.name) === normalizeText(name) && s.id !== excludeId,
   )
 
   if (!coincidences.length) return null
 
-  const excluded = coincidences.find((s) => s.id !== excludeId)
+  const excluded = coincidences.find((s) => s.active === true)
 
   return excluded || null
 }
@@ -147,6 +148,19 @@ export const PatchScholarship = async (
       .where(eq(scholarship.id, id)) //para el filtro
       .returning({ id: scholarship.id })
     return response.length
+  } catch (e) {
+    if (e instanceof Error) throw new PostgresError(e.message)
+    throw e
+  }
+}
+
+export const deleteScholarships = async (ids: number[]) => {
+  try {
+    await db
+      .update(scholarship)
+      .set({ active: false })
+      .where(inArray(scholarship.id, ids))
+    return { success: true }
   } catch (e) {
     if (e instanceof Error) throw new PostgresError(e.message)
     throw e
