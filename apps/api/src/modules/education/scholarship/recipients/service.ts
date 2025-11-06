@@ -11,7 +11,7 @@ import type { ScholarshipRecipientModel } from './model'
 
 export async function createScholarshipRecipient(
   data: ScholarshipRecipientModel.CreateScholarshipRecipient,
-): Promise<number> {
+): Promise<{ id?: number; error?: string }> {
   try {
     const userExists = await db.query.user.findFirst({
       where: (users, { eq }) => eq(users.id, data.userId),
@@ -19,7 +19,7 @@ export async function createScholarshipRecipient(
     })
 
     if (!userExists) {
-      throw new Error(`Beneficiario no encontrado`)
+      return { error: 'Beneficiario no encontrado' }
     }
 
     const scholarshipExists = await db.query.scholarship.findFirst({
@@ -28,7 +28,7 @@ export async function createScholarshipRecipient(
     })
 
     if (!scholarshipExists) {
-      throw new Error(`Beca no encontrada`)
+      return { error: 'Beca no encontrada' }
     }
 
     const existingApplication = await db.query.scholarshipApplication.findFirst(
@@ -44,7 +44,7 @@ export async function createScholarshipRecipient(
 
     if (existingApplication) {
       if (existingApplication.status === 'accepted') {
-        throw new Error(`El usuario ya es un becado de esta oportunidad`)
+        return { error: 'El beneficiario ya ha sido aceptado para esta beca' }
       }
 
       const [{ id }] = await db
@@ -58,7 +58,7 @@ export async function createScholarshipRecipient(
         .where(eq(scholarshipApplication.id, existingApplication.id))
         .returning({ id: scholarshipApplication.id })
 
-      return id
+      return { id }
     }
 
     const [{ id }] = await db.transaction(async (tx) => {
@@ -75,7 +75,7 @@ export async function createScholarshipRecipient(
         })
         .returning({ id: scholarshipApplication.id })
     })
-    return id
+    return { id }
   } catch (e) {
     if (e instanceof Error) throw new PostgresError(e.message)
     throw e

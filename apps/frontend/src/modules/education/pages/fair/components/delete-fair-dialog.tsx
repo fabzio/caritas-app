@@ -8,32 +8,42 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@workspace/ui/components/dialog'
-import { Spinner } from '@workspace/ui/components/spinner'
+import useDeleteFairs from '../hooks/use-delete-fair'
 
-type Props = {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  count: number
-  onConfirm: () => void
-  isLoading: boolean
+interface DeleteConfirmationDialogProps {
+  readonly open: boolean
+  readonly onOpenChange: (open: boolean) => void
+  readonly selectedCount: number
+  readonly ids: number[]
+  readonly clearSelection?: () => void
 }
 
-export default function DeleteFairDialog({
+export default function DeleteConfirmationDialog({
   open,
   onOpenChange,
-  count,
-  onConfirm,
-  isLoading,
-}: Readonly<Props>) {
+  selectedCount,
+  ids,
+  clearSelection,
+}: DeleteConfirmationDialogProps) {
+  const { mutateAsync: deleteFairs, isPending } = useDeleteFairs()
+  const handleConfirmDelete = async () => {
+    deleteFairs({ ids })
+    onOpenChange(false)
+    clearSelection?.()
+  }
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>
-            {`¿Seguro que desea eliminar ${count} feria${count === 1 ? '' : 's'}?`}
+            {`¿Seguro que desea eliminar ${selectedCount} feria${
+              selectedCount > 1 ? 's' : ''
+            }?`}
           </DialogTitle>
           <DialogDescription>
-            Esta acción no se puede deshacer.
+            Esta acción no se puede deshacer. Las ferias serán marcadas como
+            inactivas.
           </DialogDescription>
         </DialogHeader>
 
@@ -46,11 +56,10 @@ export default function DeleteFairDialog({
 
           <Button
             type="button"
-            variant="destructive"
-            onClick={onConfirm}
-            disabled={isLoading}
+            onClick={handleConfirmDelete}
+            disabled={isPending}
           >
-            {isLoading ? <Spinner /> : 'Eliminar'}
+            Aceptar
           </Button>
         </DialogFooter>
       </DialogContent>

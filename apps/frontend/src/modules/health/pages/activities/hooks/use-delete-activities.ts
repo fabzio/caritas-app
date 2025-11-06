@@ -18,6 +18,9 @@ export const useDeleteActivities = () => {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: [QueryKeys.HEALTH.ACTIVITIES] })
+      queryClient.invalidateQueries({
+        queryKey: [QueryKeys.HEALTH.ACTIVITY_REGIONS],
+      })
       toast.success(
         `${data.deletedCount} actividad${data.deletedCount === 1 ? '' : 'es'} eliminada${data.deletedCount === 1 ? '' : 's'} correctamente`,
       )

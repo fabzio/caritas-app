@@ -47,14 +47,19 @@ const activityModule = new Elysia({ name: 'activity', prefix: '/activities' })
       },
     },
   )
-  .get('', ({ query }) => getActivities(query), {
-    auth: true,
-    query: ActivityModel.listActivitiesQuery,
-    response: {
-      200: ActivityModel.getActivitiesResponse,
-      401: t.Literal('Unauthorized'),
+  .get(
+    '',
+    ({ query, session, user }) =>
+      getActivities(query, session?.userId ?? user?.id),
+    {
+      auth: true,
+      query: ActivityModel.listActivitiesQuery,
+      response: {
+        200: ActivityModel.getActivitiesResponse,
+        401: t.Literal('Unauthorized'),
+      },
     },
-  })
+  )
   .get(
     '/detail/:id',
     async ({ params }) => {

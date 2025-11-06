@@ -34,13 +34,15 @@ export const formScholarShipSchema = z
     endDate: z.date({ message: 'La fecha de fin es obligatoria' }),
     type: z.enum(['ML', 'PL'], { message: 'Escoja el tipo de beca' }),
     organizationId: z.string({ message: 'Escoja la organización' }),
-    vacancies: z
+    vacancies: z.coerce
       .number({ error: 'Debe ingresar un número' })
       .min(1, { message: 'Ingrese un número válido de vacantes' })
-      .max(9999, { message: 'Ingrese un número válido de vacantes' })
+      .max(9999, {
+        message: 'Ingrese un número válido de vacantes, no mayor a 9999',
+      })
       .refine((v) => v !== undefined, {
         message: 'Las vacantes son obligatorias',
-      }),
+      }) as unknown as z.ZodNumber,
   })
   .refine((data) => data.startDate < data.endDate, {
     message: 'La fecha de inicio debe ser anterior a la fecha de fin',

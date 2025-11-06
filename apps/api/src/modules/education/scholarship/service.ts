@@ -1,36 +1,37 @@
 import db from '@api/db'
 import { PostgresError } from '@api/db/errors'
-import { scholarship } from '@api/db/schemas/education'
+import { scholarship, scholarshipApplication } from '@api/db/schemas/education'
 import { normalizeText } from '@api/utils/normalize-text'
-import { eq, ilike, sql } from 'drizzle-orm'
+import { eq, ilike, inArray, sql } from 'drizzle-orm'
 import type { ScholarshipModel } from './model'
 
-// para la paginación
 type GetParams = {
   name?: string
-  page?: number // página actual
-  pageSize?: number // elementos por página
+  active?: boolean
+  page?: number
+  pageSize?: number
 }
 export const findDuplicateScholarship = async (
   name: string,
+  organizationId?: string,
   excludeId?: number,
 ) => {
   const response = await db
     .select({ scholarship })
     .from(scholarship)
-    .where(eq(scholarship.active, true))
+    .where(ilike(scholarship.name, name))
 
   const allRows = response.map((s) => s.scholarship)
 
   if (!allRows?.length) return null
 
   const coincidences = allRows.filter(
-    (s) => normalizeText(s.name) === normalizeText(name),
+    (s) => normalizeText(s.name) === normalizeText(name) && s.id !== excludeId,
   )
 
   if (!coincidences.length) return null
 
-  const excluded = coincidences.find((s) => s.id !== excludeId)
+  const excluded = coincidences.find((s) => s.active === true)
 
   return excluded || null
 }
@@ -51,12 +52,19 @@ export const createScholarship = async (
 }
 export const getScholarships = async ({
   name,
+  active,
   page = 1,
   pageSize = 10,
 }: GetParams): Promise<ScholarshipModel.Paginated> => {
   try {
-    // con filtrado por nombre
-    const where = name ? ilike(scholarship.name, `%${name}%`) : undefined
+    const conditions = []
+    if (name) conditions.push(ilike(scholarship.name, `%${name}%`))
+    if (active !== undefined) conditions.push(eq(scholarship.active, active))
+
+    const where =
+      conditions.length > 0
+        ? sql`${sql.join(conditions, sql` AND `)}`
+        : undefined
     const offset = (page - 1) * pageSize
 
     let total = 0
@@ -72,7 +80,6 @@ export const getScholarships = async ({
         .from(scholarship)
       total = Number(r.total)
     }
-    // una página con becas
     const rows = await db.query.scholarship.findMany({
       where,
       columns: {
@@ -80,17 +87,13 @@ export const getScholarships = async ({
         updatedAt: false,
       },
       with: {
-        // con el nombre de la organización
         organization: {
           columns: { id: true, name: true },
         },
       },
       limit: pageSize,
       offset,
-      // esto puede servir para futuro filtrado y ordenamiento
-      // orderBy: (s, { desc }) => [desc(s.createdAt)],
     })
-    // fechas como string
     const data = rows.map((r) => ({
       ...r,
       startDate: r.startDate.toString(),
@@ -145,6 +148,47 @@ export const PatchScholarship = async (
       .where(eq(scholarship.id, id)) //para el filtro
       .returning({ id: scholarship.id })
     return response.length
+  } catch (e) {
+    if (e instanceof Error) throw new PostgresError(e.message)
+    throw e
+  }
+}
+
+export const deleteScholarships = async (ids: number[]) => {
+  try {
+    await db
+      .update(scholarship)
+      .set({ active: false })
+      .where(inArray(scholarship.id, ids))
+    return { success: true }
+  } catch (e) {
+    if (e instanceof Error) throw new PostgresError(e.message)
+    throw e
+  }
+}
+
+export const getAvailableScholarships = async () => {
+  try {
+    const results = await db
+      .select({
+        id: scholarship.id,
+        name: scholarship.name,
+        vacancies: scholarship.vacancies,
+        acceptedCount: sql<number>`count(case when ${scholarshipApplication.status} = 'accepted' then 1 end)::int`,
+      })
+      .from(scholarship)
+      .leftJoin(
+        scholarshipApplication,
+        eq(scholarship.id, scholarshipApplication.scholarshipId),
+      )
+      .where(
+        sql`${scholarship.active} = true AND ${scholarship.startDate} <= current_date AND ${scholarship.endDate} >= current_date`,
+      )
+      .groupBy(scholarship.id, scholarship.name, scholarship.vacancies)
+
+    return results
+      .filter((r) => (r.vacancies ?? 0) - Number(r.acceptedCount) > 0)
+      .map((r) => ({ id: r.id, name: r.name }))
   } catch (e) {
     if (e instanceof Error) throw new PostgresError(e.message)
     throw e

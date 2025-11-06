@@ -36,6 +36,9 @@ export const useUpdateCompleteActivity = (id: string) => {
       queryClient.invalidateQueries({
         queryKey: [QueryKeys.HEALTH.ACTIVITY, id],
       })
+      queryClient.invalidateQueries({
+        queryKey: [QueryKeys.HEALTH.ACTIVITY_REGIONS],
+      })
       toast.success('Actividad actualizada exitosamente')
     },
     onError: (error: Error) => {

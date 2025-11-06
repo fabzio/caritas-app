@@ -24,14 +24,20 @@ export type ScholarshipPaginated = NonNullable<
   Awaited<ReturnType<typeof rpc.education.scholarship.get>>
 >['data']
 
-// hook para hacer fetch all de scholarships
-// tiene filtrado por nombre y paginación
-const useGetScholarship = (name?: string, page = 1, pageSize = 10) => {
+const useGetScholarship = (
+  name?: string,
+  page = 1,
+  pageSize = 10,
+  active?: boolean,
+) => {
   return useQuery({
-    queryKey: [QueryKeys.EDUCATION.SCHOLARSHIP, { name, page, pageSize }],
+    queryKey: [
+      QueryKeys.EDUCATION.SCHOLARSHIP,
+      { name, page, pageSize, active },
+    ],
     queryFn: async () => {
       const res = await rpc.education.scholarship.get({
-        query: { name, page, pageSize },
+        query: { name, page, pageSize, active },
       })
       if (res.error) throw res.error
       return res.data

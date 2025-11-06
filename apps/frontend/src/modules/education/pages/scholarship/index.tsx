@@ -9,16 +9,18 @@ import {
   DropdownMenuTrigger,
 } from '@workspace/ui/components/dropdown-menu'
 import { Input } from '@workspace/ui/components/input'
-import { Skeleton } from '@workspace/ui/components/skeleton'
 import debounce from 'debounce'
-import { MoreVertical, PlusCircle, Search } from 'lucide-react'
+import { ChevronDown, MoreVertical, PlusCircle, Search } from 'lucide-react'
 import { useMemo, useState } from 'react'
+import DeleteConfirmationDialog from './components/delete-confirmation-dialog'
 import ScholarshipTable from './components/scholarship-table'
 import { useScholarshipTable } from './hooks/use-table'
 export default function ScholarshipPage() {
   const isMobile = useIsMobile()
   const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({})
+  const [deleteOpen, setDeleteOpen] = useState(false)
   const navigate = useNavigate()
+  const clearSelection = () => setRowSelection({})
   const skeletonKeys = useMemo(
     () =>
       Array.from(
@@ -36,8 +38,8 @@ export default function ScholarshipPage() {
     columns,
     paginationState,
     sortingState,
+    filters,
     setFilters,
-    isLoading,
     isError,
   } = useScholarshipTable()
 
@@ -66,11 +68,15 @@ export default function ScholarshipPage() {
       })
     }
   }
+  const selectedScholarshipIds = Object.keys(rowSelection)
+    .filter((key) => rowSelection[key])
+    .map((key) => {
+      const rowIndex = Number.parseInt(key, 10)
+      return scholarships![rowIndex].id
+    })
 
   const handleDelete = () => {
-    const selectedIds = Object.keys(rowSelection)
-    //TODO: delete scholarship logic
-    console.log('Delete scholarships:', selectedIds)
+    setDeleteOpen(true)
   }
 
   return (
@@ -97,13 +103,38 @@ export default function ScholarshipPage() {
           <div className="flex gap-2">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
+                <Button variant="outline" size={isMobile ? 'sm' : 'lg'}>
+                  {filters.active === undefined
+                    ? 'Todas'
+                    : filters.active
+                      ? 'Activas'
+                      : 'Inactivas'}
+                  <ChevronDown />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem
+                  onClick={() => setFilters({ active: undefined })}
+                >
+                  Todas
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setFilters({ active: true })}>
+                  Activas
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setFilters({ active: false })}>
+                  Inactivas
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
                 <Button
                   variant="outline"
                   size={isMobile ? 'sm' : 'lg'}
                   disabled={selectedCount === 0}
                 >
-                  <MoreVertical />
                   Acciones
+                  <ChevronDown />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
@@ -130,7 +161,7 @@ export default function ScholarshipPage() {
                 size={isMobile ? 'sm' : 'lg'}
               >
                 <PlusCircle />
-                Registrar nueva beca
+                Nueva beca
               </Button>
             </Link>
           </div>
@@ -157,6 +188,13 @@ export default function ScholarshipPage() {
           />
         )}
       </div>
+      <DeleteConfirmationDialog
+        open={deleteOpen}
+        onOpenChange={setDeleteOpen}
+        selectedCount={selectedCount}
+        ids={selectedScholarshipIds}
+        clearSelection={clearSelection}
+      />
     </div>
   )
 }

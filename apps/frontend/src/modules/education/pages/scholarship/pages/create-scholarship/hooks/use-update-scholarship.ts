@@ -32,12 +32,12 @@ export const useUpdateScholarship = () => {
       }
       const { id, ...body } = cleanBody
       const res = await rpc.education.scholarship({ id: params.id }).patch(body)
-      if (res.error) throw res.error
+      if (res.error)
+        throw new Error(res.error.message || 'Error al registrar la beca')
       return res.data
     },
-    onError: (error) => {
-      console.error(error.message)
-      toast.error('Ocurrió un error desconocido al registrar la beca')
+    onError: (error: Error) => {
+      toast.error(error.message || 'Ocurrió un error al registrar la beca')
     },
     onSuccess: (data, variables) => {
       queryClient.invalidateQueries({
