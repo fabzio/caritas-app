@@ -1,8 +1,8 @@
 import db from '@api/db'
 import { PostgresError } from '@api/db/errors'
-import { scholarship } from '@api/db/schemas/education'
+import { scholarship, scholarshipApplication } from '@api/db/schemas/education'
 import { normalizeText } from '@api/utils/normalize-text'
-import { eq, ilike, sql } from 'drizzle-orm'
+import { eq, ilike, inArray, sql } from 'drizzle-orm'
 import type { ScholarshipModel } from './model'
 
 type GetParams = {
@@ -13,24 +13,25 @@ type GetParams = {
 }
 export const findDuplicateScholarship = async (
   name: string,
+  organizationId?: string,
   excludeId?: number,
 ) => {
   const response = await db
     .select({ scholarship })
     .from(scholarship)
-    .where(eq(scholarship.active, true))
+    .where(ilike(scholarship.name, name))
 
   const allRows = response.map((s) => s.scholarship)
 
   if (!allRows?.length) return null
 
   const coincidences = allRows.filter(
-    (s) => normalizeText(s.name) === normalizeText(name),
+    (s) => normalizeText(s.name) === normalizeText(name) && s.id !== excludeId,
   )
 
   if (!coincidences.length) return null
 
-  const excluded = coincidences.find((s) => s.id !== excludeId)
+  const excluded = coincidences.find((s) => s.active === true)
 
   return excluded || null
 }
@@ -147,6 +148,47 @@ export const PatchScholarship = async (
       .where(eq(scholarship.id, id)) //para el filtro
       .returning({ id: scholarship.id })
     return response.length
+  } catch (e) {
+    if (e instanceof Error) throw new PostgresError(e.message)
+    throw e
+  }
+}
+
+export const deleteScholarships = async (ids: number[]) => {
+  try {
+    await db
+      .update(scholarship)
+      .set({ active: false })
+      .where(inArray(scholarship.id, ids))
+    return { success: true }
+  } catch (e) {
+    if (e instanceof Error) throw new PostgresError(e.message)
+    throw e
+  }
+}
+
+export const getAvailableScholarships = async () => {
+  try {
+    const results = await db
+      .select({
+        id: scholarship.id,
+        name: scholarship.name,
+        vacancies: scholarship.vacancies,
+        acceptedCount: sql<number>`count(case when ${scholarshipApplication.status} = 'accepted' then 1 end)::int`,
+      })
+      .from(scholarship)
+      .leftJoin(
+        scholarshipApplication,
+        eq(scholarship.id, scholarshipApplication.scholarshipId),
+      )
+      .where(
+        sql`${scholarship.active} = true AND ${scholarship.startDate} <= current_date AND ${scholarship.endDate} >= current_date`,
+      )
+      .groupBy(scholarship.id, scholarship.name, scholarship.vacancies)
+
+    return results
+      .filter((r) => (r.vacancies ?? 0) - Number(r.acceptedCount) > 0)
+      .map((r) => ({ id: r.id, name: r.name }))
   } catch (e) {
     if (e instanceof Error) throw new PostgresError(e.message)
     throw e

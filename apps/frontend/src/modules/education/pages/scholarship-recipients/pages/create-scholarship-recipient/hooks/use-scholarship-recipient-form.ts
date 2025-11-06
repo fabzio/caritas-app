@@ -3,7 +3,7 @@ import { useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
-import useGetScholarship from '../../../../scholarship/hooks/use-get-scholarship'
+import useGetAvailableScholarship from './use-get-available-scholarship'
 import type { Beneficiary } from './use-get-beneficiaries'
 import usePostScholarshipApplication from './use-post-scholarship-application'
 
@@ -20,7 +20,7 @@ export function useScholarshipRecipientForm() {
   const navigate = useNavigate()
 
   const { data: scholarshipsData, isLoading: isLoadingScholarships } =
-    useGetScholarship('', 1, 20)
+    useGetAvailableScholarship()
 
   const { mutateAsync: createScholarshipRecipient, isPending } =
     usePostScholarshipApplication()
