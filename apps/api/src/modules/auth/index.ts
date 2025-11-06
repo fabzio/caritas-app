@@ -1,12 +1,12 @@
 import Elysia from 'elysia'
 import access from './access'
-import { welcome } from './welcome'
+import { info } from './info'
 
 const authModule = new Elysia({
   name: 'auth',
   prefix: '/auth',
   tags: ['Auth'],
 })
-  .use(welcome)
+  .use(info)
   .use(access)
 export default authModule

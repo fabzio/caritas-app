@@ -5,11 +5,11 @@ import { normalizeText } from '@api/utils/normalize-text'
 import { eq, ilike, sql } from 'drizzle-orm'
 import type { ScholarshipModel } from './model'
 
-// para la paginación
 type GetParams = {
   name?: string
-  page?: number // página actual
-  pageSize?: number // elementos por página
+  active?: boolean
+  page?: number
+  pageSize?: number
 }
 export const findDuplicateScholarship = async (
   name: string,
@@ -51,12 +51,19 @@ export const createScholarship = async (
 }
 export const getScholarships = async ({
   name,
+  active,
   page = 1,
   pageSize = 10,
 }: GetParams): Promise<ScholarshipModel.Paginated> => {
   try {
-    // con filtrado por nombre
-    const where = name ? ilike(scholarship.name, `%${name}%`) : undefined
+    const conditions = []
+    if (name) conditions.push(ilike(scholarship.name, `%${name}%`))
+    if (active !== undefined) conditions.push(eq(scholarship.active, active))
+
+    const where =
+      conditions.length > 0
+        ? sql`${sql.join(conditions, sql` AND `)}`
+        : undefined
     const offset = (page - 1) * pageSize
 
     let total = 0
@@ -72,7 +79,6 @@ export const getScholarships = async ({
         .from(scholarship)
       total = Number(r.total)
     }
-    // una página con becas
     const rows = await db.query.scholarship.findMany({
       where,
       columns: {
@@ -80,17 +86,13 @@ export const getScholarships = async ({
         updatedAt: false,
       },
       with: {
-        // con el nombre de la organización
         organization: {
           columns: { id: true, name: true },
         },
       },
       limit: pageSize,
       offset,
-      // esto puede servir para futuro filtrado y ordenamiento
-      // orderBy: (s, { desc }) => [desc(s.createdAt)],
     })
-    // fechas como string
     const data = rows.map((r) => ({
       ...r,
       startDate: r.startDate.toString(),

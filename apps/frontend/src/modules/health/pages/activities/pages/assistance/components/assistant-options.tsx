@@ -33,7 +33,6 @@ export default function AssistantOptions({ onDeleteClick }: Readonly<Props>) {
           <DropdownMenuItem
             onClick={(e) => {
               e.stopPropagation()
-              //TODO: Implementar edicion
             }}
           >
             Editar

@@ -1,7 +1,8 @@
 import { useRegions } from '@frontend/hooks/use-regions'
+import { useUserDetail } from '@frontend/modules/admin/pages/users/pages/create-user/hooks/use-user-detail'
 import { formUserSchema } from '@frontend/shared/models/user'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { getRouteApi, Link } from '@tanstack/react-router'
+import { getRouteApi, Link, useSearch } from '@tanstack/react-router'
 import { Button } from '@workspace/ui/components/button'
 import { Calendar } from '@workspace/ui/components/calendar'
 import {
@@ -37,28 +38,123 @@ import { Spinner } from '@workspace/ui/components/spinner'
 import { cn } from '@workspace/ui/lib/utils'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
-import { CalendarIcon, Check, ChevronsUpDown, Loader2 } from 'lucide-react'
+import {
+  CalendarIcon,
+  Check,
+  ChevronsUpDown,
+  Eraser,
+  Loader2,
+} from 'lucide-react'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
-import type z from 'zod'
+import z from 'zod'
+import { AutoComplete } from './components/autocomplete'
 import { useAddAttendant } from './hooks/use-add-attendant'
+import { useAddExistentUser } from './hooks/use-add-existent-user'
+import { useUpdateAttendant } from './hooks/use-edit-attendant'
+import {
+  type ExistentUsers,
+  useExistentUsers,
+} from './hooks/use-list-users-autocomplete'
 
 export default function AddAttendantPage() {
   const loaderData = getRouteApi(
     '/_authenticated/health/activities/$activityId/form',
   ).useLoaderData()
+  const formattedDate = loaderData?.date
+    ? format(new Date(loaderData.date), 'PPP', { locale: es })
+    : ''
+
+  const { id, type: viewType } = useSearch({
+    from: '/_authenticated/health/activities/$activityId/form',
+  })
+  const { data: userData } = useUserDetail(id)
 
   const { mutate: addAttendant, isPending: isPendingCreate } = useAddAttendant()
-
-  const formSchema = formUserSchema.omit({
-    password: true,
-    confirmPassword: true,
-  })
+  const { mutate: addExistentUser, isPending: isPendingAddExistent } =
+    useAddExistentUser()
+  const { mutate: updateAttendant, isPending: isPendingUpdate } =
+    useUpdateAttendant()
 
   const { data: regions, isLoading: regionsLoading } = useRegions()
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      name: userData?.name || '',
+      surname: userData?.surname || '',
+      email: userData?.email || '',
+      phone: userData?.phone || '',
+      documentType: (userData?.documentType as 'DNI' | 'CE' | 'PAS') ?? 'DNI',
+      documentNumber: userData?.documentNumber || '',
+      birthDate: userData?.birthDate,
+      sex: userData?.sex,
+      regionId: userData?.regionId,
+    },
+  })
+
+  const submitUpdate = (values: z.infer<typeof formSchema>) => {
+    if (typeof loaderData?.id !== 'number') return
+    if (!(viewType === 'edit' && userData?.id)) return
+    updateAttendant({
+      userId: userData.id,
+      data: {
+        email: values.email,
+        name: values.name,
+        surname: values.surname,
+        documentType: values.documentType,
+        documentNumber: values.documentNumber,
+        sex: values.sex,
+        birthDate: values.birthDate,
+        phone: values.phone,
+        regionId: values.regionId,
+      },
+      teamIds: undefined,
+      activityId: loaderData.id,
+    })
+  }
+
+  function onSubmit(values: z.infer<typeof formSchema>) {
+    if (typeof loaderData?.id !== 'number') return
+    if (viewType === 'edit' && userData?.id) {
+      submitUpdate(values)
+    } else if (foundUser) {
+      addExistentUser({
+        userId: foundUser.id,
+        activityId: loaderData.id,
+      })
+    } else {
+      addAttendant({
+        email: values.email,
+        name: values.name,
+        role: 'user',
+        password: import.meta.env.DEV ? 'default' : crypto.randomUUID(),
+        data: {
+          surname: values.surname,
+          documentType: values.documentType,
+          documentNumber: values.documentNumber,
+          sex: values.sex,
+          birthDate: values.birthDate,
+          phone: values.phone,
+          regionId: values.regionId,
+        },
+        activityId: loaderData.id,
+      })
+    }
+  }
+
+  const documentType = form.watch('documentType')
+  const documentNumber = form.watch('documentNumber')
+  const { data: existentUsers, isLoading: existentUsersLoading } =
+    useExistentUsers({
+      documentNumber,
+      documentType,
+      activityId: loaderData?.id as number,
+    })
+
+  const [foundUser, setFoundUser] = useState<ExistentUsers | null>(null)
+  const handleClearFields = () => {
+    form.reset({
       name: '',
       surname: '',
       email: '',
@@ -68,33 +164,19 @@ export default function AddAttendantPage() {
       birthDate: undefined,
       sex: undefined,
       regionId: undefined,
-    },
-  })
-
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    if (typeof loaderData?.id !== 'number') return
-    addAttendant({
-      email: values.email,
-      name: values.name,
-      role: 'user',
-      password: import.meta.env.DEV ? 'default' : crypto.randomUUID(),
-      data: {
-        surname: values.surname,
-        documentType: values.documentType,
-        documentNumber: values.documentNumber,
-        sex: values.sex,
-        birthDate: values.birthDate,
-        phone: values.phone,
-        regionId: values.regionId,
-      },
-      activityId: loaderData.id,
     })
+    setFoundUser(null)
   }
 
   return (
     <div className="w-full p-4">
       <div className="mt-4 w-full md:w-3/5 mx-auto">
-        <h1 className="text-2xl font-medium">Registrar Asistente</h1>
+        <h1 className="text-2xl font-medium">
+          {dependentText.mainTitle[viewType]}
+        </h1>
+        <h2 className="text-lg font-light">
+          {loaderData?.name} - {formattedDate}
+        </h2>
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
@@ -108,7 +190,11 @@ export default function AddAttendantPage() {
                   <FormItem>
                     <FormLabel>Nombre</FormLabel>
                     <FormControl>
-                      <Input placeholder="John" {...field} />
+                      <Input
+                        placeholder="John"
+                        {...field}
+                        disabled={foundUser !== null}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -121,7 +207,11 @@ export default function AddAttendantPage() {
                   <FormItem>
                     <FormLabel>Apellido</FormLabel>
                     <FormControl>
-                      <Input placeholder="Doe" {...field} />
+                      <Input
+                        placeholder="Doe"
+                        {...field}
+                        disabled={foundUser !== null}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -140,6 +230,7 @@ export default function AddAttendantPage() {
                         type="email"
                         placeholder="john.doe@example.com"
                         {...field}
+                        disabled={foundUser !== null}
                       />
                     </FormControl>
                     <FormMessage />
@@ -153,7 +244,12 @@ export default function AddAttendantPage() {
                   <FormItem>
                     <FormLabel>Teléfono</FormLabel>
                     <FormControl>
-                      <Input type="tel" placeholder="987 654 321" {...field} />
+                      <Input
+                        type="tel"
+                        placeholder="987 654 321"
+                        {...field}
+                        disabled={foundUser !== null}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -170,6 +266,7 @@ export default function AddAttendantPage() {
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
+                      disabled={foundUser !== null}
                     >
                       <FormControl>
                         <SelectTrigger className="w-full">
@@ -181,7 +278,7 @@ export default function AddAttendantPage() {
                         <SelectItem value="CE">
                           Carnet de Extranjería
                         </SelectItem>
-                        <SelectItem value="PASSPORT">Pasaporte</SelectItem>
+                        <SelectItem value="PAS">Pasaporte</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -191,15 +288,66 @@ export default function AddAttendantPage() {
               <FormField
                 control={form.control}
                 name="documentNumber"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Número de Documento</FormLabel>
-                    <FormControl>
-                      <Input placeholder="12345678" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                render={({ field }) => {
+                  const selectedUser = existentUsers?.data.find(
+                    (u) => u.documentNumber === field.value,
+                  )
+                  return viewType === 'new' ? (
+                    <FormItem className="flex flex-col">
+                      <FormLabel>Número de Documento</FormLabel>
+                      <div className="flex flex-row w-full gap-2">
+                        <div className="flex-1">
+                          <AutoComplete
+                            options={existentUsers?.data ?? []}
+                            emptyMessage="No se encontraron beneficiarios."
+                            isLoading={existentUsersLoading}
+                            placeholder="Buscar o ingresar número de documento"
+                            value={selectedUser}
+                            nonSelectedValue={field.value}
+                            onValueChange={(user) => {
+                              field.onChange(user.documentNumber)
+                              setFoundUser(user)
+                              form.setValue('name', user.name)
+                              form.setValue('surname', user.surname)
+                              form.setValue('email', user.email)
+                              form.setValue('phone', user.phone)
+                              form.setValue('sex', user.sex)
+                              form.setValue('regionId', user.regionId)
+                              form.setValue('birthDate', user.birthDate)
+                            }}
+                            onInputChange={(val) => {
+                              field.onChange(val)
+                            }}
+                            disabled={foundUser !== null}
+                          />
+                        </div>
+                        <Button
+                          variant="outline"
+                          type="button"
+                          onClick={handleClearFields}
+                          disabled={!foundUser}
+                        >
+                          <Eraser /> Limpiar
+                        </Button>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  ) : (
+                    <FormField
+                      control={form.control}
+                      name="documentNumber"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Número de Documento</FormLabel>
+                          <FormControl>
+                            <Input placeholder="12345678" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )
+                }}
               />
             </div>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -218,6 +366,7 @@ export default function AddAttendantPage() {
                               'pl-3 text-left font-normal',
                               !field.value && 'text-muted-foreground',
                             )}
+                            disabled={foundUser !== null}
                           >
                             {field.value ? (
                               format(field.value, 'PPP', { locale: es })
@@ -252,7 +401,8 @@ export default function AddAttendantPage() {
                     <FormLabel>Sexo</FormLabel>
                     <Select
                       onValueChange={field.onChange}
-                      defaultValue={field.value}
+                      value={field.value}
+                      disabled={foundUser !== null}
                     >
                       <FormControl>
                         <SelectTrigger className="w-full">
@@ -285,6 +435,7 @@ export default function AddAttendantPage() {
                               'w-full justify-between',
                               !field.value && 'text-muted-foreground',
                             )}
+                            disabled={foundUser !== null}
                           >
                             {field.value
                               ? regions?.find((r) => r.id === field.value)?.name
@@ -293,7 +444,7 @@ export default function AddAttendantPage() {
                           </Button>
                         </FormControl>
                       </PopoverTrigger>
-                      <PopoverContent className="w-full p-0">
+                      <PopoverContent className="w-full p-0" align="start">
                         <Command>
                           <CommandInput
                             placeholder="Buscar región"
@@ -338,8 +489,18 @@ export default function AddAttendantPage() {
               />
             </div>
             <div className="w-full flex gap-2 justify-center">
-              <Button type="submit" className="mt-4" disabled={isPendingCreate}>
-                {isPendingCreate ? <Spinner /> : 'Registrar Asistente'}
+              <Button
+                type="submit"
+                className="mt-4"
+                disabled={
+                  isPendingCreate || isPendingUpdate || isPendingAddExistent
+                }
+              >
+                {isPendingCreate || isPendingUpdate || isPendingAddExistent ? (
+                  <Spinner />
+                ) : (
+                  dependentText.submit[viewType]
+                )}
               </Button>
               <Link
                 to={
@@ -360,3 +521,84 @@ export default function AddAttendantPage() {
     </div>
   )
 }
+
+const dependentText = {
+  mainTitle: {
+    new: 'Registrar Asistente',
+    edit: 'Editar Asistente',
+  },
+  submit: {
+    new: 'Registrar Asistente',
+    edit: 'Guardar Cambios',
+  },
+}
+
+const formSchema = formUserSchema
+  .omit({
+    password: true,
+    confirmPassword: true,
+  })
+  .superRefine(({ documentNumber, documentType }, ctx) => {
+    const trimmedValue = documentNumber.trim()
+
+    if (documentType === 'DNI') {
+      if (!/^\d+$/.test(trimmedValue)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['documentNumber'],
+          message: 'El DNI solo debe contener números',
+        })
+        return
+      }
+
+      if (trimmedValue.length !== 8) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['documentNumber'],
+          message: 'El DNI debe tener exactamente 8 dígitos',
+        })
+      }
+      return
+    }
+
+    if (documentType === 'CE') {
+      if (!/^[a-zA-Z0-9]+$/.test(trimmedValue)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['documentNumber'],
+          message:
+            'El Carnet de Extranjería solo debe contener caracteres alfanuméricos',
+        })
+        return
+      }
+
+      if (trimmedValue.length > 12 || trimmedValue.length < 6) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['documentNumber'],
+          message:
+            'El Carnet de Extranjería debe tener como máximo 12 caracteres y como mínimo 6',
+        })
+      }
+      return
+    }
+
+    if (documentType === 'PAS') {
+      if (!/^[a-zA-Z0-9]+$/.test(trimmedValue)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['documentNumber'],
+          message: 'El Pasaporte solo debe contener caracteres alfanuméricos',
+        })
+        return
+      }
+
+      if (trimmedValue.length !== 12) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['documentNumber'],
+          message: 'El Pasaporte debe tener exactamente 12 caracteres',
+        })
+      }
+    }
+  })

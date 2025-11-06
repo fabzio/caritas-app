@@ -36,6 +36,13 @@ describe('Health Activity Module', () => {
       })
       expect(response.status).toBe(200)
       expect(response.data?.data).toBeInstanceOf(Array)
+      expect(
+        response.data?.data.every(
+          (item) =>
+            typeof item.creatorName === 'string' &&
+            item.registered === undefined,
+        ),
+      ).toBe(true)
     })
 
     it('Should support pagination parameters', async () => {
@@ -70,6 +77,42 @@ describe('Health Activity Module', () => {
       })
       expect(response.status).toBe(200)
       expect(response.data?.data).toBeInstanceOf(Array)
+    })
+
+    it('Should list active activities for user view', async () => {
+      const response = await api.activities.get({
+        query: { user: 'active' },
+        headers: {
+          cookie: authCookie,
+        },
+      })
+      expect(response.status).toBe(200)
+      expect(response.data?.data).toBeInstanceOf(Array)
+      expect(
+        response.data?.data.every(
+          (item) =>
+            typeof item.registered === 'boolean' &&
+            item.creatorName === undefined,
+        ),
+      ).toBe(true)
+    })
+
+    it('Should handle participated filter for user view', async () => {
+      const response = await api.activities.get({
+        query: { user: 'participated' },
+        headers: {
+          cookie: authCookie,
+        },
+      })
+      expect(response.status).toBe(200)
+      expect(response.data?.data).toBeInstanceOf(Array)
+      expect(
+        response.data?.data.every(
+          (item) =>
+            typeof item.registered === 'boolean' &&
+            item.creatorName === undefined,
+        ),
+      ).toBe(true)
     })
   })
 

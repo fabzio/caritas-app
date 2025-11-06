@@ -20,6 +20,11 @@ export namespace FairModel {
         t.Omit(_getFair, ['createdAt', 'updatedAt', 'regionId', 'createdBy']),
         t.Object({
           district: t.String(),
+          status: t.Union([
+            t.Literal('upcoming'),
+            t.Literal('ongoing'),
+            t.Literal('finished'),
+          ]),
         }),
       ]),
     ),
@@ -34,6 +39,7 @@ export namespace FairModel {
     q: t.Optional(t.String()),
     district: t.Optional(t.String()),
     date: t.Optional(t.String()),
+    status: t.Optional(t.String()),
     page: t.Optional(t.Integer({ minimum: 0 })),
     limit: t.Optional(t.Integer({ minimum: 1, maximum: 100 })),
     sortBy: t.Optional(t.String()),

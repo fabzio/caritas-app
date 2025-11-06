@@ -22,13 +22,11 @@ export const useCreateBeneficiary = () => {
       if (error) throw error
 
       const userId = data.user.id
-      const { error: welcomeError } = await rpc.auth.welcome.user.post({
+      const { error: patientError } = await rpc.auth.info.patient.post({
         userId,
-        patientInfo: {
-          insuranceType,
-        },
+        insuranceType,
       })
-      if (welcomeError) throw welcomeError
+      if (patientError) throw patientError
       return { userId }
     },
     onSuccess: () => {

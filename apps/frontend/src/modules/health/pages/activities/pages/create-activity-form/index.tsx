@@ -509,7 +509,7 @@ export default function CreateActivityForm() {
                       onClick={handleNewAlly}
                       size="sm"
                     >
-                      Crear organización <ShieldPlus size={16} />
+                      Registrar organización <ShieldPlus size={16} />
                     </Button>
                     <Button
                       type="button"
@@ -517,7 +517,7 @@ export default function CreateActivityForm() {
                       onClick={handleNewSpeciality}
                       size="sm"
                     >
-                      Crear especialidad <HeartPlus size={16} />
+                      Registrar especialidad <HeartPlus size={16} />
                     </Button>
 
                     <Button
@@ -539,7 +539,7 @@ export default function CreateActivityForm() {
                     <Link to="/health/activities">Cancelar</Link>
                   </Button>
                   <Button type="submit" disabled={isPending}>
-                    {isPending ? <Spinner /> : 'Crear Actividad'}
+                    {isPending ? <Spinner /> : 'Registrar Actividad'}
                   </Button>
                 </div>
               </form>

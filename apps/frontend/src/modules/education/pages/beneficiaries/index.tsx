@@ -11,6 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@workspace/ui/components/dialog'
+import { UserPlus } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import ActionsButton from './components/actions-button'
@@ -117,7 +118,10 @@ export default function TableView() {
             selectedCount={beneficiaryCount}
           />
           <Link to="/education/beneficiaries/form" search={{ type: 'new' }}>
-            <Button>Nuevo beneficiario</Button>
+            <Button>
+              <UserPlus />
+              Nuevo beneficiario
+            </Button>
           </Link>
         </div>
       </div>

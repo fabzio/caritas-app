@@ -30,6 +30,7 @@ const scholarship = new Elysia({
     auth: true,
     query: t.Object({
       name: t.Optional(t.String()),
+      active: t.Optional(t.Boolean()),
       page: t.Optional(t.Numeric({ minimum: 1, default: 1 })),
       pageSize: t.Optional(t.Numeric({ minimum: 1, maximum: 20, default: 10 })),
     }),

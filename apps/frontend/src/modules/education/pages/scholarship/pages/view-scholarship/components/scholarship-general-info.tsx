@@ -23,6 +23,18 @@ type Props = {
 export default function ScholarshipGeneralInfo({
   scholarship,
 }: Readonly<Props>) {
+  const formatDate = (dateString: string): string => {
+    const date = new Date(dateString)
+    const adjustedDate = new Date(
+      date.getTime() + date.getTimezoneOffset() * 60000,
+    )
+    return adjustedDate.toLocaleDateString('es-PE', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    })
+  }
+
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -64,7 +76,7 @@ export default function ScholarshipGeneralInfo({
             <div>
               <h3 className="font-medium">Fecha de Inicio</h3>
               <p className="text-sm text-muted-foreground">
-                {scholarship.startDate}
+                {formatDate(scholarship.startDate)}
               </p>
             </div>
           </div>
@@ -74,7 +86,7 @@ export default function ScholarshipGeneralInfo({
             <div>
               <h3 className="font-medium">Fecha de Fin</h3>
               <p className="text-sm text-muted-foreground">
-                {scholarship.endDate}
+                {formatDate(scholarship.endDate)}
               </p>
             </div>
           </div>
