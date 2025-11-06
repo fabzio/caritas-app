@@ -37,7 +37,7 @@ import {
 import { Separator } from '@workspace/ui/components/separator'
 import { Spinner } from '@workspace/ui/components/spinner'
 import { cn } from '@workspace/ui/lib/utils'
-import { format, parseISO, startOfDay } from 'date-fns'
+import { format, startOfDay } from 'date-fns'
 import {
   CalendarIcon,
   Check,
@@ -77,6 +77,9 @@ export default function CreateFairPage() {
             startTime: formatTime(loaderData.startTime),
             endTime: formatTime(loaderData.endTime),
             regionId: loaderData.regionId,
+            organizations: loaderData.organizations.map((org) => ({
+              organizationId: org.id,
+            })),
           }
         : {
             title: '',
@@ -84,11 +87,11 @@ export default function CreateFairPage() {
             address: '',
             startTime: '08:30:00',
             endTime: '08:30:00',
-            regionId: undefined,
+            regionId: 0,
             organizations: [{ organizationId: '' }],
           },
   })
-  const { fields, append, remove } = useFieldArray({
+  const { fields, remove } = useFieldArray({
     control: form.control,
     name: 'organizations',
   })
@@ -100,18 +103,23 @@ export default function CreateFairPage() {
   const maxDate = new Date(today.getTime())
   maxDate.setFullYear(today.getFullYear() + 2)
   const { data: districts, isLoading } = useRegions()
-  const { data: organizations, isLoading: isLoadingOrg } = useGetOrganization()
+  const { data: organizations } = useGetOrganization()
   const { mutate: createFair, isPending: isPendingCreate } = usePostFair()
   const { mutate: updateFair, isPending: isPendingUpdate } = useUpdateFairs()
   const { data: user } = useSession()
   const handleSubmit = form.handleSubmit((data) => {
     if (!user) return
+    const payload = {
+      ...data,
+      date: data.date,
+      createdBy: user.user.id,
+      active: true,
+    }
+    console.log(payload)
     if (viewType === 'edit' && loaderData?.id) {
-      const params = { ...data, id: loaderData.id }
-      updateFair(params)
+      updateFair({ ...payload, id: loaderData.id })
     } else {
-      const params = { ...data, createdBy: user.user.id, active: true }
-      createFair(params)
+      createFair(payload)
     }
   })
 

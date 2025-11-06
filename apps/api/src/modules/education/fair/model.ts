@@ -11,7 +11,18 @@ export namespace FairModel {
     date: t.Date(),
   })
   export type GetFair = typeof _getFair.static
-  export const createFair = createInsertSchema(fair)
+  const baseFair = createInsertSchema(fair)
+  export const createFair = t.Intersect([
+    baseFair,
+    t.Object({
+      organizations: t.Array(
+        t.Object({
+          organizationId: t.String({ minLength: 1 }),
+        }),
+      ),
+    }),
+  ])
+
   export type CreateFair = typeof createFair.static
 
   export const getFairsResponse = t.Object({
@@ -40,7 +51,17 @@ export namespace FairModel {
   })
   export type ListFairsQuery = typeof listFairsQuery.static
 
-  export const getSingleFairsResponse = t.Composite([_getFair, t.Object({})])
+  export const getSingleFairsResponse = t.Composite([
+    _getFair,
+    t.Object({
+      organizations: t.Array(
+        t.Object({
+          id: t.String(),
+          name: t.String(),
+        }),
+      ),
+    }),
+  ])
   export type GetSingleFairsResponse = typeof getSingleFairsResponse.static
 
   export const getSingleFairsQuery = t.Object({
@@ -48,7 +69,17 @@ export namespace FairModel {
   })
   export type GetSingleFairsQuery = typeof getSingleFairsQuery.static
 
-  const _updateFair = createUpdateSchema(fair)
+  const baseUpdate = createUpdateSchema(fair)
+  export const _updateFair = t.Intersect([
+    baseUpdate,
+    t.Object({
+      organizations: t.Array(
+        t.Object({
+          organizationId: t.String({ minLength: 1 }),
+        }),
+      ),
+    }),
+  ])
   export const updateFair = _updateFair
   export type UpdateFair = typeof updateFair.static
 

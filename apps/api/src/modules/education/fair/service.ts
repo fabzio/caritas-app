@@ -1,7 +1,7 @@
 import db from '@api/db'
 import { PostgresError } from '@api/db/errors'
-import { region } from '@api/db/schemas/auth'
-import { fair } from '@api/db/schemas/education'
+import { organization, region } from '@api/db/schemas/auth'
+import { fair, fairOrganization } from '@api/db/schemas/education'
 import { normalizeText } from '@api/utils/normalize-text'
 import { and, asc, count, desc, eq, ilike, inArray, or } from 'drizzle-orm'
 import type { FairModel } from './model'
@@ -139,28 +139,54 @@ export async function getFairs(
 }
 export const getSingleFair = async ({ id }: { id: number }) => {
   try {
-    const response = await db.query.fair.findFirst({
+    const fairData = await db.query.fair.findFirst({
       where: (fairs, { eq }) => eq(fairs.id, id),
     })
 
-    if (!response) return null
+    if (!fairData) return null
+
+    const organizations = await db
+      .select({
+        id: organization.id,
+        name: organization.name,
+      })
+      .from(fairOrganization)
+      .innerJoin(
+        organization,
+        eq(fairOrganization.organizationId, organization.id),
+      )
+      .where(eq(fairOrganization.fairId, id))
 
     return {
-      ...response,
-      date: new Date(response.date),
+      ...fairData,
+      date: new Date(fairData.date),
+      organizations,
     }
   } catch (e) {
     if (e instanceof Error) throw new PostgresError(e.message)
     throw e
   }
 }
+
 export const createFair = async (args: FairModel.CreateFair) => {
   try {
     const [{ id }] = await db.transaction(async (tx) => {
-      return await tx.insert(fair).values(args).returning({
-        id: fair.id,
-      })
+      const [{ id }] = await tx
+        .insert(fair)
+        .values(args)
+        .returning({ id: fair.id })
+
+      if (args.organizations && args.organizations.length > 0) {
+        await tx.insert(fairOrganization).values(
+          args.organizations.map((o) => ({
+            fairId: id,
+            organizationId: o.organizationId,
+          })),
+        )
+      }
+      return [{ id }]
     })
+
     return id
   } catch (e) {
     if (e instanceof Error) throw new PostgresError(e.message)
@@ -169,14 +195,22 @@ export const createFair = async (args: FairModel.CreateFair) => {
 }
 export const patchFair = async (id: number, args: FairModel.UpdateFair) => {
   try {
-    const response = await db
-      .update(fair)
-      .set({
-        ...args,
-      })
-      .where(eq(fair.id, id))
-      .returning({ id: fair.id })
-    return response.length
+    await db.transaction(async (tx) => {
+      await tx.update(fair).set(args).where(eq(fair.id, id))
+
+      if (args.organizations) {
+        await tx.delete(fairOrganization).where(eq(fairOrganization.fairId, id))
+        if (args.organizations.length > 0) {
+          await tx.insert(fairOrganization).values(
+            args.organizations.map((o) => ({
+              fairId: id,
+              organizationId: o.organizationId,
+            })),
+          )
+        }
+      }
+    })
+    return 1
   } catch (e) {
     if (e instanceof Error) throw new PostgresError(e.message)
     throw e
