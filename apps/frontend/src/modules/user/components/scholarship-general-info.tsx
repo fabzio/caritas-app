@@ -74,25 +74,25 @@ export default function ScholarshipGeneralInfo({ scholarship }: Props) {
       <div
         className={`rounded-lg border-2 p-6 text-center ${
           status.type === 'active'
-            ? 'border-green-600/50 bg-green-600/10'
+            ? 'border-primary bg-primary/10'
             : status.type === 'upcoming'
-              ? 'border-green-400/50 bg-green-400/10'
+              ? 'border-accent bg-accent/10'
               : 'border-muted bg-muted/50'
         }`}
       >
         <p
           className={`text-2xl font-semibold ${
             status.type === 'active'
-              ? 'text-green-700 dark:text-green-500'
+              ? 'text-primary'
               : status.type === 'upcoming'
-                ? 'text-green-600 dark:text-green-400'
+                ? 'text-accent-foreground'
                 : 'text-muted-foreground'
           }`}
         >
           {status.message}
         </p>
         {status.subMessage && (
-          <p className="text-sm text-muted-foreground mt-1">
+          <p className="mt-1 text-sm text-muted-foreground">
             {status.subMessage}
           </p>
         )}

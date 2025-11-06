@@ -8,7 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@workspace/ui/components/dialog'
-import { ChevronDown, UserPlus } from 'lucide-react'
+import { UserPlus } from 'lucide-react'
 import { useState } from 'react'
 import ActionsButton from './components/actions-button'
 import OrganizationFormDialog from './components/organization-form-dialog'
