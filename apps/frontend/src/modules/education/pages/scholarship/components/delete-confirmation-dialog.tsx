@@ -8,7 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@workspace/ui/components/dialog'
-import useDeleteFairs from '../hooks/use-delete-fair'
+import useDeleteScholarships from '../hooks/use-delete-scholarship'
 
 interface DeleteConfirmationDialogProps {
   readonly open: boolean
@@ -25,9 +25,10 @@ export default function DeleteConfirmationDialog({
   ids,
   clearSelection,
 }: DeleteConfirmationDialogProps) {
-  const { mutateAsync: deleteFairs, isPending } = useDeleteFairs()
+  const { mutateAsync: deleteScholarships, isPending } = useDeleteScholarships()
+
   const handleConfirmDelete = async () => {
-    deleteFairs({ ids })
+    await deleteScholarships({ ids })
     onOpenChange(false)
     clearSelection?.()
   }
@@ -37,12 +38,12 @@ export default function DeleteConfirmationDialog({
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>
-            {`¿Seguro que desea eliminar ${selectedCount} feria${
+            {`¿Seguro que desea eliminar ${selectedCount} beca${
               selectedCount > 1 ? 's' : ''
             }?`}
           </DialogTitle>
           <DialogDescription>
-            Esta acción no se puede deshacer. Las ferias serán marcadas como
+            Esta acción no se puede deshacer. Las becas serán marcadas como
             inactivas.
           </DialogDescription>
         </DialogHeader>

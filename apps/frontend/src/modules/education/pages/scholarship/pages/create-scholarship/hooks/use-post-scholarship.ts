@@ -31,8 +31,9 @@ const usePostScholarship = () => {
       if (res.error) throw res.error
       return res.data
     },
-    onError: () => {
-      toast.error('Ocurrió un error desconocido al registrar la beca')
+    onError: (error: Error) => {
+      console.error('Error completo:', error)
+      toast.error(error.message || 'Error al crear la beca')
     },
     onSuccess: () => {
       queryClient.invalidateQueries({

@@ -1,5 +1,5 @@
 import betterAuth from '@api/modules/auth/middleware'
-import Elysia, { t } from 'elysia'
+import Elysia, { status, t } from 'elysia'
 import { ScholarshipRecipientModel } from './model'
 import {
   createScholarshipRecipient,
@@ -25,12 +25,20 @@ const scholarshipRecipients = new Elysia({
   })
   .post(
     '',
-    ({ body, session, user }) => {
+    async ({ body, session, user }) => {
       const reviewedBy = session?.userId ?? user?.id ?? ''
-      return createScholarshipRecipient({
+      const result = await createScholarshipRecipient({
         ...body,
         reviewedBy,
       })
+      if (result.error === 'Beneficiario no encontrado')
+        throw status(404, result.error)
+      if (result.error === 'Beca no encontrada') throw status(404, result.error)
+      if (result.error === 'El beneficiario ya ha sido aceptado para esta beca')
+        throw status(409, result.error)
+      if (result.error) throw status(400, result.error)
+      if (result.id == null) throw status(500, 'No se pudo crear el becado')
+      return result.id
     },
     {
       auth: true,
@@ -39,7 +47,11 @@ const scholarshipRecipients = new Elysia({
         200: t.Number({
           description: 'ID of the created scholarship recipient',
         }),
+        400: t.String(),
         401: t.Literal('Unauthorized'),
+        404: t.String(),
+        409: t.String(),
+        500: t.String(),
       },
     },
   )

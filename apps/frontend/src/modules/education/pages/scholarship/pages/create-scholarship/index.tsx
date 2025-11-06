@@ -30,7 +30,7 @@ import {
 import { Separator } from '@workspace/ui/components/separator'
 import { Textarea } from '@workspace/ui/components/textarea'
 import { format } from 'date-fns'
-import { CalendarIcon, Loader2, UserPlus } from 'lucide-react'
+import { CalendarIcon, Loader2, ShieldPlus, UserPlus } from 'lucide-react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import useGetOrganization from './hooks/use-get-organization'
@@ -79,7 +79,7 @@ export default function CreateScholarship() {
             name: '',
             description: '',
             requirements: '',
-            vacancies: undefined,
+            vacancies: 10,
             startDate: undefined,
             endDate: undefined,
             organizationId: undefined,
@@ -175,51 +175,6 @@ export default function CreateScholarship() {
                       </FormItem>
                     )}
                   />
-                  <FormField
-                    control={form.control}
-                    name="organizationId"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Organización*</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger className="w-full">
-                              <SelectValue placeholder="Seleccione la organización" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {isLoading && (
-                              <SelectItem value="#" disabled>
-                                Cargando...
-                              </SelectItem>
-                            )}
-                            {organizations && organizations?.length > 0 ? (
-                              organizations?.map((org) => (
-                                <SelectItem key={org.id} value={String(org.id)}>
-                                  {org.name}
-                                </SelectItem>
-                              ))
-                            ) : (
-                              <div className="flex flex-col items-center py-1 gap-2">
-                                No hay organizaciones aliadas disponibles.
-                                <Separator />{' '}
-                                <Button onClick={handleNewAlly}>
-                                  <span className="py-1 flex underline items-center gap-2">
-                                    Registrar organización aliada
-                                    <UserPlus size={16} />
-                                  </span>
-                                </Button>
-                              </div>
-                            )}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
 
                   <FormField
                     control={form.control}
@@ -254,18 +209,9 @@ export default function CreateScholarship() {
                       <FormItem>
                         <FormLabel>Vacantes Disponibles*</FormLabel>
                         <FormControl>
-                          <Input
-                            {...field}
-                            type="number"
-                            onChange={(e) => {
-                              const value = e.target.value
-                              const number =
-                                value === ''
-                                  ? undefined
-                                  : Number.parseInt(value, 10)
-                              field.onChange(number)
-                            }}
-                          />
+                          <FormControl>
+                            <Input {...field} type="number" />
+                          </FormControl>
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -296,6 +242,7 @@ export default function CreateScholarship() {
                               mode="single"
                               selected={field.value}
                               onSelect={field.onChange}
+                              toYear={maxDate.getFullYear()}
                               disabled={{
                                 before: today,
                               }}
@@ -342,6 +289,59 @@ export default function CreateScholarship() {
                       </FormItem>
                     )}
                   />
+                  <FormField
+                    control={form.control}
+                    name="organizationId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Organización*</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger className="w-full">
+                              <SelectValue placeholder="Seleccione la organización" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {isLoading && (
+                              <SelectItem value="#" disabled>
+                                Cargando...
+                              </SelectItem>
+                            )}
+                            {organizations && organizations?.length > 0 ? (
+                              organizations?.map((org) => (
+                                <SelectItem key={org.id} value={String(org.id)}>
+                                  {org.name}
+                                </SelectItem>
+                              ))
+                            ) : (
+                              <div className="flex flex-col items-center py-1 gap-2">
+                                No hay organizaciones aliadas disponibles.
+                                <Separator />{' '}
+                                <Button onClick={handleNewAlly}>
+                                  <span className="py-1 flex underline it(trueems-center gap-2">
+                                    Crear organización aliada
+                                    <UserPlus size={16} />
+                                  </span>
+                                </Button>
+                              </div>
+                            )}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <Button
+                    variant="ghost"
+                    type="button"
+                    onClick={handleNewAlly}
+                    size="sm"
+                  >
+                    Crear organización <ShieldPlus size={16} />
+                  </Button>
                   <div className="flex justify-end gap-4 items-center">
                     <Link to="/education/scholarship">
                       <Button variant="outline" type="button">

@@ -1,4 +1,3 @@
-import { Link } from '@tanstack/react-router'
 import { Button } from '@workspace/ui/components/button'
 import {
   Form,
@@ -7,17 +6,11 @@ import {
   FormItem,
   FormMessage,
 } from '@workspace/ui/components/form'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@workspace/ui/components/select'
 import { Separator } from '@workspace/ui/components/separator'
-import { GraduationCap, UserPlus } from 'lucide-react'
+import { UserPlus } from 'lucide-react'
 import { useScholarshipRecipientForm } from '../hooks/use-scholarship-recipient-form'
 import BeneficiarySearch from './beneficiary-search'
+import { ScholarshipCombobox } from './scholarship-combobox'
 
 export default function ScholarshipRecipientForm() {
   const {
@@ -72,54 +65,14 @@ export default function ScholarshipRecipientForm() {
             name="scholarshipId"
             render={({ field }) => (
               <FormItem>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                  disabled={isLoadingScholarships}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue
-                        placeholder={
-                          isLoadingScholarships
-                            ? 'Cargando becas...'
-                            : 'Seleccione la beca'
-                        }
-                      />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {scholarships.length > 0 ? (
-                      scholarships.map(
-                        (scholarship: { id: number; name: string }) => (
-                          <SelectItem
-                            key={scholarship.id}
-                            value={String(scholarship.id)}
-                          >
-                            {scholarship.name}
-                          </SelectItem>
-                        ),
-                      )
-                    ) : (
-                      <Link
-                        to="/education/scholarship/form"
-                        search={{
-                          type: 'new',
-                        }}
-                        className="text-sm text-muted-foreground"
-                      >
-                        <div className="flex flex-col items-center py-1">
-                          No hay becas disponibles.
-                          <Separator />{' '}
-                          <span className="py-1 flex underline items-center gap-2">
-                            Agregar nueva beca
-                            <GraduationCap size={16} />
-                          </span>
-                        </div>
-                      </Link>
-                    )}
-                  </SelectContent>
-                </Select>
+                <FormControl>
+                  <ScholarshipCombobox
+                    value={field.value}
+                    onChange={field.onChange}
+                    scholarships={scholarships}
+                    isLoading={isLoadingScholarships}
+                  />
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}

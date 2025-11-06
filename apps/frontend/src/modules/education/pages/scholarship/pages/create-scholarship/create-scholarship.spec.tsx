@@ -18,13 +18,16 @@ vi.mock('@frontend/modules/health/components/organization-form-dialog', () => ({
   }: {
     open: boolean
     onOpenChange: (flag: boolean) => void
-  }) => (
-    <div data-open={open}>
-      <button type="button" onClick={() => onOpenChange(!open)}>
-        toggle
-      </button>
-    </div>
-  ),
+  }) =>
+    open ? (
+      <div data-open={open}>
+        <button type="button" onClick={() => onOpenChange(!open)}>
+          toggle
+        </button>
+      </div>
+    ) : (
+      <></>
+    ),
 }))
 
 vi.mock('./hooks/use-get-organization', () => ({
@@ -197,6 +200,7 @@ vi.mock('lucide-react', () => ({
   Loader2: () => <span>⏳</span>,
   XIcon: () => <span>❌</span>,
   UserPlus: () => <span>👤+</span>,
+  ShieldPlus: () => <span>👤+</span>,
 }))
 const queryClient = new QueryClient()
 describe('CreateScholarship', () => {
@@ -237,8 +241,11 @@ describe('CreateScholarship', () => {
       </QueryClientProvider>,
     )
 
-    expect(screen.getByText('Organization A')).toBeTruthy()
-    expect(screen.getByText('Organization B')).toBeTruthy()
+    const orgA = screen.getAllByText('Organization A')[0]
+    const orgB = screen.getAllByText('Organization B')[0]
+
+    expect(orgA).toBeTruthy()
+    expect(orgB).toBeTruthy()
   })
 
   it('renders scholarship type options', () => {

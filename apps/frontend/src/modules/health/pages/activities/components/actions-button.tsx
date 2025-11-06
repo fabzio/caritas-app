@@ -14,12 +14,14 @@ import { ChevronDown } from 'lucide-react'
 type Props = {
   onDeleteClick: () => void
   onEditClick: () => void
+  onExportCsvClick: () => void
   selectedCount: number
 }
 
 export default function ActionsButton({
   onDeleteClick,
   onEditClick,
+  onExportCsvClick,
   selectedCount,
 }: Readonly<Props>) {
   return (
@@ -47,7 +49,9 @@ export default function ActionsButton({
           <DropdownMenuSub>
             <DropdownMenuSubTrigger>Exportar</DropdownMenuSubTrigger>
             <DropdownMenuSubContent>
-              <DropdownMenuItem>CSV</DropdownMenuItem>
+              <DropdownMenuItem onClick={onExportCsvClick}>
+                CSV
+              </DropdownMenuItem>
               <DropdownMenuItem>Excel</DropdownMenuItem>
             </DropdownMenuSubContent>
           </DropdownMenuSub>
