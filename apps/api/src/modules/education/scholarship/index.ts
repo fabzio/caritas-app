@@ -5,6 +5,7 @@ import { ScholarshipModel } from './model'
 import scholarshipRecipients from './recipients'
 import {
   createScholarship,
+  deleteScholarships,
   findDuplicateScholarship,
   getAvailableScholarships,
   getScholarships,
@@ -58,7 +59,10 @@ const scholarship = new Elysia({
   .post(
     '',
     async ({ body }) => {
-      const duplicate = await findDuplicateScholarship(body.name)
+      const duplicate = await findDuplicateScholarship(
+        body.name,
+        body.organizationId,
+      )
       if (duplicate) throw status(400, `La beca "${duplicate.name}" ya existe`)
       return createScholarship(body)
     },
@@ -80,7 +84,11 @@ const scholarship = new Elysia({
       const existing = await getSingleScholarship({ id })
       if (!existing) throw status(404, 'No se encontró la especialidad')
       if (body.name) {
-        const duplicate = await findDuplicateScholarship(body.name, id)
+        const duplicate = await findDuplicateScholarship(
+          body.name,
+          body.organizationId,
+          id,
+        )
         if (duplicate)
           throw status(400, `La especialidad "${duplicate.name}" ya existe`)
       }
@@ -95,6 +103,24 @@ const scholarship = new Elysia({
           description: 'Number of updated rows',
         }),
         404: t.Literal('Scholarship not found'),
+      },
+    },
+  )
+  .delete(
+    '',
+    async ({ body }) => {
+      const { ids } = body
+      if (!ids.length)
+        throw status(400, 'No hay ningún ID de beca para eliminar')
+      const deleted = await deleteScholarships(ids)
+      return deleted
+    },
+    {
+      auth: true,
+      body: ScholarshipModel.deleteScholarships,
+      response: {
+        200: t.Object({ success: t.Boolean() }),
+        400: t.String(),
       },
     },
   )

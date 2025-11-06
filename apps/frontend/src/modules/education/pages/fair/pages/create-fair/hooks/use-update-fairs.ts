@@ -20,6 +20,7 @@ export const useUpdateFairs = () => {
       createdBy?: string
       createdAt?: Date
       updatedAt?: Date
+      organizations: { organizationId: string }[]
     }) => {
       const cleanBody = {
         ...params,
@@ -30,10 +31,12 @@ export const useUpdateFairs = () => {
       if (res.error) throw res.error
       return res.data
     },
-    onError: () => {
-      toast.error('Ocurrió un error desconocido al actualizar la feria')
+    onError: (error: Error) => {
+      toast.error(
+        error.message || 'Ocurrió un error al registrar la feria vocacional',
+      )
     },
-    onSuccess: (data, variables) => {
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
         queryKey: [QueryKeys.EDUCATION.FAIR],
       })

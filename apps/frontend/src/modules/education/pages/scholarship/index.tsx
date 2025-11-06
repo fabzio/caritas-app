@@ -10,14 +10,27 @@ import {
 } from '@workspace/ui/components/dropdown-menu'
 import { Input } from '@workspace/ui/components/input'
 import debounce from 'debounce'
-import { ChevronDown, PlusCircle } from 'lucide-react'
-import { useState } from 'react'
+import { ChevronDown, MoreVertical, PlusCircle, Search } from 'lucide-react'
+import { useMemo, useState } from 'react'
+import DeleteConfirmationDialog from './components/delete-confirmation-dialog'
 import ScholarshipTable from './components/scholarship-table'
 import { useScholarshipTable } from './hooks/use-table'
 export default function ScholarshipPage() {
   const isMobile = useIsMobile()
   const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({})
+  const [deleteOpen, setDeleteOpen] = useState(false)
   const navigate = useNavigate()
+  const clearSelection = () => setRowSelection({})
+  const skeletonKeys = useMemo(
+    () =>
+      Array.from(
+        { length: 6 },
+        () =>
+          globalThis.crypto?.randomUUID?.() ??
+          Math.random().toString(36).slice(2),
+      ),
+    [],
+  )
 
   const {
     data: scholarships,
@@ -55,11 +68,15 @@ export default function ScholarshipPage() {
       })
     }
   }
+  const selectedScholarshipIds = Object.keys(rowSelection)
+    .filter((key) => rowSelection[key])
+    .map((key) => {
+      const rowIndex = Number.parseInt(key, 10)
+      return scholarships![rowIndex].id
+    })
 
   const handleDelete = () => {
-    const selectedIds = Object.keys(rowSelection)
-    //TODO: delete scholarship logic
-    console.log('Delete scholarships:', selectedIds)
+    setDeleteOpen(true)
   }
 
   return (
@@ -171,6 +188,13 @@ export default function ScholarshipPage() {
           />
         )}
       </div>
+      <DeleteConfirmationDialog
+        open={deleteOpen}
+        onOpenChange={setDeleteOpen}
+        selectedCount={selectedCount}
+        ids={selectedScholarshipIds}
+        clearSelection={clearSelection}
+      />
     </div>
   )
 }

@@ -67,6 +67,11 @@ export namespace ScholarshipModel {
   )
   export type UpdateScholarship = typeof updateScholarship.static
 
+  export const deleteScholarships = t.Object({
+    ids: t.Array(t.Integer({ minimum: 1 })),
+  })
+  export type DeleteScholarships = typeof deleteScholarships.static
+
   export const getAvailableScholarships = t.Array(
     t.Pick(_select, ['id', 'name']),
   )

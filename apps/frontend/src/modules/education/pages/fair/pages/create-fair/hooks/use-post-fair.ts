@@ -20,6 +20,7 @@ const usePostFair = () => {
       active?: boolean
       createdAt?: Date
       updatedAt?: Date
+      organizations: { organizationId: string }[]
     }) => {
       const res = await rpc.education.fairs.post({
         ...params,
@@ -28,9 +29,9 @@ const usePostFair = () => {
       if (res.error) throw res.error
       return res.data
     },
-    onError: () => {
+    onError: (error: Error) => {
       toast.error(
-        'Ocurrió un error desconocido al registrar la feria vocacional',
+        error.message || 'Ocurrió un error al registrar la feria vocacional',
       )
     },
     onSuccess: () => {
