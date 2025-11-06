@@ -1,8 +1,8 @@
 import db from '@api/db'
 import { PostgresError } from '@api/db/errors'
-import { scholarship } from '@api/db/schemas/education'
+import { scholarship, scholarshipApplication } from '@api/db/schemas/education'
 import { normalizeText } from '@api/utils/normalize-text'
-import { and, eq, ilike, inArray, sql } from 'drizzle-orm'
+import { eq, ilike, inArray, sql } from 'drizzle-orm'
 import type { ScholarshipModel } from './model'
 
 type GetParams = {
@@ -161,6 +161,34 @@ export const deleteScholarships = async (ids: number[]) => {
       .set({ active: false })
       .where(inArray(scholarship.id, ids))
     return { success: true }
+  } catch (e) {
+    if (e instanceof Error) throw new PostgresError(e.message)
+    throw e
+  }
+}
+
+export const getAvailableScholarships = async () => {
+  try {
+    const results = await db
+      .select({
+        id: scholarship.id,
+        name: scholarship.name,
+        vacancies: scholarship.vacancies,
+        acceptedCount: sql<number>`count(case when ${scholarshipApplication.status} = 'accepted' then 1 end)::int`,
+      })
+      .from(scholarship)
+      .leftJoin(
+        scholarshipApplication,
+        eq(scholarship.id, scholarshipApplication.scholarshipId),
+      )
+      .where(
+        sql`${scholarship.active} = true AND ${scholarship.startDate} <= current_date AND ${scholarship.endDate} >= current_date`,
+      )
+      .groupBy(scholarship.id, scholarship.name, scholarship.vacancies)
+
+    return results
+      .filter((r) => (r.vacancies ?? 0) - Number(r.acceptedCount) > 0)
+      .map((r) => ({ id: r.id, name: r.name }))
   } catch (e) {
     if (e instanceof Error) throw new PostgresError(e.message)
     throw e

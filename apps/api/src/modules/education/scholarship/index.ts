@@ -7,6 +7,7 @@ import {
   createScholarship,
   deleteScholarships,
   findDuplicateScholarship,
+  getAvailableScholarships,
   getScholarships,
   getSingleScholarship,
   PatchScholarship,
@@ -19,6 +20,13 @@ const scholarship = new Elysia({
   .use(betterAuth)
   .use(application)
   .use(scholarshipRecipients)
+  .get('/available', async () => getAvailableScholarships(), {
+    auth: true,
+    response: {
+      200: ScholarshipModel.getAvailableScholarships,
+      401: t.Literal('Unauthorized'),
+    },
+  })
   .get('', ({ query }) => getScholarships(query), {
     auth: true,
     query: t.Object({
