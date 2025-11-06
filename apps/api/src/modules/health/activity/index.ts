@@ -13,6 +13,7 @@ import {
   createAttention,
   createCompleteActivity,
   deleteActivities,
+  exportActivitiesToCsv,
   findDuplicateAttendant,
   getActivities,
   getActivityById,
@@ -281,6 +282,24 @@ const activityModule = new Elysia({ name: 'activity', prefix: '/activities' })
       },
     },
   )
+  .get('/export', ({ query, set }) => exportActivitiesToCsv({ query, set }), {
+    auth: true,
+    query: t.Object({
+      activityIds: t.Optional(t.String()),
+      filterOnly: t.Optional(t.String()),
+      q: t.Optional(t.String()),
+      regionIds: t.Optional(t.String()),
+      startDate: t.Optional(t.String()),
+      endDate: t.Optional(t.String()),
+    }),
+    // La respuesta no necesita un esquema complejo;
+    // Elysia maneja el Content-Type: text/csv automáticamente con `set.headers`
+    response: {
+      200: t.String(), // Retorna la cadena CSV
+      400: t.String(), // Mensajes de error como "No se encontraron actividades"
+      401: t.Literal('Unauthorized'),
+    },
+  })
   .get('/existent-users', ({ query }) => getExistentUsers(query), {
     auth: true,
     query: ActivityModel.listExistentUsersQuery,

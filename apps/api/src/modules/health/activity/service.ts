@@ -8,6 +8,7 @@ import {
   activityUser,
   alliedParticipation,
   attention,
+  patientInfo,
   speciality,
 } from '@api/db/schemas/health'
 import {
@@ -18,10 +19,387 @@ import {
   eq,
   gte,
   ilike,
+  inArray,
   lte,
   or,
+  type SQLWrapper,
+  sql,
+  sum,
 } from 'drizzle-orm'
 import type { ActivityModel } from './model'
+
+type ParticipationDetail = {
+  alliedName: string
+  specialityName: string
+}
+
+export async function getDetailedActivitiesByIds(ids: number[]) {
+  if (ids.length === 0) return []
+
+  // 1. Obtener los datos principales de las actividades
+  const activities = await db
+    .select({
+      id: activity.id,
+      name: activity.name,
+      date: activity.date,
+      duration: activity.duration,
+      address: activity.address,
+      statusName: activityStatus.name,
+      typeName: activityType.name,
+      spaceName: organization.name,
+      creatorName: user.name,
+      regionName: region.name, // DISTRITO de la actividad
+    })
+    .from(activity)
+    .innerJoin(activityStatus, eq(activity.statusId, activityStatus.id))
+    .innerJoin(activityType, eq(activity.typeId, activityType.id))
+    .innerJoin(organization, eq(activity.spaceId, organization.id))
+    .innerJoin(user, eq(activity.userId, user.id)) // Creador
+    .innerJoin(region, eq(region.id, activity.regionId))
+    .where(and(inArray(activity.id, ids), eq(activity.state, true)))
+
+  const activityIds = activities.map((a) => a.id)
+
+  const allParticipations = await db
+    .select({
+      activityId: alliedParticipation.activityId,
+      alliedName: organization.name, // Nombre del Aliado
+      specialityName: speciality.name, // Nombre de la Especialidad
+    })
+    .from(alliedParticipation)
+    .innerJoin(organization, eq(alliedParticipation.alliedId, organization.id))
+    .innerJoin(speciality, eq(alliedParticipation.specialityId, speciality.id))
+    .where(inArray(alliedParticipation.activityId, activityIds))
+
+  const activityMap = new Map(
+    activities.map((a) => [
+      a.id,
+      {
+        ...a,
+        participations: [] as ParticipationDetail[],
+      },
+    ]),
+  )
+
+  allParticipations.forEach((p) => {
+    const detail = activityMap.get(p.activityId)
+    if (detail) {
+      detail.participations.push({
+        alliedName: p.alliedName,
+        specialityName: p.specialityName,
+      })
+    }
+  })
+
+  return Array.from(activityMap.values())
+}
+
+export async function getParticipantDistricts(
+  activityIds: number[],
+): Promise<string[]> {
+  if (activityIds.length === 0) return []
+
+  const uniqueDistricts = await db
+    .selectDistinct({
+      name: region.name,
+    })
+    .from(activityUser)
+    .innerJoin(user, eq(activityUser.userId, user.id))
+    .innerJoin(region, eq(user.regionId, region.id))
+    .where(inArray(activityUser.activityId, activityIds))
+
+  return uniqueDistricts.map((d) => d.name.toUpperCase().trim())
+}
+
+export async function getActivityDemographics(activityIds: number[]) {
+  if (activityIds.length === 0) return new Map()
+
+  const currentYear = new Date().getFullYear()
+  const resultsMap = new Map()
+
+  const countsByDistrict = await db
+    .select({
+      activityId: activityUser.activityId,
+      districtName: region.name,
+      countByDistrict: count(user.id).mapWith(Number),
+    })
+    .from(activityUser)
+    .innerJoin(user, eq(activityUser.userId, user.id))
+    .innerJoin(region, eq(user.regionId, region.id))
+    .where(inArray(activityUser.activityId, activityIds))
+    .groupBy(activityUser.activityId, region.name)
+
+  countsByDistrict.forEach((row: any) => {
+    const activityId = row.activityId
+    const districtKey = row.districtName.toUpperCase().trim()
+
+    if (!resultsMap.has(activityId)) {
+      resultsMap.set(activityId, {
+        districtCounts: {},
+      })
+    }
+
+    const currentCounts = resultsMap.get(activityId).districtCounts
+
+    currentCounts[districtKey] =
+      (currentCounts[districtKey] || 0) + row.countByDistrict
+  })
+
+  const totalCountsResult = await db
+    .select({
+      activityId: activityUser.activityId,
+      totalAsistentes: count(activityUser.userId).mapWith(Number),
+      countF: sum(sql`CASE WHEN ${user.sex} = 'F' THEN 1 ELSE 0 END`).mapWith(
+        Number,
+      ),
+      countM: sum(sql`CASE WHEN ${user.sex} = 'M' THEN 1 ELSE 0 END`).mapWith(
+        Number,
+      ),
+      countMenores18: sum(
+        sql`CASE WHEN (${currentYear} - EXTRACT(YEAR FROM ${user.birthDate})) < 18 THEN 1 ELSE 0 END`,
+      ).mapWith(Number),
+      count18a64: sum(
+        sql`CASE WHEN (${currentYear} - EXTRACT(YEAR FROM ${user.birthDate})) >= 18 AND (${currentYear} - EXTRACT(YEAR FROM ${user.birthDate})) <= 64 THEN 1 ELSE 0 END`,
+      ).mapWith(Number),
+      count65Mas: sum(
+        sql`CASE WHEN (${currentYear} - EXTRACT(YEAR FROM ${user.birthDate})) >= 65 THEN 1 ELSE 0 END`,
+      ).mapWith(Number),
+      countPublico: sum(
+        sql`CASE WHEN ${patientInfo.insuranceType} = 'public' THEN 1 ELSE 0 END`,
+      ).mapWith(Number),
+      countPrivado: sum(
+        sql`CASE WHEN ${patientInfo.insuranceType} = 'private' THEN 1 ELSE 0 END`,
+      ).mapWith(Number),
+      countOtrosSeguros: sum(
+        sql`CASE WHEN ${patientInfo.insuranceType} NOT IN ('public', 'private') OR ${patientInfo.insuranceType} IS NULL THEN 1 ELSE 0 END`,
+      ).mapWith(Number),
+    })
+    .from(activityUser)
+    .innerJoin(user, eq(activityUser.userId, user.id))
+    .innerJoin(patientInfo, eq(patientInfo.userId, activityUser.userId))
+    .where(inArray(activityUser.activityId, activityIds))
+    .groupBy(activityUser.activityId)
+
+  totalCountsResult.forEach((row: any) => {
+    const activityId = row.activityId
+    const data = resultsMap.get(activityId)
+
+    if (data) {
+      resultsMap.set(activityId, {
+        ...data,
+        totalAsistentes: row.totalAsistentes,
+        countF: row.countF,
+        countM: row.countM,
+        countMenores18: row.countMenores18,
+        count18a64: row.count18a64,
+        count65Mas: row.count65Mas,
+        countPublico: row.countPublico,
+        countPrivado: row.countPrivado,
+        countOtrosSeguros: row.countOtrosSeguros,
+      })
+    }
+  })
+
+  return resultsMap
+}
+
+const toDetailedCsv = (
+  mergedData: any[],
+  dynamicDistrictHeaders: string[],
+): string => {
+  if (mergedData.length === 0)
+    return 'Mensaje\nNo hay actividades para exportar\n'
+
+  // Definición de encabezados
+  const headers = [
+    'N°',
+    'ACTIVIDAD',
+    'DISTRITO',
+    'ORGANIZACIÓN',
+    'LUGAR',
+    'FECHA',
+    'DURACIÓN DE IES',
+    'ALIADOS',
+    'ESPECIALIDADES',
+    'CANTIDAD DE PERSONAS REGISTRADAS',
+    'F',
+    'M',
+    'MENORES DE 18',
+    '18 A 64',
+    '65 A MÁS',
+    ...dynamicDistrictHeaders, // Distritos Dinámicos
+    'PÚBLICO',
+    'PRIVADO',
+    'NINGUNO',
+  ]
+  let csvContent = `${headers.join(',')}\n`
+
+  mergedData.forEach((activity) => {
+    const { demographics } = activity
+    const participations =
+      activity.participations && activity.participations.length > 0
+        ? activity.participations
+        : [{ alliedName: 'N/A', specialityName: 'N/A' }]
+
+    participations.forEach((p: any) => {
+      const districtCountsRow = dynamicDistrictHeaders.map(
+        (header) => demographics.districtCounts[header] || 0,
+      )
+
+      const baseRow = [
+        activity.id,
+        `"${activity.name}"`,
+        activity.regionName, // Distrito de la actividad
+        `"${activity.spaceName}"`,
+        `"${activity.address}"`,
+        new Date(activity.date).toISOString().split('T')[0],
+        activity.duration,
+        `"${p.alliedName}"`,
+        `"${p.specialityName}"`,
+        demographics.totalAsistentes,
+        demographics.countF,
+        demographics.countM,
+        demographics.countMenores18,
+        demographics.count18a64,
+        demographics.count65Mas,
+        ...districtCountsRow, // Columnas de distritos
+        demographics.countPublico,
+        demographics.countPrivado,
+        demographics.countOtrosSeguros,
+      ]
+      csvContent += `${baseRow.join(',')}\n`
+    })
+  })
+
+  return csvContent
+}
+
+interface ExportQuery {
+  activityIds?: string
+  filterOnly?: string
+  q?: string
+  regionIds?: string
+  startDate?: string
+  endDate?: string
+}
+
+export const exportActivitiesToCsv = async ({
+  query,
+  set,
+}: {
+  query: ExportQuery
+  set: any
+}) => {
+  try {
+    const {
+      activityIds,
+      filterOnly,
+      q = '',
+      regionIds,
+      startDate,
+      endDate,
+    } = query
+
+    const baseConditions: any[] = [eq(activity.state, true)]
+    let idsToFetch: number[] = []
+    const searchQuery = q.replaceAll(/\s+/g, ' ').trim()
+
+    if (activityIds) {
+      idsToFetch = activityIds
+        .split(',')
+        .map((id: string) => Number.parseInt(id.trim(), 10))
+        .filter((id: unknown) => !Number.isNaN(id))
+    } else if (filterOnly === 'true') {
+      if (searchQuery) {
+        baseConditions.push(
+          or(
+            ilike(activity.name, `%${searchQuery}%`),
+            ilike(activityStatus.name, `%${searchQuery}%`),
+            ilike(activityType.name, `%${searchQuery}%`),
+            ilike(region.name, `%${searchQuery}%`),
+            ilike(user.name, `%${searchQuery}%`),
+          ),
+        )
+      }
+
+      const regionIdsArray = regionIds
+        ? regionIds.split(',').map((id) => Number.parseInt(id, 10))
+        : []
+
+      if (regionIdsArray.length > 0) {
+        baseConditions.push(
+          or(
+            ...regionIdsArray.map((id: number | SQLWrapper) =>
+              eq(activity.regionId, id),
+            ),
+          ),
+        )
+      }
+
+      if (startDate) {
+        baseConditions.push(gte(activity.date, startDate))
+      }
+      if (endDate) {
+        baseConditions.push(lte(activity.date, endDate))
+      }
+
+      const filteredActivities = await db
+        .select({ id: activity.id })
+        .from(activity)
+        .innerJoin(activityStatus, eq(activity.statusId, activityStatus.id))
+        .innerJoin(activityType, eq(activity.typeId, activityType.id))
+        .innerJoin(region, eq(activity.regionId, region.id))
+        .innerJoin(user, eq(activity.userId, user.id))
+        .where(and(...baseConditions))
+        .orderBy(asc(activity.date))
+
+      idsToFetch = filteredActivities.map((a) => a.id)
+    } else {
+      set.status = 400
+      return 'No se especificó ninguna actividad o filtro para exportar.'
+    }
+
+    if (idsToFetch.length === 0) {
+      set.status = 400
+      return 'No se encontraron actividades para exportar con los criterios dados.'
+    }
+
+    const [detailedActivities, demographicsMap, dynamicDistrictHeaders] =
+      await Promise.all([
+        getDetailedActivitiesByIds(idsToFetch), // Obtiene la actividad, aliados, especialidades
+        getActivityDemographics(idsToFetch), // Obtiene conteos de Sexo, Edad, Seguros y Distritos
+        getParticipantDistricts(idsToFetch), // Obtiene los nombres de las columnas de distrito
+      ])
+
+    const mergedData = detailedActivities.map((activity: { id: any }) => ({
+      ...activity,
+      demographics: demographicsMap.get(activity.id) || {
+        totalAsistentes: 0,
+        countF: 0,
+        countM: 0,
+        countMenores18: 0,
+        count18a64: 0,
+        count65Mas: 0,
+        countPublico: 0,
+        countPrivado: 0,
+        countOtrosSeguros: 0,
+        districtCounts: {},
+      },
+    }))
+
+    const csvContent = toDetailedCsv(mergedData, dynamicDistrictHeaders)
+
+    set.headers = {
+      'Content-Type': 'text/csv',
+      'Content-Disposition': `attachment; filename="detalle_actividades_${new Date().toISOString().slice(0, 10)}.csv"`,
+    }
+
+    return csvContent
+  } catch (e) {
+    if (e instanceof Error) throw new PostgresError(e.message)
+    throw e
+  }
+}
 
 export const createActivity = async (args: ActivityModel.CreateActivity) => {
   try {
