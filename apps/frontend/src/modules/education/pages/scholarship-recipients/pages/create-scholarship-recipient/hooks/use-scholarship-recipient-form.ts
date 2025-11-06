@@ -3,7 +3,7 @@ import { useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
-import useGetAvailableScholarship from './use-get-available-scholarship.ts'
+import useGetAvailableScholarship from './use-get-available-scholarship'
 import type { Beneficiary } from './use-get-beneficiaries'
 import usePostScholarshipApplication from './use-post-scholarship-application'
 

@@ -155,28 +155,26 @@ export const PatchScholarship = async (
 
 export const getAvailableScholarships = async () => {
   try {
-    // Becas activas y dentro de la fecha
-    const candidates = await db.query.scholarship.findMany({
-      where: sql`${scholarship.active} = true AND ${scholarship.startDate} <= current_date AND ${scholarship.endDate} >= current_date`,
-      columns: { id: true, name: true, vacancies: true },
-    })
-
-    // Para cada beca se cuenta las aplicaciones aceptadas y se filtra las que aún tienen cupo
-    const results: Array<{ id: number; name: string }> = []
-    for (const c of candidates) {
-      const [countRow] = await db
-        .select({ total: sql<number>`count(*)` })
-        .from(scholarshipApplication)
-        .where(
-          sql`${scholarshipApplication.scholarshipId} = ${c.id} AND ${scholarshipApplication.status} = 'accepted'`,
-        )
-
-      const accepted = Number(countRow?.total ?? 0)
-      const remaining = (c.vacancies ?? 0) - accepted
-      if (remaining > 0) results.push({ id: c.id, name: c.name })
-    }
+    const results = await db
+      .select({
+        id: scholarship.id,
+        name: scholarship.name,
+        vacancies: scholarship.vacancies,
+        acceptedCount: sql<number>`count(case when ${scholarshipApplication.status} = 'accepted' then 1 end)::int`,
+      })
+      .from(scholarship)
+      .leftJoin(
+        scholarshipApplication,
+        eq(scholarship.id, scholarshipApplication.scholarshipId),
+      )
+      .where(
+        sql`${scholarship.active} = true AND ${scholarship.startDate} <= current_date AND ${scholarship.endDate} >= current_date`,
+      )
+      .groupBy(scholarship.id, scholarship.name, scholarship.vacancies)
 
     return results
+      .filter((r) => (r.vacancies ?? 0) - Number(r.acceptedCount) > 0)
+      .map((r) => ({ id: r.id, name: r.name }))
   } catch (e) {
     if (e instanceof Error) throw new PostgresError(e.message)
     throw e

@@ -37,7 +37,7 @@ const scholarshipRecipients = new Elysia({
       if (result.error === 'El beneficiario ya ha sido aceptado para esta beca')
         throw status(409, result.error)
       if (result.error) throw status(400, result.error)
-      if (result.id == null) throw status(500, 'Fallo al crear un becado')
+      if (result.id == null) throw status(500, 'No se pudo crear el becado')
       return result.id
     },
     {
@@ -49,6 +49,9 @@ const scholarshipRecipients = new Elysia({
         }),
         400: t.String(),
         401: t.Literal('Unauthorized'),
+        404: t.String(),
+        409: t.String(),
+        500: t.String(),
       },
     },
   )

@@ -73,8 +73,8 @@ export function ScholarshipCombobox({
             onValueChange={setSearch}
             className="h-9 px-2"
           />
-          <CommandList className="p-0! m-0!">
-            <CommandEmpty className="p-0!">
+          <CommandList className="!p-0 !m-0">
+            <CommandEmpty className="!p-0">
               {scholarships.length === 0 ? (
                 <div className="flex flex-col items-center gap-0.5 py-1.5 text-sm text-muted-foreground">
                   <span className="text-center leading-tight">

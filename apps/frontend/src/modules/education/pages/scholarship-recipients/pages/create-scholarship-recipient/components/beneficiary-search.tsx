@@ -3,7 +3,13 @@ import { Input } from '@workspace/ui/components/input'
 import { Skeleton } from '@workspace/ui/components/skeleton'
 import debounce from 'debounce'
 import { Search } from 'lucide-react'
-import { type ChangeEvent, useMemo, useState } from 'react'
+import {
+  type ChangeEvent,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react'
 import { useBeneficiarySearch } from '../hooks/use-beneficiary-search'
 import type { Beneficiary } from '../hooks/use-get-beneficiaries'
 
@@ -32,13 +38,22 @@ export default function BeneficiarySearch({
     onClear,
   })
 
-  const handleChange = useMemo(
-    () =>
-      debounce((e: ChangeEvent<HTMLInputElement>) => {
-        setSearchQuery(e.target.value)
-      }, 300),
-    [setSearchQuery],
+  const debouncedSearchRef = useRef(
+    debounce((value: string) => {
+      setSearchQuery(value)
+    }, 300),
   )
+
+  useEffect(() => {
+    const debouncedSearch = debouncedSearchRef.current
+    return () => {
+      debouncedSearch.clear?.()
+    }
+  }, [])
+
+  const handleChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+    debouncedSearchRef.current(e.target.value)
+  }, [])
 
   const handleSelect = (beneficiary: Beneficiary) => {
     handleSelectBeneficiary(beneficiary)
