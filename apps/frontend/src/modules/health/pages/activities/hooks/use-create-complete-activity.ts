@@ -31,6 +31,9 @@ export const useCreateCompleteActivity = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [QueryKeys.HEALTH.ACTIVITIES] })
+      queryClient.invalidateQueries({
+        queryKey: [QueryKeys.HEALTH.ACTIVITY_REGIONS],
+      })
       toast.success('Actividad creada exitosamente')
     },
     onError: (error: Error) => {

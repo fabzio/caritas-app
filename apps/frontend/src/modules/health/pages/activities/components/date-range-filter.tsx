@@ -8,14 +8,18 @@ import {
 } from '@workspace/ui/components/popover'
 import { Separator } from '@workspace/ui/components/separator'
 import { format, parse } from 'date-fns'
-import { CalendarIcon, X } from 'lucide-react'
-import { useState } from 'react'
+import { CalendarIcon, GripVertical } from 'lucide-react'
+import React, { useCallback, useRef, useState } from 'react'
 
 export default function DateRangeFilter() {
   const { filters, setFilters } = useFilters(
     '/_authenticated/health/activities/',
   )
   const [open, setOpen] = useState(false)
+  const [position, setPosition] = useState({ x: 0, y: 0 })
+  const [isDragging, setIsDragging] = useState(false)
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 })
+  const popoverRef = useRef<HTMLDivElement>(null)
 
   const startDate = filters.startDate
     ? parse(filters.startDate, 'yyyy-MM-dd', new Date())
@@ -44,6 +48,44 @@ export default function DateRangeFilter() {
     setFilters({ startDate: undefined, endDate: undefined, page: 0 })
   }
 
+  const handleMouseMove = useCallback(
+    (e: MouseEvent) => {
+      if (isDragging) {
+        setPosition({
+          x: e.clientX - dragStart.x,
+          y: e.clientY - dragStart.y,
+        })
+      }
+    },
+    [isDragging, dragStart],
+  )
+
+  const handleMouseUp = useCallback(() => {
+    setIsDragging(false)
+  }, [])
+
+  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    if ((e.target as HTMLElement).closest('.calendar-drag-handle')) {
+      setIsDragging(true)
+      setDragStart({
+        x: e.clientX - position.x,
+        y: e.clientY - position.y,
+      })
+      e.preventDefault()
+    }
+  }
+
+  React.useEffect(() => {
+    if (isDragging) {
+      document.addEventListener('mousemove', handleMouseMove)
+      document.addEventListener('mouseup', handleMouseUp)
+      return () => {
+        document.removeEventListener('mousemove', handleMouseMove)
+        document.removeEventListener('mouseup', handleMouseUp)
+      }
+    }
+  }, [isDragging, handleMouseMove, handleMouseUp])
+
   const hasFilters = startDate || endDate
 
   return (
@@ -62,10 +104,24 @@ export default function DateRangeFilter() {
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-auto p-0" align="start">
+      <PopoverContent
+        className="w-auto p-0"
+        align="start"
+        ref={popoverRef}
+        style={{
+          transform: `translate(${position.x}px, ${position.y}px)`,
+          cursor: isDragging ? 'grabbing' : 'default',
+        }}
+        onMouseDown={handleMouseDown}
+      >
         <div className="p-3">
           <div className="flex items-center justify-between mb-2">
-            <h4 className="text-sm font-semibold">Filtrar por fecha</h4>
+            <div className="flex items-center gap-2">
+              <div className="calendar-drag-handle cursor-grab active:cursor-grabbing">
+                <GripVertical className="h-4 w-4 text-muted-foreground" />
+              </div>
+              <h4 className="text-sm font-semibold">Filtrar por fecha</h4>
+            </div>
             {hasFilters && (
               <Button
                 variant="ghost"
@@ -73,7 +129,7 @@ export default function DateRangeFilter() {
                 className="h-auto p-1 text-xs"
                 onClick={handleClearAll}
               >
-                <X className="h-4 w-4" />
+                Limpiar
               </Button>
             )}
           </div>
