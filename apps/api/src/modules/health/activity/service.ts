@@ -10,17 +10,7 @@ import {
   attention,
   speciality,
 } from '@api/db/schemas/health'
-import {
-  and,
-  asc,
-  count,
-  desc,
-  eq,
-  gte,
-  ilike,
-  lte,
-  or,
-} from 'drizzle-orm'
+import { and, asc, count, desc, eq, gte, ilike, lte, or } from 'drizzle-orm'
 import type { ActivityModel } from './model'
 
 export const createActivity = async (args: ActivityModel.CreateActivity) => {
