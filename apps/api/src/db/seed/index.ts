@@ -287,7 +287,7 @@ const initialize = async (rl: Interface) => {
   const firstName = faker.person.firstName()
   const lastName = faker.person.lastName()
   const password = createPassword()
-  const documentNumber = faker.helpers.replaceSymbols('#########')
+  const documentNumber = faker.helpers.replaceSymbols('########')
   const phone = `${faker.helpers.replaceSymbols('9########')}`
   const birthDate = faker.date.birthdate({ min: 23, max: 55, mode: 'age' })
   const regionId = await chooseRegionId()

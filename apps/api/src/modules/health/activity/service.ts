@@ -10,18 +10,86 @@ import {
   attention,
   speciality,
 } from '@api/db/schemas/health'
+import type { SQL } from 'drizzle-orm'
 import {
   and,
   asc,
   count,
   desc,
   eq,
+  exists,
   gte,
   ilike,
   lte,
+  ne,
+  not,
   or,
+  sql,
 } from 'drizzle-orm'
 import type { ActivityModel } from './model'
+
+type ActivityUserFilter = ActivityModel.ListActivitiesQuery['user']
+
+const buildRegisteredCondition = (userId: string) =>
+  exists(
+    db
+      .select({ value: sql`1` })
+      .from(activityUser)
+      .where(
+        and(
+          eq(activityUser.activityId, activity.id),
+          eq(activityUser.userId, userId),
+        ),
+      ),
+  )
+
+const buildAttentionCondition = (userId: string) =>
+  exists(
+    db
+      .select({ value: sql`1` })
+      .from(attention)
+      .innerJoin(
+        alliedParticipation,
+        eq(attention.alliedParticipationId, alliedParticipation.id),
+      )
+      .where(
+        and(
+          eq(attention.userId, userId),
+          eq(alliedParticipation.activityId, activity.id),
+        ),
+      ),
+  )
+
+const buildUserConditions = (
+  filter: ActivityUserFilter,
+  userId: string | undefined,
+  today: string,
+) => {
+  if (!filter) return []
+  if (!userId) throw new PostgresError('Usuario no encontrado')
+  if (filter === 'active') return [ne(activityStatus.name, 'Cancelado')]
+  const baseConditions = [buildRegisteredCondition(userId)]
+  if (filter === 'participated')
+    return [
+      ...baseConditions,
+      buildAttentionCondition(userId),
+      lte(activity.date, today),
+      ne(activityStatus.name, 'Cancelado'),
+    ]
+  if (filter === 'notParticipated')
+    return [
+      ...baseConditions,
+      not(buildAttentionCondition(userId)),
+      lte(activity.date, today),
+      ne(activityStatus.name, 'Cancelado'),
+    ]
+  if (filter === 'canceled')
+    return [...baseConditions, eq(activityStatus.name, 'Cancelado')]
+  return baseConditions
+}
+
+const isCondition = <T extends SQL>(value: T | undefined): value is T =>
+  value !== undefined
 
 export const createActivity = async (args: ActivityModel.CreateActivity) => {
   try {
@@ -77,6 +145,7 @@ export async function getSingleActivity(
 
 export async function getActivities(
   params: ActivityModel.ListActivitiesQuery,
+  userId?: string,
 ): Promise<ActivityModel.GetActivities> {
   try {
     const {
@@ -87,6 +156,7 @@ export async function getActivities(
       regionIds,
       startDate,
       endDate,
+      user: userFilter,
     } = params
     const searchQuery = q.replaceAll(/\s+/g, ' ').trim()
 
@@ -121,27 +191,26 @@ export async function getActivities(
       ? regionIds.split(',').map((id) => Number.parseInt(id, 10))
       : []
 
-    const regionConditions =
+    const regionCondition =
       regionIdsArray.length > 0
         ? or(...regionIdsArray.map((id) => eq(activity.regionId, id)))
         : undefined
 
-    const dateConditions = []
-    if (startDate) {
-      dateConditions.push(gte(activity.date, startDate))
-    }
-    if (endDate) {
-      dateConditions.push(lte(activity.date, endDate))
-    }
+    const dateConditions = [
+      startDate ? gte(activity.date, startDate) : undefined,
+      endDate ? lte(activity.date, endDate) : undefined,
+    ].filter(isCondition)
 
-    const conditions = [eq(activity.state, true)]
-    if (searchConditions) conditions.push(searchConditions)
-    if (regionConditions) conditions.push(regionConditions)
-    if (dateConditions.length > 0) {
-      conditions.push(...dateConditions)
-    }
+    const today = new Date().toISOString().split('T')[0]
+    const userConditions = buildUserConditions(userFilter, userId, today)
 
-    const where = and(...conditions)
+    const where = and(
+      eq(activity.state, true),
+      ...userConditions,
+      ...dateConditions,
+      ...(searchConditions ? [searchConditions] : []),
+      ...(regionCondition ? [regionCondition] : []),
+    )
 
     const [{ total }] = await db
       .select({ total: count(activity.id) })
@@ -154,19 +223,29 @@ export async function getActivities(
 
     const totalPages = Math.ceil(total / limit)
 
-    const rows = await db
-      .select({
-        id: activity.id,
-        name: activity.name,
-        date: activity.date,
-        duration: activity.duration,
-        state: activity.state,
+    const baseSelect = {
+      id: activity.id,
+      name: activity.name,
+      date: activity.date,
+      duration: activity.duration,
+      state: activity.state,
+      statusName: activityStatus.name,
+      typeName: activityType.name,
+      regionName: region.name,
+      creatorName: user.name,
+    }
 
-        statusName: activityStatus.name,
-        typeName: activityType.name,
-        regionName: region.name,
-        creatorName: user.name,
-      })
+    const selectFields = {
+      ...baseSelect,
+      ...(userFilter && userId
+        ? { registered: buildRegisteredCondition(userId) }
+        : {}),
+    } satisfies typeof baseSelect & {
+      registered?: ReturnType<typeof buildRegisteredCondition>
+    }
+
+    const rows = await db
+      .select(selectFields)
       .from(activity)
       .innerJoin(activityStatus, eq(activity.statusId, activityStatus.id))
       .innerJoin(activityType, eq(activity.typeId, activityType.id))
@@ -177,11 +256,26 @@ export async function getActivities(
       .limit(limit)
       .orderBy(orderExpr)
 
-    return {
-      data: rows.map((row) => ({
+    const data = rows.map((row) => {
+      const mappedRow = {
         ...row,
         date: new Date(row.date),
-      })),
+      }
+
+      if (userFilter) {
+        const { creatorName: _unusedCreator, ...rest } = mappedRow
+        return {
+          ...rest,
+          registered: Boolean(mappedRow.registered),
+        }
+      }
+
+      const { registered: _unusedRegistered, ...rest } = mappedRow
+      return rest
+    })
+
+    return {
+      data,
       total,
       page,
       limit,

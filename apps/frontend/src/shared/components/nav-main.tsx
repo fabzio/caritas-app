@@ -17,14 +17,10 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
   SidebarSeparator,
+  useSidebar,
 } from '@workspace/ui/components/sidebar'
-import {
-  Building2,
-  ChevronRight,
-  Church,
-  HeartPlus,
-  School,
-} from 'lucide-react'
+import { Building2, ChevronRight } from 'lucide-react'
+import type { NonUndefined } from 'react-hook-form'
 import { toast } from 'sonner'
 import { QueryKeys } from '../constants/query-keys'
 import type { NavItem } from '../types/nav-main'
@@ -48,6 +44,7 @@ const isOrganizationType = (value: string): value is OrganizationType =>
   organizationTypes.includes(value as OrganizationType)
 
 function NavMain({ items }: Readonly<Props>) {
+  const { setOpenMobile, setOpen } = useSidebar()
   const navigate = useNavigate()
   const { data: memberRoleData } = authClient.useActiveMemberRole()
   const { data: sessionData } = useSession()
@@ -123,7 +120,13 @@ function NavMain({ items }: Readonly<Props>) {
                       {item.items?.map((subItem) => (
                         <SidebarMenuSubItem key={subItem.title}>
                           <SidebarMenuSubButton asChild>
-                            <Link to={subItem.url}>
+                            <Link
+                              to={subItem.url}
+                              onClick={() => {
+                                setOpen(false)
+                                setOpenMobile(false)
+                              }}
+                            >
                               <span>{subItem.title}</span>
                             </Link>
                           </SidebarMenuSubButton>
@@ -139,7 +142,11 @@ function NavMain({ items }: Readonly<Props>) {
             <SidebarMenuItem key={item.title}>
               <SidebarMenuButton asChild>
                 <Link
-                  to={item.url}
+                  to={item.url as NonUndefined<typeof item.url>}
+                  onClick={() => {
+                    setOpen(false)
+                    setOpenMobile(false)
+                  }}
                   activeProps={{
                     className: 'text-accent-foreground bg-primary/10',
                   }}
