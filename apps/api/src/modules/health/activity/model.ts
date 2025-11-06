@@ -192,4 +192,17 @@ export namespace ActivityModel {
     ),
   })
   export type ExistentUser = typeof existentUser.static
+
+  export type ParticipationDetail = {
+    alliedName: string
+    specialityName: string
+  }
+  export interface ExportQuery {
+    activityIds?: string
+    filterOnly?: string
+    q?: string
+    regionIds?: string
+    startDate?: string
+    endDate?: string
+  }
 }
