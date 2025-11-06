@@ -36,6 +36,13 @@ export const formFairSchema = z
     startTime: z.string().nonempty('Ingrese la hora de inicio de la feria'),
     endTime: z.string().nonempty('Ingrese la hora de fin de la feria'),
     regionId: z.number().min(1, { message: 'Debes seleccionar una región' }),
+    organizations: z
+      .array(
+        z.object({
+          organizationId: z.string().min(1, 'Seleccione una organización'),
+        }),
+      )
+      .min(1, 'Debe haber al menos una organización'),
   })
   .refine((data) => data.startTime < data.endTime, {
     message: 'La hora de inicio debe ser anterior a la hora de fin',

@@ -134,6 +134,35 @@ export const fair = educationSchema.table('fair', {
   date: date('date').notNull(),
 })
 
+export const fairOrganization = educationSchema.table('fair_organization', {
+  id: integer().primaryKey().generatedByDefaultAsIdentity(),
+  fairId: integer('fair_id')
+    .notNull()
+    .references(() => fair.id, { onDelete: 'cascade' }),
+  organizationId: varchar('organization_id', { length: 32 })
+    .notNull()
+    .references(() => organization.id, { onDelete: 'cascade' }),
+})
+export const fairRelations = relations(fair, ({ many }) => ({
+  participants: many(fairOrganization),
+}))
+export const organizationRelations = relations(organization, ({ many }) => ({
+  fairs: many(fairOrganization),
+}))
+export const fairOrganizationRelations = relations(
+  fairOrganization,
+  ({ one }) => ({
+    fair: one(fair, {
+      fields: [fairOrganization.fairId],
+      references: [fair.id],
+    }),
+    organization: one(organization, {
+      fields: [fairOrganization.organizationId],
+      references: [organization.id],
+    }),
+  }),
+)
+
 export const scholarship = educationSchema.table('scholarship', {
   id: integer().primaryKey().generatedByDefaultAsIdentity(),
   name: varchar('name', { length: 100 }).notNull(),

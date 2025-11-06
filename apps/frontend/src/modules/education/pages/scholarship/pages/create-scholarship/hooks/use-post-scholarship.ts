@@ -33,7 +33,7 @@ const usePostScholarship = () => {
     },
     onError: (error: Error) => {
       console.error('Error completo:', error)
-      toast.error(error.message || 'Error al crear la actividad')
+      toast.error(error.message || 'Error al crear la beca')
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
