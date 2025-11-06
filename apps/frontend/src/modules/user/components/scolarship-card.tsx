@@ -9,13 +9,15 @@ import {
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
 import { CalendarDays, MapPin } from 'lucide-react'
-import type { Scholarship } from '../hooks/use-get-scholarship'
+import type { Scholarship } from '../pages/education/scholarship/pages/view-scholarship/hooks/use-get-scholarship'
 
 type ScholarshipCardProps = {
   scholarship: Scholarship
 }
 
-export function ScholarshipCard({ scholarship }: ScholarshipCardProps) {
+export function ScholarshipCard({
+  scholarship,
+}: Readonly<ScholarshipCardProps>) {
   return (
     <Link
       to="/user/education/scholarship/$id/view"

@@ -1,5 +1,5 @@
 import type { NavItem } from '@frontend/shared/types/nav-main'
-import { GraduationCap, User } from 'lucide-react'
+import { Book, Cross, User } from 'lucide-react'
 
 const userNavItems: NavItem[] = [
   {
@@ -9,10 +9,26 @@ const userNavItems: NavItem[] = [
     groupLabel: 'Usuario',
   },
   {
-    title: 'Becas',
-    url: '/user/education/scholarship',
-    icon: GraduationCap,
-    groupLabel: 'Usuario',
+    title: 'Educación',
+    icon: Book,
+    groupLabel: 'Educación',
+    items: [
+      {
+        title: 'Becas',
+        url: '/user/education/scholarship',
+      },
+    ],
+  },
+  {
+    title: 'Salud',
+    icon: Cross,
+    groupLabel: 'Salud',
+    items: [
+      {
+        title: 'Actividades',
+        url: '/user/health/activities',
+      },
+    ],
   },
 ]
 
