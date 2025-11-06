@@ -292,11 +292,9 @@ const activityModule = new Elysia({ name: 'activity', prefix: '/activities' })
       startDate: t.Optional(t.String()),
       endDate: t.Optional(t.String()),
     }),
-    // La respuesta no necesita un esquema complejo;
-    // Elysia maneja el Content-Type: text/csv automáticamente con `set.headers`
     response: {
-      200: t.String(), // Retorna la cadena CSV
-      400: t.String(), // Mensajes de error como "No se encontraron actividades"
+      200: t.String(),
+      400: t.String(),
       401: t.Literal('Unauthorized'),
     },
   })
