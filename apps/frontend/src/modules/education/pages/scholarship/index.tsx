@@ -9,26 +9,15 @@ import {
   DropdownMenuTrigger,
 } from '@workspace/ui/components/dropdown-menu'
 import { Input } from '@workspace/ui/components/input'
-import { Skeleton } from '@workspace/ui/components/skeleton'
 import debounce from 'debounce'
-import { MoreVertical, PlusCircle, Search } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { ChevronDown, PlusCircle } from 'lucide-react'
+import { useState } from 'react'
 import ScholarshipTable from './components/scholarship-table'
 import { useScholarshipTable } from './hooks/use-table'
 export default function ScholarshipPage() {
   const isMobile = useIsMobile()
   const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({})
   const navigate = useNavigate()
-  const skeletonKeys = useMemo(
-    () =>
-      Array.from(
-        { length: 6 },
-        () =>
-          globalThis.crypto?.randomUUID?.() ??
-          Math.random().toString(36).slice(2),
-      ),
-    [],
-  )
 
   const {
     data: scholarships,
@@ -36,8 +25,8 @@ export default function ScholarshipPage() {
     columns,
     paginationState,
     sortingState,
+    filters,
     setFilters,
-    isLoading,
     isError,
   } = useScholarshipTable()
 
@@ -97,13 +86,38 @@ export default function ScholarshipPage() {
           <div className="flex gap-2">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
+                <Button variant="outline" size={isMobile ? 'sm' : 'lg'}>
+                  {filters.active === undefined
+                    ? 'Todas'
+                    : filters.active
+                      ? 'Activas'
+                      : 'Inactivas'}
+                  <ChevronDown />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem
+                  onClick={() => setFilters({ active: undefined })}
+                >
+                  Todas
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setFilters({ active: true })}>
+                  Activas
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setFilters({ active: false })}>
+                  Inactivas
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
                 <Button
                   variant="outline"
                   size={isMobile ? 'sm' : 'lg'}
                   disabled={selectedCount === 0}
                 >
-                  <MoreVertical />
                   Acciones
+                  <ChevronDown />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
@@ -130,7 +144,7 @@ export default function ScholarshipPage() {
                 size={isMobile ? 'sm' : 'lg'}
               >
                 <PlusCircle />
-                Registrar nueva beca
+                Nueva beca
               </Button>
             </Link>
           </div>

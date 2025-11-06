@@ -79,7 +79,7 @@ export default function ScholarshipPage() {
     useState<string>('all')
   const [currentPage, setCurrentPage] = useState(1)
   const [isFilterOpen, setIsFilterOpen] = useState(false)
-  const pageSize = 3
+  const pageSize = 9
   const { data, isLoading, isError } = useGetScholarship(
     nameFilter,
     currentPage,

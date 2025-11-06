@@ -12,7 +12,12 @@ export const useScholarshipTable = () => {
     data: response,
     isLoading,
     isError,
-  } = useGetScholarship(filters.name, filters.pageIndex, filters.pageSize)
+  } = useGetScholarship(
+    filters.name,
+    filters.pageIndex,
+    filters.pageSize,
+    filters.active,
+  )
 
   const sortingState = sortByToState(filters.sortBy)
   const paginationState = {
