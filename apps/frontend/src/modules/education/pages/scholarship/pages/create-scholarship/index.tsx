@@ -117,7 +117,7 @@ export default function CreateScholarship() {
     <div className="flex flex-1 flex-col gap-6 p-4">
       <div className="flex flex-col gap-1">
         <h1 className="text-2xl font-semibold text-foreground">
-          {dependantText.mainTitle[viewType] || 'Crear nueva beca'}
+          {dependantText.mainTitle[viewType] || 'Registrar nueva beca'}
         </h1>
         <span className="text-muted-foreground">
           Complete la información de la beca
@@ -169,6 +169,51 @@ export default function CreateScholarship() {
                           <SelectContent>
                             <SelectItem value="ML">Modular</SelectItem>
                             <SelectItem value="PL">Plan de estudios</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="organizationId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Organización*</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger className="w-full">
+                              <SelectValue placeholder="Seleccione la organización" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {isLoading && (
+                              <SelectItem value="#" disabled>
+                                Cargando...
+                              </SelectItem>
+                            )}
+                            {organizations && organizations?.length > 0 ? (
+                              organizations?.map((org) => (
+                                <SelectItem key={org.id} value={String(org.id)}>
+                                  {org.name}
+                                </SelectItem>
+                              ))
+                            ) : (
+                              <div className="flex flex-col items-center py-1 gap-2">
+                                No hay organizaciones aliadas disponibles.
+                                <Separator />{' '}
+                                <Button onClick={handleNewAlly}>
+                                  <span className="py-1 flex underline items-center gap-2">
+                                    Registrar organización aliada
+                                    <UserPlus size={16} />
+                                  </span>
+                                </Button>
+                              </div>
+                            )}
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -376,7 +421,7 @@ export default function CreateScholarship() {
 }
 const dependantText = {
   mainTitle: {
-    new: 'Crear nueva beca',
+    new: 'Registrar nueva beca',
     edit: 'Editar beca',
   },
   submit: {

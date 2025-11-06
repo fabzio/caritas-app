@@ -8,7 +8,9 @@ import { toast } from 'sonner'
 import ActionsButton from './components/actions-button'
 import DeleteConfirmationDialog from './components/delete-fair-dialog.tsx'
 import FairTable from './components/fair-table'
+import RegionFilter from './components/region-filter'
 import SearchFairInput from './components/search-fair-input'
+import StatusFilter from './components/status-filter'
 import { useFairTable } from './hooks/use-fair-table'
 
 export default function FairPage() {
@@ -62,19 +64,29 @@ export default function FairPage() {
       </header>
 
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-        <div className="w-full">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 w-full">
           <div className="flex-1 w-full">
             <SearchFairInput />
           </div>
+          <div className={`flex ${isMobile ? 'w-full' : 'w-auto'} gap-2`}>
+            <RegionFilter />
+            <StatusFilter />
+          </div>
         </div>
-        <div className="flex items-center gap-2">
-          <ActionsButton
-            onDeleteClick={() => setIsDeleteModalOpen(true)}
-            onEditClick={handleEdit}
-            selectedCount={fairCount}
-          />
-          <Link search={{ type: 'new' }} to="/education/fair/form">
-            <Button size={'default'}>
+        <div className={`flex items-center gap-2 ${isMobile ? 'w-full' : ''}`}>
+          <div className={isMobile ? 'w-1/2' : ''}>
+            <ActionsButton
+              onDeleteClick={() => setIsDeleteModalOpen(true)}
+              onEditClick={handleEdit}
+              selectedCount={fairCount}
+            />
+          </div>
+          <Link
+            search={{ type: 'new' }}
+            to="/education/fair/form"
+            className={isMobile ? 'w-1/2' : ''}
+          >
+            <Button size={'default'} className={isMobile ? 'w-full' : ''}>
               <PlusCircle />
               {'Nueva feria'}
             </Button>

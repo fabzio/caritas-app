@@ -90,6 +90,7 @@ export default function FormView() {
     updateUser({
       userId: loaderData.id,
       data: {
+        id: loaderData.id,
         email: values.email.trim(),
         name: values.name.trim(),
         role: loaderData.role?.trim(),
@@ -458,6 +459,11 @@ export default function FormView() {
               </div>
 
               <div className="w-full flex gap-2 justify-center">
+                <Link to="/admin/users">
+                  <Button variant="outline" className="mt-4">
+                    Cancelar
+                  </Button>
+                </Link>
                 <Button
                   type="submit"
                   className="mt-4"
@@ -469,11 +475,6 @@ export default function FormView() {
                     dependantText.submit[viewType]
                   )}
                 </Button>
-                <Link to="/admin/users">
-                  <Button variant="outline" className="mt-4">
-                    Cancelar
-                  </Button>
-                </Link>
               </div>
             </form>
           </Form>
@@ -493,11 +494,11 @@ export default function FormView() {
 
 const dependantText = {
   mainTitle: {
-    new: 'Crear nuevo usuario',
+    new: 'Registrar nuevo usuario',
     edit: 'Editar un usuario',
   },
   submit: {
-    new: 'Crear Usuario',
+    new: 'Registrar Usuario',
     edit: 'Guardar Cambios',
   },
 }

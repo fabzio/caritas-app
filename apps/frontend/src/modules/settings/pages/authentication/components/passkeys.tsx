@@ -1,6 +1,6 @@
-import { useAddPasskey } from '@frontend/modules/settings/hooks/use-add-passkey'
-import { useListPasskeys } from '@frontend/modules/settings/hooks/use-list-passkeys'
-import { useRemovePasskey } from '@frontend/modules/settings/hooks/use-remove-passkey'
+import { useAddPasskey } from '@frontend/modules/settings/pages/authentication/hooks/use-add-passkey'
+import { useListPasskeys } from '@frontend/modules/settings/pages/authentication/hooks/use-list-passkeys'
+import { useRemovePasskey } from '@frontend/modules/settings/pages/authentication/hooks/use-remove-passkey'
 import { Button } from '@workspace/ui/components/button'
 import { Trash } from 'lucide-react'
 

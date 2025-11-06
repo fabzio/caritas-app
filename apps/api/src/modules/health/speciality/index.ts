@@ -1,4 +1,4 @@
-import betterAuth from '@api/modules/auth'
+import betterAuth from '@api/modules/auth/middleware'
 import Elysia, { status, t } from 'elysia'
 import { SpecialityModel } from './model'
 import {

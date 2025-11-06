@@ -5,6 +5,7 @@ import {
   acceptApplications,
   createScholarshipApplication,
   getApplicantsByScholarship,
+  rejectScholarshipRecipients,
 } from './service'
 
 const application = new Elysia({
@@ -38,6 +39,24 @@ const application = new Elysia({
       body: Application.acceptApplicationsBody,
       response: {
         200: t.Array(t.Number({ description: 'IDs of accepted applications' })),
+        401: t.Literal('Unauthorized'),
+      },
+    },
+  )
+  .patch(
+    '/reject',
+    ({ body, session, user }) =>
+      rejectScholarshipRecipients({
+        ...body,
+        userId: session?.userId ?? user?.id ?? '',
+      }),
+    {
+      auth: true,
+      body: Application.rejectRecipientsBody,
+      response: {
+        200: t.Array(
+          t.Number({ description: 'IDs of rejected scholarship recipients' }),
+        ),
         401: t.Literal('Unauthorized'),
       },
     },

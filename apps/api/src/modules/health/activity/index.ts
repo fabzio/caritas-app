@@ -1,4 +1,4 @@
-import betterAuth from '@api/modules/auth'
+import betterAuth from '@api/modules/auth/middleware'
 import Elysia, { status, t } from 'elysia'
 import {
   getActivityStatuses,
@@ -13,10 +13,12 @@ import {
   createAttention,
   createCompleteActivity,
   deleteActivities,
+  findDuplicateAttendant,
   getActivities,
   getActivityById,
   getActivityDetailById,
   getActivityParticipants,
+  getExistentUsers,
   getRegionsWithActivities,
   getUserAttentions,
   removeAttendantFromActivity,
@@ -242,13 +244,28 @@ const activityModule = new Elysia({ name: 'activity', prefix: '/activities' })
   })
   .post(
     '/add-attendant',
-    async ({ body }) => status(201, await addAttendantToActivity(body)),
+    async ({ body }) => {
+      const duplicate = await findDuplicateAttendant(
+        body.userId,
+        body.activityId,
+      )
+      if (duplicate)
+        throw status(
+          400,
+          `El beneficiario ya se encuentra registrado en esta actividad.`,
+        )
+      else {
+        return status(201, await addAttendantToActivity(body))
+      }
+    },
     {
       auth: true,
       body: ActivityModel.attendantActivity,
       response: {
         201: ActivityModel.attendantActivity,
+        400: t.Object({ error: t.String() }),
         401: t.Literal('Unauthorized'),
+        500: t.Object({ error: t.String() }),
       },
     },
   )
@@ -264,5 +281,13 @@ const activityModule = new Elysia({ name: 'activity', prefix: '/activities' })
       },
     },
   )
+  .get('/existent-users', ({ query }) => getExistentUsers(query), {
+    auth: true,
+    query: ActivityModel.listExistentUsersQuery,
+    response: {
+      200: ActivityModel.existentUser,
+      401: t.Literal('Unauthorized'),
+    },
+  })
 
 export default activityModule

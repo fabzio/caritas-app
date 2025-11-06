@@ -45,8 +45,8 @@ export default function ViewScholarship() {
     type: scholarship.type === 'ML' ? 'Modular' : 'Plan de estudios',
     organization: scholarship.organization?.name || 'N/A',
     vacancies: scholarship.vacancies,
-    startDate: new Date(scholarship.startDate).toLocaleDateString('es-ES'),
-    endDate: new Date(scholarship.endDate).toLocaleDateString('es-ES'),
+    startDate: scholarship.startDate,
+    endDate: scholarship.endDate,
     description: scholarship.description,
     requirements: scholarship.requirements,
   }
@@ -63,6 +63,16 @@ export default function ViewScholarship() {
           </Badge>
         </div>
         <Separator />
+      </div>
+
+      <div className="flex justify-start">
+        <Button
+          variant="outline"
+          onClick={() => navigate({ to: '/education/scholarship' })}
+        >
+          <ArrowLeftIcon className="h-4 w-4 mr-2" />
+          Regresar
+        </Button>
       </div>
 
       <Tabs
@@ -93,16 +103,6 @@ export default function ViewScholarship() {
           </div>
         </TabsContent>
       </Tabs>
-
-      <div className="flex justify-start">
-        <Button
-          variant="outline"
-          onClick={() => navigate({ to: '/education/scholarship' })}
-        >
-          <ArrowLeftIcon className="h-4 w-4 mr-2" />
-          Volver a Becas
-        </Button>
-      </div>
     </div>
   )
 }

@@ -81,6 +81,7 @@ export default function FormView() {
     updateBeneficiary({
       userId: loaderData.id,
       data: {
+        id: loaderData.id,
         email: values.email.trim(),
         name: values.name.trim(),
         role: 'user',
@@ -423,14 +424,14 @@ export default function FormView() {
             </div>
 
             <div className="w-full flex gap-2 justify-center">
-              <Button type="submit" className="mt-4" disabled={isSubmitting}>
-                {isSubmitting ? <Spinner /> : dependantText.submit[viewType]}
-              </Button>
               <Link to="/education/beneficiaries">
                 <Button variant="outline" className="mt-4">
                   Cancelar
                 </Button>
               </Link>
+              <Button type="submit" className="mt-4" disabled={isSubmitting}>
+                {isSubmitting ? <Spinner /> : dependantText.submit[viewType]}
+              </Button>
             </div>
           </form>
         </Form>
@@ -442,11 +443,11 @@ export default function FormView() {
 const dependantText = {
   mainTitle: {
     edit: 'Editar beneficiario',
-    new: 'Crear beneficiario',
+    new: 'Registrar beneficiario',
   },
   submit: {
     edit: 'Guardar Cambios',
-    new: 'Crear Beneficiario',
+    new: 'Registrar Beneficiario',
   },
 } as const
 

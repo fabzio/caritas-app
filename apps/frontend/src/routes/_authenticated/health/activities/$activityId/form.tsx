@@ -2,6 +2,7 @@ import rpc from '@frontend/lib/rpc'
 import AddAttendantPage from '@frontend/modules/health/pages/activities/pages/add-attendant'
 import { QueryKeys } from '@frontend/shared/constants/query-keys'
 import { createFileRoute } from '@tanstack/react-router'
+import { z } from 'zod'
 
 export const Route = createFileRoute(
   '/_authenticated/health/activities/$activityId/form',
@@ -21,5 +22,9 @@ export const Route = createFileRoute(
       },
     })
   },
+  validateSearch: z.object({
+    id: z.optional(z.string()),
+    type: z.enum(['new', 'edit']),
+  }),
   component: AddAttendantPage,
 })

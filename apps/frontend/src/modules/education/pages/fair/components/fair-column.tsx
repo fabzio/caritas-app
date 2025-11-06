@@ -1,5 +1,6 @@
 import { Link } from '@tanstack/react-router'
 import type { ColumnDef } from '@tanstack/react-table'
+import { Badge } from '@workspace/ui/components/badge'
 import { Button } from '@workspace/ui/components/button'
 import { Checkbox } from '@workspace/ui/components/checkbox'
 import { ArrowUpDown } from 'lucide-react'
@@ -13,6 +14,7 @@ export type Fair = {
   startTime: string
   endTime: string
   active: boolean
+  status: 'upcoming' | 'ongoing' | 'finished'
 }
 
 export const fairTableColumns: ColumnDef<Fair>[] = [
@@ -90,5 +92,23 @@ export const fairTableColumns: ColumnDef<Fair>[] = [
         month: 'long',
         year: 'numeric',
       }),
+  },
+  {
+    accessorKey: 'status',
+    header: 'Estado',
+    enableSorting: false,
+    cell: ({ row }) => {
+      const status = row.original.status
+
+      if (status === 'upcoming') {
+        return <Badge variant="outline">Próxima</Badge>
+      }
+
+      if (status === 'ongoing') {
+        return <Badge variant="default">En curso</Badge>
+      }
+
+      return <Badge variant="secondary">Finalizada</Badge>
+    },
   },
 ]

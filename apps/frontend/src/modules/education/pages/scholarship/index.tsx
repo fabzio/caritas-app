@@ -66,7 +66,6 @@ export default function ScholarshipPage() {
           id: selectedScholarship.id,
         },
       })
-      console.log('Edit scholarship:', selectedScholarship?.id)
     }
   }
   const selectedScholarshipIds = Object.keys(rowSelection)

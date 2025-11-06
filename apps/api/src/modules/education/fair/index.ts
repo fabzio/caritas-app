@@ -5,6 +5,8 @@ import {
   createFair,
   deleteFairs,
   findDuplicateFair,
+  getFairRegions,
+  getFairStatus,
   getFairs,
   getSingleFair,
   patchFair,
@@ -15,6 +17,30 @@ const fair = new Elysia({
   prefix: '/fairs',
 })
   .use(betterAuth)
+  .get('/regions', () => getFairRegions(), {
+    auth: true,
+    response: {
+      200: t.Array(
+        t.Object({
+          id: t.Number(),
+          name: t.String(),
+        }),
+      ),
+      401: t.Literal('Unauthorized'),
+    },
+  })
+  .get('/status', () => getFairStatus(), {
+    auth: true,
+    response: {
+      200: t.Array(
+        t.Object({
+          value: t.String(),
+          label: t.String(),
+        }),
+      ),
+      401: t.Literal('Unauthorized'),
+    },
+  })
   .get('/', ({ query }) => getFairs(query), {
     auth: true,
     query: FairModel.listFairsQuery,
