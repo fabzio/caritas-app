@@ -26,6 +26,13 @@ export const useUpdateActivityUser = () => {
           variables.activityId.toString(),
         ],
       })
+      queryClient.invalidateQueries({
+        queryKey: [
+          'user-attentions',
+          variables.userId,
+          variables.activityId.toString(),
+        ],
+      })
       toast.success('Incentivo marcado correctamente')
     },
     onError: () => {

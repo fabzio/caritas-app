@@ -9,11 +9,13 @@ import type { UserAttention } from '../hooks/use-user-attentions'
 interface AttentionCardProps {
   attention: UserAttention
   onClick?: (attention: UserAttention) => void
+  interactive?: boolean
 }
 
 export default function AttentionCard({
   attention,
   onClick,
+  interactive = true,
 }: Readonly<AttentionCardProps>) {
   const formatTime = (timeStr: string | null) => {
     if (!timeStr) return ''
@@ -30,12 +32,14 @@ export default function AttentionCard({
   return (
     <Card
       className={cn(
-        'cursor-pointer hover:shadow-md transition-shadow',
+        interactive
+          ? 'cursor-pointer hover:shadow-md transition-shadow'
+          : 'cursor-default',
         attention.hasAttention
           ? 'border-muted-foreground/30'
           : 'border-primary',
       )}
-      onClick={() => onClick?.(attention)}
+      onClick={interactive ? () => onClick?.(attention) : undefined}
     >
       <CardContent className="p-4">
         <div className="flex justify-between items-center">
