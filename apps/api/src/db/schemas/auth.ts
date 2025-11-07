@@ -285,8 +285,8 @@ export const invitation = authSchema.table('invitation', {
     .notNull()
     .references(() => organization.id, { onDelete: 'cascade' }),
   email: varchar('email', { length: 254 }).notNull(),
-  role: varchar('role', { length: 50 }),
-  teamId: varchar('team_id', { length: 32 }),
+  role: text(),
+  teamId: text(),
   status: varchar('status', { length: 20 }).default('pending').notNull(),
   expiresAt: timestamp('expires_at', {
     withTimezone: true,
