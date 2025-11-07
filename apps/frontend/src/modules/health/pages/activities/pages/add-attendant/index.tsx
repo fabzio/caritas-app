@@ -168,6 +168,8 @@ export default function AddAttendantPage() {
     setFoundUser(null)
   }
 
+  console.log(documentNumber)
+
   return (
     <div className="w-full p-4">
       <div className="mt-4 w-full md:w-3/5 mx-auto">
