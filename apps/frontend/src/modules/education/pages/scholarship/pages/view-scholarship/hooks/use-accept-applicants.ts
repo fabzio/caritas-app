@@ -27,9 +27,7 @@ export function useAcceptApplicants() {
       )
     },
     onError: (error) => {
-      toast.error(
-        `Error al aceptar postulantes: ${error?.message ?? String(error)}`,
-      )
+      toast.error(`${error?.message ?? String(error)}`)
     },
   })
 }

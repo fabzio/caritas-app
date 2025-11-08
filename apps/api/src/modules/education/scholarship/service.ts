@@ -182,7 +182,7 @@ export const getAvailableScholarships = async () => {
         eq(scholarship.id, scholarshipApplication.scholarshipId),
       )
       .where(
-        sql`${scholarship.active} = true AND ${scholarship.startDate} <= current_date AND ${scholarship.endDate} >= current_date`,
+        sql`${scholarship.active} = true AND ${scholarship.startDate} <= (CURRENT_TIMESTAMP AT TIME ZONE 'America/Lima')::date AND ${scholarship.endDate} >= (CURRENT_TIMESTAMP AT TIME ZONE 'America/Lima')::date`,
       )
       .groupBy(scholarship.id, scholarship.name, scholarship.vacancies)
 
