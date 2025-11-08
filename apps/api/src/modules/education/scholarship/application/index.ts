@@ -1,5 +1,5 @@
 import betterAuth from '@api/modules/auth/middleware'
-import Elysia, { t } from 'elysia'
+import Elysia, { status, t } from 'elysia'
 import { Application } from './model'
 import {
   acceptApplications,
@@ -28,18 +28,42 @@ const application = new Elysia({
   )
   .patch(
     '/accept',
-    ({ body, session, user }) => {
-      return acceptApplications({
-        ...body,
-        userId: session?.userId ?? user?.id ?? '',
-      })
+    async ({ body, session, user }) => {
+      try {
+        return await acceptApplications({
+          ...body,
+          userId: session?.userId ?? user?.id ?? '',
+        })
+      } catch (error) {
+        if (error instanceof Error) {
+          const msg = error.message.toLowerCase()
+          if (msg.includes('no se encontró la beca'))
+            throw status(404, error.message)
+          if (msg.includes('no se encontraron las aplicaciones'))
+            throw status(404, error.message)
+          if (msg.includes('ya ha postulado') || msg.includes('vacante'))
+            throw status(409, error.message)
+          if (
+            msg.includes('obligatorio') ||
+            msg.includes('seleccionar') ||
+            msg.includes('inválido')
+          )
+            throw status(400, error.message)
+          throw status(500, 'Error interno al aceptar aplicaciones')
+        }
+        throw status(500, 'Error inesperado al aceptar aplicaciones')
+      }
     },
     {
       auth: true,
       body: Application.acceptApplicationsBody,
       response: {
         200: t.Array(t.Number({ description: 'IDs of accepted applications' })),
+        400: t.String({ description: 'Bad request error message' }),
+        404: t.String({ description: 'Not found error message' }),
+        409: t.String({ description: 'Conflict error message' }),
         401: t.Literal('Unauthorized'),
+        500: t.String(),
       },
     },
   )
