@@ -30,10 +30,15 @@ export default function ApplicantsTable({ scholarshipId }: Readonly<Props>) {
   const vacancies = applicantsData?.vacancies
 
   const stats = useMemo(() => {
-    const total = applicants.length
-    const accepted = applicants.filter((a) => a.status === 'accepted').length
-    const rejected = applicants.filter((a) => a.status === 'rejected').length
-    return { total, accepted, rejected }
+    return applicants.reduce(
+      (acc, applicant) => {
+        acc.total += 1
+        if (applicant.status === 'accepted') acc.accepted += 1
+        if (applicant.status === 'rejected') acc.rejected += 1
+        return acc
+      },
+      { total: 0, accepted: 0, rejected: 0 },
+    )
   }, [applicants])
 
   const filteredApplicants = useMemo(() => {
@@ -75,7 +80,7 @@ export default function ApplicantsTable({ scholarshipId }: Readonly<Props>) {
       <div className="space-y-3">
         <h3 className="font-medium text-lg">Lista de Postulantes</h3>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          <div className="flex items-center gap-2 px-4 py-2 rounded-full border bg-background">
+          <div className="flex items-center gap-2 px-4 py-2 rounded-full border-2">
             <Users className="h-4 w-4" />
             <div className="flex items-baseline gap-1.5">
               <span className="text-sm font-medium">Total:</span>
@@ -83,7 +88,7 @@ export default function ApplicantsTable({ scholarshipId }: Readonly<Props>) {
             </div>
           </div>
 
-          <div className="flex items-center gap-2 px-4 py-2 rounded-full border bg-background">
+          <div className="flex items-center gap-2 px-4 py-2 rounded-full border-2">
             <CheckCircle2 className="h-4 w-4" />
             <div className="flex items-baseline gap-1.5">
               <span className="text-sm font-medium">Aceptados:</span>
@@ -91,7 +96,7 @@ export default function ApplicantsTable({ scholarshipId }: Readonly<Props>) {
             </div>
           </div>
 
-          <div className="flex items-center gap-2 px-4 py-2 rounded-full border bg-background">
+          <div className="flex items-center gap-2 px-4 py-2 rounded-full border-2">
             <XCircle className="h-4 w-4" />
             <div className="flex items-baseline gap-1.5">
               <span className="text-sm font-medium">Rechazados:</span>
@@ -99,7 +104,7 @@ export default function ApplicantsTable({ scholarshipId }: Readonly<Props>) {
             </div>
           </div>
 
-          <div className="flex items-center gap-2 px-4 py-2 rounded-full border bg-background">
+          <div className="flex items-center gap-2 px-4 py-2 rounded-full border-2">
             <Clock className="h-4 w-4" />
             <div className="flex items-baseline gap-1.5">
               <span className="text-sm font-medium">Vacantes:</span>
