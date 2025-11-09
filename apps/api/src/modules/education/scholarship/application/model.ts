@@ -8,19 +8,26 @@ export namespace Application {
   export type CreateScholarshipApplicationBody =
     typeof createScholarshipApplicationBody.static
 
-  export const getApplicantsByScholarshipResponse = t.Array(
-    t.Object({
-      id: t.Number(),
-      name: t.String(),
-      email: t.String(),
-      applicationDate: t.String(),
-      status: t.Enum({
-        pending: 'pending',
-        accepted: 'accepted',
-        rejected: 'rejected',
+  export const getApplicantsByScholarshipResponse = t.Object({
+    applicants: t.Array(
+      t.Object({
+        id: t.Number(),
+        name: t.String(),
+        email: t.String(),
+        applicationDate: t.String(),
+        status: t.Enum({
+          pending: 'pending',
+          accepted: 'accepted',
+          rejected: 'rejected',
+        }),
       }),
+    ),
+    vacancies: t.Object({
+      total: t.Number(),
+      accepted: t.Number(),
+      remaining: t.Number(),
     }),
-  )
+  })
 
   export type GetApplicantsByScholarshipResponse =
     typeof getApplicantsByScholarshipResponse.static

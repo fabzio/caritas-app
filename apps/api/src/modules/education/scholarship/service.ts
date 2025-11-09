@@ -2,7 +2,7 @@ import db from '@api/db'
 import { PostgresError } from '@api/db/errors'
 import { scholarship, scholarshipApplication } from '@api/db/schemas/education'
 import { normalizeText } from '@api/utils/normalize-text'
-import { eq, ilike, inArray, sql } from 'drizzle-orm'
+import { and, between, eq, ilike, inArray, sql } from 'drizzle-orm'
 import type { ScholarshipModel } from './model'
 
 type GetParams = {
@@ -61,10 +61,7 @@ export const getScholarships = async ({
     if (name) conditions.push(ilike(scholarship.name, `%${name}%`))
     if (active !== undefined) conditions.push(eq(scholarship.active, active))
 
-    const where =
-      conditions.length > 0
-        ? sql`${sql.join(conditions, sql` AND `)}`
-        : undefined
+    const where = conditions.length > 0 ? and(...conditions) : undefined
     const offset = (page - 1) * pageSize
 
     let total = 0
@@ -182,7 +179,14 @@ export const getAvailableScholarships = async () => {
         eq(scholarship.id, scholarshipApplication.scholarshipId),
       )
       .where(
-        sql`${scholarship.active} = true AND ${scholarship.startDate} <= current_date AND ${scholarship.endDate} >= current_date`,
+        and(
+          eq(scholarship.active, true),
+          between(
+            sql`(CURRENT_TIMESTAMP AT TIME ZONE 'America/Lima')::date`,
+            scholarship.startDate,
+            scholarship.endDate,
+          ),
+        ),
       )
       .groupBy(scholarship.id, scholarship.name, scholarship.vacancies)
 
