@@ -125,6 +125,7 @@ export default function AddAttendantPage() {
       })
     } else {
       addAttendant({
+        insuranceType: values.insuranceType,
         email: values.email,
         name: values.name,
         role: 'user',
@@ -489,6 +490,31 @@ export default function AddAttendantPage() {
                   </FormItem>
                 )}
               />
+              <FormField
+                control={form.control}
+                name="insuranceType"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Tipo de Seguro</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecciona un tipo" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="none">Ninguno</SelectItem>
+                        <SelectItem value="public">Público</SelectItem>
+                        <SelectItem value="private">Privado</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
             <div className="w-full flex gap-2 justify-center">
               <Button
@@ -539,6 +565,11 @@ const formSchema = formUserSchema
   .omit({
     password: true,
     confirmPassword: true,
+  })
+  .extend({
+    insuranceType: z.enum(['none', 'public', 'private'], {
+      error: 'El tipo de seguro es obligatorio',
+    }),
   })
   .superRefine(({ documentNumber, documentType }, ctx) => {
     const trimmedValue = documentNumber.trim()

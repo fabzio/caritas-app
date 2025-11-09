@@ -1,9 +1,6 @@
+import Dashboard from '@frontend/modules/health/pages/dashboard'
 import { createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/_authenticated/health/')({
-  component: RouteComponent,
+  component: Dashboard,
 })
-
-function RouteComponent() {
-  return <div>Hello "/_authenticated/health/"!</div>
-}
