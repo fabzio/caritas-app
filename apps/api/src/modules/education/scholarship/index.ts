@@ -41,6 +41,33 @@ const scholarship = new Elysia({
     },
   })
   .get(
+    '/organization/:organizationId',
+    ({ params, query }) =>
+      getScholarships({
+        ...query,
+        organizationId: params.organizationId,
+      }),
+    {
+      auth: true,
+      params: t.Object({
+        organizationId: t.String(),
+      }),
+      query: t.Object({
+        name: t.Optional(t.String()),
+        active: t.Optional(t.Boolean()),
+        page: t.Optional(t.Numeric({ minimum: 1, default: 1 })),
+        pageSize: t.Optional(
+          t.Numeric({ minimum: 1, maximum: 20, default: 10 }),
+        ),
+      }),
+      response: {
+        200: ScholarshipModel.paginated,
+        401: t.Literal('Unauthorized'),
+      },
+    },
+  )
+
+  .get(
     '/:id',
     async ({ params }) => {
       const res = await getSingleScholarship({ id: Number(params.id) })
