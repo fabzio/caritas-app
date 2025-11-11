@@ -115,7 +115,6 @@ export default function CreateFairPage() {
       createdBy: user.user.id,
       active: true,
     }
-    console.log(payload)
     if (viewType === 'edit' && loaderData?.id) {
       updateFair({ ...payload, id: loaderData.id })
     } else {

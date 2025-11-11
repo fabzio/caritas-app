@@ -10,7 +10,6 @@ const useDeleteScholarships = () => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (props: DeleteScholarshipProps) => {
-      console.log('estoy enviando estos ids', props)
       const { data, error } = await rpc.education.scholarship.delete(props)
       if (error) throw error
       return data

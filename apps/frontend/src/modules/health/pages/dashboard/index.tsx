@@ -17,7 +17,6 @@ import { useSyncDb } from './hooks/use-sync-db'
 
 export default function Dashboard() {
   const { isError, error } = useSyncDb()
-  console.log('Dashboard error', error)
   if (isError)
     return (
       <Empty>
