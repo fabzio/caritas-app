@@ -3,9 +3,11 @@ import {
   count,
   eq,
   type GetColumnData,
+  ne,
   type SQL,
   sql,
 } from 'drizzle-orm'
+import { alias } from 'drizzle-orm/pg-core'
 import { organization, region, user } from '../schemas/auth'
 import {
   activity,
@@ -35,8 +37,24 @@ export const attentionFact = healthSchema.view('attention_fact').as((qb) => {
         sql<number>`COUNT(CASE WHEN ${activityUser.rewarded} = true THEN 1 END)`
           .mapWith(Number)
           .as('rewarded'),
+      newParticipants: sql<number>`
+      COUNT(DISTINCT activity_user.user_id)
+      FILTER (
+        WHERE NOT EXISTS (
+          SELECT 1
+          FROM ${activityUser} au2
+          WHERE au2.user_id = activity_user.user_id
+          AND au2.timestamp < activity_user.timestamp
+        )
+      )
+      `
+        .mapWith(Number)
+        .as('newParticipants'),
     })
     .from(activityUser)
+    .innerJoin(activity, eq(activityUser.activityId, activity.id))
+    .innerJoin(activityStatus, eq(activity.statusId, activityStatus.id))
+    .where(ne(activityStatus.name, 'Cancelado'))
     .groupBy(activityUser.activityId)
     .as('activity_user_stats')
   return qb
@@ -50,7 +68,10 @@ export const attentionFact = healthSchema.view('attention_fact').as((qb) => {
       ),
       patientId: aliasedColumn(attention.userId, 'patientId'),
       patientSex: aliasedColumn(user.sex, 'patientSex'),
-      patientAge: aliasedColumn(user.birthDate, 'patientAge'),
+      patientAge:
+        sql<number>`FLOOR(DATE_PART('year', AGE(NOW(), ${user.birthDate})))`
+          .mapWith(Number)
+          .as('patientAge'),
       patientDocumentType: aliasedColumn(
         user.documentType,
         'patientDocumentType',
@@ -64,6 +85,7 @@ export const attentionFact = healthSchema.view('attention_fact').as((qb) => {
       activityDate: aliasedColumn(activity.date, 'activityDate'),
       activityRegistrations: activityUserStats.registrations,
       activityRewarded: activityUserStats.rewarded,
+      activityNewParticipants: activityUserStats.newParticipants,
       activityRegion: aliasedColumn(region.name, 'activityRegion'),
       activityType: aliasedColumn(activityType.name, 'activityType'),
       activityStatus: aliasedColumn(activityStatus.name, 'activityStatus'),
@@ -82,4 +104,5 @@ export const attentionFact = healthSchema.view('attention_fact').as((qb) => {
     .innerJoin(patientInfo, eq(attention.userId, patientInfo.userId))
     .innerJoin(user, eq(attention.userId, user.id))
     .leftJoin(activityUserStats, eq(activity.id, activityUserStats.activityId))
+    .where(ne(activityStatus.name, 'Cancelado'))
 })

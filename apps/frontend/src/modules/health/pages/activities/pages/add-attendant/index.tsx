@@ -169,8 +169,6 @@ export default function AddAttendantPage() {
     setFoundUser(null)
   }
 
-  console.log(documentNumber)
-
   return (
     <div className="w-full p-4">
       <div className="mt-4 w-full md:w-3/5 mx-auto">
@@ -317,6 +315,7 @@ export default function AddAttendantPage() {
                               form.setValue('sex', user.sex)
                               form.setValue('regionId', user.regionId)
                               form.setValue('birthDate', user.birthDate)
+                              form.setValue('insuranceType', user.insuranceType)
                             }}
                             onInputChange={(val) => {
                               field.onChange(val)
@@ -499,6 +498,7 @@ export default function AddAttendantPage() {
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
+                      disabled={foundUser !== null}
                     >
                       <FormControl>
                         <SelectTrigger>

@@ -31,7 +31,9 @@ export const QueryKeys = {
   },
   HEALTH: {
     ANALITICS: {
+      FILTERS: 'health-analytics-filters',
       GENERAL: 'health-analytics-general',
+      METRIC: 'health-analytics-metric',
     },
     ACTIVITIES: 'health-activities',
     ACTIVITY_DETAIL: 'health-activity-detail',
