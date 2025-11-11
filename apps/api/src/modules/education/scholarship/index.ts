@@ -3,6 +3,7 @@ import Elysia, { status, t } from 'elysia'
 import application from './application'
 import { ScholarshipModel } from './model'
 import scholarshipRecipients from './recipients'
+import scholarshipReport from './report'
 import {
   createScholarship,
   deleteScholarships,
@@ -20,6 +21,7 @@ const scholarship = new Elysia({
   .use(betterAuth)
   .use(application)
   .use(scholarshipRecipients)
+  .use(scholarshipReport)
   .get('/available', async () => getAvailableScholarships(), {
     auth: true,
     response: {

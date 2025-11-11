@@ -1,3 +1,4 @@
+import { useSession } from '@frontend/hooks/use-session'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Link, useSearch } from '@tanstack/react-router'
 import { Button } from '@workspace/ui/components/button'
@@ -25,16 +26,16 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { AutoCompleteAcceptedUser } from '../../components/autocomplete-accept'
 import { useAcceptedUsers } from '../../hooks/use-accept-applications'
+import { useCreateReport } from './hooks/use-create-report'
 import type { FormReportSchema } from './model/report'
 import { reportSchema } from './model/report'
-
 export default function CreateReportPage() {
   const search = useSearch({
     from: '/_authenticated/organization/education/scholarship/report',
   })
   const scholarshipId = Number(search.id)
-
-  const [isPending, setIsPending] = useState(false)
+  const { data: session } = useSession()
+  const reportedBy = session?.session?.userId ?? ''
   const [searchValue, setSearchValue] = useState('')
   const [selectedUser, setSelectedUser] = useState<any>(null)
 
@@ -42,12 +43,12 @@ export default function CreateReportPage() {
     scholarshipId,
     name: searchValue,
   })
-
+  const { mutate: createReport, isPending } = useCreateReport()
   // 🧾 Formulario
   const form = useForm<FormReportSchema>({
     resolver: zodResolver(reportSchema),
     defaultValues: {
-      studentId: '',
+      userId: '',
       cause: 'absence',
       causeDetail: '',
       reason: '',
@@ -58,26 +59,28 @@ export default function CreateReportPage() {
   const handleSelectUser = (user: any) => {
     console.log('Usuario seleccionado:', user)
     setSelectedUser(user)
-    form.setValue('studentId', user.id)
+    form.setValue('userId', user.id)
   }
 
   const handleClear = () => {
     setSelectedUser(null)
     setSearchValue('')
-    form.setValue('studentId', '')
+    form.setValue('userId', '')
   }
 
   const onSubmit = async (values: FormReportSchema) => {
-    try {
-      setIsPending(true)
-      console.log('📄 Reporte a registrar:', {
-        ...values,
-        studentId: values.studentId, // ya está el id del alumno
-      })
-      // Aquí iría tu lógica POST → /reports
-    } finally {
-      setIsPending(false)
-    }
+    if (!reportedBy) return
+    if (!selectedUser) return
+
+    createReport({
+      scholarshipId,
+      userId: values.userId,
+      reportedBy,
+      cause: values.cause as 'absence' | 'performance' | 'other',
+      causeDetail: values.causeDetail,
+      reason: values.reason,
+      reasonDetail: values.reasonDetail,
+    })
   }
 
   return (
@@ -110,7 +113,7 @@ export default function CreateReportPage() {
               {/* Alumno */}
               <FormField
                 control={form.control}
-                name="studentId"
+                name="userId"
                 render={() => (
                   <FormItem>
                     <FormLabel>Alumno*</FormLabel>

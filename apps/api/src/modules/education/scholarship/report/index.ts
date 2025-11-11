@@ -1,5 +1,4 @@
 import betterAuth from '@api/modules/auth/middleware'
-import { th } from '@faker-js/faker/.'
 import Elysia, { status, t } from 'elysia'
 import { ReportModel } from './model'
 import { createScholarshipReport } from './service'
@@ -11,7 +10,7 @@ const scholarshipReport = new Elysia({
   .use(betterAuth)
   .post(
     '',
-    async ({ body, set }) => {
+    async ({ body }) => {
       try {
         if (!body.reportedBy) {
           throw status(400, 'reportedBy es obligatorio')
@@ -35,3 +34,4 @@ const scholarshipReport = new Elysia({
       },
     },
   )
+export default scholarshipReport
