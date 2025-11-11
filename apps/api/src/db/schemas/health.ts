@@ -102,6 +102,7 @@ export const activityUser = healthSchema.table(
       .notNull()
       .references(() => activity.id, { onDelete: 'cascade' }),
     rewarded: boolean().default(false).notNull(),
+    timestamp: timestamp({ withTimezone: true }).defaultNow().notNull(),
   },
   (table) => [primaryKey({ columns: [table.userId, table.activityId] })],
 )

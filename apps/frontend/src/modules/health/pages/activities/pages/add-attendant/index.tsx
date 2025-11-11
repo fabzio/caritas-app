@@ -125,6 +125,7 @@ export default function AddAttendantPage() {
       })
     } else {
       addAttendant({
+        insuranceType: values.insuranceType,
         email: values.email,
         name: values.name,
         role: 'user',
@@ -167,8 +168,6 @@ export default function AddAttendantPage() {
     })
     setFoundUser(null)
   }
-
-  console.log(documentNumber)
 
   return (
     <div className="w-full p-4">
@@ -316,6 +315,7 @@ export default function AddAttendantPage() {
                               form.setValue('sex', user.sex)
                               form.setValue('regionId', user.regionId)
                               form.setValue('birthDate', user.birthDate)
+                              form.setValue('insuranceType', user.insuranceType)
                             }}
                             onInputChange={(val) => {
                               field.onChange(val)
@@ -489,6 +489,32 @@ export default function AddAttendantPage() {
                   </FormItem>
                 )}
               />
+              <FormField
+                control={form.control}
+                name="insuranceType"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Tipo de Seguro</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      disabled={foundUser !== null}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecciona un tipo" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="none">Ninguno</SelectItem>
+                        <SelectItem value="public">Público</SelectItem>
+                        <SelectItem value="private">Privado</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
             <div className="w-full flex gap-2 justify-center">
               <Button
@@ -539,6 +565,11 @@ const formSchema = formUserSchema
   .omit({
     password: true,
     confirmPassword: true,
+  })
+  .extend({
+    insuranceType: z.enum(['none', 'public', 'private'], {
+      error: 'El tipo de seguro es obligatorio',
+    }),
   })
   .superRefine(({ documentNumber, documentType }, ctx) => {
     const trimmedValue = documentNumber.trim()

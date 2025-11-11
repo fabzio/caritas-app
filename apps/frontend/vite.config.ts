@@ -25,7 +25,7 @@ export default defineConfig({
     },
   },
   optimizeDeps: {
-    exclude: ['better-auth'],
+    exclude: ['better-auth', '@electric-sql/pglite'],
   },
   resolve: {
     alias: {

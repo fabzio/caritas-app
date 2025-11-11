@@ -42,7 +42,7 @@ export const user = authSchema.table(
       withTimezone: true,
       mode: 'date',
     }),
-    documentType: varchar('document_type', { length: 20 }),
+    documentType: varchar('document_type', { length: 20 }).notNull(),
     documentNumber: varchar('document_number', { length: 20 }).notNull(),
     sex: char({ enum: ['F', 'M'] }).notNull(),
     birthDate: date('birth_date').notNull(),

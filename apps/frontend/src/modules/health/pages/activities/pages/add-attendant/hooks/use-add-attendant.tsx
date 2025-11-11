@@ -13,17 +13,30 @@ export const useAddAttendant = () => {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: async (props: AddAttendantProps) => {
+    mutationFn: async (
+      props: AddAttendantProps & {
+        insuranceType: 'none' | 'public' | 'private'
+      },
+    ) => {
       const { activityId, ...userPayload } = props
-      const { data, error } = await authClient.admin.createUser(userPayload)
-      if (error) throw error
+      const { data: userData, error: userError } =
+        await authClient.admin.createUser(userPayload)
+      if (userError) throw userError
+
+      const { error: patientError } = await rpc.auth.info.patient.post({
+        userId: userData.user.id,
+        insuranceType: props.insuranceType,
+      })
+      if (patientError) throw patientError
+
       const { data: result, error: rpcError } = await rpc.health.activities[
         'add-attendant'
       ].post({
-        userId: data.user.id,
+        userId: userData.user.id,
         activityId: activityId,
       })
       if (rpcError) throw rpcError
+      return result
     },
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({

@@ -30,6 +30,11 @@ export const QueryKeys = {
     BENEFICIARIES: 'education-beneficiaries',
   },
   HEALTH: {
+    ANALITICS: {
+      FILTERS: 'health-analytics-filters',
+      GENERAL: 'health-analytics-general',
+      METRIC: 'health-analytics-metric',
+    },
     ACTIVITIES: 'health-activities',
     ACTIVITY_DETAIL: 'health-activity-detail',
     ACTIVITY_REGIONS: 'health-activity-regions',
