@@ -1,7 +1,8 @@
 import db from '@api/db'
 import { PostgresError } from '@api/db/errors'
+import { user } from '@api/db/schemas/auth'
 import { scholarshipApplication } from '@api/db/schemas/education'
-import { and, count, eq, inArray } from 'drizzle-orm'
+import { and, count, eq, ilike, inArray, or } from 'drizzle-orm'
 import type { Application } from './model'
 
 export const createScholarshipApplication = async (
@@ -30,6 +31,43 @@ export const createScholarshipApplication = async (
   } catch (e) {
     if (e instanceof Error) throw new PostgresError(e.message)
     throw e
+  }
+}
+
+export const getAcceptedUsers = async (args: {
+  scholarshipId: number
+  name?: string
+}) => {
+  const results = await db
+    .select({
+      id: user.id,
+      name: user.name,
+      surname: user.surname,
+      email: user.email,
+      applicationDate: scholarshipApplication.applicationDate,
+    })
+    .from(scholarshipApplication)
+    .leftJoin(user, eq(scholarshipApplication.userId, user.id))
+    .where(
+      and(
+        eq(scholarshipApplication.scholarshipId, args.scholarshipId),
+        eq(scholarshipApplication.status, 'accepted'),
+        args.name
+          ? or(
+              ilike(user.name, `%${args.name}%`),
+              ilike(user.surname, `%${args.name}%`),
+            )
+          : undefined,
+      ),
+    )
+
+  return {
+    data: results.map((r) => ({
+      id: r.id ?? '',
+      name: `${r.name ?? ''} ${r.surname ?? ''}`.trim(),
+      email: r.email ?? '',
+      applicationDate: r.applicationDate ? r.applicationDate.toISOString() : '',
+    })),
   }
 }
 

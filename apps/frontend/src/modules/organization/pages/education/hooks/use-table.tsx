@@ -1,12 +1,13 @@
 import { useFilters } from '@frontend/hooks/use-filters'
-import { scholarshipTableColumns } from '@frontend/modules/education/pages/scholarship/components/columns'
 import useGetScholarship from '@frontend/modules/education/pages/scholarship/hooks/use-get-scholarship'
 import { sortByToState } from '@frontend/shared/utils/sort-by-to-state'
 import { useMemo } from 'react'
-export const useScholarshipTable = () => {
+import { scholarshipTableColumns } from '../components/columns'
+export const useScholarshipTable = (org: string | null | undefined) => {
   const { filters, setFilters } = useFilters(
     '/_authenticated/organization/education/scholarship/',
   )
+
   const {
     data: response,
     isLoading,
@@ -16,6 +17,7 @@ export const useScholarshipTable = () => {
     filters.pageIndex,
     filters.pageSize,
     filters.active,
+    org,
   )
 
   const sortingState = sortByToState(filters.sortBy)

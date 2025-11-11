@@ -28,6 +28,7 @@ export const QueryKeys = {
     SCHOLARSHIP_APPLICATION: 'education-scholarship-applications',
     ORGANIZATIONS: 'education-organizations',
     BENEFICIARIES: 'education-beneficiaries',
+    SCHOLARSHIP_ACCEPTED: 'education-scholarship-accepted-applicants',
   },
   HEALTH: {
     ACTIVITIES: 'health-activities',

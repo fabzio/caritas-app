@@ -43,4 +43,20 @@ export namespace Application {
     comments: t.Optional(t.String()),
   })
   export type RejectRecipientsBody = typeof rejectRecipientsBody.static
+
+  export const listAcceptedUsersQuery = t.Object({
+    scholarshipId: t.Numeric(),
+    name: t.Optional(t.String()),
+  })
+
+  export const acceptedUsersResponse = t.Object({
+    data: t.Array(
+      t.Object({
+        id: t.String(),
+        name: t.String(),
+        email: t.String(),
+        applicationDate: t.String(),
+      }),
+    ),
+  })
 }
