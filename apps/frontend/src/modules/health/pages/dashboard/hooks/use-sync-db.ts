@@ -32,7 +32,7 @@ export const useSyncDb = () => {
         ).rows.length > 0
       if (!exists) await migrate()
       await db.delete(attentions)
-      await db.insert(attentions).values(data)
+      if (data.length > 0) await db.insert(attentions).values(data)
       queryClient.invalidateQueries({
         queryKey: [QueryKeys.HEALTH.ANALITICS.METRIC],
       })
