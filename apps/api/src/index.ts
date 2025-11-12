@@ -17,6 +17,7 @@ const main = async () => {
     name: 'api',
     prefix: '/api/v1',
   })
+    .use(logixlysia())
     .use(
       openapi({
         enabled: env.NODE_ENV !== 'production',
