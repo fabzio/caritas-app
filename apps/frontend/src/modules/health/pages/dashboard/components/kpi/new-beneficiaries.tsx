@@ -16,7 +16,11 @@ export default function NewBeneficiaries() {
         <CardHeader>
           <CardDescription>Total de Atenciones</CardDescription>
           <CardTitle>
-            {isLoading ? <Skeleton className="h-8 w-32" /> : data?.attentions}
+            {isLoading ? (
+              <Skeleton className="h-8 w-32" />
+            ) : (
+              (data?.attentions ?? 'Sin datos')
+            )}
           </CardTitle>
         </CardHeader>
       </Card>
@@ -27,7 +31,7 @@ export default function NewBeneficiaries() {
             {isLoading ? (
               <Skeleton className="h-8 w-32" />
             ) : (
-              data?.registrations
+              (data?.registrations ?? 'Sin datos')
             )}
           </CardTitle>
         </CardHeader>
@@ -36,7 +40,11 @@ export default function NewBeneficiaries() {
         <CardHeader>
           <CardDescription>Incentivos Entregados</CardDescription>
           <CardTitle>
-            {isLoading ? <Skeleton className="h-8 w-32" /> : data?.rewarded}
+            {isLoading ? (
+              <Skeleton className="h-8 w-32" />
+            ) : (
+              (data?.rewarded ?? 'Sin datos')
+            )}
           </CardTitle>
         </CardHeader>
       </Card>
@@ -47,7 +55,7 @@ export default function NewBeneficiaries() {
             {isLoading ? (
               <Skeleton className="h-8 w-32" />
             ) : (
-              data?.newParticipants
+              (data?.newParticipants ?? 'Sin datos')
             )}
           </CardTitle>
         </CardHeader>
