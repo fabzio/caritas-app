@@ -56,6 +56,7 @@ export namespace Application {
         name: t.String(),
         email: t.String(),
         applicationDate: t.String(),
+        reviewDate: t.String(),
       }),
     ),
   })

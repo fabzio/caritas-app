@@ -40,6 +40,13 @@ export default function ScholarshipTable({
 }: Readonly<Props>) {
   const navigate = useNavigate()
 
+  const handleRowClick = (scholarship: Scholarship) => {
+    navigate({
+      to: '/organization/education/scholarship/$scholarshipId/view',
+      params: { scholarshipId: scholarship.id.toString() },
+    })
+  }
+
   return (
     <DataTable
       data={data || []}
@@ -75,6 +82,7 @@ export default function ScholarshipTable({
       }}
       setRowSelection={setRowSelection}
       rowSelection={rowSelection}
+      onRowClick={handleRowClick}
     />
   )
 }

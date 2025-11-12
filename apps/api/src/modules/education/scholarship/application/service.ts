@@ -45,6 +45,7 @@ export const getAcceptedUsers = async (args: {
       surname: user.surname,
       email: user.email,
       applicationDate: scholarshipApplication.applicationDate,
+      reviewDate: scholarshipApplication.reviewDate,
     })
     .from(scholarshipApplication)
     .leftJoin(user, eq(scholarshipApplication.userId, user.id))
@@ -67,6 +68,7 @@ export const getAcceptedUsers = async (args: {
       name: `${r.name ?? ''} ${r.surname ?? ''}`.trim(),
       email: r.email ?? '',
       applicationDate: r.applicationDate ? r.applicationDate.toISOString() : '',
+      reviewDate: r.reviewDate ? r.reviewDate.toISOString() : '',
     })),
   }
 }
