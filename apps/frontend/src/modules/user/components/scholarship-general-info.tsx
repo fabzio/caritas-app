@@ -66,6 +66,11 @@ function getScholarshipStatus(startDate: string, endDate: string) {
 export default function ScholarshipGeneralInfo({
   scholarship,
 }: Readonly<Props>) {
+  const status = getScholarshipStatus(
+    scholarship.startDate,
+    scholarship.endDate,
+  )
+
   return (
     <div className="space-y-6">
       <div

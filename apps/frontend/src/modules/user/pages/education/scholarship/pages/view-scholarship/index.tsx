@@ -1,5 +1,4 @@
 import { useNavigate, useParams } from '@tanstack/react-router'
-import { Badge } from '@workspace/ui/components/badge'
 import { Button } from '@workspace/ui/components/button'
 import { Card, CardContent } from '@workspace/ui/components/card'
 import { Separator } from '@workspace/ui/components/separator'
@@ -34,12 +33,20 @@ export default function ViewScholarshipPage() {
     )
   }
 
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString)
+    const day = date.getDate().toString().padStart(2, '0')
+    const month = (date.getMonth() + 1).toString().padStart(2, '0')
+    const year = date.getFullYear()
+    return `${day}/${month}/${year}`
+  }
+
   const scholarshipData = {
     type: scholarship.type === 'ML' ? 'Modular' : 'Plan de estudios',
     organization: scholarship.organization?.name || 'N/A',
     vacancies: scholarship.vacancies,
-    startDate: new Date(scholarship.startDate).toLocaleDateString('es-ES'),
-    endDate: new Date(scholarship.endDate).toLocaleDateString('es-ES'),
+    startDate: formatDate(scholarship.startDate),
+    endDate: formatDate(scholarship.endDate),
     description: scholarship.description,
     requirements: scholarship.requirements,
   }
@@ -47,14 +54,9 @@ export default function ViewScholarshipPage() {
   return (
     <div className="flex flex-1 flex-col gap-6 p-4">
       <div className="flex flex-col gap-1">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-semibold text-foreground">
-            {scholarship.name}
-          </h1>
-          <Badge variant={scholarship.active ? 'default' : 'secondary'}>
-            {scholarship.active ? 'Activa' : 'Inactiva'}
-          </Badge>
-        </div>
+        <h1 className="text-2xl font-semibold text-foreground">
+          {scholarship.name}
+        </h1>
         <Separator />
       </div>
 
