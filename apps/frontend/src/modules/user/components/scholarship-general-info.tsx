@@ -232,7 +232,7 @@ export default function ScholarshipGeneralInfo({
                 onClick={() => onApply(scholarship.id)}
                 disabled={isApplying}
                 size="lg"
-                className="w-full sm:w-auto min-w-[320px] h-14 text-lg font-semibold"
+                className="w-full sm:w-auto min-w-[320px]"
               >
                 {isApplying ? <Spinner /> : 'Postular a esta Beca'}
               </Button>
