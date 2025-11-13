@@ -5,6 +5,38 @@ import { scholarshipApplication } from '@api/db/schemas/education'
 import { and, count, eq, ilike, inArray, or } from 'drizzle-orm'
 import type { Application } from './model'
 
+export const checkApplicationStatus = async (args: {
+  scholarshipId: number
+  userId: string
+}): Promise<Application.CheckApplicationStatusResponse> => {
+  try {
+    const application = await db.query.scholarshipApplication.findFirst({
+      where: (app, { and, eq }) =>
+        and(
+          eq(app.scholarshipId, args.scholarshipId),
+          eq(app.userId, args.userId),
+        ),
+      columns: {
+        status: true,
+        applicationDate: true,
+      },
+    })
+
+    if (!application) {
+      return { hasApplied: false }
+    }
+
+    return {
+      hasApplied: true,
+      status: application.status,
+      applicationDate: application.applicationDate.toISOString(),
+    }
+  } catch (e) {
+    if (e instanceof Error) throw new PostgresError(e.message)
+    throw e
+  }
+}
+
 export const createScholarshipApplication = async (
   args: Application.CreateScholarshipApplicationBody,
 ) => {

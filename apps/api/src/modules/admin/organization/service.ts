@@ -1,6 +1,7 @@
 import db from '@api/db'
 import { PostgresError } from '@api/db/errors'
 import { organization } from '@api/db/schemas/auth'
+import { scholarship } from '@api/db/schemas/education'
 import { and, asc, count, desc, eq, ilike, inArray, not, or } from 'drizzle-orm'
 import type { OrganizationModel } from './model'
 
@@ -15,6 +16,7 @@ export async function getOrganizations(
     limit = 10,
     sortBy = 'name.asc',
     type,
+    active,
     organizationId,
   } = params
 
@@ -32,7 +34,8 @@ export async function getOrganizations(
   const orderExpr = sortOrder === 'desc' ? desc(column) : asc(column)
 
   const searchCondition = q ? or(ilike(organization.name, `%${q}%`)) : undefined
-  const activeCondition = eq(organization.active, true)
+  const activeCondition =
+    active !== undefined ? eq(organization.active, active) : undefined
   const typeCondition = type ? eq(organization.type, type) : undefined
   const where = and(
     activeCondition,
@@ -41,13 +44,11 @@ export async function getOrganizations(
     not(eq(organization.id, organizationId)),
   )
 
-  // Get total count
   const [{ total }] = await db
     .select({ total: count() })
     .from(organization)
     .where(where)
 
-  // Get paginated data
   const rows = await db
     .select()
     .from(organization)
@@ -120,6 +121,33 @@ export const deleteOrganizations = async (ids: string[]) => {
       .set({ active: false })
       .where(inArray(organization.id, ids))
     return { success: true }
+  } catch (e) {
+    if (e instanceof Error) throw new PostgresError(e.message)
+    throw e
+  }
+}
+
+export const checkOrganizationsHaveActiveScholarships = async (
+  ids: string[],
+) => {
+  try {
+    const organizationsWithScholarships = await db
+      .select({
+        organizationId: scholarship.organizationId,
+        organizationName: organization.name,
+        scholarshipCount: count(scholarship.id),
+      })
+      .from(scholarship)
+      .innerJoin(organization, eq(scholarship.organizationId, organization.id))
+      .where(
+        and(
+          inArray(scholarship.organizationId, ids),
+          eq(scholarship.active, true),
+        ),
+      )
+      .groupBy(scholarship.organizationId, organization.name)
+
+    return organizationsWithScholarships
   } catch (e) {
     if (e instanceof Error) throw new PostgresError(e.message)
     throw e

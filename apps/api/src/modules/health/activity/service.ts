@@ -879,8 +879,10 @@ export const getExistentUsers = async (
         birthDate: user.birthDate,
         sex: user.sex,
         regionId: user.regionId,
+        insuranceType: patientInfo.insuranceType,
       })
       .from(user)
+      .innerJoin(patientInfo, eq(user.id, patientInfo.userId))
       .orderBy(asc(user.name))
       .limit(5)
       .where(where)

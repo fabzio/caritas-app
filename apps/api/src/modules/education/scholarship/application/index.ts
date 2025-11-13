@@ -3,6 +3,7 @@ import Elysia, { status, t } from 'elysia'
 import { Application } from './model'
 import {
   acceptApplications,
+  checkApplicationStatus,
   createScholarshipApplication,
   getAcceptedUsers,
   getApplicantsByScholarship,
@@ -105,5 +106,21 @@ const application = new Elysia({
       401: t.Literal('Unauthorized'),
     },
   })
+  .get(
+    '/check/:scholarshipId',
+    ({ params, session, user }) =>
+      checkApplicationStatus({
+        scholarshipId: Number(params.scholarshipId),
+        userId: session?.userId ?? user?.id ?? '',
+      }),
+    {
+      auth: true,
+      params: t.Object({ scholarshipId: t.String() }),
+      response: {
+        200: Application.checkApplicationStatusResponse,
+        401: t.Literal('Unauthorized'),
+      },
+    },
+  )
 
 export default application

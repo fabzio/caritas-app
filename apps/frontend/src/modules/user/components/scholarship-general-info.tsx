@@ -1,12 +1,19 @@
+import { formatDate } from '@frontend/shared/utils/format-date'
+import { Button } from '@workspace/ui/components/button'
 import { Separator } from '@workspace/ui/components/separator'
+import { Spinner } from '@workspace/ui/components/spinner'
 import {
   BuildingIcon,
   CalendarIcon,
+  CheckCircleIcon,
+  ClockIcon,
   FileTextIcon,
   UsersIcon,
+  XCircleIcon,
 } from 'lucide-react'
 
 type ScholarshipData = {
+  id: number
   type: string
   organization: string
   vacancies: number
@@ -18,19 +25,25 @@ type ScholarshipData = {
 
 type Props = {
   scholarship: ScholarshipData
-}
-
-function parseDateFromDDMMYYYY(dateString: string): Date {
-  const [day, month, year] = dateString.split('/').map(Number)
-  return new Date(year, month - 1, day)
+  onApply?: (scholarshipId: number) => void
+  isApplying?: boolean
+  hasApplied?: boolean
+  applicationStatus?: 'pending' | 'accepted' | 'rejected'
 }
 
 function getScholarshipStatus(startDate: string, endDate: string) {
   const now = new Date()
   now.setHours(0, 0, 0, 0)
 
-  const start = parseDateFromDDMMYYYY(startDate)
-  const end = parseDateFromDDMMYYYY(endDate)
+  const startUTC = new Date(startDate)
+  const start = new Date(
+    startUTC.getTime() + startUTC.getTimezoneOffset() * 60000,
+  )
+  start.setHours(0, 0, 0, 0)
+
+  const endUTC = new Date(endDate)
+  const end = new Date(endUTC.getTime() + endUTC.getTimezoneOffset() * 60000)
+  end.setHours(0, 0, 0, 0)
 
   if (now < start) {
     const daysUntilStart = Math.ceil(
@@ -65,7 +78,16 @@ function getScholarshipStatus(startDate: string, endDate: string) {
 
 export default function ScholarshipGeneralInfo({
   scholarship,
+  onApply,
+  isApplying = false,
+  hasApplied = false,
+  applicationStatus,
 }: Readonly<Props>) {
+  const status = getScholarshipStatus(
+    scholarship.startDate,
+    scholarship.endDate,
+  )
+
   return (
     <div className="space-y-6">
       <div
@@ -94,6 +116,7 @@ export default function ScholarshipGeneralInfo({
           </p>
         )}
       </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-4">
           <div className="flex items-center gap-3">
@@ -133,7 +156,7 @@ export default function ScholarshipGeneralInfo({
             <div>
               <h3 className="font-medium">Fecha de Inicio</h3>
               <p className="text-sm text-muted-foreground">
-                {scholarship.startDate}
+                {formatDate(scholarship.startDate)}
               </p>
             </div>
           </div>
@@ -143,7 +166,7 @@ export default function ScholarshipGeneralInfo({
             <div>
               <h3 className="font-medium">Fecha de Fin</h3>
               <p className="text-sm text-muted-foreground">
-                {scholarship.endDate}
+                {formatDate(scholarship.endDate)}
               </p>
             </div>
           </div>
@@ -165,6 +188,61 @@ export default function ScholarshipGeneralInfo({
           {scholarship.requirements}
         </p>
       </div>
+
+      {onApply && status.type === 'active' && (
+        <>
+          <Separator />
+          {hasApplied ? (
+            <div className="rounded-lg border p-6 text-center">
+              <div className="flex items-center justify-center gap-3 mb-2">
+                {applicationStatus === 'pending' && (
+                  <>
+                    <ClockIcon className="h-6 w-6 text-accent-foreground" />
+                    <h3 className="text-lg font-semibold text-accent-foreground">
+                      Postulación en Revisión
+                    </h3>
+                  </>
+                )}
+                {applicationStatus === 'accepted' && (
+                  <>
+                    <CheckCircleIcon className="h-6 w-6 text-primary" />
+                    <h3 className="text-lg font-semibold text-primary">
+                      Postulación Aceptada
+                    </h3>
+                  </>
+                )}
+                {applicationStatus === 'rejected' && (
+                  <>
+                    <XCircleIcon className="h-6 w-6 text-destructive" />
+                    <h3 className="text-lg font-semibold text-destructive">
+                      Postulación Rechazada
+                    </h3>
+                  </>
+                )}
+              </div>
+              <p className="text-sm text-muted-foreground">
+                {applicationStatus === 'pending' &&
+                  'Tu postulación está siendo evaluada. Te notificaremos cuando haya una respuesta.'}
+                {applicationStatus === 'accepted' &&
+                  '¡Felicitaciones! Has sido aceptado para esta beca.'}
+                {applicationStatus === 'rejected' &&
+                  'Lamentablemente tu postulación no fue aceptada en esta ocasión.'}
+              </p>
+            </div>
+          ) : (
+            <div className="flex justify-center pt-4">
+              <Button
+                onClick={() => onApply(scholarship.id)}
+                disabled={isApplying}
+                size="lg"
+                className="w-full sm:w-auto min-w-[320px]"
+              >
+                {isApplying ? <Spinner /> : 'Postular a esta Beca'}
+              </Button>
+            </div>
+          )}
+        </>
+      )}
     </div>
   )
 }

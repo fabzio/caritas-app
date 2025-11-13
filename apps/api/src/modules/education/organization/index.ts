@@ -8,10 +8,18 @@ const organization = new Elysia({
   prefix: '/organization',
 })
   .use(betterAuth)
-  .get('', getOrganization, {
+  .get('', ({ query }) => getOrganization(query), {
     auth: true,
+    query: t.Object({
+      q: t.Optional(t.String()),
+      active: t.Optional(t.Boolean()),
+      page: t.Optional(t.Numeric({ minimum: 0, default: 0 })),
+      limit: t.Optional(t.Numeric({ minimum: 1, maximum: 100, default: 10 })),
+      sortBy: t.Optional(t.String()),
+      type: t.Optional(t.String()),
+    }),
     response: {
-      200: OrganizationModel.getOrganization,
+      200: OrganizationModel.paginatedOrganization,
       401: t.Literal('Unauthorized'),
     },
   })

@@ -188,6 +188,13 @@ export namespace ActivityModel {
           'sex',
           'regionId',
         ]),
+        t.Object({
+          insuranceType: t.Enum({
+            private: 'private',
+            public: 'public',
+            none: 'none',
+          }),
+        }),
       ]),
     ),
   })

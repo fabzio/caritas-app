@@ -32,6 +32,7 @@ export const useOrganizationTable = () => {
           pageSize: response.limit,
         }
       : undefined,
+    filters,
     setFilters,
     columns,
     sortingState,

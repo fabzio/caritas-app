@@ -220,8 +220,8 @@ export const auth = betterAuth({
     passkey(),
     organization({
       organizationHooks: {
-        afterAcceptInvitation: async ({ invitation: { role }, user }) => {
-          if (role.includes('admin'))
+        afterAcceptInvitation: async ({ organization, user }) => {
+          if (organization.type === 'caritas')
             await db
               .update(schema.user)
               .set({ role: 'admin' })
