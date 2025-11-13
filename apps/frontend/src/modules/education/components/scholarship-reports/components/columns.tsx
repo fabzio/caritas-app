@@ -23,12 +23,6 @@ export const scholarshipReportsColumns: ColumnDef<ScholarshipReport>[] = [
     ),
   },
   {
-    accessorKey: 'scholarship.name',
-    header: 'Beca',
-    cell: ({ row }) => row.original.scholarship.name,
-    enableSorting: false,
-  },
-  {
     accessorKey: 'cause',
     header: 'Causa',
     enableSorting: false,

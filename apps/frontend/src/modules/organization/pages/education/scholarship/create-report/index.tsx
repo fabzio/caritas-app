@@ -1,6 +1,6 @@
 import { useSession } from '@frontend/hooks/use-session'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Link, useSearch } from '@tanstack/react-router'
+import { useNavigate, useSearch } from '@tanstack/react-router'
 import { Button } from '@workspace/ui/components/button'
 import {
   Form,
@@ -25,7 +25,10 @@ import { Eraser } from 'lucide-react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { AutoCompleteAcceptedUser } from '../../components/autocomplete-accept'
-import { useAcceptedUsers } from '../../hooks/use-accept-applications'
+import {
+  type AcceptedUser,
+  useAcceptedUsers,
+} from '../../hooks/use-accept-applications'
 import { useCreateReport } from './hooks/use-create-report'
 import type { FormReportSchema } from './model/report'
 import { reportSchema } from './model/report'
@@ -34,10 +37,11 @@ export default function CreateReportPage() {
     from: '/_authenticated/organization/education/scholarship/report',
   })
   const scholarshipId = Number(search.id)
+  const navigate = useNavigate()
   const { data: session } = useSession()
   const reportedBy = session?.session?.userId ?? ''
   const [searchValue, setSearchValue] = useState('')
-  const [selectedUser, setSelectedUser] = useState<any>(null)
+  const [selectedUser, setSelectedUser] = useState<AcceptedUser | null>(null)
 
   const { data: acceptedUsers = [], isLoading } = useAcceptedUsers({
     scholarshipId,
@@ -56,8 +60,7 @@ export default function CreateReportPage() {
     },
   })
 
-  const handleSelectUser = (user: any) => {
-    console.log('Usuario seleccionado:', user)
+  const handleSelectUser = (user: AcceptedUser) => {
     setSelectedUser(user)
     form.setValue('userId', user.id)
   }
@@ -66,6 +69,14 @@ export default function CreateReportPage() {
     setSelectedUser(null)
     setSearchValue('')
     form.setValue('userId', '')
+  }
+
+  const handleCancel = () => {
+    if (typeof window !== 'undefined' && window.history.length > 1) {
+      window.history.back()
+      return
+    }
+    navigate({ to: '/organization/education/scholarship' })
   }
 
   const onSubmit = async (values: FormReportSchema) => {
@@ -230,11 +241,9 @@ export default function CreateReportPage() {
 
               {/* Footer */}
               <footer className="flex justify-end gap-4 items-center pt-4">
-                <Link to="/organization/education/scholarship">
-                  <Button variant="outline" type="button">
-                    Cancelar
-                  </Button>
-                </Link>
+                <Button variant="outline" type="button" onClick={handleCancel}>
+                  Cancelar
+                </Button>
                 <Button type="submit" disabled={isPending || !selectedUser}>
                   {isPending ? <Spinner /> : 'Registrar reporte'}
                 </Button>

@@ -16,7 +16,7 @@ import {
   FileTextIcon,
   GraduationCapIcon,
 } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import ApplicantsTable from './components/applicants-table'
 import ScholarshipGeneralInfo from './components/scholarship-general-info'
 import useScholarshipDetail from './hooks/use-scholarship-detail'
@@ -26,12 +26,6 @@ export default function ViewScholarship() {
   const [activeTab, setActiveTab] = useState('general')
 
   const { data: scholarship } = useScholarshipDetail()
-
-  const scholarshipOptions = useMemo(
-    () =>
-      scholarship ? [{ value: scholarship.id, label: scholarship.name }] : [],
-    [scholarship],
-  )
 
   if (!scholarship) {
     return (
@@ -121,10 +115,7 @@ export default function ViewScholarship() {
 
         <TabsContent value="reports" className="mt-0">
           <div className="px-6">
-            <ScholarshipReportsTable
-              scholarshipId={scholarship.id}
-              scholarshipOptions={scholarshipOptions}
-            />
+            <ScholarshipReportsTable scholarshipId={scholarship.id} />
           </div>
         </TabsContent>
       </Tabs>
