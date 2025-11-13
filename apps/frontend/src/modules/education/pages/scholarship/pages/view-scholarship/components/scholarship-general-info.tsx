@@ -1,3 +1,4 @@
+import { formatDate } from '@frontend/shared/utils/format-date'
 import { Separator } from '@workspace/ui/components/separator'
 import {
   BuildingIcon,
@@ -23,18 +24,6 @@ type Props = {
 export default function ScholarshipGeneralInfo({
   scholarship,
 }: Readonly<Props>) {
-  const formatDate = (dateString: string): string => {
-    const date = new Date(dateString)
-    const adjustedDate = new Date(
-      date.getTime() + date.getTimezoneOffset() * 60000,
-    )
-    return adjustedDate.toLocaleDateString('es-PE', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric',
-    })
-  }
-
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

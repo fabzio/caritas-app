@@ -1,3 +1,4 @@
+import { formatDate } from '@frontend/shared/utils/format-date'
 import { Button } from '@workspace/ui/components/button'
 import { Separator } from '@workspace/ui/components/separator'
 import { Spinner } from '@workspace/ui/components/spinner'
@@ -30,17 +31,19 @@ type Props = {
   applicationStatus?: 'pending' | 'accepted' | 'rejected'
 }
 
-function parseDateFromDDMMYYYY(dateString: string): Date {
-  const [day, month, year] = dateString.split('/').map(Number)
-  return new Date(year, month - 1, day)
-}
-
 function getScholarshipStatus(startDate: string, endDate: string) {
   const now = new Date()
   now.setHours(0, 0, 0, 0)
 
-  const start = parseDateFromDDMMYYYY(startDate)
-  const end = parseDateFromDDMMYYYY(endDate)
+  const startUTC = new Date(startDate)
+  const start = new Date(
+    startUTC.getTime() + startUTC.getTimezoneOffset() * 60000,
+  )
+  start.setHours(0, 0, 0, 0)
+
+  const endUTC = new Date(endDate)
+  const end = new Date(endUTC.getTime() + endUTC.getTimezoneOffset() * 60000)
+  end.setHours(0, 0, 0, 0)
 
   if (now < start) {
     const daysUntilStart = Math.ceil(
@@ -153,7 +156,7 @@ export default function ScholarshipGeneralInfo({
             <div>
               <h3 className="font-medium">Fecha de Inicio</h3>
               <p className="text-sm text-muted-foreground">
-                {scholarship.startDate}
+                {formatDate(scholarship.startDate)}
               </p>
             </div>
           </div>
@@ -163,7 +166,7 @@ export default function ScholarshipGeneralInfo({
             <div>
               <h3 className="font-medium">Fecha de Fin</h3>
               <p className="text-sm text-muted-foreground">
-                {scholarship.endDate}
+                {formatDate(scholarship.endDate)}
               </p>
             </div>
           </div>
@@ -202,8 +205,8 @@ export default function ScholarshipGeneralInfo({
                 )}
                 {applicationStatus === 'accepted' && (
                   <>
-                    <CheckCircleIcon className="h-6 w-6 text-green-600" />
-                    <h3 className="text-lg font-semibold text-green-600">
+                    <CheckCircleIcon className="h-6 w-6 text-primary" />
+                    <h3 className="text-lg font-semibold text-primary">
                       Postulación Aceptada
                     </h3>
                   </>

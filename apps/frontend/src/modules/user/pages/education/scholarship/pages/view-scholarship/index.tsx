@@ -44,14 +44,6 @@ export default function ViewScholarshipPage() {
     )
   }
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString)
-    const day = date.getDate().toString().padStart(2, '0')
-    const month = (date.getMonth() + 1).toString().padStart(2, '0')
-    const year = date.getFullYear()
-    return `${day}/${month}/${year}`
-  }
-
   const handleApply = (scholarshipId: number) => {
     if (!session?.user?.id) {
       toast.error('Debes iniciar sesión para postular')
@@ -80,8 +72,8 @@ export default function ViewScholarshipPage() {
     type: scholarship.type === 'ML' ? 'Modular' : 'Plan de estudios',
     organization: scholarship.organization?.name || 'N/A',
     vacancies: scholarship.vacancies,
-    startDate: formatDate(scholarship.startDate),
-    endDate: formatDate(scholarship.endDate),
+    startDate: scholarship.startDate,
+    endDate: scholarship.endDate,
     description: scholarship.description,
     requirements: scholarship.requirements,
   }

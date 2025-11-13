@@ -1,3 +1,4 @@
+import { formatDateShort } from '@frontend/shared/utils/format-date'
 import { Link } from '@tanstack/react-router'
 import { Badge } from '@workspace/ui/components/badge'
 import {
@@ -6,8 +7,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@workspace/ui/components/card'
-import { format } from 'date-fns'
-import { es } from 'date-fns/locale'
 import { CalendarDays, MapPin } from 'lucide-react'
 import type { Scholarship } from '../pages/education/scholarship/pages/view-scholarship/hooks/use-get-scholarship'
 
@@ -42,9 +41,7 @@ export function ScholarshipCard({
             <CalendarDays className="h-4 w-4 shrink-0" />
             <span>Fecha Inicio:</span>
             <span className="font-medium text-foreground">
-              {format(new Date(scholarship.startDate), 'dd/MM/yy', {
-                locale: es,
-              })}
+              {formatDateShort(scholarship.startDate)}
             </span>
           </div>
 
@@ -60,9 +57,7 @@ export function ScholarshipCard({
             <CalendarDays className="h-4 w-4 shrink-0" />
             <span>Fecha Fin:</span>
             <span className="font-medium text-foreground">
-              {format(new Date(scholarship.endDate), 'dd/MM/yy', {
-                locale: es,
-              })}
+              {formatDateShort(scholarship.endDate)}
             </span>
           </div>
         </CardContent>
