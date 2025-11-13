@@ -24,7 +24,8 @@ export namespace OrganizationModel {
     ),
     page: t.Optional(t.Integer({ minimum: 0 })),
     limit: t.Optional(t.Integer({ minimum: 1, maximum: 100 })),
-    sortBy: t.Optional(t.String()), // ej: "name.asc"
+    sortBy: t.Optional(t.String()),
+    active: t.Optional(t.Boolean()),
   })
   export type ListOrganizationsQuery = typeof listOrganizationsQuery.static
 

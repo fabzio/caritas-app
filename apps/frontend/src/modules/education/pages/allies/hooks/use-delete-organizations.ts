@@ -68,9 +68,7 @@ const useDeleteOrganizations = () => {
             return
           }
 
-          toast.error(
-            'No se pueden eliminar las organizaciones porque una de ellas tiene más de una beca activa.',
-          )
+          toast.error('No se puede completar la eliminación en este momento.')
           return
         }
 

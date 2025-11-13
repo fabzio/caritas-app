@@ -8,7 +8,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@workspace/ui/components/dialog'
-import { AlertCircle, UserPlus } from 'lucide-react'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@workspace/ui/components/dropdown-menu'
+import { ChevronDown, UserPlus } from 'lucide-react'
 import { useState } from 'react'
 import ActionsButton from './components/actions-button'
 import OrganizationFormDialog from './components/organization-form-dialog'
@@ -25,7 +31,6 @@ interface FormModalStateType {
 export default function OrganizationTableView() {
   const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({})
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
-  const [deleteError, setDeleteError] = useState<string | null>(null)
   const [formModal, setFormModal] = useState<FormModalStateType>({
     open: false,
     type: 'new',
@@ -39,6 +44,7 @@ export default function OrganizationTableView() {
     columns,
     paginationState,
     sortingState,
+    filters,
     setFilters,
   } = useOrganizationTable()
 
@@ -55,7 +61,6 @@ export default function OrganizationTableView() {
   const organizationCount = selectedOrganizations.length
 
   const handleDelete = async () => {
-    setDeleteError(null)
     const ids = selectedOrganizations.map((org) => org.id)
 
     deleteOrganizations.mutate(
@@ -86,6 +91,44 @@ export default function OrganizationTableView() {
           </div>
         </div>
         <div className="flex items-center gap-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline">
+                {filters.active === undefined
+                  ? 'Todas'
+                  : filters.active
+                    ? 'Activas'
+                    : 'Inactivas'}
+                <ChevronDown />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem
+                onClick={() => {
+                  setRowSelection({})
+                  setFilters({ active: undefined, pageIndex: 1 })
+                }}
+              >
+                Todas
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  setRowSelection({})
+                  setFilters({ active: true, pageIndex: 1 })
+                }}
+              >
+                Activas
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  setRowSelection({})
+                  setFilters({ active: false, pageIndex: 1 })
+                }}
+              >
+                Inactivas
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           <ActionsButton
             onDeleteClick={() => setIsDeleteModalOpen(true)}
             onEditClick={() => setFormModal({ open: true, type: 'edit' })}
@@ -126,7 +169,6 @@ export default function OrganizationTableView() {
                 type="button"
                 variant="outline"
                 disabled={deleteOrganizations.isPending}
-                onClick={() => setDeleteError(null)}
               >
                 Cancelar
               </Button>
@@ -142,7 +184,7 @@ export default function OrganizationTableView() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      {/* Modal para crear/editar */}
+
       <OrganizationFormDialog
         open={formModal.open}
         onOpenChange={setFormModal}
