@@ -43,4 +43,21 @@ export namespace Application {
     comments: t.Optional(t.String()),
   })
   export type RejectRecipientsBody = typeof rejectRecipientsBody.static
+
+  export const checkApplicationStatusResponse = t.Union([
+    t.Object({
+      hasApplied: t.Literal(true),
+      status: t.Enum({
+        pending: 'pending',
+        accepted: 'accepted',
+        rejected: 'rejected',
+      }),
+      applicationDate: t.String(),
+    }),
+    t.Object({
+      hasApplied: t.Literal(false),
+    }),
+  ])
+  export type CheckApplicationStatusResponse =
+    typeof checkApplicationStatusResponse.static
 }
