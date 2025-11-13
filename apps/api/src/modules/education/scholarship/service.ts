@@ -14,7 +14,7 @@ type GetParams = {
 }
 export const findDuplicateScholarship = async (
   name: string,
-  organizationId?: string,
+  _organizationId?: string,
   excludeId?: number,
 ) => {
   const response = await db

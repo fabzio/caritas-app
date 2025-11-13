@@ -1,3 +1,4 @@
+import { ScholarshipReportsTable } from '@frontend/modules/education/components/scholarship-reports/components/reports-table'
 import { useNavigate } from '@tanstack/react-router'
 import { Badge } from '@workspace/ui/components/badge'
 import { Button } from '@workspace/ui/components/button'
@@ -9,8 +10,13 @@ import {
   TabsList,
   TabsTrigger,
 } from '@workspace/ui/components/tabs'
-import { ArrowLeftIcon, FileTextIcon, GraduationCapIcon } from 'lucide-react'
-import { useState } from 'react'
+import {
+  AlertTriangleIcon,
+  ArrowLeftIcon,
+  FileTextIcon,
+  GraduationCapIcon,
+} from 'lucide-react'
+import { useMemo, useState } from 'react'
 import ApplicantsTable from './components/applicants-table'
 import ScholarshipGeneralInfo from './components/scholarship-general-info'
 import useScholarshipDetail from './hooks/use-scholarship-detail'
@@ -20,6 +26,12 @@ export default function ViewScholarship() {
   const [activeTab, setActiveTab] = useState('general')
 
   const { data: scholarship } = useScholarshipDetail()
+
+  const scholarshipOptions = useMemo(
+    () =>
+      scholarship ? [{ value: scholarship.id, label: scholarship.name }] : [],
+    [scholarship],
+  )
 
   if (!scholarship) {
     return (
@@ -89,6 +101,10 @@ export default function ViewScholarship() {
             <GraduationCapIcon className="h-4 w-4" />
             Postulantes
           </TabsTrigger>
+          <TabsTrigger value="reports" className="flex items-center gap-2">
+            <AlertTriangleIcon className="h-4 w-4" />
+            Reportes
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="general" className="mt-0">
@@ -100,6 +116,15 @@ export default function ViewScholarship() {
         <TabsContent value="applicants" className="mt-0">
           <div className="px-6">
             <ApplicantsTable scholarshipId={scholarship.id} />
+          </div>
+        </TabsContent>
+
+        <TabsContent value="reports" className="mt-0">
+          <div className="px-6">
+            <ScholarshipReportsTable
+              scholarshipId={scholarship.id}
+              scholarshipOptions={scholarshipOptions}
+            />
           </div>
         </TabsContent>
       </Tabs>

@@ -1,13 +1,21 @@
 import betterAuth from '@api/modules/auth/middleware'
 import Elysia, { status, t } from 'elysia'
 import { ReportModel } from './model'
-import { createScholarshipReport } from './service'
+import { createScholarshipReport, getScholarshipReports } from './service'
 
 const scholarshipReport = new Elysia({
   name: 'report',
   prefix: '/report',
 })
   .use(betterAuth)
+  .get('', ({ query }) => getScholarshipReports(query), {
+    auth: true,
+    query: ReportModel.listReportsQuery,
+    response: {
+      200: ReportModel.listReportsResponse,
+      401: t.Literal('Unauthorized'),
+    },
+  })
   .post(
     '',
     async ({ body }) => {
