@@ -6,7 +6,8 @@ export const getOrganization =
   async (): Promise<OrganizationModel.GetOrganization> => {
     try {
       return await db.query.organization.findMany({
-        where: (org, { eq }) => eq(org.type, 'education'),
+        where: (org, { eq, and }) =>
+          and(eq(org.type, 'education'), eq(org.active, true)),
         columns: {
           createdAt: false,
           updatedAt: false,
