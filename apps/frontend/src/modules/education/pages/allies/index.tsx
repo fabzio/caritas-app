@@ -8,12 +8,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@workspace/ui/components/dialog'
-import { UserPlus } from 'lucide-react'
+import { AlertCircle, UserPlus } from 'lucide-react'
 import { useState } from 'react'
 import ActionsButton from './components/actions-button'
 import OrganizationFormDialog from './components/organization-form-dialog'
 import OrganizationTable from './components/organization-table'
 import SearchHealthOrganizationInput from './components/search-organization-input'
+import useDeleteOrganizations from './hooks/use-delete-organizations'
 import { useOrganizationTable } from './hooks/use-organization-table'
 
 interface FormModalStateType {
@@ -24,10 +25,13 @@ interface FormModalStateType {
 export default function OrganizationTableView() {
   const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({})
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const [deleteError, setDeleteError] = useState<string | null>(null)
   const [formModal, setFormModal] = useState<FormModalStateType>({
     open: false,
     type: 'new',
   })
+
+  const deleteOrganizations = useDeleteOrganizations()
 
   const {
     data: organizations,
@@ -51,7 +55,18 @@ export default function OrganizationTableView() {
   const organizationCount = selectedOrganizations.length
 
   const handleDelete = async () => {
-    // TODO: implement delete organization
+    setDeleteError(null)
+    const ids = selectedOrganizations.map((org) => org.id)
+
+    deleteOrganizations.mutate(
+      { ids },
+      {
+        onSuccess: () => {
+          setIsDeleteModalOpen(false)
+          setRowSelection({})
+        },
+      },
+    )
   }
 
   return (
@@ -107,13 +122,22 @@ export default function OrganizationTableView() {
 
           <DialogFooter>
             <DialogClose asChild>
-              <Button type="button" variant="outline">
+              <Button
+                type="button"
+                variant="outline"
+                disabled={deleteOrganizations.isPending}
+                onClick={() => setDeleteError(null)}
+              >
                 Cancelar
               </Button>
             </DialogClose>
 
-            <Button type="button" onClick={handleDelete}>
-              Aceptar
+            <Button
+              type="button"
+              onClick={handleDelete}
+              disabled={deleteOrganizations.isPending}
+            >
+              {deleteOrganizations.isPending ? 'Eliminando...' : 'Aceptar'}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -62,4 +62,16 @@ export namespace OrganizationModel {
     ids: t.Array(t.String({ minimum: 1 })),
   })
   export type deleteOrganizations = typeof deleteOrganizations.static
+
+  export const deleteOrganizationsWithScholarships = t.Object({
+    organizationsWithScholarships: t.Array(
+      t.Object({
+        organizationId: t.String(),
+        organizationName: t.String(),
+        scholarshipCount: t.Number(),
+      }),
+    ),
+  })
+  export type DeleteOrganizationsWithScholarships =
+    typeof deleteOrganizationsWithScholarships.static
 }
