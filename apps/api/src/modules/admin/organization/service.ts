@@ -16,6 +16,7 @@ export async function getOrganizations(
     limit = 10,
     sortBy = 'name.asc',
     type,
+    active,
     organizationId,
   } = params
 
@@ -33,7 +34,8 @@ export async function getOrganizations(
   const orderExpr = sortOrder === 'desc' ? desc(column) : asc(column)
 
   const searchCondition = q ? or(ilike(organization.name, `%${q}%`)) : undefined
-  const activeCondition = eq(organization.active, true)
+  const activeCondition =
+    active !== undefined ? eq(organization.active, active) : undefined
   const typeCondition = type ? eq(organization.type, type) : undefined
   const where = and(
     activeCondition,
@@ -42,13 +44,11 @@ export async function getOrganizations(
     not(eq(organization.id, organizationId)),
   )
 
-  // Get total count
   const [{ total }] = await db
     .select({ total: count() })
     .from(organization)
     .where(where)
 
-  // Get paginated data
   const rows = await db
     .select()
     .from(organization)

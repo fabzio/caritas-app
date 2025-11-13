@@ -6,7 +6,7 @@ import { useQuery } from '@tanstack/react-query'
 type UseParams = {
   currentPage?: number
   pageSize?: number
-  filters?: Filters
+  filters?: Filters & { active?: boolean }
 }
 
 export const useListOrganizations = ({
@@ -15,7 +15,12 @@ export const useListOrganizations = ({
   filters,
 }: UseParams) => {
   return useQuery({
-    queryKey: [QueryKeys.EDUCATION.ORGANIZATIONS, filters],
+    queryKey: [
+      QueryKeys.EDUCATION.ORGANIZATIONS,
+      currentPage,
+      pageSize,
+      filters,
+    ],
     queryFn: async () => {
       const { data, error } = await rpc.admin.organization.get({
         query: {
@@ -24,6 +29,7 @@ export const useListOrganizations = ({
           limit: pageSize,
           sortBy: filters?.sortBy || 'name.asc',
           type: 'education',
+          active: filters?.active,
         },
       })
       if (error) throw error

@@ -10,4 +10,19 @@ export namespace OrganizationModel {
   )
 
   export type GetOrganization = typeof getOrganization.static
+
+  export const organizationItem = t.Omit(_getOrganization, [
+    'createdAt',
+    'updatedAt',
+  ])
+
+  export const paginatedOrganization = t.Object({
+    data: t.Array(organizationItem),
+    page: t.Number(),
+    limit: t.Number(),
+    total: t.Number(),
+    totalPages: t.Number(),
+  })
+
+  export type PaginatedOrganization = typeof paginatedOrganization.static
 }
