@@ -81,7 +81,11 @@ export default function CreateFairPage() {
             organizations: loaderData.organizations.map((org) => ({
               organizationId: org.id,
             })),
-            assistanceCount: loaderData.assistanceCount ?? undefined,
+            assistanceCount:
+              loaderData.assistanceCount !== null &&
+              loaderData.assistanceCount !== undefined
+                ? String(loaderData.assistanceCount)
+                : '',
           }
         : {
             title: '',
@@ -91,7 +95,7 @@ export default function CreateFairPage() {
             endTime: '08:30:00',
             regionId: 0,
             organizations: [{ organizationId: '' }],
-            assistanceCount: undefined,
+            assistanceCount: '',
           },
   })
   const { fields, remove } = useFieldArray({
@@ -112,9 +116,15 @@ export default function CreateFairPage() {
   const { data: user } = useSession()
   const handleSubmit = form.handleSubmit((data) => {
     if (!user) return
+    const { assistanceCount, ...rest } = data
+    const normalizedAssistanceCount =
+      assistanceCount && assistanceCount.trim() !== ''
+        ? Number(assistanceCount)
+        : null
     const payload = {
-      ...data,
-      date: data.date,
+      ...rest,
+      assistanceCount: normalizedAssistanceCount,
+      date: rest.date,
       createdBy: user.user.id,
       active: true,
     }
@@ -324,19 +334,9 @@ export default function CreateFairPage() {
                           <FormLabel>Número de asistentes</FormLabel>
                           <FormControl>
                             <Input
-                              type="number"
-                              min={0}
-                              step={1}
-                              value={
-                                typeof field.value === 'number'
-                                  ? field.value
-                                  : (field.value ?? '')
-                              }
+                              value={field.value ?? ''}
                               onChange={(event) => {
-                                const value = event.target.value
-                                field.onChange(
-                                  value === '' ? undefined : Number(value),
-                                )
+                                field.onChange(event.target.value)
                               }}
                             />
                           </FormControl>

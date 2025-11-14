@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+const normalizeNumericString = (value: string) => value.trim()
+
 export const formFairSchema = z
   .object({
     title: z
@@ -49,13 +51,15 @@ export const formFairSchema = z
       )
       .min(1, 'Debe haber al menos una organización'),
     assistanceCount: z
-      .number({
-        invalid_type_error: 'Ingresa un número válido de asistentes',
-      })
-      .int('El número de asistentes debe ser un número entero')
-      .min(0, {
-        message: 'La cantidad de asistentes no puede ser negativa',
-      })
+      .union([
+        z
+          .string()
+          .transform((value) => normalizeNumericString(value))
+          .refine((value) => value === '' || /^\d+$/.test(value), {
+            message: 'Ingresa solo números enteros positivos',
+          }),
+        z.undefined(),
+      ])
       .optional(),
   })
 
@@ -64,7 +68,12 @@ export const formFairSchema = z
     path: ['endTime'],
   })
   .superRefine((data, ctx) => {
-    if (data.assistanceCount === undefined || data.assistanceCount === null) {
+    const assistanceValue =
+      typeof data.assistanceCount === 'string'
+        ? data.assistanceCount.trim()
+        : undefined
+
+    if (!assistanceValue) {
       return
     }
 

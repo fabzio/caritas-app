@@ -21,7 +21,7 @@ const usePostFair = () => {
       createdAt?: Date
       updatedAt?: Date
       organizations: { organizationId: string }[]
-      assistanceCount?: number
+      assistanceCount?: number | null
     }) => {
       const res = await rpc.education.fairs.post({
         ...params,

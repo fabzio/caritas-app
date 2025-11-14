@@ -21,7 +21,7 @@ export const useUpdateFairs = () => {
       createdAt?: Date
       updatedAt?: Date
       organizations: { organizationId: string }[]
-      assistanceCount?: number
+      assistanceCount?: number | null
     }) => {
       const cleanBody = {
         ...params,
