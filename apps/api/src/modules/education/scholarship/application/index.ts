@@ -5,6 +5,7 @@ import {
   acceptApplications,
   checkApplicationStatus,
   createScholarshipApplication,
+  getAcceptedUsers,
   getApplicantsByScholarship,
   rejectScholarshipRecipients,
 } from './service'
@@ -27,6 +28,15 @@ const application = new Elysia({
       },
     },
   )
+  .get('/accepted-users', ({ query }) => getAcceptedUsers(query), {
+    auth: true,
+    query: Application.listAcceptedUsersQuery,
+    response: {
+      200: Application.acceptedUsersResponse,
+      401: t.Literal('Unauthorized'),
+    },
+  })
+
   .patch(
     '/accept',
     async ({ body, session, user }) => {

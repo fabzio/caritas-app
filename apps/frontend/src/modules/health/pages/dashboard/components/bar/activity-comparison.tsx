@@ -20,7 +20,7 @@ import {
   SelectValue,
 } from '@workspace/ui/components/select'
 import { useState } from 'react'
-import { Bar, BarChart, CartesianGrid, LabelList, XAxis } from 'recharts'
+import { Bar, BarChart, CartesianGrid, LabelList, Text, XAxis } from 'recharts'
 import { useActivityComparison } from '../../hooks/use-activity-comparison'
 
 export default function ActivityComparison() {
@@ -76,6 +76,7 @@ export default function ActivityComparison() {
             <CartesianGrid vertical={false} />
             <XAxis
               dataKey="activity"
+              tickFormatter={(val) => `${val.slice(0, 20)}...`}
               tickLine={false}
               tickMargin={10}
               angle={-10}
@@ -98,7 +99,12 @@ export default function ActivityComparison() {
               ))
             )}
 
-            <ChartLegend content={<ChartLegendContent />} />
+            <ChartLegend
+              content={<ChartLegendContent payload={{}} />}
+              wrapperStyle={{
+                overflow: 'auto',
+              }}
+            />
             <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
           </BarChart>
         </ChartContainer>

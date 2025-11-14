@@ -26,7 +26,7 @@ export default function RegionDistribution() {
     },
     ...(data?.reduce(
       (acc, item) => {
-        acc[item.region as string] = {
+        acc[item.region?.replaceAll(' ', '_') as string] = {
           color: colorVars[Object.keys(acc).length % colorVars.length],
           label: item.region as string,
         }
@@ -38,7 +38,7 @@ export default function RegionDistribution() {
   const chartData =
     data?.map((item) => ({
       ...item,
-      fill: `var(--color-${item.region})`,
+      fill: `var(--color-${item.region?.replaceAll(' ', '_')})`,
     })) || []
   return (
     <Card>

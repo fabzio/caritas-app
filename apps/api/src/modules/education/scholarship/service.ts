@@ -10,10 +10,11 @@ type GetParams = {
   active?: boolean
   page?: number
   pageSize?: number
+  organizationId?: string
 }
 export const findDuplicateScholarship = async (
   name: string,
-  organizationId?: string,
+  _organizationId?: string,
   excludeId?: number,
 ) => {
   const response = await db
@@ -55,11 +56,14 @@ export const getScholarships = async ({
   active,
   page = 1,
   pageSize = 10,
+  organizationId,
 }: GetParams): Promise<ScholarshipModel.Paginated> => {
   try {
     const conditions = []
     if (name) conditions.push(ilike(scholarship.name, `%${name}%`))
     if (active !== undefined) conditions.push(eq(scholarship.active, active))
+    if (organizationId !== undefined)
+      conditions.push(eq(scholarship.organizationId, organizationId))
 
     const where = conditions.length > 0 ? and(...conditions) : undefined
     const offset = (page - 1) * pageSize

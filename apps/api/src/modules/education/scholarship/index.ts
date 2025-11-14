@@ -3,6 +3,7 @@ import Elysia, { status, t } from 'elysia'
 import application from './application'
 import { ScholarshipModel } from './model'
 import scholarshipRecipients from './recipients'
+import scholarshipReport from './report'
 import {
   createScholarship,
   deleteScholarships,
@@ -20,6 +21,7 @@ const scholarship = new Elysia({
   .use(betterAuth)
   .use(application)
   .use(scholarshipRecipients)
+  .use(scholarshipReport)
   .get('/available', async () => getAvailableScholarships(), {
     auth: true,
     response: {
@@ -32,6 +34,7 @@ const scholarship = new Elysia({
     query: t.Object({
       name: t.Optional(t.String()),
       active: t.Optional(t.Boolean()),
+      organizationId: t.Optional(t.String()),
       page: t.Optional(t.Numeric({ minimum: 1, default: 1 })),
       pageSize: t.Optional(t.Numeric({ minimum: 1, maximum: 20, default: 10 })),
     }),
