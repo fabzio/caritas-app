@@ -6,9 +6,11 @@ const useGetOrganization = () => {
   return useQuery({
     queryKey: [QueryKeys.ADMIN.ALLIES],
     queryFn: async () => {
-      const res = await rpc.education.organization.get()
+      const res = await rpc.education.organization.get({
+        query: { active: true },
+      })
       if (res.error) throw res.error
-      return res.data
+      return res.data?.data
     },
   })
 }

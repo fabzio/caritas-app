@@ -5,6 +5,7 @@ import {
   acceptApplications,
   checkApplicationStatus,
   createScholarshipApplication,
+  getAcceptedUsers,
   getApplicantsByScholarship,
   rejectScholarshipRecipients,
 } from './service'
@@ -27,6 +28,15 @@ const application = new Elysia({
       },
     },
   )
+  .get('/accepted-users', ({ query }) => getAcceptedUsers(query), {
+    auth: true,
+    query: Application.listAcceptedUsersQuery,
+    response: {
+      200: Application.acceptedUsersResponse,
+      401: t.Literal('Unauthorized'),
+    },
+  })
+
   .patch(
     '/accept',
     async ({ body, session, user }) => {
@@ -86,16 +96,35 @@ const application = new Elysia({
       },
     },
   )
-  .post('', ({ body }) => createScholarshipApplication(body), {
-    auth: true,
-    body: Application.createScholarshipApplicationBody,
-    response: {
-      200: t.Number({
-        description: 'ID of the created scholarship application',
-      }),
-      401: t.Literal('Unauthorized'),
+  .post(
+    '',
+    async ({ body }) => {
+      try {
+        return await createScholarshipApplication(body)
+      } catch (error) {
+        if (error instanceof Error) {
+          const msg = error.message.toLowerCase()
+          if (msg.includes('ya ha postulado')) throw status(409, error.message)
+          if (msg.includes('no se encontró')) throw status(404, error.message)
+          throw status(500, 'Error interno al crear la aplicación')
+        }
+        throw status(500, 'Error inesperado al crear la aplicación')
+      }
     },
-  })
+    {
+      auth: true,
+      body: Application.createScholarshipApplicationBody,
+      response: {
+        200: t.Number({
+          description: 'ID of the created scholarship application',
+        }),
+        401: t.Literal('Unauthorized'),
+        404: t.String({ description: 'Not found error message' }),
+        409: t.String({ description: 'Conflict error message' }),
+        500: t.String({ description: 'Internal server error message' }),
+      },
+    },
+  )
   .get(
     '/check/:scholarshipId',
     ({ params, session, user }) =>
