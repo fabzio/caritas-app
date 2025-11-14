@@ -7,6 +7,7 @@ import {
   findDuplicateSpeciality,
   getSingleSpeciality,
   getSpecialities,
+  hasActivitiesAssociated,
   updateSpeciality,
 } from './service'
 
@@ -88,8 +89,31 @@ const speciality = new Elysia({
     '/',
     async ({ body }) => {
       const { ids } = body
-      if (!ids.length)
+
+      if (!ids.length) {
         throw status(400, 'No hay ningún ID de especialidad para eliminar')
+      }
+
+      const idsWithActivities = []
+      const specialityNames = []
+
+      for (const id of ids) {
+        const hasActivities = await hasActivitiesAssociated(id)
+        if (hasActivities) {
+          idsWithActivities.push(id)
+          const speciality = await getSingleSpeciality(id)
+          if (speciality) {
+            specialityNames.push(speciality.name)
+          }
+        }
+      }
+
+      if (idsWithActivities.length > 0) {
+        throw status(
+          400,
+          `Las siguientes especialidades no se pueden eliminar por tener actividades asociadas: ${specialityNames.join(', ')}`,
+        )
+      }
 
       const deleted = await deleteSpecialities(ids)
       return deleted
