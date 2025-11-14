@@ -29,6 +29,7 @@ const useGetScholarship = (
   page = 1,
   pageSize = 10,
   active?: boolean,
+  organizationId?: string,
 ) => {
   return useQuery({
     queryKey: [
@@ -37,7 +38,7 @@ const useGetScholarship = (
     ],
     queryFn: async () => {
       const res = await rpc.education.scholarship.get({
-        query: { name, page, pageSize, active },
+        query: { name, page, pageSize, active, organizationId },
       })
       if (res.error) throw res.error
       return res.data

@@ -1,5 +1,5 @@
 import { ScholarshipReportsTable } from '@frontend/modules/education/components/scholarship-reports/components/reports-table'
-import { useNavigate } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
 import { Badge } from '@workspace/ui/components/badge'
 import { Button } from '@workspace/ui/components/button'
 import { Card, CardContent } from '@workspace/ui/components/card'
@@ -13,11 +13,12 @@ import {
 import {
   AlertTriangleIcon,
   ArrowLeftIcon,
+  FilePlus2,
   FileTextIcon,
   GraduationCapIcon,
 } from 'lucide-react'
 import { useState } from 'react'
-import ApplicantsTable from './components/applicants-table'
+import AcceptedStudentsTable from './components/accepted-students-table'
 import ScholarshipGeneralInfo from './components/scholarship-general-info'
 import useScholarshipDetail from './hooks/use-scholarship-detail'
 
@@ -35,7 +36,9 @@ export default function ViewScholarship() {
             <p className="text-muted-foreground">Beca no encontrada</p>
             <Button
               variant="outline"
-              onClick={() => navigate({ to: '/education/scholarship' })}
+              onClick={() =>
+                navigate({ to: '/organization/education/scholarship' })
+              }
               className="mt-4"
             >
               <ArrowLeftIcon className="h-4 w-4 mr-2" />
@@ -74,7 +77,9 @@ export default function ViewScholarship() {
       <div className="flex justify-start">
         <Button
           variant="outline"
-          onClick={() => navigate({ to: '/education/scholarship' })}
+          onClick={() =>
+            navigate({ to: '/organization/education/scholarship' })
+          }
         >
           <ArrowLeftIcon className="h-4 w-4 mr-2" />
           Regresar
@@ -91,9 +96,9 @@ export default function ViewScholarship() {
             <FileTextIcon className="h-4 w-4" />
             Información General
           </TabsTrigger>
-          <TabsTrigger value="applicants" className="flex items-center gap-2">
+          <TabsTrigger value="students" className="flex items-center gap-2">
             <GraduationCapIcon className="h-4 w-4" />
-            Postulantes
+            Becados
           </TabsTrigger>
           <TabsTrigger value="reports" className="flex items-center gap-2">
             <AlertTriangleIcon className="h-4 w-4" />
@@ -107,15 +112,28 @@ export default function ViewScholarship() {
           </div>
         </TabsContent>
 
-        <TabsContent value="applicants" className="mt-0">
+        <TabsContent value="students" className="mt-0">
           <div className="px-6">
-            <ApplicantsTable scholarshipId={scholarship.id} />
+            <AcceptedStudentsTable scholarshipId={scholarship.id} />
           </div>
         </TabsContent>
 
         <TabsContent value="reports" className="mt-0">
           <div className="px-6">
-            <ScholarshipReportsTable scholarshipId={scholarship.id} />
+            <ScholarshipReportsTable
+              scholarshipId={scholarship.id}
+              actionSlot={
+                <Button asChild>
+                  <Link
+                    to="/organization/education/scholarship/report"
+                    search={{ type: 'new', id: scholarship.id }}
+                  >
+                    <FilePlus2 className="mr-2 h-4 w-4" />
+                    Crear reporte
+                  </Link>
+                </Button>
+              }
+            />
           </div>
         </TabsContent>
       </Tabs>
