@@ -44,9 +44,14 @@ export const createScholarshipApplication = async (
     const res = await db
       .select()
       .from(scholarshipApplication)
-      .where(eq(scholarshipApplication.userId, args.userId))
+      .where(
+        and(
+          eq(scholarshipApplication.userId, args.userId),
+          eq(scholarshipApplication.scholarshipId, args.scholarshipId),
+        ),
+      )
     if (res.length > 0)
-      throw new Error('El usuario ya ha postulado a dicha oportunidad')
+      throw new Error('El usuario ya ha postulado a esta beca')
 
     const [{ id }] = await db.transaction(async (tx) => {
       return await tx
