@@ -56,7 +56,7 @@ export default function ActivityFilter() {
             />
 
             {filteredActivities && filteredActivities.length > 0 ? (
-              <ScrollArea className="mt-2 max-h-36 w-48 rounded-md">
+              <ScrollArea className="mt-2 h-36 w-48 rounded-md">
                 {filteredActivities.map((activity) => (
                   <div
                     key={activity.activityId}

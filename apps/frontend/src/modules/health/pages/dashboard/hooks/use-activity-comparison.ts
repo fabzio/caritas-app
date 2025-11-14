@@ -23,7 +23,7 @@ export const useActivityComparison = (
         : [attentions.activityId, attentions.activityName]
       const res = await db
         .select({
-          activity: sql<string>`concat('#', ${attentions.activityId}, ' - ', ${attentions.activityName})`,
+          activity: sql<string>`concat('#', ${attentions.activityId}, ' ', ${attentions.activityName})`,
           ...(groupby ? { group: mapBy[groupby] } : {}),
           total: count(attentions.attentionId),
         })
