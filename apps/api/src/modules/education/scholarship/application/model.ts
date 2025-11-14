@@ -44,6 +44,23 @@ export namespace Application {
   })
   export type RejectRecipientsBody = typeof rejectRecipientsBody.static
 
+  export const listAcceptedUsersQuery = t.Object({
+    scholarshipId: t.Numeric(),
+    name: t.Optional(t.String()),
+  })
+
+  export const acceptedUsersResponse = t.Object({
+    data: t.Array(
+      t.Object({
+        id: t.String(),
+        name: t.String(),
+        email: t.String(),
+        applicationDate: t.String(),
+        reviewDate: t.String(),
+      }),
+    ),
+  })
+
   export const checkApplicationStatusResponse = t.Union([
     t.Object({
       hasApplied: t.Literal(true),
