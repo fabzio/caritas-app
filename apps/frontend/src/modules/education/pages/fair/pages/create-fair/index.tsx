@@ -16,6 +16,7 @@ import {
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -80,6 +81,7 @@ export default function CreateFairPage() {
             organizations: loaderData.organizations.map((org) => ({
               organizationId: org.id,
             })),
+            assistanceCount: loaderData.assistanceCount ?? undefined,
           }
         : {
             title: '',
@@ -89,6 +91,7 @@ export default function CreateFairPage() {
             endTime: '08:30:00',
             regionId: 0,
             organizations: [{ organizationId: '' }],
+            assistanceCount: undefined,
           },
   })
   const { fields, remove } = useFieldArray({
@@ -312,6 +315,40 @@ export default function CreateFairPage() {
                       </FormItem>
                     )}
                   />
+                  {viewType === 'edit' && (
+                    <FormField
+                      control={form.control}
+                      name="assistanceCount"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Número de asistentes</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="number"
+                              min={0}
+                              step={1}
+                              value={
+                                typeof field.value === 'number'
+                                  ? field.value
+                                  : (field.value ?? '')
+                              }
+                              onChange={(event) => {
+                                const value = event.target.value
+                                field.onChange(
+                                  value === '' ? undefined : Number(value),
+                                )
+                              }}
+                            />
+                          </FormControl>
+                          <FormDescription>
+                            Registra los asistentes solo cuando la feria haya
+                            finalizado.
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )}
                   {/* --- Organizaciones Participantes --- */}
                   <div className="border-t pt-4 mt-6">
                     <h3 className="text-lg font-medium mb-2">
@@ -327,7 +364,7 @@ export default function CreateFairPage() {
                         .map((o) => o.organizationId)
                         .filter((id, idx) => idx !== index && id)
 
-                      const availableOrgs = organizations?.filter(
+                      const availableOrgs = organizations?.data?.filter(
                         (o: { id: string; name: string }) =>
                           !selectedIds.includes(o.id),
                       )
