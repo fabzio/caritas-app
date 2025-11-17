@@ -8,7 +8,7 @@ export const SENDER =
 const transporter = nodemailer.createTransport({
   host: env.SMTP_HOST,
   port: env.SMTP_PORT,
-  requireTLS: true,
+  secure: false,
   auth: {
     user: env.SMTP_USER,
     pass: env.SMTP_PASSWORD,

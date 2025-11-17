@@ -10,12 +10,12 @@ const scholarshipReport = new Elysia({
   .use(betterAuth)
   .post(
     '',
-    async ({ body }) => {
+    async ({ body, request }) => {
       try {
         if (!body.reportedBy) {
           throw status(400, 'reportedBy es obligatorio')
         }
-        const id = await createScholarshipReport(body)
+        const id = await createScholarshipReport(body, request.headers)
         return id
       } catch (error) {
         console.error('Error creando reporte:', error)
