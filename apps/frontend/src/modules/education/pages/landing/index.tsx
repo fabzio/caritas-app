@@ -236,7 +236,7 @@ export default function LandingPage() {
           />
         </div>
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-20 sm:py-28 lg:py-36">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-20 sm:py-28 lg:py-36 mb-40">
           <div className="max-w-3xl">
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight mb-6">
               Tu oportunidad educativa empieza aquí
@@ -245,13 +245,6 @@ export default function LandingPage() {
               Explora y mantente atento de nuestras ferias educativas, programa
               de becas y servicios de orientación vocacional.
             </p>
-            <button
-              type="button"
-              className="bg-green-600 hover:bg-green-700 text-white font-semibold px-8 py-4 rounded-lg transition transform hover:scale-105 shadow-lg"
-              onClick={() => navigate({ to: '/landing/apply' })}
-            >
-              Regístrate ahora
-            </button>
           </div>
         </div>
       </section>
@@ -728,7 +721,7 @@ function ScholarshipCard({
   onApply: () => void
 }) {
   return (
-    <li className="min-w-[280px] sm:min-w-[320px] max-w-sm flex-1 rounded-2xl border border-gray-100 bg-white p-6 shadow-sm snap-start">
+    <li className="min-w-[280px] sm:min-w-[320px] max-w-sm lg:min-h-100 flex-1 flex flex-col rounded-2xl border border-gray-100 bg-white p-6 shadow-sm snap-start">
       <div className="flex items-start justify-between gap-4">
         <div>
           <h4 className="text-xl font-semibold text-gray-900 leading-tight line-clamp-2">
@@ -769,12 +762,17 @@ function ScholarshipCard({
         )}
       </div>
 
+      <div className="flex-1"></div>
+
       <button
         type="button"
         onClick={onApply}
-        className="mt-6 w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2.5 rounded-lg transition"
+        className={`mt-6 w-full text-white font-semibold py-2.5 rounded-lg transition ${new Date(scholarship.startDate) > new Date() ? 'bg-gray-700' : 'bg-green-600 hover:bg-green-700 '}`}
+        disabled={new Date(scholarship.startDate) > new Date()}
       >
-        Postular
+        {new Date(scholarship.startDate) < new Date()
+          ? 'Postular'
+          : 'Aún no disponible'}
       </button>
     </li>
   )
