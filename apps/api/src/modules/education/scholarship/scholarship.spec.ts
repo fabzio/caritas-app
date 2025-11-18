@@ -114,6 +114,13 @@ afterAll(async () => {
 })
 
 describe('Scholarship Module', () => {
+  it('allows listing scholarships without authentication', async () => {
+    const response = await api.scholarship.get()
+
+    expect(response.status).toBe(200)
+    expect(response.data?.data).toBeInstanceOf(Array)
+  })
+
   it('creates a new scholarship', async () => {
     const response = await api.scholarship.post(
       {
