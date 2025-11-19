@@ -1,4 +1,5 @@
 export { buildEmailVerificationTemplate } from './email-verification'
 export { buildInviteOrganizationTemplate } from './invite-organization'
 export { buildPasswordResetTemplate } from './password-reset'
+export { buildScholarshipReportNotificationTemplate } from './scholarship-report-notification'
 export { buildSignInTemplate } from './sign-in'
