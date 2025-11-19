@@ -30,7 +30,6 @@ const scholarship = new Elysia({
     },
   })
   .get('', ({ query }) => getScholarships(query), {
-    auth: true,
     query: t.Object({
       name: t.Optional(t.String()),
       active: t.Optional(t.Boolean()),
@@ -40,7 +39,6 @@ const scholarship = new Elysia({
     }),
     response: {
       200: ScholarshipModel.paginated,
-      401: t.Literal('Unauthorized'),
     },
   })
   .get(

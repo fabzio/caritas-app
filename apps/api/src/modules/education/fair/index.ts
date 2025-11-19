@@ -42,11 +42,9 @@ const fair = new Elysia({
     },
   })
   .get('/', ({ query }) => getFairs(query), {
-    auth: true,
     query: FairModel.listFairsQuery,
     response: {
       200: FairModel.getFairsResponse,
-      401: t.Literal('Unauthorized'),
     },
   })
   .get(
