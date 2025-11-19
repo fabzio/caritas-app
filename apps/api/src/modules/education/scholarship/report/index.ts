@@ -7,7 +7,6 @@ const scholarshipReport = new Elysia({
   name: 'report',
   prefix: '/report',
 })
-  .use(betterAuth)
   .get('', ({ query }) => getScholarshipReports(query), {
     auth: true,
     query: ReportModel.listReportsQuery,
@@ -31,7 +30,6 @@ const scholarshipReport = new Elysia({
       }
     },
     {
-      auth: true,
       body: ReportModel.createScholarshipReport,
       response: {
         200: t.Number({

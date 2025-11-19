@@ -29,6 +29,6 @@ export const useAcceptedUsers = ({
       if (error) throw error
       return data.data
     },
-    enabled: !!scholarshipId && name.length >= 2,
+    enabled: !!scholarshipId && name.length >= 0,
   })
 }
