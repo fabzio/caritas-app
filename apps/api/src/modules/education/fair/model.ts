@@ -7,11 +7,21 @@ import {
 import { t } from 'elysia'
 
 export namespace FairModel {
+  const assistanceCountValue = t.Integer({
+    minimum: 0,
+    description: 'Cantidad de asistentes',
+  })
+  const assistanceCountSchema = t.Optional(
+    t.Union([assistanceCountValue, t.Null()]),
+  )
   const _getFair = createSelectSchema(fair, {
     date: t.Date(),
+    assistanceCount: assistanceCountSchema,
   })
   export type GetFair = typeof _getFair.static
-  const baseFair = createInsertSchema(fair)
+  const baseFair = createInsertSchema(fair, {
+    assistanceCount: assistanceCountSchema,
+  })
   export const createFair = t.Intersect([
     baseFair,
     t.Object({
@@ -75,7 +85,9 @@ export namespace FairModel {
   })
   export type GetSingleFairsQuery = typeof getSingleFairsQuery.static
 
-  const baseUpdate = createUpdateSchema(fair)
+  const baseUpdate = createUpdateSchema(fair, {
+    assistanceCount: assistanceCountSchema,
+  })
   export const _updateFair = t.Intersect([
     baseUpdate,
     t.Object({

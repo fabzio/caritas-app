@@ -42,6 +42,7 @@ export namespace ReportModel {
       id: t.String(),
       name: t.String(),
       email: t.String(),
+      phone: t.String(),
     }),
     cause: t.Enum({
       absence: 'absence',

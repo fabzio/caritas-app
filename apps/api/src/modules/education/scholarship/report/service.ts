@@ -1,10 +1,14 @@
 import db from '@api/db'
-import { user } from '@api/db/schemas/auth'
+import { organization, user } from '@api/db/schemas/auth'
 import {
   reportReason,
   scholarship,
   scholarshipStudentReport,
 } from '@api/db/schemas/education'
+import env from '@api/env'
+import { auth } from '@api/lib/auth'
+import transporter, { SENDER } from '@api/mail'
+import { buildScholarshipReportNotificationTemplate } from '@api/mail/templates'
 import { and, desc, eq, ilike, or, sql } from 'drizzle-orm'
 import { alias } from 'drizzle-orm/pg-core'
 import type { ReportModel } from './model'
@@ -14,6 +18,7 @@ import type { ReportModel } from './model'
  */
 export async function createScholarshipReport(
   data: ReportModel.CreateScholarshipReport,
+  headers?: Headers,
 ) {
   const [newReason] = await db
     .insert(reportReason)
@@ -35,6 +40,8 @@ export async function createScholarshipReport(
       reasonDetail: data.reasonDetail,
     })
     .returning({ id: scholarshipStudentReport.id })
+
+  await sendReportNotificationToEducationMembers(data, headers)
 
   return created.id
 }
@@ -90,6 +97,7 @@ export async function getScholarshipReports(
       studentName: studentUser.name,
       studentSurname: studentUser.surname,
       studentEmail: studentUser.email,
+      studentPhone: studentUser.phone,
       cause: scholarshipStudentReport.cause,
       causeDetail: scholarshipStudentReport.causeDetail,
       reasonId: reportReason.id,
@@ -138,6 +146,7 @@ export async function getScholarshipReports(
       id: row.studentId ?? '',
       name: `${row.studentName ?? ''} ${row.studentSurname ?? ''}`.trim(),
       email: row.studentEmail ?? '',
+      phone: row.studentPhone ?? '',
     },
     cause: row.cause,
     causeDetail: row.causeDetail ?? undefined,
@@ -167,4 +176,99 @@ export async function getScholarshipReports(
     total,
     pageCount,
   }
+}
+
+async function sendReportNotificationToEducationMembers(
+  data: ReportModel.CreateScholarshipReport,
+  headers?: Headers,
+) {
+  const scholarshipData = await db.query.scholarship.findFirst({
+    where: eq(scholarship.id, data.scholarshipId),
+    columns: {
+      id: true,
+      name: true,
+    },
+  })
+
+  if (!scholarshipData) {
+    return
+  }
+
+  const studentData = await db.query.user.findFirst({
+    where: (user, { eq }) => eq(user.id, data.userId),
+    columns: {
+      name: true,
+      surname: true,
+    },
+  })
+
+  const reporterData = await db.query.user.findFirst({
+    where: (user, { eq }) => eq(user.id, data.reportedBy),
+    columns: {
+      name: true,
+      surname: true,
+    },
+  })
+
+  const caritasOrg = await db.query.organization.findFirst({
+    where: eq(organization.type, 'caritas'),
+    columns: {
+      id: true,
+      name: true,
+    },
+  })
+
+  if (!caritasOrg) {
+    return
+  }
+
+  const membersResponse = await auth.api.listMembers({
+    headers,
+    query: {
+      organizationId: caritasOrg.id,
+      limit: 100,
+      filterField: 'role',
+      filterOperator: 'contains',
+      filterValue: 'educationMember',
+    },
+  })
+
+  if (!membersResponse?.members || membersResponse.members.length === 0) {
+    return
+  }
+
+  const educationMembers = membersResponse.members.map((m) => ({
+    email: m.user?.email ?? null,
+  }))
+
+  const studentName = studentData
+    ? `${studentData.name} ${studentData.surname}`.trim()
+    : 'Estudiante desconocido'
+  const reporterName = reporterData
+    ? `${reporterData.name} ${reporterData.surname}`.trim()
+    : 'Usuario desconocido'
+
+  const { subject, html } = buildScholarshipReportNotificationTemplate({
+    scholarshipName: scholarshipData.name,
+    studentName,
+    reporterName,
+    cause: data.cause,
+    baseUrl: env.BETTER_AUTH_URL,
+    scholarshipId: scholarshipData.id,
+  })
+
+  const emailPromises = educationMembers.map(async (member) => {
+    if (!member.email) {
+      return
+    }
+    const result = await transporter.sendMail({
+      from: SENDER,
+      to: member.email,
+      subject,
+      html,
+    })
+    return result
+  })
+
+  await Promise.allSettled(emailPromises)
 }

@@ -132,6 +132,7 @@ export const fair = educationSchema.table('fair', {
     withTimezone: true,
   }).notNull(),
   date: date('date').notNull(),
+  assistanceCount: integer('assistance_count'),
 })
 
 export const fairOrganization = educationSchema.table('fair_organization', {

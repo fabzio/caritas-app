@@ -156,6 +156,7 @@ export async function getFairs(
         startTime: fair.startTime,
         endTime: fair.endTime,
         date: fair.date,
+        assistanceCount: fair.assistanceCount,
       })
       .from(fair)
       .innerJoin(region, eq(fair.regionId, region.id))

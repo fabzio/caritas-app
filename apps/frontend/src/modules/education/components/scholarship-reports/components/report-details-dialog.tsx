@@ -58,6 +58,9 @@ export function ReportDetailsDialog({
               <p className="text-sm text-muted-foreground">
                 {report.student.email}
               </p>
+              <p className="text-sm text-muted-foreground">
+                {report.student.phone}
+              </p>
             </div>
 
             <div>
