@@ -1,8 +1,8 @@
 import db from '@api/db'
 import { PostgresError } from '@api/db/errors'
-import { speciality } from '@api/db/schemas/health'
+import { alliedParticipation, speciality } from '@api/db/schemas/health'
 import { normalizeText } from '@api/utils/normalize-text'
-import { asc, desc, eq, inArray } from 'drizzle-orm'
+import { asc, count, desc, eq, inArray } from 'drizzle-orm'
 import type { SpecialityModel } from './model'
 
 export async function getSpecialities(
@@ -161,4 +161,12 @@ export const deleteSpecialities = async (ids: number[]) => {
     if (e instanceof Error) throw new PostgresError(e.message)
     throw e
   }
+}
+
+export async function hasActivitiesAssociated(id: number) {
+  const activityCount = await db
+    .select({ count: count() })
+    .from(alliedParticipation)
+    .where(eq(alliedParticipation.specialityId, id))
+  return activityCount[0].count > 0
 }
