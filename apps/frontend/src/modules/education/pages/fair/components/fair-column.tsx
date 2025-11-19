@@ -15,6 +15,7 @@ export type Fair = {
   endTime: string
   active: boolean
   status: 'upcoming' | 'ongoing' | 'finished'
+  assistanceCount?: number | null
 }
 
 export const fairTableColumns: ColumnDef<Fair>[] = [
@@ -109,6 +110,18 @@ export const fairTableColumns: ColumnDef<Fair>[] = [
       }
 
       return <Badge variant="secondary">Finalizada</Badge>
+    },
+  },
+  {
+    accessorKey: 'assistanceCount',
+    header: 'Asistentes',
+    enableSorting: false,
+    cell: ({ row }) => {
+      if (row.original.status !== 'finished') return '—'
+      if (typeof row.original.assistanceCount === 'number') {
+        return row.original.assistanceCount.toLocaleString('es-PE')
+      }
+      return 'Sin registro'
     },
   },
 ]
