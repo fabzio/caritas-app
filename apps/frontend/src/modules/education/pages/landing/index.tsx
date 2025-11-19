@@ -6,9 +6,25 @@ import UNILogo from '@frontend/assets/img/landing/uni.webp'
 import UNMSMLogo from '@frontend/assets/img/landing/unmsm.webp'
 import USATLogo from '@frontend/assets/img/landing/usat.webp'
 import UTPLogo from '@frontend/assets/img/landing/utp.webp'
+import { formatDate } from '@frontend/shared/utils/format-date'
 import { useNavigate } from '@tanstack/react-router'
-import { GraduationCap, TrendingUp } from 'lucide-react'
-import { useState } from 'react'
+import {
+  ArrowLeft,
+  ArrowRight,
+  Award,
+  CalendarDays,
+  Clock,
+  GraduationCap,
+  MapPin,
+  TrendingUp,
+} from 'lucide-react'
+import type { MutableRefObject } from 'react'
+import { useRef, useState } from 'react'
+import {
+  type LandingFair,
+  type LandingScholarship,
+  useLandingOpportunities,
+} from './hooks/use-landing-opportunities'
 
 const originalPageReferences = {
   nosotros: 'https://caritaslima.org.pe/quienes-somos/',
@@ -21,6 +37,88 @@ const originalPageReferences = {
 export default function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const navigate = useNavigate()
+  const { fairs, scholarships } = useLandingOpportunities()
+  const fairsCarouselRef = useRef<HTMLDivElement>(null)
+  const scholarshipsCarouselRef = useRef<HTMLDivElement>(null)
+
+  const scrollCarousel = (
+    ref: MutableRefObject<HTMLDivElement | null>,
+    direction: 'left' | 'right',
+  ) => {
+    if (!ref.current) return
+    const container = ref.current
+    const scrollAmount = container.clientWidth * 0.8
+    container.scrollBy({
+      left: direction === 'left' ? -scrollAmount : scrollAmount,
+      behavior: 'smooth',
+    })
+  }
+
+  const renderFairItems = () => {
+    if (fairs.isLoading) {
+      return createSkeletonCards('fair')
+    }
+
+    if (fairs.isError) {
+      return [
+        <OpportunityMessageCard
+          key="fair-error"
+          tone="error"
+          message={
+            fairs.error?.message ??
+            'No se pudieron cargar las ferias. Intenta nuevamente.'
+          }
+        />,
+      ]
+    }
+
+    if (!fairs.items.length) {
+      return [
+        <OpportunityMessageCard
+          key="fair-empty"
+          message="Muy pronto anunciaremos nuevas ferias vocacionales."
+        />,
+      ]
+    }
+
+    return fairs.items.map((fair) => <FairCard key={fair.id} fair={fair} />)
+  }
+
+  const renderScholarshipItems = () => {
+    if (scholarships.isLoading) {
+      return createSkeletonCards('scholarship')
+    }
+
+    if (scholarships.isError) {
+      return [
+        <OpportunityMessageCard
+          key="scholarship-error"
+          tone="error"
+          message={
+            scholarships.error?.message ??
+            'No se pudieron cargar las becas. Intenta nuevamente.'
+          }
+        />,
+      ]
+    }
+
+    if (!scholarships.items.length) {
+      return [
+        <OpportunityMessageCard
+          key="scholarship-empty"
+          message="Actualmente no hay becas abiertas, vuelve pronto."
+        />,
+      ]
+    }
+
+    return scholarships.items.map((scholarship) => (
+      <ScholarshipCard
+        key={scholarship.id}
+        scholarship={scholarship}
+        onApply={() => navigate({ to: '/landing/apply' })}
+      />
+    ))
+  }
 
   return (
     <div className="min-h-screen">
@@ -138,7 +236,7 @@ export default function LandingPage() {
           />
         </div>
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-20 sm:py-28 lg:py-36">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-20 sm:py-28 lg:py-36 mb-40">
           <div className="max-w-3xl">
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight mb-6">
               Tu oportunidad educativa empieza aquí
@@ -147,13 +245,6 @@ export default function LandingPage() {
               Explora y mantente atento de nuestras ferias educativas, programa
               de becas y servicios de orientación vocacional.
             </p>
-            <button
-              type="button"
-              className="bg-green-600 hover:bg-green-700 text-white font-semibold px-8 py-4 rounded-lg transition transform hover:scale-105 shadow-lg"
-              onClick={() => navigate({ to: '/landing/apply' })}
-            >
-              Regístrate ahora
-            </button>
           </div>
         </div>
       </section>
@@ -190,13 +281,14 @@ export default function LandingPage() {
                   de financiamiento que se alinean con tus objetivos
                   profesionales y posibilidades.
                 </p>
-                <button
-                  type="button"
-                  onClick={() => navigate({ to: '/landing/apply' })}
-                  className="inline-flex items-center font-semibold hover:underline"
-                >
-                  Regístrese →
-                </button>
+                <a href="#becas-abiertas">
+                  <button
+                    type="button"
+                    className="inline-flex items-center font-semibold hover:underline"
+                  >
+                    Postule →
+                  </button>
+                </a>
               </div>
 
               <div className="bg-green-600 text-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition">
@@ -209,39 +301,18 @@ export default function LandingPage() {
                 <p className="text-green-50 mb-6 leading-relaxed">
                   Organizamos encuentros educativos estratégicos donde
                   conectamos directamente a estudiantes con instituciones y
-                  universidades. Nuestras ferias son un espacios parroquiales
-                  donde podrás conocer opciones de carreras académicas y obtener
+                  universidades. Nuestras ferias son espacios parroquiales donde
+                  podrás conocer opciones de carreras académicas y obtener
                   información de estas.
                 </p>
-                <button
-                  type="button"
-                  onClick={() => navigate({ to: '/landing/apply' })}
-                  className="inline-flex items-center font-semibold hover:underline"
-                >
-                  Regístrese →
-                </button>
-              </div>
-
-              <div className="bg-green-600 text-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition">
-                <div className="w-16 h-16 mb-6">
-                  <TrendingUp className="w-full h-full" strokeWidth={1.5} />
-                </div>
-                <h3 className="text-3xl font-bold mb-4">
-                  Orientación vocacional
-                </h3>
-                <p className="text-green-50 mb-6 leading-relaxed">
-                  Organizamos campañas donde evaluamos a los estudiantes por
-                  medio de exámenes para que les ayude en el proceso de
-                  encontrar su verdadera potenciar y tomar decisiones informadas
-                  sobre su futuro profesional.
-                </p>
-                <button
-                  type="button"
-                  onClick={() => navigate({ to: '/landing/apply' })}
-                  className="inline-flex items-center font-semibold hover:underline"
-                >
-                  Regístrese →
-                </button>
+                <a href="#ferias-vocacionales-en-agenda">
+                  <button
+                    type="button"
+                    className="inline-flex items-center font-semibold hover:underline"
+                  >
+                    Ver próximas →
+                  </button>
+                </a>
               </div>
             </div>
           </div>
@@ -320,6 +391,88 @@ export default function LandingPage() {
                 alt="UNMSM"
                 className="w-full h-auto object-contain"
               />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-white py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 space-y-12">
+          <div className="space-y-3">
+            <p className="text-green-600 font-semibold uppercase text-sm tracking-wide">
+              Próximas oportunidades
+            </p>
+            <h2 className="text-4xl font-bold text-gray-900">
+              Ferias y becas para acompañar tu decisión
+            </h2>
+            <p className="text-gray-600 max-w-3xl">
+              Descubre las actividades que estamos preparando para que conozcas
+              nuevas carreras y postules a becas activas junto a nuestras
+              organizaciones aliadas.
+            </p>
+          </div>
+
+          <div className="space-y-16">
+            <div id="becas-abiertas" className="scroll-mt-24">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <h3 className="text-2xl font-semibold text-gray-900">
+                    Becas abiertas para postular
+                  </h3>
+                  <p className="text-gray-500">
+                    Postula en línea a las becas activas y da el siguiente paso
+                    hacia tus metas académicas.
+                  </p>
+                </div>
+                {scholarships.items.length > 1 &&
+                  !scholarships.isLoading &&
+                  !scholarships.isError && (
+                    <CarouselControls
+                      onPrev={() =>
+                        scrollCarousel(scholarshipsCarouselRef, 'left')
+                      }
+                      onNext={() =>
+                        scrollCarousel(scholarshipsCarouselRef, 'right')
+                      }
+                    />
+                  )}
+              </div>
+              <ul
+                ref={scholarshipsCarouselRef}
+                className="mt-8 flex list-none gap-6 overflow-x-auto pb-4 snap-x snap-mandatory scroll-smooth"
+                aria-label="Listado de becas disponibles"
+              >
+                {renderScholarshipItems()}
+              </ul>
+            </div>
+
+            <div id="ferias-vocacionales-en-agenda" className="scroll-mt-24">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <h3 className="text-2xl font-semibold text-gray-900">
+                    Ferias vocacionales en agenda
+                  </h3>
+                  <p className="text-gray-500">
+                    Participa en los próximos encuentros presenciales para
+                    resolver tus dudas y conocer nuevas opciones de estudio.
+                  </p>
+                </div>
+                {fairs.items.length > 1 &&
+                  !fairs.isLoading &&
+                  !fairs.isError && (
+                    <CarouselControls
+                      onPrev={() => scrollCarousel(fairsCarouselRef, 'left')}
+                      onNext={() => scrollCarousel(fairsCarouselRef, 'right')}
+                    />
+                  )}
+              </div>
+              <ul
+                ref={fairsCarouselRef}
+                className="mt-8 flex list-none gap-6 overflow-x-auto pb-4 snap-x snap-mandatory scroll-smooth"
+                aria-label="Listado de ferias vocacionales"
+              >
+                {renderFairItems()}
+              </ul>
             </div>
           </div>
         </div>
@@ -439,4 +592,228 @@ export default function LandingPage() {
       </footer>
     </div>
   )
+}
+
+const FAIR_STATUS_LABEL: Record<LandingFair['status'], string> = {
+  upcoming: 'Próxima',
+  ongoing: 'En curso',
+  finished: 'Finalizada',
+}
+
+const FAIR_STATUS_STYLES: Record<LandingFair['status'], string> = {
+  upcoming: 'bg-amber-50 text-amber-800 border-amber-200',
+  ongoing: 'bg-emerald-50 text-emerald-800 border-emerald-200',
+  finished: 'bg-slate-50 text-slate-600 border-slate-200',
+}
+
+const SKELETON_KEYS = ['uno', 'dos', 'tres', 'cuatro', 'cinco'] as const
+
+function createSkeletonCards(prefix: string, count = 3) {
+  return SKELETON_KEYS.slice(0, count).map((seed) => (
+    <OpportunitySkeletonCard key={`${prefix}-skeleton-${seed}`} />
+  ))
+}
+
+function CarouselControls({
+  onPrev,
+  onNext,
+}: {
+  onPrev: () => void
+  onNext: () => void
+}) {
+  return (
+    <div className="flex items-center gap-3">
+      <button
+        type="button"
+        onClick={onPrev}
+        aria-label="Ver tarjetas anteriores"
+        className="p-2 rounded-full border border-gray-200 text-gray-600 hover:bg-green-50 hover:text-green-700 transition"
+      >
+        <ArrowLeft className="h-5 w-5" />
+      </button>
+      <button
+        type="button"
+        onClick={onNext}
+        aria-label="Ver siguientes tarjetas"
+        className="p-2 rounded-full border border-gray-200 text-gray-600 hover:bg-green-50 hover:text-green-700 transition"
+      >
+        <ArrowRight className="h-5 w-5" />
+      </button>
+    </div>
+  )
+}
+
+function OpportunityMessageCard({
+  message,
+  tone = 'info',
+}: {
+  message: string
+  tone?: 'info' | 'error'
+}) {
+  const color =
+    tone === 'error'
+      ? 'border-red-200 bg-red-50 text-red-700'
+      : 'border-gray-200 bg-gray-50 text-gray-600'
+  return (
+    <li
+      className={`min-w-[280px] sm:min-w-[420px] max-w-2xl rounded-2xl border p-6 snap-start ${color}`}
+      role={tone === 'error' ? 'alert' : undefined}
+    >
+      <p className="font-medium leading-relaxed">{message}</p>
+    </li>
+  )
+}
+
+function OpportunitySkeletonCard() {
+  return (
+    <li className="min-w-[280px] sm:min-w-[320px] max-w-sm rounded-2xl border border-gray-100 bg-white p-6 shadow-sm animate-pulse space-y-4 snap-start">
+      <div className="h-4 w-24 bg-gray-200 rounded" />
+      <div className="h-6 w-3/4 bg-gray-200 rounded" />
+      <div className="h-4 w-1/2 bg-gray-200 rounded" />
+      <div className="h-4 w-full bg-gray-200 rounded" />
+      <div className="h-4 w-2/3 bg-gray-200 rounded" />
+    </li>
+  )
+}
+
+function FairCard({ fair }: { fair: LandingFair }) {
+  return (
+    <li className="min-w-[280px] sm:min-w-[320px] max-w-sm flex-1 rounded-2xl border border-green-100 bg-white p-6 shadow-sm snap-start">
+      <div className="flex items-center justify-between gap-3 mb-4">
+        <span
+          className={`text-xs font-semibold uppercase tracking-wide px-3 py-1 rounded-full border ${FAIR_STATUS_STYLES[fair.status]}`}
+        >
+          {FAIR_STATUS_LABEL[fair.status]}
+        </span>
+        <span className="text-sm font-medium text-gray-600">
+          {formatFairDateLabel(fair.date)}
+        </span>
+      </div>
+
+      <h4 className="text-xl font-semibold text-gray-900 mb-2 line-clamp-2">
+        {fair.title}
+      </h4>
+      <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
+        <MapPin className="h-4 w-4 text-green-600" />
+        <span className="font-medium text-gray-800">{fair.district}</span>
+      </div>
+      <p className="text-sm text-gray-500 line-clamp-2">{fair.address}</p>
+
+      <div className="mt-4 space-y-2 text-sm text-gray-700">
+        <div className="flex items-center gap-2">
+          <CalendarDays className="h-4 w-4 text-green-600" />
+          <span>{formatFairDateLabel(fair.date)}</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <Clock className="h-4 w-4 text-green-600" />
+          <span>{formatTimeWindow(fair.startTime, fair.endTime)}</span>
+        </div>
+      </div>
+    </li>
+  )
+}
+
+function ScholarshipCard({
+  scholarship,
+  onApply,
+}: {
+  scholarship: LandingScholarship
+  onApply: () => void
+}) {
+  return (
+    <li className="min-w-[280px] sm:min-w-[320px] max-w-sm lg:min-h-100 flex-1 flex flex-col rounded-2xl border border-gray-100 bg-white p-6 shadow-sm snap-start">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h4 className="text-xl font-semibold text-gray-900 leading-tight line-clamp-2">
+            {scholarship.name}
+          </h4>
+          <p className="text-sm text-green-700 font-semibold mt-1">
+            {scholarship.organizationName ?? 'Organización aliada'}
+          </p>
+        </div>
+        <div className="min-w-12 h-12 rounded-full bg-green-100 text-green-800 flex items-center justify-center font-semibold">
+          {scholarship.vacancies}
+        </div>
+      </div>
+
+      <p className="mt-4 text-sm text-gray-600 leading-relaxed line-clamp-3">
+        {scholarship.description}
+      </p>
+
+      <div className="mt-6 space-y-3 text-sm text-gray-700">
+        <div className="flex items-center gap-2">
+          <CalendarDays className="h-4 w-4 text-green-600" />
+          <span>
+            {formatScholarshipPeriod(
+              scholarship.startDate,
+              scholarship.endDate,
+            )}
+          </span>
+        </div>
+        <div className="flex items-center gap-2">
+          <Award className="h-4 w-4 text-green-600" />
+          <span>{scholarship.vacancies} vacante(s) disponible(s)</span>
+        </div>
+        {scholarship.daysLeft !== undefined && (
+          <div className="flex items-center gap-2 text-emerald-700 font-semibold">
+            <Clock className="h-4 w-4" />
+            <span>{formatDaysLeftLabel(scholarship.daysLeft)}</span>
+          </div>
+        )}
+      </div>
+
+      <div className="flex-1"></div>
+
+      <button
+        type="button"
+        onClick={onApply}
+        className={`mt-6 w-full text-white font-semibold py-2.5 rounded-lg transition ${new Date(scholarship.startDate) > new Date() ? 'bg-gray-700' : 'bg-green-600 hover:bg-green-700 '}`}
+        disabled={new Date(scholarship.startDate) > new Date()}
+      >
+        {new Date(scholarship.startDate) < new Date()
+          ? 'Postular'
+          : 'Aún no disponible'}
+      </button>
+    </li>
+  )
+}
+
+function formatFairDateLabel(date: Date) {
+  const formatted = date.toLocaleDateString('es-PE', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+  })
+  return capitalizeFirstLetter(formatted)
+}
+
+function formatTimeWindow(start?: string, end?: string) {
+  const formattedStart = formatTimeValue(start)
+  const formattedEnd = formatTimeValue(end)
+  if (!formattedStart && !formattedEnd) return 'Horario por confirmar'
+  if (!formattedStart) return formattedEnd
+  if (!formattedEnd) return formattedStart
+  return `${formattedStart} - ${formattedEnd}`
+}
+
+function formatTimeValue(value?: string) {
+  if (!value) return ''
+  return value.slice(0, 5)
+}
+
+function formatScholarshipPeriod(start: string, end: string) {
+  if (!start && !end) return 'Fechas por confirmar'
+  if (!end) return formatDate(start)
+  return `${formatDate(start)} - ${formatDate(end)}`
+}
+
+function formatDaysLeftLabel(days: number) {
+  if (days <= 0) return 'Cierra hoy'
+  if (days === 1) return 'Cierra en 1 día'
+  return `Cierra en ${days} días`
+}
+
+function capitalizeFirstLetter(value: string) {
+  if (!value) return value
+  return value.charAt(0).toUpperCase() + value.slice(1)
 }

@@ -6,12 +6,12 @@ import fair from '.'
 const api = treaty(fair)
 
 describe('Fair Module', () => {
-  it('should not allow unauthenticated access', async () => {
+  it('should allow unauthenticated access for listing fairs', async () => {
     const response = await api.fairs.get({
       query: { page: 0, limit: 10 },
       headers: {},
     })
-    expect(response.status).toBe(401)
+    expect(response.status).toBe(200)
   })
 
   it('should list fairs for authenticated user', async () => {
