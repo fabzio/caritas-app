@@ -364,7 +364,7 @@ export default function CreateFairPage() {
                         .map((o) => o.organizationId)
                         .filter((id, idx) => idx !== index && id)
 
-                      const availableOrgs = organizations?.data?.filter(
+                      const availableOrgs = organizations?.filter(
                         (o: { id: string; name: string }) =>
                           !selectedIds.includes(o.id),
                       )
