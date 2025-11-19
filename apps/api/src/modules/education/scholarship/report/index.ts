@@ -30,6 +30,7 @@ const scholarshipReport = new Elysia({
       }
     },
     {
+      auth: true,
       body: ReportModel.createScholarshipReport,
       response: {
         200: t.Number({
