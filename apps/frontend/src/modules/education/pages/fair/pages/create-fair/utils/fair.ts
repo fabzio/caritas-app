@@ -1,5 +1,6 @@
-import { data } from 'happy-dom/lib/PropertySymbol'
 import { z } from 'zod'
+
+const normalizeNumericString = (value: string) => value.trim()
 
 export const formFairSchema = z
   .object({
@@ -49,11 +50,64 @@ export const formFairSchema = z
         }),
       )
       .min(1, 'Debe haber al menos una organización'),
+    assistanceCount: z
+      .union([
+        z
+          .string()
+          .transform((value) => normalizeNumericString(value))
+          .refine((value) => value === '' || /^\d+$/.test(value), {
+            message: 'Ingresa solo números enteros positivos',
+          }),
+        z.undefined(),
+      ])
+      .optional(),
   })
 
   .refine((data) => data.startTime < data.endTime, {
     message: 'La hora de inicio debe ser anterior a la hora de fin',
     path: ['endTime'],
+  })
+  .superRefine((data, ctx) => {
+    const assistanceValue =
+      typeof data.assistanceCount === 'string'
+        ? data.assistanceCount.trim()
+        : undefined
+
+    if (!assistanceValue) {
+      return
+    }
+
+    if (!data.date) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Solo puedes registrar asistentes cuando la feria ya terminó',
+        path: ['assistanceCount'],
+      })
+      return
+    }
+
+    const today = new Date()
+    const fairDate = new Date(data.date)
+
+    const normalizeDate = (date: Date) =>
+      new Date(date.getFullYear(), date.getMonth(), date.getDate())
+
+    const normalizedToday = normalizeDate(today)
+    const normalizedFairDate = normalizeDate(fairDate)
+
+    const isPastDate = normalizedFairDate.getTime() < normalizedToday.getTime()
+    const isSameDay = normalizedFairDate.getTime() === normalizedToday.getTime()
+
+    const currentTime = today.toTimeString().slice(0, 8)
+    const hasEndedToday = isSameDay && data.endTime <= currentTime
+
+    if (!isPastDate && !hasEndedToday) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Solo puedes registrar asistentes cuando la feria ya terminó',
+        path: ['assistanceCount'],
+      })
+    }
   })
 
 export type FormFairSchema = z.infer<typeof formFairSchema>
