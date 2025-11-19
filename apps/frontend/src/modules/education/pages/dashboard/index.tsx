@@ -84,9 +84,7 @@ export default function EducationDashboard() {
               <Separator orientation="vertical" />
               <div className="flex flex-col items-center">
                 <span className="text-sm text-muted-foreground">Activas</span>
-                <span className="text-2xl font-bold text-green-600 dark:text-green-500">
-                  {activeScholarships}
-                </span>
+                <span className="text-2xl font-bold">{activeScholarships}</span>
               </div>
             </div>
             <Separator />
@@ -96,7 +94,6 @@ export default function EducationDashboard() {
           </CardContent>
         </Card>
 
-        {/* Fairs Card */}
         <Card className="flex flex-col">
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
@@ -119,7 +116,6 @@ export default function EducationDashboard() {
           </CardContent>
         </Card>
 
-        {/* Beneficiaries Card */}
         <Card className="flex flex-col">
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
@@ -147,7 +143,6 @@ export default function EducationDashboard() {
         </Card>
       </div>
 
-      {/* Quick Access Section */}
       <Card>
         <CardHeader>
           <CardTitle className="text-lg">Acceso Rápido</CardTitle>
