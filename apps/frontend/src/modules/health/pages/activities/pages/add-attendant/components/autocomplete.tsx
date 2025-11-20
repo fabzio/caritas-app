@@ -155,7 +155,11 @@ export const AutoComplete = ({
                 })}
               </CommandGroup>
             ) : null}
-            {!isLoading ? <CommandEmpty>{emptyMessage}</CommandEmpty> : null}
+            {!isLoading ? (
+              <CommandEmpty>
+                <div className="px-2">{emptyMessage}</div>
+              </CommandEmpty>
+            ) : null}
           </CommandList>
         </div>
       </div>
