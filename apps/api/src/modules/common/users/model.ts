@@ -13,4 +13,19 @@ export namespace UserModel {
     image: t.Nullable(t.String()),
   })
   export type GetUserResponse = typeof getUserResponse.static
+
+  export const getUserOrganizationsResponse = t.Array(
+    t.Object({
+      id: t.String(),
+      name: t.String(),
+      type: t.Enum({
+        caritas: 'caritas',
+        health: 'health',
+        education: 'education',
+        beneficiary: 'beneficiary',
+      }),
+    }),
+  )
+  export type GetUserOrganizationsResponse =
+    typeof getUserOrganizationsResponse.static
 }
