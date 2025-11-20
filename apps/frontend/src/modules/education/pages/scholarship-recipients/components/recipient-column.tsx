@@ -82,18 +82,4 @@ export const scholarshipRecipientTableColumns: ColumnDef<Recipient>[] = [
     ),
     cell: ({ row }) => row.original.organizationName,
   },
-  {
-    accessorKey: 'region',
-    header: ({ column }) => (
-      <Button
-        variant="ghost"
-        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-      >
-        Distrito
-        <ArrowUpDown />
-      </Button>
-    ),
-    cell: ({ row }) =>
-      row.original.region ? row.original.region : 'Sin distrito asignado',
-  },
 ]
