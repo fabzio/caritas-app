@@ -115,7 +115,12 @@ export default function LandingPage() {
       <ScholarshipCard
         key={scholarship.id}
         scholarship={scholarship}
-        onApply={() => navigate({ to: '/landing/apply' })}
+        onApply={() =>
+          navigate({
+            to: '/landing/apply',
+            search: { scholarshipId: scholarship.id },
+          })
+        }
       />
     ))
   }

@@ -1,6 +1,6 @@
 import FullColorCaritasLogo from '@frontend/assets/img/landing/logo-fullcolor.webp'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useLoaderData, useNavigate } from '@tanstack/react-router'
+import { useLoaderData, useNavigate, useSearch } from '@tanstack/react-router'
 import { Button } from '@workspace/ui/components/button'
 import {
   Command,
@@ -42,14 +42,23 @@ export default function ApplyPage() {
   const { isLoggedIn, user, scholarships } = useLoaderData({
     from: '/landing/apply',
   })
+  const { scholarshipId: scholarshipIdFromSearch } = useSearch({
+    from: '/landing/apply',
+  })
   const navigate = useNavigate()
 
   const { mutate, isPending } = useCreateApplication()
 
+  const preselectedScholarshipId = scholarships.some(
+    (scholarship) => scholarship.id === scholarshipIdFromSearch,
+  )
+    ? scholarshipIdFromSearch
+    : undefined
+
   const form = useForm<z.infer<typeof applyFormSchema>>({
     resolver: zodResolver(applyFormSchema),
     defaultValues: {
-      scholarshipId: undefined,
+      scholarshipId: preselectedScholarshipId,
     },
   })
 
@@ -76,7 +85,14 @@ export default function ApplyPage() {
   const handleSubmit = form.handleSubmit(onSubmit)
 
   const handleLoginRedirect = () => {
-    navigate({ to: '/auth/login', search: { redirect: '/landing/apply' } })
+    const redirectPath = preselectedScholarshipId
+      ? `/landing/apply?scholarshipId=${preselectedScholarshipId}`
+      : '/landing/apply'
+
+    navigate({
+      to: '/auth/login',
+      search: { redirect: redirectPath },
+    })
   }
 
   return (
