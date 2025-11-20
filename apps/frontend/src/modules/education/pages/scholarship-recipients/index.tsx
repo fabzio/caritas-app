@@ -85,13 +85,6 @@ export default function ScholarshipRecipients() {
             </div>
             <div className="flex flex-row gap-4 px-10">
               <SelectFilters
-                value={regionFilter}
-                onValueChange={handleRegionFilterChange}
-                valueList={regionNames}
-                item="distrito"
-                placeholder="Todos los distritos"
-              />
-              <SelectFilters
                 value={scholarshipFilter}
                 onValueChange={handleScholarshipFilterChange}
                 valueList={scholarshipNames}
