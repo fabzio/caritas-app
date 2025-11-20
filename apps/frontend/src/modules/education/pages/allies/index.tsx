@@ -1,3 +1,4 @@
+import { useNavigate, useSearch } from '@tanstack/react-router'
 import { Button } from '@workspace/ui/components/button'
 import {
   Dialog,
@@ -15,7 +16,7 @@ import {
   DropdownMenuTrigger,
 } from '@workspace/ui/components/dropdown-menu'
 import { ChevronDown, UserPlus } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import ActionsButton from './components/actions-button'
 import OrganizationFormDialog from './components/organization-form-dialog'
 import OrganizationTable from './components/organization-table'
@@ -29,12 +30,26 @@ interface FormModalStateType {
 }
 
 export default function OrganizationTableView() {
+  const navigate = useNavigate()
+  const search = useSearch({ from: '/_authenticated/education/organization/' })
   const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({})
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [formModal, setFormModal] = useState<FormModalStateType>({
     open: false,
     type: 'new',
   })
+
+  // Open create modal when action=create parameter is present
+  useEffect(() => {
+    if (search.action === 'create') {
+      setFormModal({ open: true, type: 'new' })
+      // Clear the action parameter after opening
+      navigate({
+        to: '/education/organization',
+        replace: true,
+      })
+    }
+  }, [search.action, navigate])
 
   const deleteOrganizations = useDeleteOrganizations()
 

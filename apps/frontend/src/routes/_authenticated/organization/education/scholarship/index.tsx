@@ -11,6 +11,3 @@ export const Route = createFileRoute(
   validateSearch: () => ({}) as ScholarshipFilters,
   component: ScholarshipPage,
 })
-function RouteComponent() {
-  return <div>Hello "/_authenticated/organization/"!zxds</div>
-}

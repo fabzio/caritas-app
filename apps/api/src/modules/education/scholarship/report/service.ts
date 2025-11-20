@@ -1,15 +1,14 @@
 import db from '@api/db'
-import { organization, user } from '@api/db/schemas/auth'
+import { member, organization, user } from '@api/db/schemas/auth'
 import {
   reportReason,
   scholarship,
   scholarshipStudentReport,
 } from '@api/db/schemas/education'
 import env from '@api/env'
-import { auth } from '@api/lib/auth'
 import transporter, { SENDER } from '@api/mail'
 import { buildScholarshipReportNotificationTemplate } from '@api/mail/templates'
-import { and, desc, eq, ilike, or, sql } from 'drizzle-orm'
+import { and, desc, eq, ilike, like, or, sql } from 'drizzle-orm'
 import { alias } from 'drizzle-orm/pg-core'
 import type { ReportModel } from './model'
 /**
@@ -18,7 +17,6 @@ import type { ReportModel } from './model'
  */
 export async function createScholarshipReport(
   data: ReportModel.CreateScholarshipReport,
-  headers?: Headers,
 ) {
   const [newReason] = await db
     .insert(reportReason)
@@ -41,7 +39,7 @@ export async function createScholarshipReport(
     })
     .returning({ id: scholarshipStudentReport.id })
 
-  await sendReportNotificationToEducationMembers(data, headers)
+  await sendReportNotificationToEducationMembers(data)
 
   return created.id
 }
@@ -180,7 +178,6 @@ export async function getScholarshipReports(
 
 async function sendReportNotificationToEducationMembers(
   data: ReportModel.CreateScholarshipReport,
-  headers?: Headers,
 ) {
   const scholarshipData = await db.query.scholarship.findFirst({
     where: eq(scholarship.id, data.scholarshipId),
@@ -222,24 +219,23 @@ async function sendReportNotificationToEducationMembers(
     return
   }
 
-  const membersResponse = await auth.api.listMembers({
-    headers,
-    query: {
-      organizationId: caritasOrg.id,
-      limit: 100,
-      filterField: 'role',
-      filterOperator: 'contains',
-      filterValue: 'educationMember',
+  const educationMembers = await db.query.member.findMany({
+    where: and(
+      eq(member.organizationId, caritasOrg.id),
+      like(member.role, '%educationMember%'),
+    ),
+    with: {
+      user: {
+        columns: {
+          email: true,
+        },
+      },
     },
   })
 
-  if (!membersResponse?.members || membersResponse.members.length === 0) {
+  if (!educationMembers || educationMembers.length === 0) {
     return
   }
-
-  const educationMembers = membersResponse.members.map((m) => ({
-    email: m.user?.email ?? null,
-  }))
 
   const studentName = studentData
     ? `${studentData.name} ${studentData.surname}`.trim()
@@ -257,13 +253,13 @@ async function sendReportNotificationToEducationMembers(
     scholarshipId: scholarshipData.id,
   })
 
-  const emailPromises = educationMembers.map(async (member) => {
-    if (!member.email) {
+  const emailPromises = educationMembers.map(async (memberData) => {
+    if (!memberData.user.email) {
       return
     }
     const result = await transporter.sendMail({
       from: SENDER,
-      to: member.email,
+      to: memberData.user.email,
       subject,
       html,
     })
