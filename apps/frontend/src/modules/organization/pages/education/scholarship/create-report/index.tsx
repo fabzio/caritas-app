@@ -40,6 +40,7 @@ export default function CreateReportPage() {
   const navigate = useNavigate()
   const { data: session } = useSession()
   const reportedBy = session?.session?.userId ?? ''
+
   const [searchValue, setSearchValue] = useState('')
   const [selectedUser, setSelectedUser] = useState<AcceptedUser | null>(null)
 
@@ -82,7 +83,15 @@ export default function CreateReportPage() {
   const onSubmit = async (values: FormReportSchema) => {
     if (!reportedBy) return
     if (!selectedUser) return
-
+    console.log({
+      scholarshipId,
+      userId: values.userId,
+      reportedBy,
+      cause: values.cause as 'absence' | 'performance' | 'other',
+      causeDetail: values.causeDetail,
+      reason: values.reason,
+      reasonDetail: values.reasonDetail,
+    })
     createReport({
       scholarshipId,
       userId: values.userId,
@@ -127,7 +136,7 @@ export default function CreateReportPage() {
                 name="userId"
                 render={() => (
                   <FormItem>
-                    <FormLabel>Alumno*</FormLabel>
+                    <FormLabel>Nombre del Alumno*</FormLabel>
                     <FormControl>
                       <div className="flex flex-row gap-2 items-center">
                         <div className="flex-1">

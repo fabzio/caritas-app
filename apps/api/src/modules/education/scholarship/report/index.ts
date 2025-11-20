@@ -7,7 +7,6 @@ const scholarshipReport = new Elysia({
   name: 'report',
   prefix: '/report',
 })
-  .use(betterAuth)
   .get('', ({ query }) => getScholarshipReports(query), {
     auth: true,
     query: ReportModel.listReportsQuery,

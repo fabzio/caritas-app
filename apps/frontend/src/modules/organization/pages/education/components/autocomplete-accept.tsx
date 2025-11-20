@@ -37,11 +37,9 @@ export const AutoCompleteAcceptedUser = ({
 }: AutoCompleteAcceptedUserProps) => {
   const inputRef = useRef<HTMLInputElement>(null)
   const [isOpen, setOpen] = useState(false)
-  const [selected, setSelected] = useState<AcceptedUser | undefined>(value)
-  const [nonSelected, setNonSelected] = useState<string>(
-    nonSelectedValue as string,
-  )
-  const [inputValue, setInputValue] = useState<string>(value?.name || '')
+
+  const selected = value
+  const inputValue = value?.name || nonSelectedValue || ''
 
   const handleKeyDown = useCallback(
     (event: KeyboardEvent<HTMLDivElement>) => {
@@ -56,7 +54,6 @@ export const AutoCompleteAcceptedUser = ({
             option.email.toLowerCase() === input.value.toLowerCase(),
         )
         if (optionToSelect) {
-          setSelected(optionToSelect)
           onValueChange?.(optionToSelect)
         }
       }
@@ -70,8 +67,6 @@ export const AutoCompleteAcceptedUser = ({
 
   const handleSelectOption = useCallback(
     (selectedOption: AcceptedUser) => {
-      setInputValue(selectedOption.name)
-      setSelected(selectedOption)
       onValueChange?.(selectedOption)
       setOpen(false)
       setTimeout(() => {
@@ -82,17 +77,14 @@ export const AutoCompleteAcceptedUser = ({
   )
 
   const handleInputChange = (val: string) => {
-    setInputValue(val)
-    setNonSelected(val)
     onInputChange?.(val)
-    setSelected(undefined)
   }
 
   return (
     <CommandPrimitive onKeyDown={handleKeyDown}>
       <CommandInput
         ref={inputRef}
-        value={inputValue}
+        value={inputValue} // Ahora está completamente controlado por el padre
         onValueChange={isLoading ? undefined : handleInputChange}
         onBlur={handleBlur}
         onFocus={() => setOpen(true)}
