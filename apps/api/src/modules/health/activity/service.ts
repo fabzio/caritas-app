@@ -851,6 +851,38 @@ export const getRegionsWithActivities = async () => {
   }
 }
 
+export const getSingleUserActivity = async (
+  userId: string,
+): Promise<ActivityModel.SingleUserActivity | null> => {
+  const [userData] = await db
+    .select({
+      id: user.id,
+      name: user.name,
+      surname: user.surname,
+      documentType: user.documentType,
+      documentNumber: user.documentNumber,
+      email: user.email,
+      phone: user.phone,
+      birthDate: user.birthDate,
+      sex: user.sex,
+      regionId: user.regionId,
+      insuranceType: patientInfo.insuranceType,
+    })
+    .from(user)
+    .innerJoin(patientInfo, eq(user.id, patientInfo.userId))
+    .where(eq(user.id, userId))
+    .limit(1)
+
+  if (!userData) return null
+
+  return {
+    data: {
+      ...userData,
+      birthDate: new Date(userData.birthDate),
+    },
+  }
+}
+
 export const getExistentUsers = async (
   params: ActivityModel.ListExistentUsersQuery,
 ): Promise<ActivityModel.ExistentUser> => {

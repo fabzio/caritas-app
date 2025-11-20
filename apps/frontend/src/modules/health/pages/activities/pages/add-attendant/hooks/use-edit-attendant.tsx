@@ -11,6 +11,7 @@ type UpdateAttendantProps = Parameters<
 >[0] & {
   teamIds?: string[]
   activityId: number
+  insuranceType: 'none' | 'public' | 'private'
 }
 
 export const useUpdateAttendant = () => {
@@ -30,12 +31,26 @@ export const useUpdateAttendant = () => {
           .patch({
             teamIds,
           })
+      const { error: patientError } = await rpc.auth.info
+        .patient({ userId: props.userId as string })
+        .patch({
+          insuranceType: props.insuranceType,
+        })
+      if (patientError) throw patientError
       return data
     },
     onSuccess: (_, { userId, activityId }) => {
       queryClient.invalidateQueries({ queryKey: [QueryKeys.ADMIN.USERS] })
       queryClient.invalidateQueries({
         queryKey: [QueryKeys.ADMIN.USERS, userId],
+      })
+      queryClient.invalidateQueries({
+        queryKey: [QueryKeys.HEALTH.ACTIVITIES],
+        refetchType: 'all',
+      })
+      queryClient.invalidateQueries({
+        queryKey: [QueryKeys.HEALTH.ADD_ATTENDANT],
+        refetchType: 'all',
       })
       if (session?.user.id === userId)
         queryClient.invalidateQueries({ queryKey: [QueryKeys.ACCESS] })
