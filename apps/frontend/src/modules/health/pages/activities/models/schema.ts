@@ -7,13 +7,20 @@ export const participantSchema = z.object({
     .min(1, 'Seleccione al menos una especialidad'),
 })
 
+const today = new Date()
+today.setHours(0, 0, 0, 0)
+
 export const createCompleteActivitySchema = z.object({
   name: z
     .string()
     .min(3, 'El nombre debe tener al menos 3 caracteres')
     .max(100, 'El nombre no puede exceder 100 caracteres')
     .refine((val) => val.trim().length > 0, 'El nombre no puede estar vacío'),
-  date: z.date({ message: 'La fecha es requerida' }),
+  date: z.date({ message: 'La fecha es requerida' }).refine((d) => {
+    const dd = new Date(d)
+    dd.setHours(0, 0, 0, 0)
+    return dd.getTime() >= today.getTime()
+  }, 'La fecha no puede ser anterior al día actual'),
   durationHours: z.coerce
     .number({ message: 'Seleccione la duración' })
     .min(1, 'La duración debe ser al menos 1 hora')

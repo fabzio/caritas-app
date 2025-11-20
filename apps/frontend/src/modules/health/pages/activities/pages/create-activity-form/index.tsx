@@ -30,14 +30,12 @@ import { Separator } from '@workspace/ui/components/separator'
 import { Spinner } from '@workspace/ui/components/spinner'
 import { format } from 'date-fns'
 import {
-  Building,
   CalendarIcon,
   HeartPlus,
   Loader2,
   Plus,
   ShieldPlus,
   Trash2,
-  UserPlus,
 } from 'lucide-react'
 import { useState } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
@@ -72,6 +70,7 @@ export default function CreateActivityForm() {
       name: '',
       durationHours: 2,
       participants: [{ alliedId: '', specialityIds: [] }],
+      statusId: undefined,
     },
   })
 
@@ -83,6 +82,18 @@ export default function CreateActivityForm() {
   const { data: activityTypes, isLoading: loadingTypes } = useActivityTypes()
   const { data: activityStatuses, isLoading: loadingStatuses } =
     useActivityStatuses()
+
+  if (
+    !form.getValues('statusId') &&
+    activityStatuses &&
+    activityStatuses.length > 0
+  ) {
+    const scheduled = activityStatuses.find(
+      (s: { id: number; name: string }) =>
+        s.name.toLowerCase() === 'programado',
+    )
+    if (scheduled) form.setValue('statusId', scheduled.id)
+  }
   const { data: regions, isLoading: loadingRegions } = useRegions()
   const { data: allies, isLoading: loadingAllies } = useAllies()
   const { data: specialities, isLoading: loadingSpecialities } =
@@ -196,6 +207,13 @@ export default function CreateActivityForm() {
                               mode="single"
                               selected={field.value}
                               onSelect={field.onChange}
+                              disabled={(date) => {
+                                const d = new Date(date)
+                                d.setHours(0, 0, 0, 0)
+                                const t = new Date()
+                                t.setHours(0, 0, 0, 0)
+                                return d.getTime() < t.getTime()
+                              }}
                             />
                           </PopoverContent>
                         </Popover>
@@ -261,30 +279,20 @@ export default function CreateActivityForm() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Estado*</FormLabel>
-                        <Select
-                          onValueChange={(value) =>
-                            field.onChange(Number(value))
-                          }
-                          value={field.value?.toString()}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Seleccione un estado" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {activityStatuses?.map(
-                              (status: { id: number; name: string }) => (
-                                <SelectItem
-                                  key={status.id}
-                                  value={status.id.toString()}
-                                >
-                                  {status.name}
-                                </SelectItem>
-                              ),
-                            )}
-                          </SelectContent>
-                        </Select>
+                        <FormControl>
+                          <Input
+                            value={(() => {
+                              const s = activityStatuses?.find(
+                                (st: { id: number; name: string }) =>
+                                  st.id === field.value,
+                              )
+                              return s ? s.name : 'Programado'
+                            })()}
+                            readOnly
+                            disabled
+                            className="bg-muted text-muted-foreground cursor-not-allowed"
+                          />
+                        </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
