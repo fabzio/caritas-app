@@ -31,12 +31,24 @@ export const useUpdateAttendant = () => {
           .patch({
             teamIds,
           })
-      const { error: patientError } = await rpc.auth.info
+      // Check if insurance info exists, then update or create accordingly
+      const { data: insuranceInfo } = await rpc.auth.info
         .patient({ userId: props.userId as string })
-        .patch({
+        .get()
+      if (insuranceInfo) {
+        const { error: patientError } = await rpc.auth.info
+          .patient({ userId: props.userId as string })
+          .patch({
+            insuranceType: props.insuranceType,
+          })
+        if (patientError) throw patientError
+      } else {
+        const { error: patientError } = await rpc.auth.info.patient.post({
+          userId: props.userId as string,
           insuranceType: props.insuranceType,
         })
-      if (patientError) throw patientError
+        if (patientError) throw patientError
+      }
       return data
     },
     onSuccess: (_, { userId, activityId }) => {

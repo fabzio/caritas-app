@@ -869,7 +869,7 @@ export const getSingleUserActivity = async (
       insuranceType: patientInfo.insuranceType,
     })
     .from(user)
-    .innerJoin(patientInfo, eq(user.id, patientInfo.userId))
+    .leftJoin(patientInfo, eq(user.id, patientInfo.userId))
     .where(eq(user.id, userId))
     .limit(1)
 
@@ -879,6 +879,7 @@ export const getSingleUserActivity = async (
     data: {
       ...userData,
       birthDate: new Date(userData.birthDate),
+      insuranceType: userData.insuranceType ?? 'none',
     },
   }
 }
@@ -914,7 +915,7 @@ export const getExistentUsers = async (
         insuranceType: patientInfo.insuranceType,
       })
       .from(user)
-      .innerJoin(patientInfo, eq(user.id, patientInfo.userId))
+      .leftJoin(patientInfo, eq(user.id, patientInfo.userId))
       .orderBy(asc(user.name))
       .limit(5)
       .where(where)
@@ -923,6 +924,7 @@ export const getExistentUsers = async (
       data: users.map((u) => ({
         ...u,
         birthDate: new Date(u.birthDate),
+        insuranceType: u.insuranceType ?? 'none',
       })),
     }
   } catch (e) {
