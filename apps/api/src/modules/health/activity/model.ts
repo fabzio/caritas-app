@@ -200,6 +200,31 @@ export namespace ActivityModel {
   })
   export type ExistentUser = typeof existentUser.static
 
+  export const singleUserActivity = t.Object({
+    data: t.Composite([
+      t.Pick(_getUsers, [
+        'id',
+        'name',
+        'surname',
+        'email',
+        'phone',
+        'documentType',
+        'documentNumber',
+        'birthDate',
+        'sex',
+        'regionId',
+      ]),
+      t.Object({
+        insuranceType: t.Enum({
+          private: 'private',
+          public: 'public',
+          none: 'none',
+        }),
+      }),
+    ]),
+  })
+  export type SingleUserActivity = typeof singleUserActivity.static
+
   export type ParticipationDetail = {
     alliedName: string
     specialityName: string

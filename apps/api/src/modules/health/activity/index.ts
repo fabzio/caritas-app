@@ -21,6 +21,7 @@ import {
   getActivityParticipants,
   getExistentUsers,
   getRegionsWithActivities,
+  getSingleUserActivity,
   getUserAttentions,
   removeAttendantFromActivity,
   setActivityUser,
@@ -311,5 +312,21 @@ const activityModule = new Elysia({ name: 'activity', prefix: '/activities' })
       401: t.Literal('Unauthorized'),
     },
   })
+  .get(
+    '/attendant/:id',
+    async ({ params }) => {
+      const res = await getSingleUserActivity(params.id)
+      if (!res) throw status(404, 'User not found')
+      return res
+    },
+    {
+      auth: true,
+      params: t.Object({ id: t.String() }),
+      response: {
+        200: ActivityModel.singleUserActivity,
+        404: t.Literal('User not found'),
+      },
+    },
+  )
 
 export default activityModule

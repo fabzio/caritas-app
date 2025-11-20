@@ -1,5 +1,4 @@
 import { useRegions } from '@frontend/hooks/use-regions'
-import { useUserDetail } from '@frontend/modules/admin/pages/users/pages/create-user/hooks/use-user-detail'
 import { formUserSchema } from '@frontend/shared/models/user'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { getRouteApi, Link, useSearch } from '@tanstack/react-router'
@@ -52,6 +51,7 @@ import { AutoComplete } from './components/autocomplete'
 import { useAddAttendant } from './hooks/use-add-attendant'
 import { useAddExistentUser } from './hooks/use-add-existent-user'
 import { useUpdateAttendant } from './hooks/use-edit-attendant'
+import { useAttendantDetail } from './hooks/use-get-single-user'
 import {
   type ExistentUsers,
   useExistentUsers,
@@ -68,7 +68,8 @@ export default function AddAttendantPage() {
   const { id, type: viewType } = useSearch({
     from: '/_authenticated/health/activities/$activityId/form',
   })
-  const { data: userData } = useUserDetail(id)
+  const { data: userDataDetails } = useAttendantDetail(id)
+  const userData = userDataDetails?.data
 
   const { mutate: addAttendant, isPending: isPendingCreate } = useAddAttendant()
   const { mutate: addExistentUser, isPending: isPendingAddExistent } =
@@ -90,6 +91,8 @@ export default function AddAttendantPage() {
       birthDate: userData?.birthDate,
       sex: userData?.sex,
       regionId: userData?.regionId,
+      insuranceType:
+        (userData?.insuranceType as 'none' | 'public' | 'private') ?? 'none',
     },
   })
 
@@ -111,6 +114,7 @@ export default function AddAttendantPage() {
       },
       teamIds: undefined,
       activityId: loaderData.id,
+      insuranceType: values.insuranceType,
     })
   }
 
@@ -165,6 +169,7 @@ export default function AddAttendantPage() {
       birthDate: undefined,
       sex: undefined,
       regionId: undefined,
+      insuranceType: undefined,
     })
     setFoundUser(null)
   }
@@ -183,6 +188,107 @@ export default function AddAttendantPage() {
             onSubmit={form.handleSubmit(onSubmit)}
             className="space-y-6 mt-5"
           >
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <FormField
+                control={form.control}
+                name="documentNumber"
+                render={({ field }) => {
+                  const selectedUser = existentUsers?.data.find(
+                    (u) => u.documentNumber === field.value,
+                  )
+                  return viewType === 'new' ? (
+                    <FormItem className="flex flex-col">
+                      <FormLabel>
+                        Buscar o registrar por Número de Documento
+                      </FormLabel>
+                      <div className="flex flex-row w-full gap-2">
+                        <div className="flex-1">
+                          <AutoComplete
+                            options={existentUsers?.data ?? []}
+                            emptyMessage="No se encontraron beneficiarios. El número ingresado será registrado como nuevo beneficiario."
+                            isLoading={existentUsersLoading}
+                            placeholder="Buscar o registrar número de documento"
+                            value={selectedUser}
+                            nonSelectedValue={field.value}
+                            onValueChange={(user) => {
+                              console.log(user.insuranceType)
+                              field.onChange(user.documentNumber)
+                              setFoundUser(user)
+                              form.setValue('name', user.name)
+                              form.setValue('surname', user.surname)
+                              form.setValue('email', user.email)
+                              form.setValue('phone', user.phone)
+                              form.setValue('sex', user.sex)
+                              form.setValue('regionId', user.regionId)
+                              form.setValue(
+                                'birthDate',
+                                user.birthDate ?? 'none',
+                              )
+                              form.setValue('insuranceType', user.insuranceType)
+                            }}
+                            onInputChange={(val) => {
+                              field.onChange(val)
+                            }}
+                            disabled={foundUser !== null}
+                          />
+                        </div>
+                        <Button
+                          variant="outline"
+                          type="button"
+                          onClick={handleClearFields}
+                          disabled={!foundUser}
+                        >
+                          <Eraser /> Limpiar
+                        </Button>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  ) : (
+                    <FormField
+                      control={form.control}
+                      name="documentNumber"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Número de Documento</FormLabel>
+                          <FormControl>
+                            <Input placeholder="12345678" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )
+                }}
+              />
+              <FormField
+                control={form.control}
+                name="documentType"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Tipo de Documento</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      disabled={foundUser !== null}
+                    >
+                      <FormControl>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Selecciona un tipo" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="DNI">DNI</SelectItem>
+                        <SelectItem value="CE">
+                          Carnet de Extranjería
+                        </SelectItem>
+                        <SelectItem value="PAS">Pasaporte</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <FormField
                 control={form.control}
@@ -255,101 +361,6 @@ export default function AddAttendantPage() {
                     <FormMessage />
                   </FormItem>
                 )}
-              />
-            </div>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <FormField
-                control={form.control}
-                name="documentType"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Tipo de Documento</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                      disabled={foundUser !== null}
-                    >
-                      <FormControl>
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Selecciona un tipo" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="DNI">DNI</SelectItem>
-                        <SelectItem value="CE">
-                          Carnet de Extranjería
-                        </SelectItem>
-                        <SelectItem value="PAS">Pasaporte</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="documentNumber"
-                render={({ field }) => {
-                  const selectedUser = existentUsers?.data.find(
-                    (u) => u.documentNumber === field.value,
-                  )
-                  return viewType === 'new' ? (
-                    <FormItem className="flex flex-col">
-                      <FormLabel>Número de Documento</FormLabel>
-                      <div className="flex flex-row w-full gap-2">
-                        <div className="flex-1">
-                          <AutoComplete
-                            options={existentUsers?.data ?? []}
-                            emptyMessage="No se encontraron beneficiarios."
-                            isLoading={existentUsersLoading}
-                            placeholder="Buscar o ingresar número de documento"
-                            value={selectedUser}
-                            nonSelectedValue={field.value}
-                            onValueChange={(user) => {
-                              field.onChange(user.documentNumber)
-                              setFoundUser(user)
-                              form.setValue('name', user.name)
-                              form.setValue('surname', user.surname)
-                              form.setValue('email', user.email)
-                              form.setValue('phone', user.phone)
-                              form.setValue('sex', user.sex)
-                              form.setValue('regionId', user.regionId)
-                              form.setValue('birthDate', user.birthDate)
-                              form.setValue('insuranceType', user.insuranceType)
-                            }}
-                            onInputChange={(val) => {
-                              field.onChange(val)
-                            }}
-                            disabled={foundUser !== null}
-                          />
-                        </div>
-                        <Button
-                          variant="outline"
-                          type="button"
-                          onClick={handleClearFields}
-                          disabled={!foundUser}
-                        >
-                          <Eraser /> Limpiar
-                        </Button>
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  ) : (
-                    <FormField
-                      control={form.control}
-                      name="documentNumber"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Número de Documento</FormLabel>
-                          <FormControl>
-                            <Input placeholder="12345678" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  )
-                }}
               />
             </div>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -497,7 +508,7 @@ export default function AddAttendantPage() {
                     <FormLabel>Tipo de Seguro</FormLabel>
                     <Select
                       onValueChange={field.onChange}
-                      defaultValue={field.value}
+                      value={field.value}
                       disabled={foundUser !== null}
                     >
                       <FormControl>
