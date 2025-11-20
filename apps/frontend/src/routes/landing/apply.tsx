@@ -4,6 +4,16 @@ import { QueryKeys } from '@frontend/shared/constants/query-keys'
 import { createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/landing/apply')({
+  validateSearch: (search) => ({
+    scholarshipId:
+      typeof search.scholarshipId === 'string' ||
+      typeof search.scholarshipId === 'number'
+        ? (() => {
+            const parsed = Number(search.scholarshipId)
+            return Number.isNaN(parsed) ? undefined : parsed
+          })()
+        : undefined,
+  }),
   component: ApplyPage,
   loader: async ({ context: { authClient, queryClient } }) => {
     const { data: authData, error: authError } = await queryClient.fetchQuery({
