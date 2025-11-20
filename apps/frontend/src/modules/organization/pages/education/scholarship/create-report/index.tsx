@@ -136,7 +136,7 @@ export default function CreateReportPage() {
                 name="userId"
                 render={() => (
                   <FormItem>
-                    <FormLabel>Alumno*</FormLabel>
+                    <FormLabel>Nombre del Alumno*</FormLabel>
                     <FormControl>
                       <div className="flex flex-row gap-2 items-center">
                         <div className="flex-1">
