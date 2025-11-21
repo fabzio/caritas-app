@@ -10,6 +10,13 @@ const useGetPatientMock = vi.fn()
 const useSetPatientMock = vi.fn()
 const useUpdatePatientMock = vi.fn()
 
+vi.mock('./hooks/use-update-profile', () => ({
+  useUpdateProfile: () => ({
+    mutate: vi.fn(),
+    isPending: false,
+  }),
+}))
+
 vi.mock('@frontend/hooks/use-session', () => ({
   useSession: () => useSessionMock(),
 }))

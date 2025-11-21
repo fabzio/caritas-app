@@ -1,5 +1,6 @@
 import { useSession } from '@frontend/hooks/use-session'
 import authClient from '@frontend/lib/authClient'
+import rpc from '@frontend/lib/rpc'
 import { useQuery } from '@tanstack/react-query'
 import { Link, useNavigate } from '@tanstack/react-router'
 import {
@@ -51,7 +52,11 @@ function NavMain({ items }: Readonly<Props>) {
   const { data: orgs, isLoading } = useQuery({
     queryKey: [QueryKeys.ORGANIZATIONS],
     queryFn: async () => {
-      const { data, error } = await authClient.organization.list()
+      const { data, error } = await rpc
+        .users({
+          id: sessionData?.user.id || '',
+        })
+        .organizations.get()
       if (error) throw error
       return data
     },

@@ -1,4 +1,5 @@
 import { useSession } from '@frontend/hooks/use-session'
+import rpc from '@frontend/lib/rpc'
 import { formUserSchema } from '@frontend/shared/models/user'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '@workspace/ui/components/button'
@@ -11,7 +12,9 @@ import {
   FormMessage,
 } from '@workspace/ui/components/form'
 import { Input } from '@workspace/ui/components/input'
+import { Spinner } from '@workspace/ui/components/spinner'
 import { useForm } from 'react-hook-form'
+import { useUpdateProfile } from '../hooks/use-update-profile'
 
 type PersonalFormValues = {
   name: string
@@ -33,6 +36,7 @@ const personalFormSchema = formUserSchema.omit({
 export default function PersonalDetails() {
   const { data } = useSession()
   const user = data?.user
+  const { mutate, isPending } = useUpdateProfile()
   const form = useForm<PersonalFormValues>({
     resolver: zodResolver(personalFormSchema),
     defaultValues: {
@@ -42,7 +46,14 @@ export default function PersonalDetails() {
     },
   })
 
-  const onSubmit = form.handleSubmit(() => {})
+  const onSubmit = form.handleSubmit((data) => {
+    mutate({
+      userId: user?.id || '',
+      name: data.name,
+      surname: data.surname,
+      phone: data.phone,
+    })
+  })
 
   return (
     <div className="my-4 w-3/5">
@@ -87,8 +98,13 @@ export default function PersonalDetails() {
               </FormItem>
             )}
           />
-          <Button type="submit" variant="secondary" className="mt-4">
-            Guardar Cambios
+          <Button
+            type="submit"
+            variant="secondary"
+            className="mt-4"
+            disabled={isPending}
+          >
+            {isPending ? <Spinner /> : 'Guardar cambios'}
           </Button>
         </form>
       </Form>
