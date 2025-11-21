@@ -82,7 +82,7 @@ const users = new Elysia({
         }),
         401: t.Literal('Unauthorized'),
         404: t.Literal('User not found'),
-        409: t.Literal('Phone number already in use'),
+        409: t.Literal('Número de teléfono ya en uso'),
       },
     },
   )
