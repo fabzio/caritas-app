@@ -1,7 +1,6 @@
 import authClient from '@frontend/lib/authClient'
 import { QueryKeys } from '@frontend/shared/constants/query-keys'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { useNavigate } from '@tanstack/react-router'
 import { toast } from 'sonner'
 
 type CreateAllyProps = {
@@ -11,7 +10,6 @@ type useCreateAllyProps = {
   type: 'health' | 'education'
 }
 export const useCreateAlly = ({ type }: useCreateAllyProps) => {
-  const navigate = useNavigate()
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (props: CreateAllyProps) => {

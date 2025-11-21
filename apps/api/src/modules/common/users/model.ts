@@ -28,4 +28,11 @@ export namespace UserModel {
   )
   export type GetUserOrganizationsResponse =
     typeof getUserOrganizationsResponse.static
+
+  export const updateUserBody = t.Object({
+    name: t.String({ minLength: 1, maxLength: 100 }),
+    surname: t.String({ minLength: 1, maxLength: 100 }),
+    phone: t.String({ minLength: 1, maxLength: 15 }),
+  })
+  export type UpdateUserBody = typeof updateUserBody.static
 }

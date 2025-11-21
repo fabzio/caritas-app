@@ -38,7 +38,9 @@ export default function CreateAlly({ viewType }: Readonly<Props>) {
     },
   })
 
-  const { mutate: createOrganization, isPending } = useCreateAlly()
+  const { mutate: createOrganization, isPending } = useCreateAlly({
+    type: 'health',
+  })
 
   const handleSubmit = form.handleSubmit((values) => {
     // TODO: handle edit ally
