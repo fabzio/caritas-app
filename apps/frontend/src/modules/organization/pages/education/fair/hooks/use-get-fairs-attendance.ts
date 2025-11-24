@@ -2,7 +2,7 @@ import rpc from '@frontend/lib/rpc'
 import { QueryKeys } from '@frontend/shared/constants/query-keys'
 import { useQuery } from '@tanstack/react-query'
 
-type GetFairsParams = {
+type GetFairsAttendanceParams = {
   currentPage?: number
   pageSize?: number
   filters?: {
@@ -16,15 +16,15 @@ type GetFairsParams = {
   }
 }
 
-export const useGetFairs = ({
+export const useGetFairsAttendance = ({
   currentPage = 1,
   pageSize = 10,
   filters,
-}: GetFairsParams) => {
+}: GetFairsAttendanceParams) => {
   return useQuery({
-    queryKey: [QueryKeys.EDUCATION.FAIR, filters],
+    queryKey: [QueryKeys.EDUCATION.FAIR, 'attendance', filters],
     queryFn: async () => {
-      const response = await rpc.education.fairs.get({
+      const response = await rpc.education.fairs.attendance.get({
         query: {
           page: Math.max(0, (currentPage || 1) - 1),
           limit: pageSize,

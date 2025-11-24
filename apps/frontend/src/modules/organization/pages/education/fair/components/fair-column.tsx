@@ -1,3 +1,4 @@
+import { Link } from '@tanstack/react-router'
 import type { ColumnDef } from '@tanstack/react-table'
 import { Badge } from '@workspace/ui/components/badge'
 import { Button } from '@workspace/ui/components/button'
@@ -28,7 +29,16 @@ export const fairTableColumns: ColumnDef<Fair>[] = [
         <ArrowUpDown />
       </Button>
     ),
-    cell: ({ row }) => <span>{row.original.title}</span>,
+    cell: ({ row }) => (
+      <Button asChild variant="link">
+        <Link
+          to="/organization/education/fair/$id/attendance"
+          params={{ id: String(row.original.id) }}
+        >
+          {row.original.title}
+        </Link>
+      </Button>
+    ),
   },
   {
     accessorKey: 'district',

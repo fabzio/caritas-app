@@ -8,8 +8,10 @@ import {
   getFairRegions,
   getFairStatus,
   getFairs,
+  getFairsAttendance,
   getSingleFair,
   patchFair,
+  updateFairAttendance,
 } from './service'
 
 const fair = new Elysia({
@@ -151,6 +153,31 @@ const fair = new Elysia({
       response: {
         200: t.Object({ success: t.Boolean() }),
         400: t.String(),
+      },
+    },
+  )
+  .get('/attendance', ({ query }) => getFairsAttendance(query), {
+    auth: true,
+    query: FairModel.listFairsQuery,
+    response: {
+      200: FairModel.getAttendanceResponse,
+      401: t.Literal('Unauthorized'),
+    },
+  })
+  .patch(
+    '/:id/attendance',
+    async ({ params, body }) => {
+      const id = Number(params.id)
+      const updated = await updateFairAttendance(id, body)
+      return updated
+    },
+    {
+      auth: true,
+      params: FairModel.getSingleFairsQuery,
+      body: FairModel.updateAttendance,
+      response: {
+        200: t.Number({ description: 'Number of updated rows' }),
+        401: t.Literal('Unauthorized'),
       },
     },
   )
