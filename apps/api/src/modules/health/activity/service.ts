@@ -1206,7 +1206,7 @@ export const toDetailedXlsx = async (
     'DURACIÓN DE IES',
   ]
   const demographyHeaders = [
-    'TOTAL ASISTENTES',
+    'TOTAL REGISTRADOS',
     'F',
     'M',
     'MENORES DE 18',
@@ -1231,7 +1231,7 @@ export const toDetailedXlsx = async (
   const headerMap = [
     { title: 'DATOS DE ACTIVIDAD', cols: fixedHeaders.length },
     { title: 'PARTICIPACIÓN', cols: participationHeaders.length },
-    { title: 'TOTAL ASISTENTES', cols: 1 },
+    { title: 'TOTAL REGISTRADOS', cols: 1 },
     { title: 'SEXO', cols: 2 },
     { title: 'RANGO DE EDAD', cols: 3 },
     {
@@ -1282,8 +1282,8 @@ export const toDetailedXlsx = async (
     cell.fill = {
       type: 'pattern',
       pattern: 'solid',
-      fgColor: { argb: 'FFDDDDDD' },
-    } // Gris claro
+      fgColor: { argb: 'FFF0FFF0' },
+    } // Verde claro
     cell.alignment = { horizontal: 'center', vertical: 'middle' }
     cell.border = {
       top: { style: 'thin', color: { argb: 'FF089C54' } },
@@ -1292,6 +1292,45 @@ export const toDetailedXlsx = async (
       right: { style: 'thin', color: { argb: 'FF089C54' } },
     }
   })
+
+  const presetWidths: number[] = [
+    5, // 1: N°
+    35, // 2: ACTIVIDAD
+    18, // 3: DISTRITO
+    25, // 4: ESAC INVOLUCRADAS
+    28, // 5: LUGAR (Dirección)
+    14, // 6: FECHA (Ajustado para DD/MM/YYYY)
+    22, // 7: DURACIÓN DE IES
+    25, // 8: ALIADOS
+    30, // 9: ESPECIALIDADES
+    20, // 10: TOTAL REGISTRADOS
+    10, // 11: F
+    10, // 12: M
+    18, // 13: MENORES DE 18
+    15, // 14: 18 A 64
+    15, // 15: 65 A MÁS
+    // Las siguientes 3 columnas son para los Seguros
+    15, // PÚBLICO
+    15, // PRIVADO
+    15, // NINGUNO
+  ]
+
+  const columnDefinitions = []
+
+  for (let i = 0; i < 15; i++) {
+    columnDefinitions.push({ width: presetWidths[i] })
+  }
+
+  const districtWidth = 35
+  for (let i = 0; i < dynamicDistrictHeaders.length; i++) {
+    columnDefinitions.push({ width: districtWidth })
+  }
+
+  for (let i = 15; i < 18; i++) {
+    columnDefinitions.push({ width: presetWidths[i] })
+  }
+
+  worksheet.columns = columnDefinitions
 
   let startRowMerge = worksheet.lastRow.number + 1
 
@@ -1648,18 +1687,13 @@ export const exportActivitiesToXlsx = async ({
 
     const xlsxBuffer = await toDetailedXlsx(mergedData, dynamicDistrictHeaders)
 
-    set.headers = {
-      'Content-Type':
-        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-      'Content-Disposition': `attachment; filename="detalle_actividades_${new Date().toISOString().slice(0, 10)}.xlsx"`,
-      'Content-Length': xlsxBuffer.length,
-    }
+    const base64String = xlsxBuffer.toString('base64')
 
-    const finalArrayBuffer = xlsxBuffer.buffer.slice(
-      xlsxBuffer.byteOffset,
-      xlsxBuffer.byteOffset + xlsxBuffer.length,
+    console.log(
+      `Reporte generado. Tamaño Base64: ${base64String.length} caracteres.`,
     )
-    return finalArrayBuffer as ArrayBuffer
+
+    return base64String
   } catch (e) {
     if (e instanceof Error) throw new PostgresError(e.message)
     throw e

@@ -56,21 +56,15 @@ export const exportActivitiesDetailXlsx = async (query: ExportQuery) => {
   try {
     const { data, error } = await rpc.health.activities.export.xlsx.get({
       query,
-      fetch: {
-        responseType: 'blob',
-      },
     })
 
     if (error) {
       throw new Error(error.value as string)
     }
-
-    const xlsxContent = data
-    console.log('Tipo de xlsxContent:', typeof xlsxContent)
-
-    const blob = new Blob([xlsxContent], {
-      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    })
+    const mimeType =
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    const blob = base64ToBlob(data, mimeType)
+    console.log('Tipo de xlsxContent:', typeof blob)
 
     const url = window.URL.createObjectURL(blob)
     const a = document.createElement('a')
@@ -88,4 +82,14 @@ export const exportActivitiesDetailXlsx = async (query: ExportQuery) => {
     console.error('Error al exportar actividades:', e)
     throw e
   }
+}
+
+function base64ToBlob(base64: string, mimeType: string) {
+  const byteCharacters = atob(base64)
+  const byteNumbers = new Array(byteCharacters.length)
+  for (let i = 0; i < byteCharacters.length; i++) {
+    byteNumbers[i] = byteCharacters[i].charCodeAt(0)
+  }
+  const byteArray = new Uint8Array(byteNumbers)
+  return new Blob([byteArray], { type: mimeType })
 }

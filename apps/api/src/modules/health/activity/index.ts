@@ -323,7 +323,7 @@ const activityModule = new Elysia({ name: 'activity', prefix: '/activities' })
         endDate: t.Optional(t.String()),
       }),
       response: {
-        200: t.ArrayBuffer(),
+        200: t.Any(),
         400: t.String(),
         401: t.Literal('Unauthorized'),
       },
