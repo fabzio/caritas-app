@@ -59,6 +59,7 @@ import { Route as AuthenticatedAdminUsersFormRouteImport } from './routes/_authe
 import { Route as AuthenticatedUserHealthActivitiesIndexRouteImport } from './routes/_authenticated/user/health/activities/index'
 import { Route as AuthenticatedUserEducationScholarshipIndexRouteImport } from './routes/_authenticated/user/education/scholarship/index'
 import { Route as AuthenticatedOrganizationEducationScholarshipIndexRouteImport } from './routes/_authenticated/organization/education/scholarship/index'
+import { Route as AuthenticatedOrganizationEducationFairIndexRouteImport } from './routes/_authenticated/organization/education/fair/index'
 import { Route as AuthenticatedHealthActivitiesActivityIdIndexRouteImport } from './routes/_authenticated/health/activities/$activityId/index'
 import { Route as AuthenticatedUserHealthActivitiesIdRouteImport } from './routes/_authenticated/user/health/activities/$id'
 import { Route as AuthenticatedOrganizationEducationScholarshipReportRouteImport } from './routes/_authenticated/organization/education/scholarship/report'
@@ -350,6 +351,12 @@ const AuthenticatedOrganizationEducationScholarshipIndexRoute =
     path: '/education/scholarship/',
     getParentRoute: () => AuthenticatedOrganizationRoute,
   } as any)
+const AuthenticatedOrganizationEducationFairIndexRoute =
+  AuthenticatedOrganizationEducationFairIndexRouteImport.update({
+    id: '/education/fair/',
+    path: '/education/fair/',
+    getParentRoute: () => AuthenticatedOrganizationRoute,
+  } as any)
 const AuthenticatedHealthActivitiesActivityIdIndexRoute =
   AuthenticatedHealthActivitiesActivityIdIndexRouteImport.update({
     id: '/activities/$activityId/',
@@ -467,6 +474,7 @@ export interface FileRoutesByFullPath {
   '/organization/education/scholarship/report': typeof AuthenticatedOrganizationEducationScholarshipReportRoute
   '/user/health/activities/$id': typeof AuthenticatedUserHealthActivitiesIdRoute
   '/health/activities/$activityId': typeof AuthenticatedHealthActivitiesActivityIdIndexRoute
+  '/organization/education/fair': typeof AuthenticatedOrganizationEducationFairIndexRoute
   '/organization/education/scholarship': typeof AuthenticatedOrganizationEducationScholarshipIndexRoute
   '/user/education/scholarship': typeof AuthenticatedUserEducationScholarshipIndexRoute
   '/user/health/activities': typeof AuthenticatedUserHealthActivitiesIndexRoute
@@ -521,6 +529,7 @@ export interface FileRoutesByTo {
   '/organization/education/scholarship/report': typeof AuthenticatedOrganizationEducationScholarshipReportRoute
   '/user/health/activities/$id': typeof AuthenticatedUserHealthActivitiesIdRoute
   '/health/activities/$activityId': typeof AuthenticatedHealthActivitiesActivityIdIndexRoute
+  '/organization/education/fair': typeof AuthenticatedOrganizationEducationFairIndexRoute
   '/organization/education/scholarship': typeof AuthenticatedOrganizationEducationScholarshipIndexRoute
   '/user/education/scholarship': typeof AuthenticatedUserEducationScholarshipIndexRoute
   '/user/health/activities': typeof AuthenticatedUserHealthActivitiesIndexRoute
@@ -584,6 +593,7 @@ export interface FileRoutesById {
   '/_authenticated/organization/education/scholarship/report': typeof AuthenticatedOrganizationEducationScholarshipReportRoute
   '/_authenticated/user/health/activities/$id': typeof AuthenticatedUserHealthActivitiesIdRoute
   '/_authenticated/health/activities/$activityId/': typeof AuthenticatedHealthActivitiesActivityIdIndexRoute
+  '/_authenticated/organization/education/fair/': typeof AuthenticatedOrganizationEducationFairIndexRoute
   '/_authenticated/organization/education/scholarship/': typeof AuthenticatedOrganizationEducationScholarshipIndexRoute
   '/_authenticated/user/education/scholarship/': typeof AuthenticatedUserEducationScholarshipIndexRoute
   '/_authenticated/user/health/activities/': typeof AuthenticatedUserHealthActivitiesIndexRoute
@@ -647,6 +657,7 @@ export interface FileRouteTypes {
     | '/organization/education/scholarship/report'
     | '/user/health/activities/$id'
     | '/health/activities/$activityId'
+    | '/organization/education/fair'
     | '/organization/education/scholarship'
     | '/user/education/scholarship'
     | '/user/health/activities'
@@ -701,6 +712,7 @@ export interface FileRouteTypes {
     | '/organization/education/scholarship/report'
     | '/user/health/activities/$id'
     | '/health/activities/$activityId'
+    | '/organization/education/fair'
     | '/organization/education/scholarship'
     | '/user/education/scholarship'
     | '/user/health/activities'
@@ -763,6 +775,7 @@ export interface FileRouteTypes {
     | '/_authenticated/organization/education/scholarship/report'
     | '/_authenticated/user/health/activities/$id'
     | '/_authenticated/health/activities/$activityId/'
+    | '/_authenticated/organization/education/fair/'
     | '/_authenticated/organization/education/scholarship/'
     | '/_authenticated/user/education/scholarship/'
     | '/_authenticated/user/health/activities/'
@@ -1131,6 +1144,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOrganizationEducationScholarshipIndexRouteImport
       parentRoute: typeof AuthenticatedOrganizationRoute
     }
+    '/_authenticated/organization/education/fair/': {
+      id: '/_authenticated/organization/education/fair/'
+      path: '/education/fair'
+      fullPath: '/organization/education/fair'
+      preLoaderRoute: typeof AuthenticatedOrganizationEducationFairIndexRouteImport
+      parentRoute: typeof AuthenticatedOrganizationRoute
+    }
     '/_authenticated/health/activities/$activityId/': {
       id: '/_authenticated/health/activities/$activityId/'
       path: '/activities/$activityId'
@@ -1315,6 +1335,7 @@ const AuthenticatedHealthRouteWithChildren =
 interface AuthenticatedOrganizationRouteChildren {
   AuthenticatedOrganizationIndexRoute: typeof AuthenticatedOrganizationIndexRoute
   AuthenticatedOrganizationEducationScholarshipReportRoute: typeof AuthenticatedOrganizationEducationScholarshipReportRoute
+  AuthenticatedOrganizationEducationFairIndexRoute: typeof AuthenticatedOrganizationEducationFairIndexRoute
   AuthenticatedOrganizationEducationScholarshipIndexRoute: typeof AuthenticatedOrganizationEducationScholarshipIndexRoute
   AuthenticatedOrganizationEducationScholarshipScholarshipIdViewRoute: typeof AuthenticatedOrganizationEducationScholarshipScholarshipIdViewRoute
 }
@@ -1324,6 +1345,8 @@ const AuthenticatedOrganizationRouteChildren: AuthenticatedOrganizationRouteChil
     AuthenticatedOrganizationIndexRoute: AuthenticatedOrganizationIndexRoute,
     AuthenticatedOrganizationEducationScholarshipReportRoute:
       AuthenticatedOrganizationEducationScholarshipReportRoute,
+    AuthenticatedOrganizationEducationFairIndexRoute:
+      AuthenticatedOrganizationEducationFairIndexRoute,
     AuthenticatedOrganizationEducationScholarshipIndexRoute:
       AuthenticatedOrganizationEducationScholarshipIndexRoute,
     AuthenticatedOrganizationEducationScholarshipScholarshipIdViewRoute:
