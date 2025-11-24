@@ -30,7 +30,7 @@ export const useUpdateFairAttendance = () => {
         queryKey: [QueryKeys.EDUCATION.FAIR, 'attendance'],
       })
       queryClient.invalidateQueries({
-        queryKey: [QueryKeys.EDUCATION.FAIR, variables.id],
+        queryKey: [QueryKeys.EDUCATION.FAIR, 'attendance', variables.id],
       })
 
       toast.success('Asistencia actualizada correctamente')

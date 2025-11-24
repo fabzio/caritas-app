@@ -94,11 +94,14 @@ describe('Fair Module', () => {
     const cookie = headers.get('set-cookie')
     expect(cookie).toBeDefined()
 
-    const response = await api.fairs({ id: '1' }).attendance.patch({
-      assistanceCount: 100,
-      fourthGradeAssistance: 50,
-      fifthGradeAssistance: 50,
-    })
+    const response = await api.fairs({ id: '1' }).attendance.patch(
+      {
+        assistanceCount: 100,
+        fourthGradeAssistance: 50,
+        fifthGradeAssistance: 50,
+      },
+      { headers: { cookie } },
+    )
 
     expect(response.status).toBe(200)
     expect(response.data).toBe(1)
