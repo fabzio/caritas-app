@@ -53,20 +53,29 @@ export default function FairAttendancePage() {
   const { mutate: updateAttendance, isPending } = useUpdateFairAttendance()
 
   const handleSubmit = form.handleSubmit((data) => {
+    const fourth =
+      data.fourthGradeAssistance && data.fourthGradeAssistance.trim() !== ''
+        ? Number(data.fourthGradeAssistance)
+        : null
+    const fifth =
+      data.fifthGradeAssistance && data.fifthGradeAssistance.trim() !== ''
+        ? Number(data.fifthGradeAssistance)
+        : null
+
+    const gradeSum = (fourth || 0) + (fifth || 0)
+
+    const hasTotal = data.assistanceCount && data.assistanceCount.trim() !== ''
+    const calculatedTotal = hasTotal
+      ? Number(data.assistanceCount)
+      : gradeSum > 0
+        ? gradeSum
+        : null
+
     const normalizedData = {
       id: Number(params.id),
-      assistanceCount:
-        data.assistanceCount && data.assistanceCount.trim() !== ''
-          ? Number(data.assistanceCount)
-          : null,
-      fourthGradeAssistance:
-        data.fourthGradeAssistance && data.fourthGradeAssistance.trim() !== ''
-          ? Number(data.fourthGradeAssistance)
-          : null,
-      fifthGradeAssistance:
-        data.fifthGradeAssistance && data.fifthGradeAssistance.trim() !== ''
-          ? Number(data.fifthGradeAssistance)
-          : null,
+      assistanceCount: calculatedTotal,
+      fourthGradeAssistance: fourth,
+      fifthGradeAssistance: fifth,
     }
 
     updateAttendance(normalizedData)
@@ -132,11 +141,13 @@ export default function FairAttendancePage() {
                         type="number"
                         min="0"
                         step="1"
-                        placeholder="Ingrese el número total de asistentes"
+                        placeholder="Se calculará automáticamente si se deja vacío"
                       />
                     </FormControl>
                     <FormDescription>
-                      Número total de personas que asistieron a la feria
+                      Si se deja vacío, se calculará como la suma de 4to y 5to
+                      grado. Complete este campo solo si hubo asistentes
+                      externos adicionales
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -149,10 +160,7 @@ export default function FairAttendancePage() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>
-                      Asistentes de Cuarto Grado
-                      <span className="text-muted-foreground text-sm font-normal ml-1">
-                        (opcional)
-                      </span>
+                      Asistentes de Cuarto Grado De Secundaria
                     </FormLabel>
                     <FormControl>
                       <Input
@@ -164,7 +172,8 @@ export default function FairAttendancePage() {
                       />
                     </FormControl>
                     <FormDescription>
-                      Número de estudiantes de cuarto grado que asistieron
+                      Número de estudiantes de cuarto grado (no incluye
+                      externos)
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -177,10 +186,7 @@ export default function FairAttendancePage() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>
-                      Asistentes de Quinto Grado
-                      <span className="text-muted-foreground text-sm font-normal ml-1">
-                        (opcional)
-                      </span>
+                      Asistentes de Quinto Grado de Secundaria
                     </FormLabel>
                     <FormControl>
                       <Input
@@ -192,7 +198,8 @@ export default function FairAttendancePage() {
                       />
                     </FormControl>
                     <FormDescription>
-                      Número de estudiantes de quinto grado que asistieron
+                      Número de estudiantes de quinto grado (no incluye
+                      externos)
                     </FormDescription>
                     <FormMessage />
                   </FormItem>

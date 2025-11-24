@@ -1,5 +1,8 @@
 import { useIsMobile } from '@frontend/hooks/use-mobile'
+import { useNavigate } from '@tanstack/react-router'
 import { Skeleton } from '@workspace/ui/components/skeleton'
+import { useState } from 'react'
+import ActionsButton from './components/actions-button'
 import FairTable from './components/fair-table'
 import RegionFilter from './components/region-filter'
 import SearchFairInput from './components/search-fair-input'
@@ -8,6 +11,8 @@ import { useFairTable } from './hooks/use-fair-table'
 
 export default function FairPage() {
   const isMobile = useIsMobile()
+  const navigate = useNavigate()
+  const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({})
   const {
     data: fairs,
     isLoading,
@@ -37,6 +42,21 @@ export default function FairPage() {
           <div className={`flex ${isMobile ? 'w-full' : 'w-auto'} gap-2`}>
             <RegionFilter />
             <StatusFilter />
+            <ActionsButton
+              onManageAttendanceClick={() => {
+                const selectedIds = Object.keys(rowSelection)
+                  .filter((key) => rowSelection[key])
+                  .map((key) => Number(key))
+                if (selectedIds.length === 1 && fairs) {
+                  const fairId = fairs[selectedIds[0]].id
+                  navigate({
+                    to: '/organization/education/fair/$id/attendance',
+                    params: { id: String(fairId) },
+                  })
+                }
+              }}
+              selectedCount={Object.values(rowSelection).filter(Boolean).length}
+            />
           </div>
         </div>
       </div>
@@ -50,6 +70,8 @@ export default function FairPage() {
           </div>
         ) : (
           <FairTable
+            rowSelection={rowSelection}
+            setRowSelection={setRowSelection}
             data={fairs || []}
             columns={columns}
             paginationState={paginationState}
