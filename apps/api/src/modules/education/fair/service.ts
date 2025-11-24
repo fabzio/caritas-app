@@ -157,6 +157,8 @@ export async function getFairs(
         endTime: fair.endTime,
         date: fair.date,
         assistanceCount: fair.assistanceCount,
+        fourthGradeAssistance: fair.fourthGradeAssistance,
+        fifthGradeAssistance: fair.fifthGradeAssistance,
       })
       .from(fair)
       .innerJoin(region, eq(fair.regionId, region.id))
@@ -329,5 +331,148 @@ export const getFairStatus = async () => {
   } catch (error) {
     if (error instanceof Error) throw new PostgresError(error.message)
     throw error
+  }
+}
+
+export const getFairsAttendance = async (
+  params: FairModel.ListFairsQuery,
+): Promise<FairModel.GetAttendanceResponse> => {
+  const {
+    q = '',
+    district,
+    date,
+    status: statusFilter,
+    page = 0,
+    limit = 10,
+    sortBy = 'date.desc',
+  } = params
+
+  const [sortFieldRaw, sortOrderRaw] = (sortBy ?? 'date.desc').split('.', 2)
+  const sortField = (sortFieldRaw ?? 'date').trim()
+  const sortOrder =
+    (sortOrderRaw ?? 'desc').trim().toLowerCase() === 'desc' ? 'desc' : 'asc'
+
+  const columns = {
+    title: fair.title,
+    date: fair.date,
+    district: region.name,
+  } as const
+
+  const column = columns[sortField as keyof typeof columns] ?? fair.date
+  const orderExpr = sortOrder === 'desc' ? desc(column) : asc(column)
+
+  const searchCondition = q ? or(ilike(fair.title, `%${q}%`)) : undefined
+
+  const districtCondition = district
+    ? inArray(
+        region.name,
+        district.split(',').map((d) => d.trim()),
+      )
+    : undefined
+
+  const dateCondition = date ? eq(fair.date, date) : undefined
+
+  const statusFilters = statusFilter?.split(',').map((s) => s.trim()) ?? []
+  let statusCondition: ReturnType<typeof sql> | undefined
+
+  if (statusFilters.length > 0) {
+    const conditions = statusFilters.map((status) => {
+      if (status === 'upcoming') {
+        return sql`(${fair.date} > (CURRENT_TIMESTAMP AT TIME ZONE 'America/Lima')::date OR (${fair.date} = (CURRENT_TIMESTAMP AT TIME ZONE 'America/Lima')::date AND ${fair.startTime} > (CURRENT_TIMESTAMP AT TIME ZONE 'America/Lima')::time))`
+      }
+      if (status === 'ongoing') {
+        return sql`(${fair.date} = (CURRENT_TIMESTAMP AT TIME ZONE 'America/Lima')::date AND ${fair.startTime} <= (CURRENT_TIMESTAMP AT TIME ZONE 'America/Lima')::time AND ${fair.endTime} > (CURRENT_TIMESTAMP AT TIME ZONE 'America/Lima')::time)`
+      }
+      if (status === 'finished') {
+        return sql`(${fair.date} < (CURRENT_TIMESTAMP AT TIME ZONE 'America/Lima')::date OR (${fair.date} = (CURRENT_TIMESTAMP AT TIME ZONE 'America/Lima')::date AND ${fair.endTime} <= (CURRENT_TIMESTAMP AT TIME ZONE 'America/Lima')::time))`
+      }
+      return sql`FALSE`
+    })
+
+    statusCondition = conditions.length > 0 ? or(...conditions) : undefined
+  }
+
+  const activeCondition = eq(fair.active, true)
+
+  const where = and(
+    activeCondition,
+    searchCondition,
+    districtCondition,
+    dateCondition,
+    statusCondition,
+  )
+
+  try {
+    const [{ total }] = await db
+      .select({ total: count() })
+      .from(fair)
+      .innerJoin(region, eq(fair.regionId, region.id))
+      .where(where)
+
+    const rows = await db
+      .select({
+        id: fair.id,
+        title: fair.title,
+        date: fair.date,
+        district: region.name,
+        assistanceCount: fair.assistanceCount,
+        fourthGradeAssistance: fair.fourthGradeAssistance,
+        fifthGradeAssistance: fair.fifthGradeAssistance,
+        startTime: fair.startTime,
+        endTime: fair.endTime,
+      })
+      .from(fair)
+      .innerJoin(region, eq(fair.regionId, region.id))
+      .where(where)
+      .offset(page * limit)
+      .limit(limit)
+      .orderBy(orderExpr)
+
+    const totalPages = Math.ceil(total / limit)
+
+    return {
+      data: rows.map((row) => ({
+        id: row.id,
+        title: row.title,
+        date: new Date(row.date),
+        district: row.district,
+        assistanceCount: row.assistanceCount,
+        fourthGradeAssistance: row.fourthGradeAssistance,
+        fifthGradeAssistance: row.fifthGradeAssistance,
+        status: calculateFairStatus(
+          new Date(row.date),
+          row.startTime,
+          row.endTime,
+        ),
+      })),
+      total,
+      page,
+      limit,
+      totalPages,
+    }
+  } catch (e) {
+    if (e instanceof Error) throw new PostgresError(e.message)
+    throw e
+  }
+}
+
+export const updateFairAttendance = async (
+  id: number,
+  attendance: FairModel.UpdateAttendance,
+) => {
+  try {
+    await db
+      .update(fair)
+      .set({
+        assistanceCount: attendance.assistanceCount,
+        fourthGradeAssistance: attendance.fourthGradeAssistance,
+        fifthGradeAssistance: attendance.fifthGradeAssistance,
+      })
+      .where(eq(fair.id, id))
+
+    return 1
+  } catch (e) {
+    if (e instanceof Error) throw new PostgresError(e.message)
+    throw e
   }
 }
