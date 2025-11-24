@@ -86,6 +86,16 @@ export default function CreateFairPage() {
               loaderData.assistanceCount !== undefined
                 ? String(loaderData.assistanceCount)
                 : '',
+            fourthGradeAssistance:
+              loaderData.fourthGradeAssistance !== null &&
+              loaderData.fourthGradeAssistance !== undefined
+                ? String(loaderData.fourthGradeAssistance)
+                : '',
+            fifthGradeAssistance:
+              loaderData.fifthGradeAssistance !== null &&
+              loaderData.fifthGradeAssistance !== undefined
+                ? String(loaderData.fifthGradeAssistance)
+                : '',
           }
         : {
             title: '',
@@ -96,6 +106,8 @@ export default function CreateFairPage() {
             regionId: 0,
             organizations: [{ organizationId: '' }],
             assistanceCount: '',
+            fourthGradeAssistance: '',
+            fifthGradeAssistance: '',
           },
   })
   const { fields, remove } = useFieldArray({
@@ -116,14 +128,34 @@ export default function CreateFairPage() {
   const { data: user } = useSession()
   const handleSubmit = form.handleSubmit((data) => {
     if (!user) return
-    const { assistanceCount, ...rest } = data
-    const normalizedAssistanceCount =
+    const {
+      assistanceCount,
+      fourthGradeAssistance,
+      fifthGradeAssistance,
+      ...rest
+    } = data
+
+    const fourth =
+      fourthGradeAssistance && fourthGradeAssistance.trim() !== ''
+        ? Number(fourthGradeAssistance)
+        : null
+    const fifth =
+      fifthGradeAssistance && fifthGradeAssistance.trim() !== ''
+        ? Number(fifthGradeAssistance)
+        : null
+    const external =
       assistanceCount && assistanceCount.trim() !== ''
         ? Number(assistanceCount)
         : null
+
+    const gradeSum = (fourth || 0) + (fifth || 0) + (external || 0)
+    const calculatedTotal = gradeSum > 0 ? gradeSum : null
+
     const payload = {
       ...rest,
-      assistanceCount: normalizedAssistanceCount,
+      assistanceCount: calculatedTotal,
+      fourthGradeAssistance: fourth,
+      fifthGradeAssistance: fifth,
       date: rest.date,
       createdBy: user.user.id,
       active: true,
@@ -326,28 +358,110 @@ export default function CreateFairPage() {
                     )}
                   />
                   {viewType === 'edit' && (
-                    <FormField
-                      control={form.control}
-                      name="assistanceCount"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Número de asistentes</FormLabel>
-                          <FormControl>
-                            <Input
-                              value={field.value ?? ''}
-                              onChange={(event) => {
-                                field.onChange(event.target.value)
-                              }}
-                            />
-                          </FormControl>
-                          <FormDescription>
-                            Registra los asistentes solo cuando la feria haya
-                            finalizado.
-                          </FormDescription>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                    <div className="border-t pt-4 mt-6">
+                      <h3 className="text-lg font-medium mb-2">
+                        Registro de Asistencia
+                      </h3>
+                      <p className="text-sm text-muted-foreground mb-4">
+                        Complete estos campos solo cuando la feria haya
+                        finalizado.
+                      </p>
+
+                      <div className="flex flex-col gap-4">
+                        <FormField
+                          control={form.control}
+                          name="fourthGradeAssistance"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>
+                                Asistentes de Cuarto Grado de Secundaria
+                              </FormLabel>
+                              <FormControl>
+                                <Input
+                                  {...field}
+                                  type="number"
+                                  min="0"
+                                  step="1"
+                                  placeholder="Ingrese el número de estudiantes de 4to grado"
+                                  value={field.value ?? ''}
+                                  onChange={(event) => {
+                                    field.onChange(event.target.value)
+                                  }}
+                                />
+                              </FormControl>
+                              <FormDescription>
+                                Número de estudiantes de cuarto grado (no
+                                incluye externos)
+                              </FormDescription>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name="fifthGradeAssistance"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>
+                                Asistentes de Quinto Grado de Secundaria
+                              </FormLabel>
+                              <FormControl>
+                                <Input
+                                  {...field}
+                                  type="number"
+                                  min="0"
+                                  step="1"
+                                  placeholder="Ingrese el número de estudiantes de 5to grado"
+                                  value={field.value ?? ''}
+                                  onChange={(event) => {
+                                    field.onChange(event.target.value)
+                                  }}
+                                />
+                              </FormControl>
+                              <FormDescription>
+                                Número de estudiantes de quinto grado (no
+                                incluye externos)
+                              </FormDescription>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name="assistanceCount"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>
+                                Asistentes Externos (Otros)
+                                <span className="text-muted-foreground text-sm font-normal ml-1">
+                                  (opcional)
+                                </span>
+                              </FormLabel>
+                              <FormControl>
+                                <Input
+                                  {...field}
+                                  type="number"
+                                  min="0"
+                                  step="1"
+                                  placeholder="Ingrese el número de asistentes externos"
+                                  value={field.value ?? ''}
+                                  onChange={(event) => {
+                                    field.onChange(event.target.value)
+                                  }}
+                                />
+                              </FormControl>
+                              <FormDescription>
+                                Asistentes que no son estudiantes de 4to o 5to
+                                grado. El total final será: 4to + 5to + Externos
+                              </FormDescription>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    </div>
                   )}
                   {/* --- Organizaciones Participantes --- */}
                   <div className="border-t pt-4 mt-6">

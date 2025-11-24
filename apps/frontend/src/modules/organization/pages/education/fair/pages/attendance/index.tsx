@@ -32,11 +32,7 @@ export default function FairAttendancePage() {
   const form = useForm<AttendanceSchema>({
     resolver: zodResolver(attendanceSchema),
     defaultValues: {
-      assistanceCount:
-        loaderData?.assistanceCount !== null &&
-        loaderData?.assistanceCount !== undefined
-          ? String(loaderData.assistanceCount)
-          : '',
+      externalAssistance: '',
       fourthGradeAssistance:
         loaderData?.fourthGradeAssistance !== null &&
         loaderData?.fourthGradeAssistance !== undefined
@@ -61,15 +57,13 @@ export default function FairAttendancePage() {
       data.fifthGradeAssistance && data.fifthGradeAssistance.trim() !== ''
         ? Number(data.fifthGradeAssistance)
         : null
-
-    const gradeSum = (fourth || 0) + (fifth || 0)
-
-    const hasTotal = data.assistanceCount && data.assistanceCount.trim() !== ''
-    const calculatedTotal = hasTotal
-      ? Number(data.assistanceCount)
-      : gradeSum > 0
-        ? gradeSum
+    const external =
+      data.externalAssistance && data.externalAssistance.trim() !== ''
+        ? Number(data.externalAssistance)
         : null
+
+    const gradeSum = (fourth || 0) + (fifth || 0) + (external || 0)
+    const calculatedTotal = gradeSum > 0 ? gradeSum : null
 
     const normalizedData = {
       id: Number(params.id),
@@ -126,41 +120,11 @@ export default function FairAttendancePage() {
             <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
               <FormField
                 control={form.control}
-                name="assistanceCount"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>
-                      Asistencia Total
-                      <span className="text-muted-foreground text-sm font-normal ml-1">
-                        (opcional)
-                      </span>
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        type="number"
-                        min="0"
-                        step="1"
-                        placeholder="Se calculará automáticamente si se deja vacío"
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      Si se deja vacío, se calculará como la suma de 4to y 5to
-                      grado. Complete este campo solo si hubo asistentes
-                      externos adicionales
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
                 name="fourthGradeAssistance"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>
-                      Asistentes de Cuarto Grado De Secundaria
+                      Asistentes de Cuarto Grado de Secundaria
                     </FormLabel>
                     <FormControl>
                       <Input
@@ -200,6 +164,35 @@ export default function FairAttendancePage() {
                     <FormDescription>
                       Número de estudiantes de quinto grado (no incluye
                       externos)
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="externalAssistance"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      Asistentes Externos (Otros)
+                      <span className="text-muted-foreground text-sm font-normal ml-1">
+                        (opcional)
+                      </span>
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        type="number"
+                        min="0"
+                        step="1"
+                        placeholder="Ingrese el número de asistentes externos"
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Asistentes que no son estudiantes de 4to o 5to grado de
+                      secundaria
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
