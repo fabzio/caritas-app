@@ -133,6 +133,8 @@ export const fair = educationSchema.table('fair', {
   }).notNull(),
   date: date('date').notNull(),
   assistanceCount: integer('assistance_count'),
+  fourthGradeAssistance: integer('fourth_grade_assistance'),
+  fifthGradeAssistance: integer('fifth_grade_assistance'),
 })
 
 export const fairOrganization = educationSchema.table('fair_organization', {
