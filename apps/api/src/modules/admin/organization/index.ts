@@ -3,11 +3,13 @@ import Elysia, { status, t } from 'elysia'
 
 import { OrganizationModel } from './model'
 import {
+  checkOrganizationsHaveActiveActivities,
   checkOrganizationsHaveActiveScholarships,
   deleteOrganizations,
   findDuplicateOrganizations,
   getOrganizations,
   getSingleOrganization,
+  hasActivitiesAssociated,
   updateOrganization,
 } from './service'
 
@@ -83,12 +85,40 @@ const organization = new Elysia({
       if (!ids.length)
         throw status(400, 'No hay ningún ID de organización para eliminar')
 
+      // const idsWithActivities = []
+      // const organizationNames = []
+
+      // for (const id of ids) {
+      //   const hasActivities = await hasActivitiesAssociated(id)
+      //   if (hasActivities) {
+      //     idsWithActivities.push(id)
+      //     const org = await getSingleOrganization({id})
+      //     if (org) {
+      //       organizationNames.push(org.name)
+      //     }
+      //   }
+      // }
+      // if (idsWithActivities.length > 0) {
+      //   throw status(
+      //     400,
+      //     `Las siguientes organizaciones no se pueden eliminar por tener actividades asociadas: ${organizationNames.join(', ')}`,
+      //   )
+      // }
+
       const organizationsWithScholarships =
         await checkOrganizationsHaveActiveScholarships(ids)
 
       if (organizationsWithScholarships.length > 0) {
         throw status(409, {
           organizationsWithScholarships,
+        })
+      }
+      const organizationsWithActivities =
+        await checkOrganizationsHaveActiveActivities(ids)
+      if (organizationsWithActivities.length > 0) {
+        console.log('index:', organizationsWithActivities)
+        throw status(410, {
+          organizationsWithActivities,
         })
       }
 
@@ -102,6 +132,7 @@ const organization = new Elysia({
         200: t.Object({ success: t.Boolean() }),
         400: t.String(),
         409: OrganizationModel.deleteOrganizationsWithScholarships,
+        410: OrganizationModel.deleteOrganizationsWithActivities,
       },
     },
   )
