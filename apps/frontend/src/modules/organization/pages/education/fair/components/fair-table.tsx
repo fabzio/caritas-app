@@ -3,13 +3,15 @@ import DataTable from '@frontend/shared/components/data-table'
 import { stateToSortBy } from '@frontend/shared/utils/sort-by-to-state'
 import type {
   ColumnDef,
+  OnChangeFn,
   PaginationState,
   SortingState,
 } from '@tanstack/react-table'
-import { useState } from 'react'
 import type { Fair } from './fair-column'
 
 type Props = {
+  rowSelection: Record<string, boolean>
+  setRowSelection: OnChangeFn<Record<string, boolean>>
   data: Fair[]
   columns: ColumnDef<Fair>[]
   paginationState: PaginationState
@@ -24,6 +26,8 @@ type Props = {
 }
 
 export default function FairTable({
+  rowSelection,
+  setRowSelection,
   data,
   columns,
   paginationState,
@@ -31,21 +35,18 @@ export default function FairTable({
   setFilters,
   pagination,
 }: Readonly<Props>) {
-  const [rowSelection, setRowSelection] = useState({})
-
   return (
     <DataTable
       data={data || []}
       columns={columns}
       pagination={paginationState}
       sorting={sortingState}
-      rowSelection={rowSelection}
-      setRowSelection={setRowSelection}
       onSortingChange={(updateOrValue) => {
         const newSortingState =
           typeof updateOrValue === 'function'
             ? updateOrValue(sortingState)
             : updateOrValue
+        setRowSelection({})
         return setFilters({ sortBy: stateToSortBy(newSortingState) })
       }}
       paginationOptions={{
@@ -66,6 +67,8 @@ export default function FairTable({
         rowCount: pagination?.total || 0,
         pageCount: pagination?.totalPages || 1,
       }}
+      setRowSelection={setRowSelection}
+      rowSelection={rowSelection}
     />
   )
 }
