@@ -18,7 +18,9 @@ type ExportQuery = z.infer<typeof ExportQuerySchema>
  */
 export const exportActivitiesDetailCsv = async (query: ExportQuery) => {
   try {
-    const { data, error } = await rpc.health.activities.export.get({ query })
+    const { data, error } = await rpc.health.activities.export.csv.get({
+      query,
+    })
 
     if (error) {
       throw new Error(error.value as string)
@@ -32,6 +34,48 @@ export const exportActivitiesDetailCsv = async (query: ExportQuery) => {
     const a = document.createElement('a')
 
     const filename = `detalle_actividades_${new Date().toISOString().slice(0, 10)}.csv`
+
+    a.href = url
+    a.download = filename
+    document.body.appendChild(a)
+    a.click()
+
+    window.URL.revokeObjectURL(url)
+    a.remove()
+  } catch (e) {
+    console.error('Error al exportar actividades:', e)
+    throw e
+  }
+}
+
+/**
+ * Llama al endpoint de exportación Xlsx y fuerza la descarga del archivo Blob.
+ * @param query Los parámetros de filtrado o la lista de IDs de actividad.
+ */
+export const exportActivitiesDetailXlsx = async (query: ExportQuery) => {
+  try {
+    const { data, error } = await rpc.health.activities.export.xlsx.get({
+      query,
+      fetch: {
+        responseType: 'blob',
+      },
+    })
+
+    if (error) {
+      throw new Error(error.value as string)
+    }
+
+    const xlsxContent = data
+    console.log('Tipo de xlsxContent:', typeof xlsxContent)
+
+    const blob = new Blob([xlsxContent], {
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    })
+
+    const url = window.URL.createObjectURL(blob)
+    const a = document.createElement('a')
+
+    const filename = `detalle_actividades_${new Date().toISOString().slice(0, 10)}.xlsx`
 
     a.href = url
     a.download = filename

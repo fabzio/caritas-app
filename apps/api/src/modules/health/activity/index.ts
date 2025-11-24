@@ -14,6 +14,7 @@ import {
   createCompleteActivity,
   deleteActivities,
   exportActivitiesToCsv,
+  exportActivitiesToXlsx,
   findDuplicateAttendant,
   getActivities,
   getActivityById,
@@ -288,22 +289,46 @@ const activityModule = new Elysia({ name: 'activity', prefix: '/activities' })
       },
     },
   )
-  .get('/export', ({ query, set }) => exportActivitiesToCsv({ query, set }), {
-    auth: true,
-    query: t.Object({
-      activityIds: t.Optional(t.String()),
-      filterOnly: t.Optional(t.String()),
-      q: t.Optional(t.String()),
-      regionIds: t.Optional(t.String()),
-      startDate: t.Optional(t.String()),
-      endDate: t.Optional(t.String()),
-    }),
-    response: {
-      200: t.String(),
-      400: t.String(),
-      401: t.Literal('Unauthorized'),
+  .get(
+    '/export/csv',
+    ({ query, set }) => exportActivitiesToCsv({ query, set }),
+    {
+      auth: true,
+      query: t.Object({
+        activityIds: t.Optional(t.String()),
+        filterOnly: t.Optional(t.String()),
+        q: t.Optional(t.String()),
+        regionIds: t.Optional(t.String()),
+        startDate: t.Optional(t.String()),
+        endDate: t.Optional(t.String()),
+      }),
+      response: {
+        200: t.String(),
+        400: t.String(),
+        401: t.Literal('Unauthorized'),
+      },
     },
-  })
+  )
+  .get(
+    '/export/xlsx',
+    ({ query, set }) => exportActivitiesToXlsx({ query, set }),
+    {
+      auth: true,
+      query: t.Object({
+        activityIds: t.Optional(t.String()),
+        filterOnly: t.Optional(t.String()),
+        q: t.Optional(t.String()),
+        regionIds: t.Optional(t.String()),
+        startDate: t.Optional(t.String()),
+        endDate: t.Optional(t.String()),
+      }),
+      response: {
+        200: t.ArrayBuffer(),
+        400: t.String(),
+        401: t.Literal('Unauthorized'),
+      },
+    },
+  )
   .get('/existent-users', ({ query }) => getExistentUsers(query), {
     auth: true,
     query: ActivityModel.listExistentUsersQuery,

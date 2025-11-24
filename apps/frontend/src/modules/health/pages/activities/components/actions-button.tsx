@@ -15,6 +15,7 @@ type Props = {
   onDeleteClick: () => void
   onEditClick: () => void
   onExportCsvClick: () => void
+  onExportXlsxClick: () => void
   selectedCount: number
 }
 
@@ -22,6 +23,7 @@ export default function ActionsButton({
   onDeleteClick,
   onEditClick,
   onExportCsvClick,
+  onExportXlsxClick,
   selectedCount,
 }: Readonly<Props>) {
   return (
@@ -52,7 +54,9 @@ export default function ActionsButton({
               <DropdownMenuItem onClick={onExportCsvClick}>
                 CSV
               </DropdownMenuItem>
-              <DropdownMenuItem>Excel</DropdownMenuItem>
+              <DropdownMenuItem onClick={onExportXlsxClick}>
+                Excel
+              </DropdownMenuItem>
             </DropdownMenuSubContent>
           </DropdownMenuSub>
         </DropdownMenuGroup>
