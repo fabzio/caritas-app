@@ -45,7 +45,7 @@ type Props<T> = {
   sorting: SortingState
   onSortingChange: OnChangeFn<SortingState>
   rowSelection?: Record<string, boolean>
-  setRowSelection: OnChangeFn<Record<string, boolean>>
+  setRowSelection?: OnChangeFn<Record<string, boolean>>
   showPageSizeSelector?: boolean
   pageSizeOptions?: number[]
   onRowClick?: (row: T) => void
