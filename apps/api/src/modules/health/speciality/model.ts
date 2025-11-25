@@ -48,4 +48,16 @@ export namespace SpecialityModel {
     ids: t.Array(t.Integer({ minimum: 1 })),
   })
   export type DeleteSpecialities = typeof deleteSpecialities.static
+
+  export const deleteSpecialitiesWithActivities = t.Object({
+    specialitiesWithActivities: t.Array(
+      t.Object({
+        specialityId: t.String(),
+        specialityName: t.String(),
+        activityCount: t.Number(),
+      }),
+    ),
+  })
+  export type DeleteSpecialitiesWithActivities =
+    typeof deleteSpecialitiesWithActivities.static
 }

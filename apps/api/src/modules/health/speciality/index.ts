@@ -2,6 +2,7 @@ import betterAuth from '@api/modules/auth/middleware'
 import Elysia, { status, t } from 'elysia'
 import { SpecialityModel } from './model'
 import {
+  checkSpecialityHaveActiveActivities,
   createSpeciality,
   deleteSpecialities,
   findDuplicateSpeciality,
@@ -94,25 +95,35 @@ const speciality = new Elysia({
         throw status(400, 'No hay ningún ID de especialidad para eliminar')
       }
 
-      const idsWithActivities = []
-      const specialityNames = []
+      // const idsWithActivities = []
+      // const specialityNames = []
 
-      for (const id of ids) {
-        const hasActivities = await hasActivitiesAssociated(id)
-        if (hasActivities) {
-          idsWithActivities.push(id)
-          const speciality = await getSingleSpeciality(id)
-          if (speciality) {
-            specialityNames.push(speciality.name)
-          }
-        }
-      }
+      // for (const id of ids) {
+      //   const hasActivities = await hasActivitiesAssociated(id)
+      //   if (hasActivities) {
+      //     idsWithActivities.push(id)
+      //     const speciality = await getSingleSpeciality(id)
+      //     if (speciality) {
+      //       specialityNames.push(speciality.name)
+      //     }
+      //   }
+      // }
 
-      if (idsWithActivities.length > 0) {
-        throw status(
-          400,
-          `Las siguientes especialidades no se pueden eliminar por tener actividades asociadas: ${specialityNames.join(', ')}`,
-        )
+      // if (idsWithActivities.length > 0) {
+      //   throw status(
+      //     400,
+      //     `Las siguientes especialidades no se pueden eliminar por tener actividades asociadas: ${specialityNames.join(', ')}`,
+      //   )
+      // }
+
+      const specialitiesWithActivities =
+        await checkSpecialityHaveActiveActivities(ids)
+
+      if (specialitiesWithActivities.length > 0) {
+        console.log('index:', specialitiesWithActivities)
+        throw status(409, {
+          specialitiesWithActivities,
+        })
       }
 
       const deleted = await deleteSpecialities(ids)
@@ -124,6 +135,7 @@ const speciality = new Elysia({
       response: {
         200: t.Object({ success: t.Boolean() }),
         400: t.String(),
+        409: SpecialityModel.deleteSpecialitiesWithActivities,
       },
     },
   )
