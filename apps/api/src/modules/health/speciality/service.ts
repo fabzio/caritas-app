@@ -1,8 +1,12 @@
 import db from '@api/db'
 import { PostgresError } from '@api/db/errors'
-import { alliedParticipation, speciality } from '@api/db/schemas/health'
+import {
+  activity,
+  alliedParticipation,
+  speciality,
+} from '@api/db/schemas/health'
 import { normalizeText } from '@api/utils/normalize-text'
-import { asc, count, desc, eq, inArray } from 'drizzle-orm'
+import { and, asc, count, desc, eq, inArray } from 'drizzle-orm'
 import type { SpecialityModel } from './model'
 
 export async function getSpecialities(
@@ -169,4 +173,33 @@ export async function hasActivitiesAssociated(id: number) {
     .from(alliedParticipation)
     .where(eq(alliedParticipation.specialityId, id))
   return activityCount[0].count > 0
+}
+
+export const checkSpecialityHaveActiveActivities = async (ids: number[]) => {
+  try {
+    const withActivities = await db
+      .select({
+        specialityId: alliedParticipation.specialityId,
+        specialityName: speciality.name,
+        activityCount: count(activity.id),
+      })
+      .from(alliedParticipation)
+      .innerJoin(activity, eq(alliedParticipation.activityId, activity.id))
+      .innerJoin(
+        speciality,
+        eq(speciality.id, alliedParticipation.specialityId),
+      )
+      .where(
+        and(
+          inArray(alliedParticipation.specialityId, ids),
+          eq(activity.state, true),
+        ),
+      )
+      .groupBy(alliedParticipation.specialityId, speciality.name)
+    console.log('check:', withActivities)
+    return withActivities
+  } catch (e) {
+    if (e instanceof Error) throw new PostgresError(e.message)
+    throw e
+  }
 }
