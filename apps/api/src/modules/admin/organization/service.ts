@@ -160,7 +160,7 @@ export const checkOrganizationsHaveActiveActivities = async (ids: string[]) => {
       .select({
         organizationId: alliedParticipation.alliedId,
         organizationName: organization.name,
-        activityCount: count(activity.id),
+        activitiesCount: count(activity.id),
       })
       .from(alliedParticipation)
       .innerJoin(
