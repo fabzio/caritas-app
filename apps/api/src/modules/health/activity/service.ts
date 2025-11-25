@@ -1689,10 +1689,6 @@ export const exportActivitiesToXlsx = async ({
 
     const base64String = xlsxBuffer.toString('base64')
 
-    console.log(
-      `Reporte generado. Tamaño Base64: ${base64String.length} caracteres.`,
-    )
-
     return base64String
   } catch (e) {
     if (e instanceof Error) throw new PostgresError(e.message)

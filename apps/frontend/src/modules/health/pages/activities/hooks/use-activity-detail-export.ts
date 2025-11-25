@@ -64,7 +64,6 @@ export const exportActivitiesDetailXlsx = async (query: ExportQuery) => {
     const mimeType =
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     const blob = base64ToBlob(data, mimeType)
-    console.log('Tipo de xlsxContent:', typeof blob)
 
     const url = window.URL.createObjectURL(blob)
     const a = document.createElement('a')
