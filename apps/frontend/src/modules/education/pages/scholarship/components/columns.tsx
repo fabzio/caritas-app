@@ -59,21 +59,21 @@ export const scholarshipTableColumns: ColumnDef<Scholarship>[] = [
     ),
     cell: ({ row }) => row.original.vacancies,
   },
-  {
-    accessorKey: 'active',
-    header: ({ column }) => (
-      <Button
-        variant="ghost"
-        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-      >
-        Estado
-        <ArrowUpDown />
-      </Button>
-    ),
-    cell: ({ row }) => (
-      <Badge variant={row.original.active ? 'default' : 'secondary'}>
-        {row.original.active ? 'Activa' : 'Inactiva'}
-      </Badge>
-    ),
-  },
+  // {
+  //   accessorKey: 'active',
+  //   header: ({ column }) => (
+  //     <Button
+  //       variant="ghost"
+  //       onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+  //     >
+  //       Estado
+  //       <ArrowUpDown />
+  //     </Button>
+  //   ),
+  //   cell: ({ row }) => (
+  //     <Badge variant={row.original.active ? 'default' : 'secondary'}>
+  //       {row.original.active ? 'Activa' : 'Inactiva'}
+  //     </Badge>
+  //   ),
+  // },
 ]

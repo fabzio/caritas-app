@@ -75,4 +75,16 @@ export namespace OrganizationModel {
   })
   export type DeleteOrganizationsWithScholarships =
     typeof deleteOrganizationsWithScholarships.static
+
+  export const deleteOrganizationsWithActivities = t.Object({
+    organizationsWithActivities: t.Array(
+      t.Object({
+        organizationId: t.String(),
+        organizationName: t.String(),
+        activitiesCount: t.Number(),
+      }),
+    ),
+  })
+  export type DeleteOrganizationsWithActivities =
+    typeof deleteOrganizationsWithActivities.static
 }

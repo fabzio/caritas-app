@@ -53,7 +53,7 @@ export const createScholarship = async (
 }
 export const getScholarships = async ({
   name,
-  active,
+  active = true,
   page = 1,
   pageSize = 10,
   organizationId,
