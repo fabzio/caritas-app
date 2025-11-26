@@ -138,9 +138,9 @@ export namespace FairModel {
   export type UpdateAttendance = typeof updateAttendance.static
 
   export const deleteFairsOngoingOrEnded = t.Object({
-    deleteFairsOngoingOrEnded: t.Array(
+    fairsOngoingOrEnded: t.Array(
       t.Object({
-        fairId: t.String(),
+        fairId: t.Number(),
         fairName: t.String(),
         fairCount: t.Number(),
       }),

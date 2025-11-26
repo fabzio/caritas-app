@@ -477,9 +477,8 @@ export const updateFairAttendance = async (
   }
 }
 
-export const checkFairStatus = async (ids: number[]) => {
+export const checkFairsOngoingOrEnded = async (ids: number[]) => {
   try {
-    console.log(ids)
     const fairsEnded = await db
       .select({
         fairId: fair.id,
@@ -494,7 +493,6 @@ export const checkFairStatus = async (ids: number[]) => {
         ),
       )
       .groupBy(fair.id, fair.title)
-    console.log(fairsEnded)
     return fairsEnded
   } catch (e) {
     if (e instanceof Error) throw new PostgresError(e.message)

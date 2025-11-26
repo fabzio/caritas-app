@@ -116,7 +116,6 @@ const organization = new Elysia({
       const organizationsWithActivities =
         await checkOrganizationsHaveActiveActivities(ids)
       if (organizationsWithActivities.length > 0) {
-        console.log('index:', organizationsWithActivities)
         throw status(410, {
           organizationsWithActivities,
         })
