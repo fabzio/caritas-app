@@ -12,6 +12,7 @@ import { Input } from '@workspace/ui/components/input'
 import debounce from 'debounce'
 import { ChevronDown, MoreVertical, PlusCircle, Search } from 'lucide-react'
 import { useMemo, useState } from 'react'
+import { toast } from 'sonner'
 import DeleteConfirmationDialog from './components/delete-confirmation-dialog'
 import ScholarshipTable from './components/scholarship-table'
 import { useScholarshipTable } from './hooks/use-table'
@@ -59,6 +60,19 @@ export default function ScholarshipPage() {
     if (selectedIds.length === 1 && scholarships) {
       const selectedScholarship =
         scholarships[Number.parseInt(selectedIds[0], 10)]
+      const start = new Date(selectedScholarship.startDate)
+      const now = new Date()
+      const startDateOnly = new Date(
+        start.getFullYear(),
+        start.getMonth(),
+        start.getDate(),
+      )
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+      const expired = startDateOnly <= today
+      if (expired) {
+        toast.error('No puede editar una beca cuya inscripcion ya ha iniciado')
+        return
+      }
       navigate({
         to: '/education/scholarship/form',
         search: {
