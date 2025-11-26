@@ -162,6 +162,7 @@ const fair = new Elysia({
       response: {
         200: t.Object({ success: t.Boolean() }),
         400: t.String(),
+        409: FairModel.deleteFairsOngoingOrEnded,
       },
     },
   )
