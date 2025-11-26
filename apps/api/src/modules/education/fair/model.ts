@@ -136,4 +136,16 @@ export namespace FairModel {
     fifthGradeAssistance: assistanceCountSchema,
   })
   export type UpdateAttendance = typeof updateAttendance.static
+
+  export const deleteFairsOngoingOrEnded = t.Object({
+    deleteFairsOngoingOrEnded: t.Array(
+      t.Object({
+        fairId: t.String(),
+        fairName: t.String(),
+        fairCount: t.Number(),
+      }),
+    ),
+  })
+  export type DeleteFairsOngoingOrEnded =
+    typeof deleteFairsOngoingOrEnded.static
 }
