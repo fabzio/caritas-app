@@ -196,7 +196,6 @@ export const checkSpecialityHaveActiveActivities = async (ids: number[]) => {
         ),
       )
       .groupBy(alliedParticipation.specialityId, speciality.name)
-    console.log('check:', withActivities)
     return withActivities
   } catch (e) {
     if (e instanceof Error) throw new PostgresError(e.message)
