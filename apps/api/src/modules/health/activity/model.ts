@@ -237,4 +237,27 @@ export namespace ActivityModel {
     startDate?: string
     endDate?: string
   }
+
+  export const deleteActivitiesWithAttendees = t.Object({
+    activitiesWithAttendees: t.Array(
+      t.Object({
+        activitieId: t.Number(),
+        activitieName: t.String(),
+        attendeesCount: t.Number(),
+      }),
+    ),
+  })
+  export type DeleteActivitiesWithAttendees =
+    typeof deleteActivitiesWithAttendees.static
+
+  export const deleteExpiredActivities = t.Object({
+    expiredActivities: t.Array(
+      t.Object({
+        activitieId: t.Number(),
+        activitieName: t.String(),
+        activityStatus: t.String(),
+      }),
+    ),
+  })
+  export type DeleteExpiredActivities = typeof deleteExpiredActivities.static
 }
