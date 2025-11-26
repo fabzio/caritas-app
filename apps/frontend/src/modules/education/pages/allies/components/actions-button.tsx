@@ -44,13 +44,6 @@ export default function ActionsButton({
           >
             Editar
           </DropdownMenuItem>
-          <DropdownMenuSub>
-            <DropdownMenuSubTrigger>Exportar</DropdownMenuSubTrigger>
-            <DropdownMenuSubContent>
-              <DropdownMenuItem>CSV</DropdownMenuItem>
-              <DropdownMenuItem>Excel</DropdownMenuItem>
-            </DropdownMenuSubContent>
-          </DropdownMenuSub>
         </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>

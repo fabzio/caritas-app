@@ -141,11 +141,7 @@ export default function ScholarshipPage() {
                 <DropdownMenuItem onClick={handleEdit} disabled={!canEdit}>
                   Editar
                 </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={handleDelete}
-                  disabled={!canDelete}
-                  className="text-destructive"
-                >
+                <DropdownMenuItem onClick={handleDelete} disabled={!canDelete}>
                   Eliminar {selectedCount > 1 ? `(${selectedCount})` : ''}
                 </DropdownMenuItem>
               </DropdownMenuContent>
