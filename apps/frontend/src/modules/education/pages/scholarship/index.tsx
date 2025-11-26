@@ -103,31 +103,6 @@ export default function ScholarshipPage() {
           <div className="flex gap-2">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" size={isMobile ? 'sm' : 'lg'}>
-                  {filters.active === undefined
-                    ? 'Todas'
-                    : filters.active
-                      ? 'Activas'
-                      : 'Inactivas'}
-                  <ChevronDown />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem
-                  onClick={() => setFilters({ active: undefined })}
-                >
-                  Todas
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setFilters({ active: true })}>
-                  Activas
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setFilters({ active: false })}>
-                  Inactivas
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
                 <Button
                   variant="outline"
                   size={isMobile ? 'sm' : 'lg'}

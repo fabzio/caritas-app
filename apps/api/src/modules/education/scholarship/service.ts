@@ -202,3 +202,24 @@ export const getAvailableScholarships = async () => {
     throw e
   }
 }
+
+export const checkScholarshipsOngoingOrEnded = async (ids: number[]) => {
+  try {
+    const scholarships = await db
+      .select({
+        id: scholarship.id,
+        name: scholarship.name,
+      })
+      .from(scholarship)
+      .where(
+        and(
+          sql`(${scholarship.startDate} <= (CURRENT_TIMESTAMP AT TIME ZONE 'America/Lima')::date)`,
+          inArray(scholarship.id, ids),
+        ),
+      )
+    return scholarships
+  } catch (e) {
+    if (e instanceof Error) throw new PostgresError(e.message)
+    throw e
+  }
+}

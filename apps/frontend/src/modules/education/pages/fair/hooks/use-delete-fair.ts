@@ -35,7 +35,7 @@ const useDeleteFairs = () => {
         if (error.message === IS_ONGOING_OR_ENDED_ERROR) {
           const errorData = error.cause as {
             fairsOngoingOrEnded: Array<{
-              fairId: string
+              fairId: number
               fairName: string
               fairCount: number
             }>
