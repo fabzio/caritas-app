@@ -5,6 +5,7 @@ import { ScholarshipModel } from './model'
 import scholarshipRecipients from './recipients'
 import scholarshipReport from './report'
 import {
+  checkScholarshipsOngoingOrEnded,
   createScholarship,
   deleteScholarships,
   findDuplicateScholarship,
@@ -113,6 +114,14 @@ const scholarship = new Elysia({
       const { ids } = body
       if (!ids.length)
         throw status(400, 'No hay ningún ID de beca para eliminar')
+      const scholarshipsOngoingOrEnded =
+        await checkScholarshipsOngoingOrEnded(ids)
+
+      if (scholarshipsOngoingOrEnded.length > 0) {
+        throw status(409, {
+          scholarshipsOngoingOrEnded,
+        })
+      }
       const deleted = await deleteScholarships(ids)
       return deleted
     },
@@ -122,6 +131,7 @@ const scholarship = new Elysia({
       response: {
         200: t.Object({ success: t.Boolean() }),
         400: t.String(),
+        409: ScholarshipModel.deleteScholarshipsOngoingOrEnded,
       },
     },
   )

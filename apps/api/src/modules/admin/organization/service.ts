@@ -175,7 +175,6 @@ export const checkOrganizationsHaveActiveActivities = async (ids: string[]) => {
         ),
       )
       .groupBy(alliedParticipation.alliedId, organization.name)
-    console.log('check:', organizationsWithActivities)
     return organizationsWithActivities
   } catch (e) {
     if (e instanceof Error) throw new PostgresError(e.message)

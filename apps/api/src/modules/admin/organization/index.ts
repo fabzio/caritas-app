@@ -9,7 +9,6 @@ import {
   findDuplicateOrganizations,
   getOrganizations,
   getSingleOrganization,
-  hasActivitiesAssociated,
   updateOrganization,
 } from './service'
 
@@ -85,26 +84,6 @@ const organization = new Elysia({
       if (!ids.length)
         throw status(400, 'No hay ningún ID de organización para eliminar')
 
-      // const idsWithActivities = []
-      // const organizationNames = []
-
-      // for (const id of ids) {
-      //   const hasActivities = await hasActivitiesAssociated(id)
-      //   if (hasActivities) {
-      //     idsWithActivities.push(id)
-      //     const org = await getSingleOrganization({id})
-      //     if (org) {
-      //       organizationNames.push(org.name)
-      //     }
-      //   }
-      // }
-      // if (idsWithActivities.length > 0) {
-      //   throw status(
-      //     400,
-      //     `Las siguientes organizaciones no se pueden eliminar por tener actividades asociadas: ${organizationNames.join(', ')}`,
-      //   )
-      // }
-
       const organizationsWithScholarships =
         await checkOrganizationsHaveActiveScholarships(ids)
 
@@ -116,7 +95,6 @@ const organization = new Elysia({
       const organizationsWithActivities =
         await checkOrganizationsHaveActiveActivities(ids)
       if (organizationsWithActivities.length > 0) {
-        console.log('index:', organizationsWithActivities)
         throw status(410, {
           organizationsWithActivities,
         })

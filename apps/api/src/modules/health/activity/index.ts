@@ -9,6 +9,8 @@ import {
 import { ActivityModel } from './model'
 import {
   addAttendantToActivity,
+  checkActivitiesHaveActiveAttendees,
+  checkActivitiesStatus,
   createActivity,
   createAttention,
   createCompleteActivity,
@@ -166,17 +168,45 @@ const activityModule = new Elysia({ name: 'activity', prefix: '/activities' })
       },
     },
   )
-  .delete('', ({ body }) => deleteActivities(body), {
-    auth: true,
-    body: ActivityModel.deleteActivities,
-    response: {
-      200: t.Object({
-        deletedCount: t.Number(),
-        deletedIds: t.Array(t.Number()),
-      }),
-      401: t.Literal('Unauthorized'),
+  .delete(
+    '',
+    async ({ body }) => {
+      const { ids } = body
+      if (!ids.length)
+        throw status(400, 'No hay ningún ID de actividad para eliminar')
+      const expiredActivities = await checkActivitiesStatus(ids)
+
+      if (expiredActivities.length > 0) {
+        throw status(410, {
+          expiredActivities,
+        })
+      }
+      const activitiesWithAttendees =
+        await checkActivitiesHaveActiveAttendees(ids)
+
+      if (activitiesWithAttendees.length > 0) {
+        throw status(409, {
+          activitiesWithAttendees,
+        })
+      }
+
+      const deleted = await deleteActivities({ ids })
+      return deleted
     },
-  })
+    {
+      auth: true,
+      body: ActivityModel.deleteActivities,
+      response: {
+        200: t.Object({
+          deletedCount: t.Number(),
+          deletedIds: t.Array(t.Number()),
+        }),
+        401: t.Literal('Unauthorized'),
+        409: ActivityModel.deleteActivitiesWithAttendees,
+        410: ActivityModel.deleteExpiredActivities,
+      },
+    },
+  )
   .get('/types', () => getActivityTypes(), {
     auth: true,
     response: {

@@ -476,3 +476,26 @@ export const updateFairAttendance = async (
     throw e
   }
 }
+
+export const checkFairsOngoingOrEnded = async (ids: number[]) => {
+  try {
+    const fairsEnded = await db
+      .select({
+        fairId: fair.id,
+        fairName: fair.title,
+        fairCount: count(fair.id),
+      })
+      .from(fair)
+      .where(
+        and(
+          sql`(${fair.date} < (CURRENT_TIMESTAMP AT TIME ZONE 'America/Lima')::date OR (${fair.date} = (CURRENT_TIMESTAMP AT TIME ZONE 'America/Lima')::date AND ${fair.endTime} <= (CURRENT_TIMESTAMP AT TIME ZONE 'America/Lima')::time))`,
+          inArray(fair.id, ids),
+        ),
+      )
+      .groupBy(fair.id, fair.title)
+    return fairsEnded
+  } catch (e) {
+    if (e instanceof Error) throw new PostgresError(e.message)
+    throw e
+  }
+}

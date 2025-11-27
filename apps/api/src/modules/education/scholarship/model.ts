@@ -76,4 +76,15 @@ export namespace ScholarshipModel {
     t.Pick(_select, ['id', 'name']),
   )
   export type GetAvailableScholarships = typeof getAvailableScholarships.static
+
+  export const deleteScholarshipsOngoingOrEnded = t.Object({
+    scholarshipsOngoingOrEnded: t.Array(
+      t.Object({
+        id: t.Number(),
+        name: t.String(),
+      }),
+    ),
+  })
+  export type DeleteScholarshipOngoingOrEnded =
+    typeof deleteScholarshipsOngoingOrEnded.static
 }

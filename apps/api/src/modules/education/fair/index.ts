@@ -2,6 +2,7 @@ import betterAuth from '@api/modules/auth/middleware'
 import Elysia, { status, t } from 'elysia'
 import { FairModel } from './model'
 import {
+  checkFairsOngoingOrEnded,
   createFair,
   deleteFairs,
   findDuplicateFair,
@@ -144,6 +145,14 @@ const fair = new Elysia({
       if (!ids.length) {
         throw status(400, 'No hay ningún ID de feria para eliminar')
       }
+      const fairsOngoingOrEnded = await checkFairsOngoingOrEnded(ids)
+
+      if (fairsOngoingOrEnded.length > 0) {
+        throw status(409, {
+          fairsOngoingOrEnded,
+        })
+      }
+
       const deleted = await deleteFairs(ids)
       return deleted
     },
@@ -153,6 +162,7 @@ const fair = new Elysia({
       response: {
         200: t.Object({ success: t.Boolean() }),
         400: t.String(),
+        409: FairModel.deleteFairsOngoingOrEnded,
       },
     },
   )

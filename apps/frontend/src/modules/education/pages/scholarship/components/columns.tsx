@@ -1,5 +1,4 @@
 import type { ColumnDef } from '@tanstack/react-table'
-import { Badge } from '@workspace/ui/components/badge'
 import { Button } from '@workspace/ui/components/button'
 import { Checkbox } from '@workspace/ui/components/checkbox'
 import { ArrowUpDown } from 'lucide-react'
@@ -9,71 +8,68 @@ export const scholarshipTableColumns: ColumnDef<Scholarship>[] = [
   {
     id: 'select',
     header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && 'indeterminate')
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
+      <div className="flex justify-center">
+        <Checkbox
+          checked={
+            table.getIsAllPageRowsSelected() ||
+            (table.getIsSomePageRowsSelected() && 'indeterminate')
+          }
+          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+          aria-label="Select all"
+        />
+      </div>
     ),
     cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-        onClick={(e) => e.stopPropagation()}
-      />
+      <div className="flex justify-center">
+        <Checkbox
+          checked={row.getIsSelected()}
+          onCheckedChange={(value) => row.toggleSelected(!!value)}
+          aria-label="Select row"
+          onClick={(e) => e.stopPropagation()}
+        />
+      </div>
     ),
   },
   {
     accessorKey: 'name',
     header: ({ column }) => (
-      <Button
-        variant="ghost"
-        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-      >
-        Nombre
-        <ArrowUpDown />
-      </Button>
+      <div className="flex justify-center">
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+        >
+          Nombre
+          <ArrowUpDown />
+        </Button>
+      </div>
     ),
-    cell: ({ row }) => row.original.name,
+    cell: ({ row }) => <div className="text-center">{row.original.name}</div>,
   },
   {
     accessorKey: 'organization',
-    header: () => <div>Organización</div>,
-    cell: ({ row }) => row.original.organization?.name || 'N/A',
+    header: () => <div className="text-center">Organización</div>,
+    cell: ({ row }) => (
+      <div className="text-center">
+        {row.original.organization?.name || 'N/A'}
+      </div>
+    ),
     enableSorting: false,
   },
   {
     accessorKey: 'vacancies',
     header: ({ column }) => (
-      <Button
-        variant="ghost"
-        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-      >
-        Vacantes
-        <ArrowUpDown />
-      </Button>
+      <div className="flex justify-center">
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+        >
+          Vacantes
+          <ArrowUpDown />
+        </Button>
+      </div>
     ),
-    cell: ({ row }) => row.original.vacancies,
+    cell: ({ row }) => (
+      <div className="text-center">{row.original.vacancies}</div>
+    ),
   },
-  // {
-  //   accessorKey: 'active',
-  //   header: ({ column }) => (
-  //     <Button
-  //       variant="ghost"
-  //       onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-  //     >
-  //       Estado
-  //       <ArrowUpDown />
-  //     </Button>
-  //   ),
-  //   cell: ({ row }) => (
-  //     <Badge variant={row.original.active ? 'default' : 'secondary'}>
-  //       {row.original.active ? 'Activa' : 'Inactiva'}
-  //     </Badge>
-  //   ),
-  // },
 ]
