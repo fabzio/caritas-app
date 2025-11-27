@@ -8,7 +8,6 @@ import {
   findDuplicateSpeciality,
   getSingleSpeciality,
   getSpecialities,
-  hasActivitiesAssociated,
   updateSpeciality,
 } from './service'
 
