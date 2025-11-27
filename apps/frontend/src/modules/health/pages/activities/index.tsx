@@ -12,6 +12,7 @@ import {
 } from '@workspace/ui/components/dialog'
 import { SquareActivity } from 'lucide-react'
 import { useCallback, useState } from 'react'
+import { toast } from 'sonner'
 import ActionsButton from './components/actions-button'
 import { ActivityTable } from './components/activity-table'
 import DateRangeFilter from './components/date-range-filter'
@@ -61,6 +62,19 @@ export default function ActivityPage() {
   const handleEdit = () => {
     if (activityCount === 1) {
       const activityId = selectedActivities[0].id
+      const start = new Date(selectedActivities[0].date)
+      const now = new Date()
+      const startDateOnly = new Date(
+        start.getFullYear(),
+        start.getMonth(),
+        start.getDate(),
+      )
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+      const expired = startDateOnly <= today
+      if (expired) {
+        toast.error('No puede editar una actividad en curso o pasada.')
+        return
+      }
       navigate({ to: `/health/activities/edit/${activityId}` })
     }
   }
