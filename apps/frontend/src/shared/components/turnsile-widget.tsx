@@ -1,6 +1,7 @@
 import { env } from '@frontend/env'
 import { Turnstile } from '@marsidev/react-turnstile'
 import type { ComponentProps } from 'react'
+import { toast } from 'sonner'
 import { useTheme } from './theme-provider'
 
 type Props = Omit<ComponentProps<typeof Turnstile>, 'siteKey' | 'options'>
@@ -16,6 +17,7 @@ export default function TurnstileWidget(props: Readonly<Props>) {
         theme: theme === 'system' ? 'auto' : theme,
         language: 'es',
       }}
+      onClickCapture={() => toast.info('Validando...')}
       {...props}
     />
   )

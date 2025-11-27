@@ -24,7 +24,7 @@ import {
 import { defaultRoles } from 'better-auth/plugins/organization/access'
 import { passkey } from 'better-auth/plugins/passkey'
 import { localization } from 'better-auth-localization'
-import { eq } from 'drizzle-orm'
+import { eq, ilike } from 'drizzle-orm'
 import transporter, { SENDER } from '../mail'
 
 export const auth = betterAuth({
@@ -220,6 +220,27 @@ export const auth = betterAuth({
     passkey(),
     organization({
       organizationHooks: {
+        beforeCreateOrganization: async ({ organization }) => {
+          const normalized = organization?.name
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '') // quitar acentos
+            .toLowerCase()
+            .trim()
+            .replace(/\s+/g, '-') // espacios → guiones
+            .replace(/[^a-z0-9-]/g, '') // quitar símbolos
+            .replace(/--+/g, '-') // evitar doble guión
+            .replace(/^-+|-+$/g, '') // quitar guiones al inicio/fin
+
+          const existing = await db.query.organization.findFirst({
+            where: (org, { eq }) => eq(org.slug, normalized),
+          })
+
+          if (existing)
+            throw new APIError('CONFLICT', {
+              message: `La organización "${organization.name}" ya existe`,
+            })
+        },
+
         afterAcceptInvitation: async ({ organization, user }) => {
           if (organization.type === 'caritas')
             await db

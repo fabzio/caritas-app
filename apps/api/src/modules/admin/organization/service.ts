@@ -80,10 +80,19 @@ export async function getOrganizations(
   }
 }
 export async function getOrganizationsSimple(name: string) {
+  const normalizedName = name
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '') // quitar acentos
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, '-') // espacios → guiones
+    .replace(/[^a-z0-9-]/g, '') // quitar símbolos
+    .replace(/--+/g, '-') // evitar doble guión
+    .replace(/^-+|-+$/g, '') // quitar guiones al inicio/fin
   const rows = await db
     .select()
     .from(organization)
-    .where(ilike(organization.name, `%${name}%`))
+    .where(eq(organization.slug, normalizedName))
   return {
     data: rows,
   }
