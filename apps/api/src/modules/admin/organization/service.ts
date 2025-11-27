@@ -3,7 +3,18 @@ import { PostgresError } from '@api/db/errors'
 import { organization } from '@api/db/schemas/auth'
 import { scholarship } from '@api/db/schemas/education'
 import { activity, alliedParticipation } from '@api/db/schemas/health'
-import { and, asc, count, desc, eq, ilike, inArray, not, or } from 'drizzle-orm'
+import {
+  and,
+  asc,
+  count,
+  countDistinct,
+  desc,
+  eq,
+  ilike,
+  inArray,
+  not,
+  or,
+} from 'drizzle-orm'
 import type { OrganizationModel } from './model'
 
 export async function getOrganizations(
@@ -158,9 +169,9 @@ export const checkOrganizationsHaveActiveActivities = async (ids: string[]) => {
   try {
     const organizationsWithActivities = await db
       .select({
-        organizationId: alliedParticipation.alliedId,
+        organizationId: organization.id,
         organizationName: organization.name,
-        activitiesCount: count(activity.id),
+        activitiesCount: countDistinct(activity.id),
       })
       .from(alliedParticipation)
       .innerJoin(
@@ -174,18 +185,10 @@ export const checkOrganizationsHaveActiveActivities = async (ids: string[]) => {
           eq(activity.state, true),
         ),
       )
-      .groupBy(alliedParticipation.alliedId, organization.name)
+      .groupBy(organization.id, organization.name)
     return organizationsWithActivities
   } catch (e) {
     if (e instanceof Error) throw new PostgresError(e.message)
     throw e
   }
-}
-export async function hasActivitiesAssociated(id: string) {
-  const activityCount = await db
-    .select({ count: count() })
-    .from(alliedParticipation)
-    .innerJoin(activity, eq(alliedParticipation.activityId, activity.id))
-    .where(and(eq(alliedParticipation.alliedId, id), eq(activity.state, true)))
-  return activityCount[0].count > 0
 }
