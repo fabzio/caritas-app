@@ -30,6 +30,8 @@ import {
   sql,
   sum,
 } from 'drizzle-orm'
+import * as ExcelJS from 'exceljs'
+import { writeFileSync } from 'fs'
 import type { ActivityModel } from './model'
 
 type ActivityUserFilter = ActivityModel.ListActivitiesQuery['user']
@@ -1187,6 +1189,281 @@ const toDetailedCsv = (
 
   return csvContent
 }
+export const toDetailedXlsx = async (
+  mergedData: any[],
+  dynamicDistrictHeaders: string[],
+): Promise<Buffer> => {
+  const workbook = new ExcelJS.Workbook()
+  const worksheet = workbook.addWorksheet('Reporte Detallado')
+
+  const fixedHeaders = [
+    'N°',
+    'ACTIVIDAD',
+    'DISTRITO',
+    'ESAC INVOLUCRADAS',
+    'LUGAR',
+    'FECHA',
+    'DURACIÓN DE IES',
+  ]
+  const demographyHeaders = [
+    'TOTAL REGISTRADOS',
+    'F',
+    'M',
+    'MENORES DE 18',
+    '18 A 64',
+    '65 A MÁS',
+  ]
+  const insuranceHeaders = ['PÚBLICO', 'PRIVADO', 'NINGUNO']
+  const participationHeaders = ['ALIADOS', 'ESPECIALIDADES']
+
+  const ALIED_COL_INDEX = fixedHeaders.length + 1 // Columna H
+  const DEMO_START_COL_INDEX =
+    fixedHeaders.length + participationHeaders.length + 1 // Columna J
+
+  const columnNamesRow2 = [
+    ...fixedHeaders,
+    ...participationHeaders,
+    ...demographyHeaders,
+    ...dynamicDistrictHeaders,
+    ...insuranceHeaders,
+  ]
+
+  const headerMap = [
+    { title: 'DATOS DE ACTIVIDAD', cols: fixedHeaders.length },
+    { title: 'PARTICIPACIÓN', cols: participationHeaders.length },
+    { title: 'TOTAL REGISTRADOS', cols: 1 },
+    { title: 'SEXO', cols: 2 },
+    { title: 'RANGO DE EDAD', cols: 3 },
+    {
+      title: 'DISTRITOS DE PARTICIPANTES',
+      cols: dynamicDistrictHeaders.length,
+    },
+    { title: 'SEGURO DE SALUD', cols: insuranceHeaders.length },
+  ]
+
+  let currentColumn = 1
+  const headerRow1 = worksheet.addRow([])
+
+  headerMap.forEach((item) => {
+    headerRow1.getCell(currentColumn).value = item.title
+    if (item.cols > 1) {
+      const startCol = currentColumn
+      const endCol = currentColumn + item.cols - 1
+      worksheet.mergeCells(
+        headerRow1.number,
+        startCol,
+        headerRow1.number,
+        endCol,
+      )
+    }
+    currentColumn += item.cols
+  })
+
+  headerRow1.eachCell((cell) => {
+    cell.font = { bold: true, color: { argb: 'FFFFFFFF' } }
+    cell.fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'FF089C54' },
+    }
+    cell.alignment = { horizontal: 'center', vertical: 'middle' }
+    cell.border = {
+      top: { style: 'thin', color: { argb: 'FF089C54' } },
+      left: { style: 'thin', color: { argb: 'FF089C54' } },
+      bottom: { style: 'thin', color: { argb: 'FF089C54' } },
+      right: { style: 'thin', color: { argb: 'FF089C54' } },
+    }
+  })
+
+  const headerRow2 = worksheet.addRow(columnNamesRow2)
+
+  headerRow2.eachCell((cell) => {
+    cell.font = { bold: true }
+    cell.fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'FFF0FFF0' },
+    } // Verde claro
+    cell.alignment = { horizontal: 'center', vertical: 'middle' }
+    cell.border = {
+      top: { style: 'thin', color: { argb: 'FF089C54' } },
+      left: { style: 'thin', color: { argb: 'FF089C54' } },
+      bottom: { style: 'thin', color: { argb: 'FF089C54' } },
+      right: { style: 'thin', color: { argb: 'FF089C54' } },
+    }
+  })
+
+  const presetWidths: number[] = [
+    5, // 1: N°
+    35, // 2: ACTIVIDAD
+    18, // 3: DISTRITO
+    25, // 4: ESAC INVOLUCRADAS
+    28, // 5: LUGAR (Dirección)
+    14, // 6: FECHA (Ajustado para DD/MM/YYYY)
+    22, // 7: DURACIÓN DE IES
+    25, // 8: ALIADOS
+    30, // 9: ESPECIALIDADES
+    20, // 10: TOTAL REGISTRADOS
+    10, // 11: F
+    10, // 12: M
+    18, // 13: MENORES DE 18
+    15, // 14: 18 A 64
+    15, // 15: 65 A MÁS
+    // Las siguientes 3 columnas son para los Seguros
+    15, // PÚBLICO
+    15, // PRIVADO
+    15, // NINGUNO
+  ]
+
+  const columnDefinitions = []
+
+  for (let i = 0; i < 15; i++) {
+    columnDefinitions.push({ width: presetWidths[i] })
+  }
+
+  const districtWidth = 35
+  for (let i = 0; i < dynamicDistrictHeaders.length; i++) {
+    columnDefinitions.push({ width: districtWidth })
+  }
+
+  for (let i = 15; i < 18; i++) {
+    columnDefinitions.push({ width: presetWidths[i] })
+  }
+
+  worksheet.columns = columnDefinitions
+
+  let startRowMerge = worksheet.lastRow.number + 1
+
+  for (const activity of mergedData) {
+    const { demographics } = activity
+    const participations =
+      activity.participations && activity.participations.length > 0
+        ? activity.participations
+        : [{ alliedName: 'N/A', specialityName: 'N/A' }]
+
+    const groupedParticipations = participations.reduce(
+      (acc, p) => {
+        if (!acc[p.alliedName]) {
+          acc[p.alliedName] = []
+        }
+        acc[p.alliedName].push(p)
+        return acc
+      },
+      {} as { [key: string]: any[] },
+    )
+
+    const sortedParticipations: any[] = Object.values(
+      groupedParticipations,
+    ).flat()
+
+    const numParticipationRows = sortedParticipations.length
+    const endRowMerge = startRowMerge + numParticipationRows - 1
+
+    const districtCountsRow = dynamicDistrictHeaders.map(
+      (header) => demographics.districtCounts[header] || 0,
+    )
+
+    const fixedData = [
+      activity.id,
+      activity.name,
+      activity.regionName,
+      activity.spaceName,
+      activity.address,
+      formatDate(activity.date),
+      activity.duration,
+    ]
+
+    const demographyData = [
+      demographics.totalAsistentes,
+      demographics.countF,
+      demographics.countM,
+      demographics.countMenores18,
+      demographics.count18a64,
+      demographics.count65Mas,
+      ...districtCountsRow,
+      demographics.countPublico,
+      demographics.countPrivado,
+      demographics.countOtrosSeguros,
+    ]
+
+    for (let i = 0; i < numParticipationRows; i++) {
+      const p = sortedParticipations[i]
+
+      const rowData = [
+        ...fixedData,
+        p.alliedName,
+        p.specialityName,
+        ...demographyData,
+      ]
+
+      const newRow = worksheet.addRow(rowData)
+
+      newRow.eachCell((cell) => {
+        cell.border = {
+          top: { style: 'thin', color: { argb: 'FF089C54' } },
+          left: { style: 'thin', color: { argb: 'FF089C54' } },
+          bottom: { style: 'thin', color: { argb: 'FF089C54' } },
+          right: { style: 'thin', color: { argb: 'FF089C54' } },
+        }
+        cell.alignment = { horizontal: 'center', vertical: 'middle' }
+      })
+    }
+
+    if (numParticipationRows > 1) {
+      const fixedAndDemoColsToMerge: number[] = []
+      for (let i = 1; i <= fixedHeaders.length; i++) {
+        fixedAndDemoColsToMerge.push(i)
+      }
+      for (let i = DEMO_START_COL_INDEX; i <= columnNamesRow2.length; i++) {
+        fixedAndDemoColsToMerge.push(i)
+      }
+
+      fixedAndDemoColsToMerge.forEach((colIndex) => {
+        worksheet.mergeCells(startRowMerge, colIndex, endRowMerge, colIndex)
+      })
+
+      let currentAllyStartRow = startRowMerge
+      let currentAllyName = sortedParticipations[0].alliedName
+
+      for (let i = 1; i < numParticipationRows; i++) {
+        const nextAllyName = sortedParticipations[i].alliedName
+        const currentRow = startRowMerge + i
+
+        if (nextAllyName !== currentAllyName) {
+          const allyBlockSize = currentRow - currentAllyStartRow
+
+          if (allyBlockSize > 1) {
+            worksheet.mergeCells(
+              currentAllyStartRow,
+              ALIED_COL_INDEX, // Columna H
+              currentRow - 1,
+              ALIED_COL_INDEX,
+            )
+          }
+
+          currentAllyName = nextAllyName
+          currentAllyStartRow = currentRow
+        }
+      }
+
+      const lastAllyBlockSize = endRowMerge - currentAllyStartRow + 1
+      if (lastAllyBlockSize > 1) {
+        worksheet.mergeCells(
+          currentAllyStartRow,
+          ALIED_COL_INDEX, // Columna H
+          endRowMerge,
+          ALIED_COL_INDEX,
+        )
+      }
+    }
+
+    startRowMerge = endRowMerge + 1
+  }
+
+  const buffer = await workbook.xlsx.writeBuffer()
+  return buffer as unknown as Buffer
+}
+
 export const exportActivitiesToCsv = async ({
   query,
   set,
@@ -1304,6 +1581,121 @@ export const exportActivitiesToCsv = async ({
     throw e
   }
 }
+export const exportActivitiesToXlsx = async ({
+  query,
+  set,
+}: {
+  query: ActivityModel.ExportQuery
+  set: any
+}) => {
+  try {
+    const {
+      activityIds,
+      filterOnly,
+      q = '',
+      regionIds,
+      startDate,
+      endDate,
+    } = query
+
+    const baseConditions: any[] = [eq(activity.state, true)]
+    let idsToFetch: number[] = []
+    const searchQuery = q.replaceAll(/\s+/g, ' ').trim()
+
+    if (activityIds) {
+      idsToFetch = activityIds
+        .split(',')
+        .map((id: string) => Number.parseInt(id.trim(), 10))
+        .filter((id: unknown) => !Number.isNaN(id))
+    } else if (filterOnly === 'true') {
+      if (searchQuery) {
+        baseConditions.push(
+          or(
+            ilike(activity.name, `%${searchQuery}%`),
+            ilike(activityStatus.name, `%${searchQuery}%`),
+            ilike(activityType.name, `%${searchQuery}%`),
+            ilike(region.name, `%${searchQuery}%`),
+            ilike(user.name, `%${searchQuery}%`),
+          ),
+        )
+      }
+
+      const regionIdsArray = regionIds
+        ? regionIds.split(',').map((id) => Number.parseInt(id, 10))
+        : []
+
+      if (regionIdsArray.length > 0) {
+        baseConditions.push(
+          or(
+            ...regionIdsArray.map((id: number | SQLWrapper) =>
+              eq(activity.regionId, id),
+            ),
+          ),
+        )
+      }
+
+      if (startDate) {
+        baseConditions.push(gte(activity.date, startDate))
+      }
+      if (endDate) {
+        baseConditions.push(lte(activity.date, endDate))
+      }
+
+      const filteredActivities = await db
+        .select({ id: activity.id })
+        .from(activity)
+        .innerJoin(activityStatus, eq(activity.statusId, activityStatus.id))
+        .innerJoin(activityType, eq(activity.typeId, activityType.id))
+        .innerJoin(region, eq(activity.regionId, region.id))
+        .innerJoin(user, eq(activity.userId, user.id))
+        .where(and(...baseConditions))
+        .orderBy(asc(activity.date))
+
+      idsToFetch = filteredActivities.map((a) => a.id)
+    } else {
+      set.status = 400
+      return 'No se especificó ninguna actividad o filtro para exportar.'
+    }
+
+    if (idsToFetch.length === 0) {
+      set.status = 400
+      return 'No se encontraron actividades para exportar con los criterios dados.'
+    }
+
+    const [detailedActivities, demographicsMap, dynamicDistrictHeaders] =
+      await Promise.all([
+        getDetailedActivitiesByIds(idsToFetch), // Obtiene la actividad, aliados, especialidades
+        getActivityDemographics(idsToFetch), // Obtiene conteos de Sexo, Edad, Seguros y Distritos
+        getParticipantDistricts(idsToFetch), // Obtiene los nombres de las columnas de distrito
+      ])
+
+    const mergedData = detailedActivities.map((activity: { id: any }) => ({
+      ...activity,
+      demographics: demographicsMap.get(activity.id) || {
+        totalAsistentes: 0,
+        countF: 0,
+        countM: 0,
+        countMenores18: 0,
+        count18a64: 0,
+        count65Mas: 0,
+        countPublico: 0,
+        countPrivado: 0,
+        countOtrosSeguros: 0,
+        districtCounts: {},
+      },
+    }))
+
+    const xlsxBuffer = await toDetailedXlsx(mergedData, dynamicDistrictHeaders)
+
+    const base64String = xlsxBuffer.toString('base64')
+
+    return base64String
+  } catch (e) {
+  if (e instanceof Error) throw new PostgresError(e.message)
+  throw e
+  }
+}
+
 export const checkActivitiesHaveActiveAttendees = async (ids: number[]) => {
   try {
     const activitiesWithAttendees = await db
@@ -1322,6 +1714,14 @@ export const checkActivitiesHaveActiveAttendees = async (ids: number[]) => {
     if (e instanceof Error) throw new PostgresError(e.message)
     throw e
   }
+}
+
+const formatDate = (date: string | Date): string => {
+  const d = new Date(date)
+  const day = String(d.getDate()).padStart(2, '0')
+  const month = String(d.getMonth() + 1).padStart(2, '0')
+  const year = d.getFullYear()
+  return `${day}/${month}/${year}`
 }
 
 export const checkActivitiesStatus = async (ids: number[]) => {

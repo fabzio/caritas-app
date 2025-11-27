@@ -17,7 +17,10 @@ import { ActivityTable } from './components/activity-table'
 import DateRangeFilter from './components/date-range-filter'
 import RegionFilter from './components/region-filter'
 import SearchActivityInput from './components/search-activity-input'
-import { exportActivitiesDetailCsv } from './hooks/use-activity-detail-export'
+import {
+  exportActivitiesDetailCsv,
+  exportActivitiesDetailXlsx,
+} from './hooks/use-activity-detail-export'
 import { useActivityTable } from './hooks/use-activity-table'
 import { useDeleteActivities } from './hooks/use-delete-activities'
 
@@ -79,6 +82,23 @@ export default function ActivityPage() {
     await exportActivitiesDetailCsv(query)
   }, [activityCount, selectedActivities, rawFilters])
 
+  const handleExportXlsx = useCallback(async () => {
+    const query: { [key: string]: string | number } = {}
+
+    if (activityCount > 0) {
+      const idsToExport = selectedActivities.map((activity) => activity.id)
+      query.activityIds = idsToExport.join(',')
+    } else {
+      if (rawFilters.q) query.q = rawFilters.q
+      if (rawFilters.regionIds) query.regionIds = rawFilters.regionIds
+      if (rawFilters.startDate) query.startDate = rawFilters.startDate
+      if (rawFilters.endDate) query.endDate = rawFilters.endDate
+
+      query.filterOnly = 'true'
+    }
+    await exportActivitiesDetailXlsx(query)
+  }, [activityCount, selectedActivities, rawFilters])
+
   return (
     <div className="w-full p-4">
       <header className="mb-6">
@@ -104,6 +124,7 @@ export default function ActivityPage() {
               onDeleteClick={() => setIsDeleteModalOpen(true)}
               onEditClick={handleEdit}
               onExportCsvClick={handleExportCsv}
+              onExportXlsxClick={handleExportXlsx}
               selectedCount={activityCount}
             />
             <Link to="/health/activities/form">
