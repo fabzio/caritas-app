@@ -1,5 +1,4 @@
 import type { ColumnDef } from '@tanstack/react-table'
-import { Badge } from '@workspace/ui/components/badge'
 import { Button } from '@workspace/ui/components/button'
 import { Checkbox } from '@workspace/ui/components/checkbox'
 import { ArrowUpDown } from 'lucide-react'
@@ -72,61 +71,5 @@ export const scholarshipTableColumns: ColumnDef<Scholarship>[] = [
     cell: ({ row }) => (
       <div className="text-center">{row.original.vacancies}</div>
     ),
-  },
-  {
-    accessorKey: 'startDate',
-    header: ({ column }) => (
-      <div className="flex justify-center">
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        >
-          Fecha de inicio
-          <ArrowUpDown />
-        </Button>
-      </div>
-    ),
-    cell: ({ row }) => {
-      const date = row.original.startDate
-      if (!date) return <div className="text-center">N/A</div>
-
-      return (
-        <div className="text-center">
-          {new Date(date).toLocaleDateString('es-PE', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
-          })}
-        </div>
-      )
-    },
-  },
-  {
-    accessorKey: 'endDate',
-    header: ({ column }) => (
-      <div className="flex justify-center">
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        >
-          Fecha de fin
-          <ArrowUpDown />
-        </Button>
-      </div>
-    ),
-    cell: ({ row }) => {
-      const date = row.original.endDate
-      if (!date) return <div className="text-center">N/A</div>
-
-      return (
-        <div className="text-center">
-          {new Date(date).toLocaleDateString('es-PE', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
-          })}
-        </div>
-      )
-    },
   },
 ]

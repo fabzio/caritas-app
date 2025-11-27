@@ -167,14 +167,6 @@ export const deleteSpecialities = async (ids: number[]) => {
   }
 }
 
-export async function hasActivitiesAssociated(id: number) {
-  const activityCount = await db
-    .select({ count: count() })
-    .from(alliedParticipation)
-    .where(eq(alliedParticipation.specialityId, id))
-  return activityCount[0].count > 0
-}
-
 export const checkSpecialityHaveActiveActivities = async (ids: number[]) => {
   try {
     const withActivities = await db

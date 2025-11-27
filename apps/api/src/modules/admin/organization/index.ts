@@ -9,7 +9,6 @@ import {
   findDuplicateOrganizations,
   getOrganizations,
   getSingleOrganization,
-  hasActivitiesAssociated,
   updateOrganization,
 } from './service'
 
