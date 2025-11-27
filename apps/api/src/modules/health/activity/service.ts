@@ -1691,8 +1691,8 @@ export const exportActivitiesToXlsx = async ({
 
     return base64String
   } catch (e) {
-  if (e instanceof Error) throw new PostgresError(e.message)
-  throw e
+    if (e instanceof Error) throw new PostgresError(e.message)
+    throw e
   }
 }
 
