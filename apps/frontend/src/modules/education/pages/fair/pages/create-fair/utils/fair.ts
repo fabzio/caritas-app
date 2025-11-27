@@ -61,6 +61,28 @@ export const formFairSchema = z
         z.undefined(),
       ])
       .optional(),
+    fourthGradeAssistance: z
+      .union([
+        z
+          .string()
+          .transform((value) => normalizeNumericString(value))
+          .refine((value) => value === '' || /^\d+$/.test(value), {
+            message: 'Ingresa solo números enteros positivos',
+          }),
+        z.undefined(),
+      ])
+      .optional(),
+    fifthGradeAssistance: z
+      .union([
+        z
+          .string()
+          .transform((value) => normalizeNumericString(value))
+          .refine((value) => value === '' || /^\d+$/.test(value), {
+            message: 'Ingresa solo números enteros positivos',
+          }),
+        z.undefined(),
+      ])
+      .optional(),
   })
 
   .refine((data) => data.startTime < data.endTime, {
@@ -73,16 +95,48 @@ export const formFairSchema = z
         ? data.assistanceCount.trim()
         : undefined
 
-    if (!assistanceValue) {
+    const fourthGradeValue =
+      typeof data.fourthGradeAssistance === 'string'
+        ? data.fourthGradeAssistance.trim()
+        : undefined
+
+    const fifthGradeValue =
+      typeof data.fifthGradeAssistance === 'string'
+        ? data.fifthGradeAssistance.trim()
+        : undefined
+
+    const hasAnyAttendance =
+      assistanceValue || fourthGradeValue || fifthGradeValue
+
+    if (!hasAnyAttendance) {
       return
     }
 
     if (!data.date) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'Solo puedes registrar asistentes cuando la feria ya terminó',
-        path: ['assistanceCount'],
-      })
+      if (assistanceValue) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message:
+            'Solo puedes registrar asistentes cuando la feria ya terminó',
+          path: ['assistanceCount'],
+        })
+      }
+      if (fourthGradeValue) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message:
+            'Solo puedes registrar asistentes cuando la feria ya terminó',
+          path: ['fourthGradeAssistance'],
+        })
+      }
+      if (fifthGradeValue) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message:
+            'Solo puedes registrar asistentes cuando la feria ya terminó',
+          path: ['fifthGradeAssistance'],
+        })
+      }
       return
     }
 
@@ -102,11 +156,30 @@ export const formFairSchema = z
     const hasEndedToday = isSameDay && data.endTime <= currentTime
 
     if (!isPastDate && !hasEndedToday) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'Solo puedes registrar asistentes cuando la feria ya terminó',
-        path: ['assistanceCount'],
-      })
+      if (assistanceValue) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message:
+            'Solo puedes registrar asistentes cuando la feria ya terminó',
+          path: ['assistanceCount'],
+        })
+      }
+      if (fourthGradeValue) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message:
+            'Solo puedes registrar asistentes cuando la feria ya terminó',
+          path: ['fourthGradeAssistance'],
+        })
+      }
+      if (fifthGradeValue) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message:
+            'Solo puedes registrar asistentes cuando la feria ya terminó',
+          path: ['fifthGradeAssistance'],
+        })
+      }
     }
   })
 

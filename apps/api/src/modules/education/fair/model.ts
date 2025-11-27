@@ -105,4 +105,47 @@ export namespace FairModel {
     ids: t.Array(t.Integer({ minimum: 1 })),
   })
   export type DeleteFairs = typeof deleteFairs.static
+
+  export const getAttendanceResponse = t.Object({
+    data: t.Array(
+      t.Object({
+        id: t.Integer(),
+        title: t.String(),
+        date: t.Date(),
+        district: t.String(),
+        assistanceCount: assistanceCountSchema,
+        fourthGradeAssistance: assistanceCountSchema,
+        fifthGradeAssistance: assistanceCountSchema,
+        status: t.Union([
+          t.Literal('upcoming'),
+          t.Literal('ongoing'),
+          t.Literal('finished'),
+        ]),
+      }),
+    ),
+    total: t.Integer(),
+    page: t.Integer(),
+    limit: t.Integer(),
+    totalPages: t.Integer(),
+  })
+  export type GetAttendanceResponse = typeof getAttendanceResponse.static
+
+  export const updateAttendance = t.Object({
+    assistanceCount: assistanceCountSchema,
+    fourthGradeAssistance: assistanceCountSchema,
+    fifthGradeAssistance: assistanceCountSchema,
+  })
+  export type UpdateAttendance = typeof updateAttendance.static
+
+  export const deleteFairsOngoingOrEnded = t.Object({
+    fairsOngoingOrEnded: t.Array(
+      t.Object({
+        fairId: t.Number(),
+        fairName: t.String(),
+        fairCount: t.Number(),
+      }),
+    ),
+  })
+  export type DeleteFairsOngoingOrEnded =
+    typeof deleteFairsOngoingOrEnded.static
 }

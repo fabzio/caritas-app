@@ -1691,6 +1691,26 @@ export const exportActivitiesToXlsx = async ({
 
     return base64String
   } catch (e) {
+  if (e instanceof Error) throw new PostgresError(e.message)
+  throw e
+  }
+}
+
+export const checkActivitiesHaveActiveAttendees = async (ids: number[]) => {
+  try {
+    const activitiesWithAttendees = await db
+      .select({
+        activityId: activity.id,
+        activityName: activity.name,
+        attendeesCount: count(activityUser.userId),
+      })
+      .from(activityUser)
+      .innerJoin(activity, eq(activityUser.activityId, activity.id))
+      .innerJoin(user, eq(user.id, activityUser.userId))
+      .where(and(inArray(activity.id, ids), eq(user.active, true)))
+      .groupBy(activity.id, activity.name)
+    return activitiesWithAttendees
+  } catch (e) {
     if (e instanceof Error) throw new PostgresError(e.message)
     throw e
   }
@@ -1702,4 +1722,27 @@ const formatDate = (date: string | Date): string => {
   const month = String(d.getMonth() + 1).padStart(2, '0')
   const year = d.getFullYear()
   return `${day}/${month}/${year}`
+}
+
+export const checkActivitiesStatus = async (ids: number[]) => {
+  try {
+    const activities = await db
+      .select({
+        activityId: activity.id,
+        activityName: activity.name,
+        activityStatus: activityStatus.name,
+      })
+      .from(activity)
+      .innerJoin(activityStatus, eq(activityStatus.id, activity.statusId))
+      .where(
+        and(
+          inArray(activity.id, ids),
+          not(eq(activityStatus.name, 'Programado')),
+        ),
+      )
+    return activities
+  } catch (e) {
+    if (e instanceof Error) throw new PostgresError(e.message)
+    throw e
+  }
 }

@@ -59,6 +59,7 @@ import { Route as AuthenticatedAdminUsersFormRouteImport } from './routes/_authe
 import { Route as AuthenticatedUserHealthActivitiesIndexRouteImport } from './routes/_authenticated/user/health/activities/index'
 import { Route as AuthenticatedUserEducationScholarshipIndexRouteImport } from './routes/_authenticated/user/education/scholarship/index'
 import { Route as AuthenticatedOrganizationEducationScholarshipIndexRouteImport } from './routes/_authenticated/organization/education/scholarship/index'
+import { Route as AuthenticatedOrganizationEducationFairIndexRouteImport } from './routes/_authenticated/organization/education/fair/index'
 import { Route as AuthenticatedHealthActivitiesActivityIdIndexRouteImport } from './routes/_authenticated/health/activities/$activityId/index'
 import { Route as AuthenticatedUserHealthActivitiesIdRouteImport } from './routes/_authenticated/user/health/activities/$id'
 import { Route as AuthenticatedOrganizationEducationScholarshipReportRouteImport } from './routes/_authenticated/organization/education/scholarship/report'
@@ -68,6 +69,7 @@ import { Route as AuthenticatedHealthActivitiesActivityIdAssistanceRouteImport }
 import { Route as AuthenticatedEducationScholarshipScholarshipIdViewRouteImport } from './routes/_authenticated/education/scholarship/$scholarshipId/view'
 import { Route as AuthenticatedUserEducationScholarshipIdViewRouteImport } from './routes/_authenticated/user/education/scholarship/$id/view'
 import { Route as AuthenticatedOrganizationEducationScholarshipScholarshipIdViewRouteImport } from './routes/_authenticated/organization/education/scholarship/$scholarshipId/view'
+import { Route as AuthenticatedOrganizationEducationFairIdAttendanceRouteImport } from './routes/_authenticated/organization/education/fair/$id/attendance'
 import { Route as AuthenticatedHealthActivitiesActivityIdAttentionsUserIdRouteImport } from './routes/_authenticated/health/activities/$activityId/attentions/$userId'
 
 const AuthRoute = AuthRouteImport.update({
@@ -350,6 +352,12 @@ const AuthenticatedOrganizationEducationScholarshipIndexRoute =
     path: '/education/scholarship/',
     getParentRoute: () => AuthenticatedOrganizationRoute,
   } as any)
+const AuthenticatedOrganizationEducationFairIndexRoute =
+  AuthenticatedOrganizationEducationFairIndexRouteImport.update({
+    id: '/education/fair/',
+    path: '/education/fair/',
+    getParentRoute: () => AuthenticatedOrganizationRoute,
+  } as any)
 const AuthenticatedHealthActivitiesActivityIdIndexRoute =
   AuthenticatedHealthActivitiesActivityIdIndexRouteImport.update({
     id: '/activities/$activityId/',
@@ -406,6 +414,12 @@ const AuthenticatedOrganizationEducationScholarshipScholarshipIdViewRoute =
       getParentRoute: () => AuthenticatedOrganizationRoute,
     } as any,
   )
+const AuthenticatedOrganizationEducationFairIdAttendanceRoute =
+  AuthenticatedOrganizationEducationFairIdAttendanceRouteImport.update({
+    id: '/education/fair/$id/attendance',
+    path: '/education/fair/$id/attendance',
+    getParentRoute: () => AuthenticatedOrganizationRoute,
+  } as any)
 const AuthenticatedHealthActivitiesActivityIdAttentionsUserIdRoute =
   AuthenticatedHealthActivitiesActivityIdAttentionsUserIdRouteImport.update({
     id: '/activities/$activityId/attentions/$userId',
@@ -467,10 +481,12 @@ export interface FileRoutesByFullPath {
   '/organization/education/scholarship/report': typeof AuthenticatedOrganizationEducationScholarshipReportRoute
   '/user/health/activities/$id': typeof AuthenticatedUserHealthActivitiesIdRoute
   '/health/activities/$activityId': typeof AuthenticatedHealthActivitiesActivityIdIndexRoute
+  '/organization/education/fair': typeof AuthenticatedOrganizationEducationFairIndexRoute
   '/organization/education/scholarship': typeof AuthenticatedOrganizationEducationScholarshipIndexRoute
   '/user/education/scholarship': typeof AuthenticatedUserEducationScholarshipIndexRoute
   '/user/health/activities': typeof AuthenticatedUserHealthActivitiesIndexRoute
   '/health/activities/$activityId/attentions/$userId': typeof AuthenticatedHealthActivitiesActivityIdAttentionsUserIdRoute
+  '/organization/education/fair/$id/attendance': typeof AuthenticatedOrganizationEducationFairIdAttendanceRoute
   '/organization/education/scholarship/$scholarshipId/view': typeof AuthenticatedOrganizationEducationScholarshipScholarshipIdViewRoute
   '/user/education/scholarship/$id/view': typeof AuthenticatedUserEducationScholarshipIdViewRoute
 }
@@ -521,10 +537,12 @@ export interface FileRoutesByTo {
   '/organization/education/scholarship/report': typeof AuthenticatedOrganizationEducationScholarshipReportRoute
   '/user/health/activities/$id': typeof AuthenticatedUserHealthActivitiesIdRoute
   '/health/activities/$activityId': typeof AuthenticatedHealthActivitiesActivityIdIndexRoute
+  '/organization/education/fair': typeof AuthenticatedOrganizationEducationFairIndexRoute
   '/organization/education/scholarship': typeof AuthenticatedOrganizationEducationScholarshipIndexRoute
   '/user/education/scholarship': typeof AuthenticatedUserEducationScholarshipIndexRoute
   '/user/health/activities': typeof AuthenticatedUserHealthActivitiesIndexRoute
   '/health/activities/$activityId/attentions/$userId': typeof AuthenticatedHealthActivitiesActivityIdAttentionsUserIdRoute
+  '/organization/education/fair/$id/attendance': typeof AuthenticatedOrganizationEducationFairIdAttendanceRoute
   '/organization/education/scholarship/$scholarshipId/view': typeof AuthenticatedOrganizationEducationScholarshipScholarshipIdViewRoute
   '/user/education/scholarship/$id/view': typeof AuthenticatedUserEducationScholarshipIdViewRoute
 }
@@ -584,10 +602,12 @@ export interface FileRoutesById {
   '/_authenticated/organization/education/scholarship/report': typeof AuthenticatedOrganizationEducationScholarshipReportRoute
   '/_authenticated/user/health/activities/$id': typeof AuthenticatedUserHealthActivitiesIdRoute
   '/_authenticated/health/activities/$activityId/': typeof AuthenticatedHealthActivitiesActivityIdIndexRoute
+  '/_authenticated/organization/education/fair/': typeof AuthenticatedOrganizationEducationFairIndexRoute
   '/_authenticated/organization/education/scholarship/': typeof AuthenticatedOrganizationEducationScholarshipIndexRoute
   '/_authenticated/user/education/scholarship/': typeof AuthenticatedUserEducationScholarshipIndexRoute
   '/_authenticated/user/health/activities/': typeof AuthenticatedUserHealthActivitiesIndexRoute
   '/_authenticated/health/activities/$activityId/attentions/$userId': typeof AuthenticatedHealthActivitiesActivityIdAttentionsUserIdRoute
+  '/_authenticated/organization/education/fair/$id/attendance': typeof AuthenticatedOrganizationEducationFairIdAttendanceRoute
   '/_authenticated/organization/education/scholarship/$scholarshipId/view': typeof AuthenticatedOrganizationEducationScholarshipScholarshipIdViewRoute
   '/_authenticated/user/education/scholarship/$id/view': typeof AuthenticatedUserEducationScholarshipIdViewRoute
 }
@@ -647,10 +667,12 @@ export interface FileRouteTypes {
     | '/organization/education/scholarship/report'
     | '/user/health/activities/$id'
     | '/health/activities/$activityId'
+    | '/organization/education/fair'
     | '/organization/education/scholarship'
     | '/user/education/scholarship'
     | '/user/health/activities'
     | '/health/activities/$activityId/attentions/$userId'
+    | '/organization/education/fair/$id/attendance'
     | '/organization/education/scholarship/$scholarshipId/view'
     | '/user/education/scholarship/$id/view'
   fileRoutesByTo: FileRoutesByTo
@@ -701,10 +723,12 @@ export interface FileRouteTypes {
     | '/organization/education/scholarship/report'
     | '/user/health/activities/$id'
     | '/health/activities/$activityId'
+    | '/organization/education/fair'
     | '/organization/education/scholarship'
     | '/user/education/scholarship'
     | '/user/health/activities'
     | '/health/activities/$activityId/attentions/$userId'
+    | '/organization/education/fair/$id/attendance'
     | '/organization/education/scholarship/$scholarshipId/view'
     | '/user/education/scholarship/$id/view'
   id:
@@ -763,10 +787,12 @@ export interface FileRouteTypes {
     | '/_authenticated/organization/education/scholarship/report'
     | '/_authenticated/user/health/activities/$id'
     | '/_authenticated/health/activities/$activityId/'
+    | '/_authenticated/organization/education/fair/'
     | '/_authenticated/organization/education/scholarship/'
     | '/_authenticated/user/education/scholarship/'
     | '/_authenticated/user/health/activities/'
     | '/_authenticated/health/activities/$activityId/attentions/$userId'
+    | '/_authenticated/organization/education/fair/$id/attendance'
     | '/_authenticated/organization/education/scholarship/$scholarshipId/view'
     | '/_authenticated/user/education/scholarship/$id/view'
   fileRoutesById: FileRoutesById
@@ -1131,6 +1157,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOrganizationEducationScholarshipIndexRouteImport
       parentRoute: typeof AuthenticatedOrganizationRoute
     }
+    '/_authenticated/organization/education/fair/': {
+      id: '/_authenticated/organization/education/fair/'
+      path: '/education/fair'
+      fullPath: '/organization/education/fair'
+      preLoaderRoute: typeof AuthenticatedOrganizationEducationFairIndexRouteImport
+      parentRoute: typeof AuthenticatedOrganizationRoute
+    }
     '/_authenticated/health/activities/$activityId/': {
       id: '/_authenticated/health/activities/$activityId/'
       path: '/activities/$activityId'
@@ -1192,6 +1225,13 @@ declare module '@tanstack/react-router' {
       path: '/education/scholarship/$scholarshipId/view'
       fullPath: '/organization/education/scholarship/$scholarshipId/view'
       preLoaderRoute: typeof AuthenticatedOrganizationEducationScholarshipScholarshipIdViewRouteImport
+      parentRoute: typeof AuthenticatedOrganizationRoute
+    }
+    '/_authenticated/organization/education/fair/$id/attendance': {
+      id: '/_authenticated/organization/education/fair/$id/attendance'
+      path: '/education/fair/$id/attendance'
+      fullPath: '/organization/education/fair/$id/attendance'
+      preLoaderRoute: typeof AuthenticatedOrganizationEducationFairIdAttendanceRouteImport
       parentRoute: typeof AuthenticatedOrganizationRoute
     }
     '/_authenticated/health/activities/$activityId/attentions/$userId': {
@@ -1315,7 +1355,9 @@ const AuthenticatedHealthRouteWithChildren =
 interface AuthenticatedOrganizationRouteChildren {
   AuthenticatedOrganizationIndexRoute: typeof AuthenticatedOrganizationIndexRoute
   AuthenticatedOrganizationEducationScholarshipReportRoute: typeof AuthenticatedOrganizationEducationScholarshipReportRoute
+  AuthenticatedOrganizationEducationFairIndexRoute: typeof AuthenticatedOrganizationEducationFairIndexRoute
   AuthenticatedOrganizationEducationScholarshipIndexRoute: typeof AuthenticatedOrganizationEducationScholarshipIndexRoute
+  AuthenticatedOrganizationEducationFairIdAttendanceRoute: typeof AuthenticatedOrganizationEducationFairIdAttendanceRoute
   AuthenticatedOrganizationEducationScholarshipScholarshipIdViewRoute: typeof AuthenticatedOrganizationEducationScholarshipScholarshipIdViewRoute
 }
 
@@ -1324,8 +1366,12 @@ const AuthenticatedOrganizationRouteChildren: AuthenticatedOrganizationRouteChil
     AuthenticatedOrganizationIndexRoute: AuthenticatedOrganizationIndexRoute,
     AuthenticatedOrganizationEducationScholarshipReportRoute:
       AuthenticatedOrganizationEducationScholarshipReportRoute,
+    AuthenticatedOrganizationEducationFairIndexRoute:
+      AuthenticatedOrganizationEducationFairIndexRoute,
     AuthenticatedOrganizationEducationScholarshipIndexRoute:
       AuthenticatedOrganizationEducationScholarshipIndexRoute,
+    AuthenticatedOrganizationEducationFairIdAttendanceRoute:
+      AuthenticatedOrganizationEducationFairIdAttendanceRoute,
     AuthenticatedOrganizationEducationScholarshipScholarshipIdViewRoute:
       AuthenticatedOrganizationEducationScholarshipScholarshipIdViewRoute,
   }

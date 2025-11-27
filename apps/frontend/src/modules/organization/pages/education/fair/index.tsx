@@ -1,11 +1,8 @@
 import { useIsMobile } from '@frontend/hooks/use-mobile'
-import { Link, useNavigate } from '@tanstack/react-router'
-import { Button } from '@workspace/ui/components/button'
+import { useNavigate } from '@tanstack/react-router'
 import { Skeleton } from '@workspace/ui/components/skeleton'
-import { PlusCircle } from 'lucide-react'
 import { useState } from 'react'
 import ActionsButton from './components/actions-button'
-import DeleteConfirmationDialog from './components/delete-fair-dialog.tsx'
 import FairTable from './components/fair-table'
 import RegionFilter from './components/region-filter'
 import SearchFairInput from './components/search-fair-input'
@@ -14,10 +11,8 @@ import { useFairTable } from './hooks/use-fair-table'
 
 export default function FairPage() {
   const isMobile = useIsMobile()
-  const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({})
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const navigate = useNavigate()
-
+  const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({})
   const {
     data: fairs,
     isLoading,
@@ -28,34 +23,11 @@ export default function FairPage() {
     setFilters,
   } = useFairTable()
 
-  const selectedRows = Object.keys(rowSelection)
-    .filter((key) => rowSelection[key])
-    .map((key) => Number.parseInt(key, 10))
-
-  const selectedFairs = selectedRows
-    .map((rowIndex) => fairs?.[rowIndex])
-    .filter(
-      (fair): fair is NonNullable<typeof fair> =>
-        fair !== undefined && fair !== null,
-    )
-
-  const fairCount = selectedFairs.length
-  const resetSelectedRows = () => setRowSelection({})
-
-  const handleEdit = () => {
-    const targetFair = selectedFairs[0]
-    if (!targetFair) return
-    navigate({
-      to: '/education/fair/form',
-      search: { id: targetFair.id, type: 'edit' },
-    })
-  }
-
   return (
     <div className="w-full p-4">
       <header className="mb-6">
         <h2 className="text-2xl font-bold leading-tight">
-          Administración de Ferias Vocacionales
+          Ferias Vocacionales
         </h2>
         <p className="text-muted-foreground">
           Aquí podrá visualizar todas las ferias vocacionales registradas.
@@ -70,28 +42,25 @@ export default function FairPage() {
           <div className={`flex ${isMobile ? 'w-full' : 'w-auto'} gap-2`}>
             <RegionFilter />
             <StatusFilter />
-          </div>
-        </div>
-        <div className={`flex items-center gap-2 ${isMobile ? 'w-full' : ''}`}>
-          <div className={isMobile ? 'w-1/2' : ''}>
             <ActionsButton
-              onDeleteClick={() => setIsDeleteModalOpen(true)}
-              onEditClick={handleEdit}
-              selectedCount={fairCount}
+              onManageAttendanceClick={() => {
+                const selectedIds = Object.keys(rowSelection)
+                  .filter((key) => rowSelection[key])
+                  .map((key) => Number(key))
+                if (selectedIds.length === 1 && fairs) {
+                  const fairId = fairs[selectedIds[0]].id
+                  navigate({
+                    to: '/organization/education/fair/$id/attendance',
+                    params: { id: String(fairId) },
+                  })
+                }
+              }}
+              selectedCount={Object.values(rowSelection).filter(Boolean).length}
             />
           </div>
-          <Link
-            search={{ type: 'new' }}
-            to="/education/fair/form"
-            className={isMobile ? 'w-1/2' : ''}
-          >
-            <Button size={'default'} className={isMobile ? 'w-full' : ''}>
-              <PlusCircle />
-              {'Nueva feria'}
-            </Button>
-          </Link>
         </div>
       </div>
+
       <div className="mt-4">
         {isLoading ? (
           <div className="space-y-4">
@@ -112,13 +81,6 @@ export default function FairPage() {
           />
         )}
       </div>
-      <DeleteConfirmationDialog
-        open={isDeleteModalOpen}
-        onOpenChange={setIsDeleteModalOpen}
-        selectedCount={fairCount}
-        ids={selectedFairs.map((fair) => fair.id)}
-        clearSelection={resetSelectedRows}
-      />
     </div>
   )
 }

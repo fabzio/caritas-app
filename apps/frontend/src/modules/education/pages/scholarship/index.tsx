@@ -12,6 +12,7 @@ import { Input } from '@workspace/ui/components/input'
 import debounce from 'debounce'
 import { ChevronDown, MoreVertical, PlusCircle, Search } from 'lucide-react'
 import { useMemo, useState } from 'react'
+import { toast } from 'sonner'
 import DeleteConfirmationDialog from './components/delete-confirmation-dialog'
 import ScholarshipTable from './components/scholarship-table'
 import { useScholarshipTable } from './hooks/use-table'
@@ -59,6 +60,19 @@ export default function ScholarshipPage() {
     if (selectedIds.length === 1 && scholarships) {
       const selectedScholarship =
         scholarships[Number.parseInt(selectedIds[0], 10)]
+      const start = new Date(selectedScholarship.startDate)
+      const now = new Date()
+      const startDateOnly = new Date(
+        start.getFullYear(),
+        start.getMonth(),
+        start.getDate(),
+      )
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+      const expired = startDateOnly <= today
+      if (expired) {
+        toast.error('No puede editar una beca cuya inscripcion ya ha iniciado')
+        return
+      }
       navigate({
         to: '/education/scholarship/form',
         search: {
@@ -103,31 +117,6 @@ export default function ScholarshipPage() {
           <div className="flex gap-2">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" size={isMobile ? 'sm' : 'lg'}>
-                  {filters.active === undefined
-                    ? 'Todas'
-                    : filters.active
-                      ? 'Activas'
-                      : 'Inactivas'}
-                  <ChevronDown />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem
-                  onClick={() => setFilters({ active: undefined })}
-                >
-                  Todas
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setFilters({ active: true })}>
-                  Activas
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setFilters({ active: false })}>
-                  Inactivas
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
                 <Button
                   variant="outline"
                   size={isMobile ? 'sm' : 'lg'}
@@ -141,11 +130,7 @@ export default function ScholarshipPage() {
                 <DropdownMenuItem onClick={handleEdit} disabled={!canEdit}>
                   Editar
                 </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={handleDelete}
-                  disabled={!canDelete}
-                  className="text-destructive"
-                >
+                <DropdownMenuItem onClick={handleDelete} disabled={!canDelete}>
                   Eliminar {selectedCount > 1 ? `(${selectedCount})` : ''}
                 </DropdownMenuItem>
               </DropdownMenuContent>

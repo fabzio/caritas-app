@@ -2,14 +2,17 @@ import betterAuth from '@api/modules/auth/middleware'
 import Elysia, { status, t } from 'elysia'
 import { FairModel } from './model'
 import {
+  checkFairsOngoingOrEnded,
   createFair,
   deleteFairs,
   findDuplicateFair,
   getFairRegions,
   getFairStatus,
   getFairs,
+  getFairsAttendance,
   getSingleFair,
   patchFair,
+  updateFairAttendance,
 } from './service'
 
 const fair = new Elysia({
@@ -142,6 +145,14 @@ const fair = new Elysia({
       if (!ids.length) {
         throw status(400, 'No hay ningún ID de feria para eliminar')
       }
+      const fairsOngoingOrEnded = await checkFairsOngoingOrEnded(ids)
+
+      if (fairsOngoingOrEnded.length > 0) {
+        throw status(409, {
+          fairsOngoingOrEnded,
+        })
+      }
+
       const deleted = await deleteFairs(ids)
       return deleted
     },
@@ -151,6 +162,32 @@ const fair = new Elysia({
       response: {
         200: t.Object({ success: t.Boolean() }),
         400: t.String(),
+        409: FairModel.deleteFairsOngoingOrEnded,
+      },
+    },
+  )
+  .get('/attendance', ({ query }) => getFairsAttendance(query), {
+    auth: true,
+    query: FairModel.listFairsQuery,
+    response: {
+      200: FairModel.getAttendanceResponse,
+      401: t.Literal('Unauthorized'),
+    },
+  })
+  .patch(
+    '/:id/attendance',
+    async ({ params, body }) => {
+      const id = Number(params.id)
+      const updated = await updateFairAttendance(id, body)
+      return updated
+    },
+    {
+      auth: true,
+      params: FairModel.getSingleFairsQuery,
+      body: FairModel.updateAttendance,
+      response: {
+        200: t.Number({ description: 'Number of updated rows' }),
+        401: t.Literal('Unauthorized'),
       },
     },
   )

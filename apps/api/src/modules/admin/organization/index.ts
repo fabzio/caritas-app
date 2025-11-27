@@ -3,11 +3,13 @@ import Elysia, { status, t } from 'elysia'
 
 import { OrganizationModel } from './model'
 import {
+  checkOrganizationsHaveActiveActivities,
   checkOrganizationsHaveActiveScholarships,
   deleteOrganizations,
   findDuplicateOrganizations,
   getOrganizations,
   getSingleOrganization,
+  hasActivitiesAssociated,
   updateOrganization,
 } from './service'
 
@@ -91,6 +93,13 @@ const organization = new Elysia({
           organizationsWithScholarships,
         })
       }
+      const organizationsWithActivities =
+        await checkOrganizationsHaveActiveActivities(ids)
+      if (organizationsWithActivities.length > 0) {
+        throw status(410, {
+          organizationsWithActivities,
+        })
+      }
 
       const deleted = await deleteOrganizations(ids)
       return deleted
@@ -102,6 +111,7 @@ const organization = new Elysia({
         200: t.Object({ success: t.Boolean() }),
         400: t.String(),
         409: OrganizationModel.deleteOrganizationsWithScholarships,
+        410: OrganizationModel.deleteOrganizationsWithActivities,
       },
     },
   )

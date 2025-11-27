@@ -204,6 +204,7 @@ export async function getSelectNamesResponse(): Promise<ScholarshipRecipientMode
     const team = await db.query.scholarship.findMany({
       columns: { name: true },
       orderBy: asc(scholarship.name),
+      where: eq(scholarship.active, true),
     })
     return {
       scholarshipNames: team.map((t) => t.name),

@@ -1,31 +1,29 @@
+import { useIsMobile } from '@frontend/hooks/use-mobile'
 import { Button } from '@workspace/ui/components/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from '@workspace/ui/components/dropdown-menu'
 import { ChevronDown } from 'lucide-react'
 
 type Props = {
-  onDeleteClick: () => void
-  onEditClick: () => void
+  onManageAttendanceClick: () => void
   selectedCount: number
 }
 
 export default function ActionsButton({
-  onDeleteClick,
-  onEditClick,
+  onManageAttendanceClick,
   selectedCount,
 }: Readonly<Props>) {
+  const isMobile = useIsMobile()
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline">
+        <Button variant="outline" className={isMobile ? 'w-full' : ''}>
           Acciones
           <ChevronDown />
         </Button>
@@ -33,16 +31,10 @@ export default function ActionsButton({
       <DropdownMenuContent>
         <DropdownMenuGroup>
           <DropdownMenuItem
-            onClick={onDeleteClick}
-            disabled={selectedCount === 0}
-          >
-            Eliminar
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={onEditClick}
+            onClick={onManageAttendanceClick}
             disabled={selectedCount !== 1}
           >
-            Editar
+            Registrar/Editar Asistencias
           </DropdownMenuItem>
         </DropdownMenuGroup>
       </DropdownMenuContent>

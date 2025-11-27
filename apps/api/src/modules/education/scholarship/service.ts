@@ -53,7 +53,7 @@ export const createScholarship = async (
 }
 export const getScholarships = async ({
   name,
-  active,
+  active = true,
   page = 1,
   pageSize = 10,
   organizationId,
@@ -197,6 +197,27 @@ export const getAvailableScholarships = async () => {
     return results
       .filter((r) => (r.vacancies ?? 0) - Number(r.acceptedCount) > 0)
       .map((r) => ({ id: r.id, name: r.name }))
+  } catch (e) {
+    if (e instanceof Error) throw new PostgresError(e.message)
+    throw e
+  }
+}
+
+export const checkScholarshipsOngoingOrEnded = async (ids: number[]) => {
+  try {
+    const scholarships = await db
+      .select({
+        id: scholarship.id,
+        name: scholarship.name,
+      })
+      .from(scholarship)
+      .where(
+        and(
+          sql`(${scholarship.startDate} <= (CURRENT_TIMESTAMP AT TIME ZONE 'America/Lima')::date)`,
+          inArray(scholarship.id, ids),
+        ),
+      )
+    return scholarships
   } catch (e) {
     if (e instanceof Error) throw new PostgresError(e.message)
     throw e

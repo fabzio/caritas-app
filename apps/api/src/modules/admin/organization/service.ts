@@ -2,6 +2,7 @@ import db from '@api/db'
 import { PostgresError } from '@api/db/errors'
 import { organization } from '@api/db/schemas/auth'
 import { scholarship } from '@api/db/schemas/education'
+import { activity, alliedParticipation } from '@api/db/schemas/health'
 import { and, asc, count, desc, eq, ilike, inArray, not, or } from 'drizzle-orm'
 import type { OrganizationModel } from './model'
 
@@ -38,7 +39,7 @@ export async function getOrganizations(
     active !== undefined ? eq(organization.active, active) : undefined
   const typeCondition = type ? eq(organization.type, type) : undefined
   const where = and(
-    activeCondition,
+    eq(organization.active, true),
     searchCondition,
     typeCondition,
     not(eq(organization.id, organizationId)),
@@ -152,4 +153,39 @@ export const checkOrganizationsHaveActiveScholarships = async (
     if (e instanceof Error) throw new PostgresError(e.message)
     throw e
   }
+}
+export const checkOrganizationsHaveActiveActivities = async (ids: string[]) => {
+  try {
+    const organizationsWithActivities = await db
+      .select({
+        organizationId: alliedParticipation.alliedId,
+        organizationName: organization.name,
+        activitiesCount: count(activity.id),
+      })
+      .from(alliedParticipation)
+      .innerJoin(
+        organization,
+        eq(alliedParticipation.alliedId, organization.id),
+      )
+      .innerJoin(activity, eq(alliedParticipation.activityId, activity.id))
+      .where(
+        and(
+          inArray(alliedParticipation.alliedId, ids),
+          eq(activity.state, true),
+        ),
+      )
+      .groupBy(alliedParticipation.alliedId, organization.name)
+    return organizationsWithActivities
+  } catch (e) {
+    if (e instanceof Error) throw new PostgresError(e.message)
+    throw e
+  }
+}
+export async function hasActivitiesAssociated(id: string) {
+  const activityCount = await db
+    .select({ count: count() })
+    .from(alliedParticipation)
+    .innerJoin(activity, eq(alliedParticipation.activityId, activity.id))
+    .where(and(eq(alliedParticipation.alliedId, id), eq(activity.state, true)))
+  return activityCount[0].count > 0
 }
