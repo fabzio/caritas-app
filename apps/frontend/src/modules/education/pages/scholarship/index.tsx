@@ -61,6 +61,7 @@ export default function ScholarshipPage() {
   const { data: organizationsResponse } = useListOrganizations({
     currentPage: 1,
     pageSize: 100,
+    filters: { active: true },
   })
   const organizations = organizationsResponse?.data || []
 
