@@ -5,6 +5,7 @@ import { createFileRoute } from '@tanstack/react-router'
 export type ScholarshipFilters = Filters & {
   name?: string
   active?: boolean
+  organizationId?: string
 }
 
 export const Route = createFileRoute('/_authenticated/education/scholarship/')({

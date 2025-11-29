@@ -34,7 +34,7 @@ const useGetScholarship = (
   return useQuery({
     queryKey: [
       QueryKeys.EDUCATION.SCHOLARSHIP,
-      { name, page, pageSize, active },
+      { name, page, pageSize, active, organizationId },
     ],
     queryFn: async () => {
       const res = await rpc.education.scholarship.get({

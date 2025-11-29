@@ -9,10 +9,23 @@ import {
   DropdownMenuTrigger,
 } from '@workspace/ui/components/dropdown-menu'
 import { Input } from '@workspace/ui/components/input'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@workspace/ui/components/popover'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@workspace/ui/components/select'
 import debounce from 'debounce'
-import { ChevronDown, MoreVertical, PlusCircle, Search } from 'lucide-react'
+import { ChevronDown, Filter, PlusCircle, X } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
+import { useListOrganizations } from '../allies/hooks/use-list-organizations'
 import DeleteConfirmationDialog from './components/delete-confirmation-dialog'
 import ScholarshipTable from './components/scholarship-table'
 import { useScholarshipTable } from './hooks/use-table'
@@ -20,6 +33,7 @@ export default function ScholarshipPage() {
   const isMobile = useIsMobile()
   const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({})
   const [deleteOpen, setDeleteOpen] = useState(false)
+  const [isFilterOpen, setIsFilterOpen] = useState(false)
   const navigate = useNavigate()
   const clearSelection = () => setRowSelection({})
   const skeletonKeys = useMemo(
@@ -44,6 +58,12 @@ export default function ScholarshipPage() {
     isError,
   } = useScholarshipTable()
 
+  const { data: organizationsResponse } = useListOrganizations({
+    currentPage: 1,
+    pageSize: 100,
+  })
+  const organizations = organizationsResponse?.data || []
+
   const handleSearchChange = debounce(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       setFilters({ name: e.target.value })
@@ -54,6 +74,12 @@ export default function ScholarshipPage() {
   const selectedCount = Object.keys(rowSelection).length
   const canEdit = selectedCount === 1
   const canDelete = selectedCount > 0
+
+  const hasActiveFilters = filters.organizationId !== undefined
+
+  const clearFilters = () => {
+    setFilters({ organizationId: undefined, pageIndex: 1 })
+  }
 
   const handleEdit = () => {
     const selectedIds = Object.keys(rowSelection)
@@ -114,7 +140,66 @@ export default function ScholarshipPage() {
               onChange={handleSearchChange}
             />
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 items-center">
+            <Popover open={isFilterOpen} onOpenChange={setIsFilterOpen}>
+              <PopoverTrigger asChild>
+                <Button variant="default" className="gap-2">
+                  <Filter className="h-4 w-4" />
+                  Filtros
+                  {hasActiveFilters && (
+                    <span className="ml-1 rounded-full bg-primary-foreground text-primary px-2 py-0.5 text-xs font-semibold">
+                      1
+                    </span>
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-80" align="end">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h4 className="font-semibold">Filtros</h4>
+                    {hasActiveFilters && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={clearFilters}
+                        className="h-8 px-2 text-xs"
+                      >
+                        <X className="h-3 w-3 mr-1" />
+                        Limpiar
+                      </Button>
+                    )}
+                  </div>
+                  <div className="space-y-3">
+                    <div className="space-y-2">
+                      <span className="text-sm font-medium">Organización</span>
+                      <Select
+                        value={filters.organizationId || 'all'}
+                        onValueChange={(value) =>
+                          setFilters({
+                            organizationId: value === 'all' ? undefined : value,
+                            pageIndex: 1,
+                          })
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Todas las organizaciones" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">
+                            Todas las organizaciones
+                          </SelectItem>
+                          {organizations.map((org) => (
+                            <SelectItem key={org.id} value={org.id}>
+                              {org.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </div>
+              </PopoverContent>
+            </Popover>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
