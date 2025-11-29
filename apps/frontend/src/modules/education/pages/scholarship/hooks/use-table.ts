@@ -17,6 +17,7 @@ export const useScholarshipTable = () => {
     filters.pageIndex,
     filters.pageSize,
     filters.active,
+    filters.organizationId,
   )
 
   const sortingState = sortByToState(filters.sortBy)
