@@ -45,7 +45,7 @@ const isOrganizationType = (value: string): value is OrganizationType =>
   organizationTypes.includes(value as OrganizationType)
 
 function NavMain({ items }: Readonly<Props>) {
-  const { setOpenMobile, setOpen } = useSidebar()
+  const { setOpenMobile, setOpen, state } = useSidebar()
   const navigate = useNavigate()
   const { data: memberRoleData } = authClient.useActiveMemberRole()
   const { data: sessionData } = useSession()
@@ -63,6 +63,12 @@ function NavMain({ items }: Readonly<Props>) {
   })
   const groupLabel =
     items.find((item) => item.groupLabel)?.groupLabel || 'Navegación'
+
+  const handleExpandSidebar = () => {
+    if (state === 'collapsed') {
+      setOpen(true)
+    }
+  }
 
   const handleChangeOrganization = async (
     newOrg: NonNullable<typeof orgs>[number],
@@ -114,7 +120,10 @@ function NavMain({ items }: Readonly<Props>) {
               >
                 <SidebarMenuItem>
                   <CollapsibleTrigger asChild>
-                    <SidebarMenuButton tooltip={item.title}>
+                    <SidebarMenuButton
+                      tooltip={item.title}
+                      onClick={handleExpandSidebar}
+                    >
                       {item.icon && <item.icon />}
                       <span>{item.title}</span>
                       <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
@@ -176,7 +185,10 @@ function NavMain({ items }: Readonly<Props>) {
             >
               <SidebarMenuItem>
                 <CollapsibleTrigger asChild>
-                  <SidebarMenuButton tooltip="Mis Organizaciones">
+                  <SidebarMenuButton
+                    tooltip="Mis Organizaciones"
+                    onClick={handleExpandSidebar}
+                  >
                     <Building2 />
                     <span>Mis Organizaciones</span>
                     <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
