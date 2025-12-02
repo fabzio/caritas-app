@@ -127,15 +127,51 @@ export const auth = betterAuth({
               message: 'El email ya está registrado',
             })
 
-          if (samePhone)
+          if (samePhone) {
+            const phoneUser = await db.query.user.findFirst({
+              where: (u, { eq }) => eq(u.phone, user.phone as string),
+              with: {
+                organizations: {
+                  columns: { id: true },
+                },
+              },
+            })
+
+            if (phoneUser?.organizations?.length === 0) {
+              throw new APIError('CONFLICT', {
+                message: 'Este teléfono pertenece a una cuenta desactivada',
+              })
+            }
+
             throw new APIError('CONFLICT', {
               message: 'Teléfono ya registrado',
             })
+          }
 
-          if (sameDocument)
+          if (sameDocument) {
+            const docUser = await db.query.user.findFirst({
+              where: (u, { eq, and }) =>
+                and(
+                  eq(u.documentNumber, user.documentNumber as string),
+                  eq(u.documentType, user.documentType as string),
+                ),
+              with: {
+                organizations: {
+                  columns: { id: true },
+                },
+              },
+            })
+
+            if (docUser?.organizations?.length === 0) {
+              throw new APIError('CONFLICT', {
+                message: 'Este documento pertenece a una cuenta desactivada',
+              })
+            }
+
             throw new APIError('CONFLICT', {
               message: 'Documento ya registrado',
             })
+          }
         },
       },
       update: {
@@ -148,6 +184,11 @@ export const auth = betterAuth({
                   eq(u.documentType, user.documentType as string),
                   ne(u.id, user.id as string),
                 ),
+              with: {
+                organizations: {
+                  columns: { id: true },
+                },
+              },
               columns: { id: true },
             }),
             db.query.user.findFirst({
@@ -156,6 +197,11 @@ export const auth = betterAuth({
                   eq(u.phone, user.phone as string),
                   ne(u.id, user.id as string),
                 ),
+              with: {
+                organizations: {
+                  columns: { id: true },
+                },
+              },
               columns: { id: true },
             }),
             db.query.user.findFirst({
@@ -173,15 +219,29 @@ export const auth = betterAuth({
               message: 'El nuevo email ya le pertenece a otro usuario',
             })
 
-          if (samePhone)
+          if (samePhone) {
+            if (samePhone?.organizations?.length === 0) {
+              throw new APIError('CONFLICT', {
+                message: 'Este teléfono pertenece a una cuenta desactivada',
+              })
+            }
+
             throw new APIError('CONFLICT', {
               message: 'El nuevo teléfono ya le pertenece a otro usuario',
             })
+          }
 
-          if (sameDocument)
+          if (sameDocument) {
+            if (sameDocument?.organizations?.length === 0) {
+              throw new APIError('CONFLICT', {
+                message: 'Este documento pertenece a una cuenta desactivada',
+              })
+            }
+
             throw new APIError('CONFLICT', {
               message: 'El nuevo documento ya le pertenece a otro usuario',
             })
+          }
 
           return { data: user }
         },
