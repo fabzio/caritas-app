@@ -184,7 +184,7 @@ export function ReportDetailsDialog({
                           <FormControl>
                             <Input
                               {...field}
-                              placeholder="Ej: Exceso de faltas"
+                              placeholder="Ej: Distancia a la sede asignada"
                             />
                           </FormControl>
                           <FormMessage />
