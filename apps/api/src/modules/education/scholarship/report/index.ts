@@ -1,7 +1,11 @@
 import betterAuth from '@api/modules/auth/middleware'
 import Elysia, { status, t } from 'elysia'
 import { ReportModel } from './model'
-import { createScholarshipReport, getScholarshipReports } from './service'
+import {
+  createScholarshipReport,
+  getScholarshipReports,
+  updateScholarshipReportReason,
+} from './service'
 
 const scholarshipReport = new Elysia({
   name: 'report',
@@ -38,6 +42,35 @@ const scholarshipReport = new Elysia({
         }),
         400: t.String(),
         401: t.Literal('Unauthorized'),
+      },
+    },
+  )
+  .patch(
+    '/:id',
+    async ({ params, body, user }) => {
+      try {
+        if (!user?.id) {
+          throw status(401, 'Usuario no autenticado')
+        }
+        return await updateScholarshipReportReason(params.id, body, user.id)
+      } catch (error) {
+        const message =
+          error instanceof Error
+            ? error.message
+            : 'Error actualizando el motivo del reporte'
+        throw status(400, message)
+      }
+    },
+    {
+      auth: true,
+      params: t.Object({
+        id: t.Numeric(),
+      }),
+      body: ReportModel.updateReportReason,
+      response: {
+        200: t.Object({ success: t.Boolean() }),
+        400: t.String(),
+        401: t.String(),
       },
     },
   )

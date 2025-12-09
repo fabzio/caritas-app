@@ -56,8 +56,6 @@ export default function CreateReportPage() {
       userId: '',
       cause: 'absence',
       causeDetail: '',
-      reason: '',
-      reasonDetail: '',
     },
   })
 
@@ -83,23 +81,13 @@ export default function CreateReportPage() {
   const onSubmit = async (values: FormReportSchema) => {
     if (!reportedBy) return
     if (!selectedUser) return
-    console.log({
-      scholarshipId,
-      userId: values.userId,
-      reportedBy,
-      cause: values.cause as 'absence' | 'performance' | 'other',
-      causeDetail: values.causeDetail,
-      reason: values.reason,
-      reasonDetail: values.reasonDetail,
-    })
+
     createReport({
       scholarshipId,
       userId: values.userId,
       reportedBy,
       cause: values.cause as 'absence' | 'performance' | 'other',
       causeDetail: values.causeDetail,
-      reason: values.reason,
-      reasonDetail: values.reasonDetail,
     })
   }
 
@@ -121,7 +109,7 @@ export default function CreateReportPage() {
           <header>
             <h3 className="text-lg font-medium">Información del reporte</h3>
             <p className="text-sm text-muted-foreground mb-4">
-              Identifica al alumno y describe la causa y razón del reporte.
+              Identifica al alumno y describe la causa del reporte.
             </p>
           </header>
 
@@ -203,43 +191,6 @@ export default function CreateReportPage() {
                       <Textarea
                         {...field}
                         placeholder="Describe la causa con más detalle..."
-                        rows={3}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Razón */}
-              <FormField
-                control={form.control}
-                name="reason"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Razón*</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        placeholder="Ej: Bajo rendimiento académico"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Detalle de razón */}
-              <FormField
-                control={form.control}
-                name="reasonDetail"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Detalle de la razón*</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        {...field}
-                        placeholder="Describe la razón con más detalle..."
                         rows={3}
                       />
                     </FormControl>

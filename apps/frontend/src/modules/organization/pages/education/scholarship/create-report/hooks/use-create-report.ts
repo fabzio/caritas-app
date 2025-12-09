@@ -9,7 +9,7 @@ type CreateReportParams = {
   reportedBy: string
   cause: 'absence' | 'performance' | 'other'
   causeDetail?: string
-  reason: string
+  reason?: string
   reasonDetail?: string
 }
 
