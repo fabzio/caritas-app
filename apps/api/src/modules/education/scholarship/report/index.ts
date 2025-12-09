@@ -48,18 +48,10 @@ const scholarshipReport = new Elysia({
   .patch(
     '/:id',
     async ({ params, body, user }) => {
-      try {
-        if (!user?.id) {
-          throw status(401, 'Usuario no autenticado')
-        }
-        return await updateScholarshipReportReason(params.id, body, user.id)
-      } catch (error) {
-        const message =
-          error instanceof Error
-            ? error.message
-            : 'Error actualizando el motivo del reporte'
-        throw status(400, message)
+      if (!user?.id) {
+        throw status(401, 'Usuario no autenticado')
       }
+      return await updateScholarshipReportReason(params.id, body, user.id)
     },
     {
       auth: true,
@@ -71,6 +63,8 @@ const scholarshipReport = new Elysia({
         200: t.Object({ success: t.Boolean() }),
         400: t.String(),
         401: t.String(),
+        404: t.String(),
+        409: t.String(),
       },
     },
   )

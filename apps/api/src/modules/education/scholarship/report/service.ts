@@ -10,6 +10,7 @@ import transporter, { SENDER } from '@api/mail'
 import { buildScholarshipReportNotificationTemplate } from '@api/mail/templates'
 import { and, desc, eq, ilike, like, or, sql } from 'drizzle-orm'
 import { alias } from 'drizzle-orm/pg-core'
+import { status } from 'elysia'
 import type { ReportModel } from './model'
 /**
  * Crea un nuevo reporte de beca.
@@ -63,17 +64,17 @@ export async function updateScholarshipReportReason(
   })
 
   if (!existingReport) {
-    throw new Error('Reporte no encontrado')
+    throw status(404, 'Reporte no encontrado')
   }
 
   if (existingReport.reason) {
-    throw new Error('El reporte ya tiene un motivo registrado')
+    throw status(409, 'El reporte ya tiene un motivo registrado')
   }
 
   const [newReason] = await db
     .insert(reportReason)
     .values({
-      name: data.reason.trim(),
+      name: data.reason,
       createdBy: userId,
     })
     .returning({ id: reportReason.id })
@@ -82,7 +83,7 @@ export async function updateScholarshipReportReason(
     .update(scholarshipStudentReport)
     .set({
       reason: newReason.id,
-      reasonDetail: data.reasonDetail.trim(),
+      reasonDetail: data.reasonDetail,
       updatedAt: new Date(),
     })
     .where(eq(scholarshipStudentReport.id, reportId))
