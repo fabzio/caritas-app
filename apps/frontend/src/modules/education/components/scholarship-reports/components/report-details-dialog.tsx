@@ -1,3 +1,5 @@
+import { useAccess } from '@frontend/hooks/use-access'
+import authClient from '@frontend/lib/authClient'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '@workspace/ui/components/button'
 import {
@@ -47,6 +49,7 @@ export function ReportDetailsDialog({
   onOpenChange,
 }: Readonly<Props>) {
   const { mutate: updateReason, isPending } = useUpdateReportReason()
+  const { data: access } = useAccess()
 
   const form = useForm<ReasonFormSchema>({
     resolver: zodResolver(reasonSchema),
@@ -57,6 +60,7 @@ export function ReportDetailsDialog({
   })
 
   const hasReason = Boolean(report?.reason?.name)
+  const canManageReasons = access?.education.admin === true
 
   const onSubmit = (values: ReasonFormSchema) => {
     if (!report) return
@@ -158,7 +162,7 @@ export function ReportDetailsDialog({
             )}
           </section>
 
-          {!hasReason && (
+          {!hasReason && canManageReasons && (
             <>
               <Separator />
 
