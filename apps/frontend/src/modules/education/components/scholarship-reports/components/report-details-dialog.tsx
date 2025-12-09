@@ -1,3 +1,5 @@
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Button } from '@workspace/ui/components/button'
 import {
   Dialog,
   DialogContent,
@@ -5,8 +7,22 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@workspace/ui/components/dialog'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@workspace/ui/components/form'
+import { Input } from '@workspace/ui/components/input'
 import { Separator } from '@workspace/ui/components/separator'
+import { Spinner } from '@workspace/ui/components/spinner'
+import { Textarea } from '@workspace/ui/components/textarea'
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
 import type { ScholarshipReport } from '../hooks/use-scholarship-reports'
+import { useUpdateReportReason } from '../hooks/use-update-report-reason'
 import { causeLabels } from './columns'
 
 type Props = {
@@ -15,11 +31,60 @@ type Props = {
   onOpenChange: (open: boolean) => void
 }
 
+const reasonSchema = z.object({
+  reason: z
+    .string()
+    .min(1, 'El motivo es requerido')
+    .transform((val) => val.trim())
+    .refine((val) => val.length > 0, {
+      message: 'El motivo no puede estar vacío',
+    }),
+  reasonDetail: z
+    .string()
+    .min(3, 'El detalle debe tener al menos 3 caracteres')
+    .transform((val) => val.trim())
+    .refine((val) => val.length >= 3, {
+      message: 'El detalle debe tener al menos 3 caracteres',
+    }),
+})
+
+type ReasonFormSchema = z.infer<typeof reasonSchema>
+
 export function ReportDetailsDialog({
   report,
   open,
   onOpenChange,
 }: Readonly<Props>) {
+  const { mutate: updateReason, isPending } = useUpdateReportReason()
+
+  const form = useForm<ReasonFormSchema>({
+    resolver: zodResolver(reasonSchema),
+    defaultValues: {
+      reason: '',
+      reasonDetail: '',
+    },
+  })
+
+  const hasReason = Boolean(report?.reason?.name)
+
+  const onSubmit = (values: ReasonFormSchema) => {
+    if (!report) return
+
+    updateReason(
+      {
+        reportId: report.id,
+        reason: values.reason,
+        reasonDetail: values.reasonDetail,
+      },
+      {
+        onSuccess: () => {
+          form.reset()
+          onOpenChange(false)
+        },
+      },
+    )
+  }
+
   if (!report) {
     return null
   }
@@ -88,18 +153,81 @@ export function ReportDetailsDialog({
                 {report.causeDetail || 'Sin detalle'}
               </p>
             </div>
-            <div>
-              <h4 className="text-sm font-semibold text-muted-foreground">
-                Motivo
-              </h4>
-              <p className="font-medium">
-                {report.reason.name ?? 'Sin motivo'}
-              </p>
-              <p className="text-sm text-muted-foreground whitespace-pre-line">
-                {report.reasonDetail || 'Sin detalle'}
-              </p>
-            </div>
+
+            {hasReason && (
+              <div>
+                <h4 className="text-sm font-semibold text-muted-foreground mb-2">
+                  Motivo
+                </h4>
+                <p className="font-medium">{report.reason.name}</p>
+                <p className="text-sm text-muted-foreground whitespace-pre-line">
+                  {report.reasonDetail || 'Sin detalle'}
+                </p>
+              </div>
+            )}
           </section>
+
+          {!hasReason && (
+            <>
+              <Separator />
+
+              <section>
+                <h4 className="text-sm font-semibold text-muted-foreground mb-4">
+                  Motivo
+                </h4>
+
+                <Form {...form}>
+                  <form
+                    onSubmit={form.handleSubmit(onSubmit)}
+                    className="space-y-4"
+                  >
+                    <FormField
+                      control={form.control}
+                      name="reason"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Motivo*</FormLabel>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              placeholder="Ej: Exceso de faltas"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="reasonDetail"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Detalle del motivo*</FormLabel>
+                          <FormControl>
+                            <Textarea
+                              {...field}
+                              placeholder="Describe el motivo con más detalle..."
+                              rows={3}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <Button
+                      type="submit"
+                      disabled={isPending}
+                      className="w-full"
+                    >
+                      {isPending ? <Spinner /> : 'Guardar motivo'}
+                    </Button>
+                  </form>
+                </Form>
+              </section>
+            </>
+          )}
         </div>
       </DialogContent>
     </Dialog>

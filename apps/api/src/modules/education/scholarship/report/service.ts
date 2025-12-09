@@ -18,13 +18,18 @@ import type { ReportModel } from './model'
 export async function createScholarshipReport(
   data: ReportModel.CreateScholarshipReport,
 ) {
-  const [newReason] = await db
-    .insert(reportReason)
-    .values({
-      name: data.reason,
-      createdBy: data.reportedBy,
-    })
-    .returning({ id: reportReason.id })
+  let reasonId: number | undefined
+
+  if (data.reason) {
+    const [newReason] = await db
+      .insert(reportReason)
+      .values({
+        name: data.reason,
+        createdBy: data.reportedBy,
+      })
+      .returning({ id: reportReason.id })
+    reasonId = newReason.id
+  }
 
   const [created] = await db
     .insert(scholarshipStudentReport)
@@ -34,7 +39,7 @@ export async function createScholarshipReport(
       reportedBy: data.reportedBy,
       cause: data.cause,
       causeDetail: data.causeDetail,
-      reason: newReason.id,
+      reason: reasonId,
       reasonDetail: data.reasonDetail,
     })
     .returning({ id: scholarshipStudentReport.id })
@@ -42,6 +47,47 @@ export async function createScholarshipReport(
   await sendReportNotificationToEducationMembers(data)
 
   return created.id
+}
+
+export async function updateScholarshipReportReason(
+  reportId: number,
+  data: ReportModel.UpdateReportReason,
+  userId: string,
+) {
+  const existingReport = await db.query.scholarshipStudentReport.findFirst({
+    where: eq(scholarshipStudentReport.id, reportId),
+    columns: {
+      id: true,
+      reason: true,
+    },
+  })
+
+  if (!existingReport) {
+    throw new Error('Reporte no encontrado')
+  }
+
+  if (existingReport.reason) {
+    throw new Error('El reporte ya tiene un motivo registrado')
+  }
+
+  const [newReason] = await db
+    .insert(reportReason)
+    .values({
+      name: data.reason,
+      createdBy: userId,
+    })
+    .returning({ id: reportReason.id })
+
+  await db
+    .update(scholarshipStudentReport)
+    .set({
+      reason: newReason.id,
+      reasonDetail: data.reasonDetail,
+      updatedAt: new Date(),
+    })
+    .where(eq(scholarshipStudentReport.id, reportId))
+
+  return { success: true }
 }
 
 export async function getScholarshipReports(

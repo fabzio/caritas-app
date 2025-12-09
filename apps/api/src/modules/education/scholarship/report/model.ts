@@ -12,9 +12,12 @@ export namespace ReportModel {
   export const createScholarshipReport = t.Composite([
     baseSchema,
     t.Object({
-      reason: t.String({
-        description: 'Nombre del motivo del reporte (se crea en report_reason)',
-      }),
+      reason: t.Optional(
+        t.String({
+          description:
+            'Nombre del motivo del reporte (se crea en report_reason)',
+        }),
+      ),
     }),
   ])
 
@@ -72,5 +75,17 @@ export namespace ReportModel {
     pageCount: t.Number(),
   })
 
+  export const updateReportReason = t.Object({
+    reason: t.String({
+      minLength: 1,
+      description: 'Nombre del motivo del reporte',
+    }),
+    reasonDetail: t.String({
+      minLength: 3,
+      description: 'Detalle del motivo del reporte',
+    }),
+  })
+
   export type ListReportsQuery = typeof listReportsQuery.static
+  export type UpdateReportReason = typeof updateReportReason.static
 }
