@@ -73,7 +73,7 @@ export async function updateScholarshipReportReason(
   const [newReason] = await db
     .insert(reportReason)
     .values({
-      name: data.reason,
+      name: data.reason.trim(),
       createdBy: userId,
     })
     .returning({ id: reportReason.id })
@@ -82,7 +82,7 @@ export async function updateScholarshipReportReason(
     .update(scholarshipStudentReport)
     .set({
       reason: newReason.id,
-      reasonDetail: data.reasonDetail,
+      reasonDetail: data.reasonDetail.trim(),
       updatedAt: new Date(),
     })
     .where(eq(scholarshipStudentReport.id, reportId))

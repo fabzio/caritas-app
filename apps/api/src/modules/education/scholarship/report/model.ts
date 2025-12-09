@@ -78,10 +78,12 @@ export namespace ReportModel {
   export const updateReportReason = t.Object({
     reason: t.String({
       minLength: 1,
+      pattern: '^(?!\\s*$).+',
       description: 'Nombre del motivo del reporte',
     }),
     reasonDetail: t.String({
       minLength: 3,
+      pattern: '^(?!\\s*$).+',
       description: 'Detalle del motivo del reporte',
     }),
   })

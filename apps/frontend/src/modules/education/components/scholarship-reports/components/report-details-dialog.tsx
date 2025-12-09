@@ -32,20 +32,11 @@ type Props = {
 }
 
 const reasonSchema = z.object({
-  reason: z
-    .string()
-    .min(1, 'El motivo es requerido')
-    .transform((val) => val.trim())
-    .refine((val) => val.length > 0, {
-      message: 'El motivo no puede estar vacío',
-    }),
+  reason: z.string().trim().min(1, 'El motivo es requerido'),
   reasonDetail: z
     .string()
-    .min(3, 'El detalle debe tener al menos 3 caracteres')
-    .transform((val) => val.trim())
-    .refine((val) => val.length >= 3, {
-      message: 'El detalle debe tener al menos 3 caracteres',
-    }),
+    .trim()
+    .min(3, 'El detalle debe tener al menos 3 caracteres'),
 })
 
 type ReasonFormSchema = z.infer<typeof reasonSchema>
