@@ -1,5 +1,4 @@
 import { useAccess } from '@frontend/hooks/use-access'
-import authClient from '@frontend/lib/authClient'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '@workspace/ui/components/button'
 import {
