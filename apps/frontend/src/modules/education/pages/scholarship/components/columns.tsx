@@ -1,3 +1,4 @@
+import { formatDateShort } from '@frontend/shared/utils/format-date'
 import type { ColumnDef } from '@tanstack/react-table'
 import { Button } from '@workspace/ui/components/button'
 import { Checkbox } from '@workspace/ui/components/checkbox'
@@ -89,15 +90,7 @@ export const scholarshipTableColumns: ColumnDef<Scholarship>[] = [
       const date = row.original.startDate
       if (!date) return <div className="text-center">N/A</div>
 
-      return (
-        <div className="text-center">
-          {new Date(date).toLocaleDateString('es-PE', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
-          })}
-        </div>
-      )
+      return <div className="text-center">{formatDateShort(date)}</div>
     },
   },
   {
@@ -117,15 +110,7 @@ export const scholarshipTableColumns: ColumnDef<Scholarship>[] = [
       const date = row.original.endDate
       if (!date) return <div className="text-center">N/A</div>
 
-      return (
-        <div className="text-center">
-          {new Date(date).toLocaleDateString('es-PE', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
-          })}
-        </div>
-      )
+      return <div className="text-center">{formatDateShort(date)}</div>
     },
   },
 ]
