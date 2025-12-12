@@ -1,6 +1,13 @@
 import { useFilters } from '@frontend/hooks/use-filters'
+import { useIsMobile } from '@frontend/hooks/use-mobile'
 import { Button } from '@workspace/ui/components/button'
 import { Calendar } from '@workspace/ui/components/calendar'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@workspace/ui/components/dialog'
 import {
   Popover,
   PopoverContent,
@@ -15,6 +22,7 @@ export default function DateRangeFilter() {
   const { filters, setFilters } = useFilters(
     '/_authenticated/health/activities/',
   )
+  const isMobile = useIsMobile()
   const [open, setOpen] = useState(false)
   const [position, setPosition] = useState({ x: 0, y: 0 })
   const [isDragging, setIsDragging] = useState(false)
@@ -85,6 +93,72 @@ export default function DateRangeFilter() {
 
   const hasFilters = startDate || endDate
 
+  if (isMobile) {
+    return (
+      <Dialog open={open} onOpenChange={setOpen}>
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          className="inline-flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium border border-input bg-background hover:bg-accent hover:text-accent-foreground rounded-md h-10"
+        >
+          <CalendarIcon className="h-4 w-4" />
+          {hasFilters ? (
+            <span className="text-xs sm:text-sm">
+              {startDate && format(startDate, 'dd/MM')}
+              {startDate && endDate && ' - '}
+              {endDate && format(endDate, 'dd/MM')}
+            </span>
+          ) : (
+            <span className="text-xs sm:text-sm">Fechas</span>
+          )}
+        </button>
+        <DialogContent className="max-h-[90vh] overflow-y-auto p-4">
+          <DialogHeader className="text-left">
+            <DialogTitle>Filtrar por rango de fecha</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <p className="text-xs text-muted-foreground mb-2 font-medium">
+                Desde
+              </p>
+              <Calendar
+                mode="single"
+                selected={startDate}
+                onSelect={handleStartChange}
+                disabled={(date) => (endDate ? date > endDate : false)}
+                initialFocus
+                className="w-full"
+              />
+            </div>
+            <Separator />
+            <div>
+              <p className="text-xs text-muted-foreground mb-2 font-medium">
+                Hasta
+              </p>
+              <Calendar
+                mode="single"
+                selected={endDate}
+                onSelect={handleEndChange}
+                disabled={(date) => (startDate ? date < startDate : false)}
+                className="w-full"
+              />
+            </div>
+            {hasFilters && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full"
+                onClick={handleClearAll}
+              >
+                Limpiar filtro
+              </Button>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+    )
+  }
+
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
@@ -135,7 +209,7 @@ export default function DateRangeFilter() {
               )}
             </div>
             <Separator className="my-2" />
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-4">
               <div>
                 <p className="text-xs text-muted-foreground mb-2">Desde</p>
                 <Calendar
