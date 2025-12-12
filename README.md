@@ -413,36 +413,8 @@ docker compose --env-file .env.development up -d
 
 # 3. Esperar a que la DB esté lista y aplicar esquema (desde apps/api)
 cd ../api
-bun run db:push
 bun run db:seed  # Sembrar datos iniciales
 ```
-
-# 4. Iniciar desarrollo
-cd ../..
-bun dev
-```
-
-### 1. Clonar e Instalar
-
-```bash
-git clone https://github.com/fabzio/caritas-app.git
-cd caritas-app
-bun install
-```
-
-### 2. Configuración de Base de Datos
-
-```bash
-# Iniciar PostgreSQL y Valkey con Docker
-cd apps/db
-docker-compose up -d
-
-# Migrar esquemas a la base de datos
-cd ../api
-bun run db:push
-```
-
-### 3. Variables de Entorno
 
 Crea los archivos `.env.development` necesarios basándote en los ejemplos:
 
