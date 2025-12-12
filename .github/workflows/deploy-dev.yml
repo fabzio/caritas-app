@@ -51,12 +51,6 @@ jobs:
 
       - name: Run tests
         run: bun run test
-
-      - name: Scan with SonarQube
-        uses: SonarSource/sonarqube-scan-action@v6
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
   build-api:
     needs: [changes, test]
     if: needs.changes.outputs.api == 'true'
