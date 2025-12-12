@@ -10,28 +10,6 @@ permissions:
   contents: read
 
 jobs:
-  changes:
-    runs-on: ubuntu-latest
-    permissions:
-      pull-requests: read
-      contents: read
-    outputs:
-      api: ${{ steps.changes.outputs.api }}
-      frontend: ${{ steps.changes.outputs.frontend }}
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v5
-
-      - uses: dorny/paths-filter@v3
-        id: changes
-        with:
-          filters: |
-            api:
-              - 'apps/api/**'
-              - 'packages/**'
-            frontend:
-              - 'apps/frontend/**'
-              - 'packages/**'
   test:
     runs-on: ubuntu-latest
     steps:
@@ -49,8 +27,7 @@ jobs:
       - name: Run tests
         run: bun run test
   build-api:
-    needs: [changes, test]
-    if: needs.changes.outputs.api == 'true'
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -82,8 +59,7 @@ jobs:
         run: docker push ghcr.io/${{ github.repository_owner }}/caritas-api:latest
 
   build-frontend:
-    needs: [changes, test]
-    if: needs.changes.outputs.frontend == 'true'
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
