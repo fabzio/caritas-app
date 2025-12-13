@@ -2,6 +2,12 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { getRouteApi, Link } from '@tanstack/react-router'
 import { Button } from '@workspace/ui/components/button'
 import {
+  Card,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@workspace/ui/components/card'
+import {
   Form,
   FormControl,
   FormDescription,
@@ -13,7 +19,8 @@ import {
 import { Input } from '@workspace/ui/components/input'
 import { Separator } from '@workspace/ui/components/separator'
 import { Spinner } from '@workspace/ui/components/spinner'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, Clock } from 'lucide-react'
+import { useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 import { useUpdateFairAttendance } from '../../hooks/use-update-fair-attendance'
 import {
@@ -32,7 +39,16 @@ export default function FairAttendancePage() {
   const form = useForm<AttendanceSchema>({
     resolver: zodResolver(attendanceSchema),
     defaultValues: {
-      externalAssistance: '',
+      externalAssistance: (() => {
+        const total = loaderData?.assistanceCount
+        const fourth = loaderData?.fourthGradeAssistance
+        const fifth = loaderData?.fifthGradeAssistance
+        if (total != null && fourth != null && fifth != null) {
+          const external = total - fourth - fifth
+          return external > 0 ? String(external) : ''
+        }
+        return ''
+      })(),
       fourthGradeAssistance:
         loaderData?.fourthGradeAssistance !== null &&
         loaderData?.fourthGradeAssistance !== undefined
@@ -47,6 +63,18 @@ export default function FairAttendancePage() {
   })
 
   const { mutate: updateAttendance, isPending } = useUpdateFairAttendance()
+
+  const hasFairStarted = useMemo(() => {
+    if (!loaderData?.date || !loaderData?.startTime) return false
+
+    const fairDate = new Date(loaderData.date)
+    const [hours, minutes] = loaderData.startTime.split(':').map(Number)
+
+    const fairStartDateTime = new Date(fairDate)
+    fairStartDateTime.setHours(hours, minutes, 0, 0)
+
+    return new Date() >= fairStartDateTime
+  }, [loaderData?.date, loaderData?.startTime])
 
   const handleSubmit = form.handleSubmit((data) => {
     const fourth =
@@ -116,100 +144,121 @@ export default function FairAttendancePage() {
             </p>
           </header>
 
-          <Form {...form}>
-            <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
-              <FormField
-                control={form.control}
-                name="fourthGradeAssistance"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>
-                      Asistentes de Cuarto Grado de Secundaria
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        type="number"
-                        min="0"
-                        step="1"
-                        placeholder="Ingrese el número de estudiantes de 4to grado"
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      Número de estudiantes de cuarto grado (no incluye
-                      externos)
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+          {hasFairStarted ? (
+            <Form {...form}>
+              <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+                <FormField
+                  control={form.control}
+                  name="fourthGradeAssistance"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        Asistentes de Cuarto Grado de Secundaria
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          type="number"
+                          min="0"
+                          step="1"
+                          placeholder="Ingrese el número de estudiantes de 4to grado"
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Número de estudiantes de cuarto grado (no incluye
+                        externos)
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              <FormField
-                control={form.control}
-                name="fifthGradeAssistance"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>
-                      Asistentes de Quinto Grado de Secundaria
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        type="number"
-                        min="0"
-                        step="1"
-                        placeholder="Ingrese el número de estudiantes de 5to grado"
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      Número de estudiantes de quinto grado (no incluye
-                      externos)
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                <FormField
+                  control={form.control}
+                  name="fifthGradeAssistance"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        Asistentes de Quinto Grado de Secundaria
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          type="number"
+                          min="0"
+                          step="1"
+                          placeholder="Ingrese el número de estudiantes de 5to grado"
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Número de estudiantes de quinto grado (no incluye
+                        externos)
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              <FormField
-                control={form.control}
-                name="externalAssistance"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>
-                      Asistentes Externos (Otros)
-                      <span className="text-muted-foreground text-sm font-normal ml-1">
-                        (opcional)
-                      </span>
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        type="number"
-                        min="0"
-                        step="1"
-                        placeholder="Ingrese el número de asistentes externos"
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      Asistentes que no son estudiantes de 4to o 5to grado de
-                      secundaria
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                <FormField
+                  control={form.control}
+                  name="externalAssistance"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        Asistentes Externos (Otros)
+                        <span className="text-muted-foreground text-sm font-normal ml-1">
+                          (opcional)
+                        </span>
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          type="number"
+                          min="0"
+                          step="1"
+                          placeholder="Ingrese el número de asistentes externos"
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Asistentes que no son estudiantes de 4to o 5to grado de
+                        secundaria
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              <div className="flex justify-end gap-3 mt-6">
-                <Button variant="outline" type="button" asChild>
-                  <Link to="/organization/education/fair">Cancelar</Link>
-                </Button>
-                <Button type="submit" disabled={isPending}>
-                  {isPending && <Spinner />}
-                  Guardar Cambios
-                </Button>
-              </div>
-            </form>
-          </Form>
+                <div className="flex justify-end gap-3 mt-6">
+                  <Button variant="outline" type="button" asChild>
+                    <Link to="/organization/education/fair">Cancelar</Link>
+                  </Button>
+                  <Button type="submit" disabled={isPending}>
+                    {isPending && <Spinner />}
+                    Guardar Cambios
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          ) : (
+            <Card className="border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-amber-800 dark:text-amber-200">
+                  <Clock className="h-5 w-5" />
+                  Feria aún no iniciada
+                </CardTitle>
+                <CardDescription className="text-amber-700 dark:text-amber-300">
+                  No puedes registrar la asistencia hasta que la feria haya
+                  comenzado. La feria está programada para el{' '}
+                  {new Date(loaderData.date).toLocaleDateString('es-PE', {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric',
+                  })}{' '}
+                  a las {loaderData.startTime?.slice(0, 5)}.
+                </CardDescription>
+              </CardHeader>
+            </Card>
+          )}
         </div>
       </div>
     </div>
