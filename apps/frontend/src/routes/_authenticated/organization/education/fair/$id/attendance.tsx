@@ -7,7 +7,7 @@ export const Route = createFileRoute(
   '/_authenticated/organization/education/fair/$id/attendance',
 )({
   loader: async ({ context: { queryClient }, params: { id } }) => {
-    return await queryClient.ensureQueryData({
+    return await queryClient.fetchQuery({
       queryKey: [QueryKeys.EDUCATION.FAIR, 'attendance', Number(id)],
       queryFn: async () => {
         const { data, error } = await rpc.education
@@ -16,7 +16,7 @@ export const Route = createFileRoute(
         if (error) throw error
         return data || undefined
       },
-      gcTime: 0,
+      staleTime: 0,
     })
   },
   component: FairAttendancePage,
