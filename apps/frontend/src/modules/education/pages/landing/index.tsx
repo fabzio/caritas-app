@@ -1,6 +1,5 @@
 import CoverImage from '@frontend/assets/img/landing/cover.webp'
-import CaritasLogo from '@frontend/assets/img/landing/logo.webp'
-import FullColorCaritasLogo from '@frontend/assets/img/landing/logo-fullcolor.webp'
+
 import PUCPLogo from '@frontend/assets/img/landing/pucp.webp'
 import UNILogo from '@frontend/assets/img/landing/uni.webp'
 import UNMSMLogo from '@frontend/assets/img/landing/unmsm.webp'
@@ -131,11 +130,9 @@ export default function LandingPage() {
         <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12">
           <div className="flex items-center justify-between h-20">
             <div className="flex items-center gap-3">
-              <img
-                src={FullColorCaritasLogo}
-                alt="Cáritas lima"
-                className="h-12"
-              />
+              <span className="text-xl font-semibold">
+                Plataforma Solidaria
+              </span>
             </div>
 
             <div className="hidden lg:flex items-center gap-8">
@@ -263,8 +260,8 @@ export default function LandingPage() {
               </h2>
               <p className="text-gray-600 leading-relaxed">
                 Cada una de las líneas presentes son actividades que realizamos
-                en Cáritas Lima, interviniendo en educación y conocimientos con
-                nuevos objetivos y competencias para que puedas alcanzar tus
+                en la organización, interviniendo en educación y conocimientos
+                con nuevos objetivos y competencias para que puedas alcanzar tus
                 metas académicas e inicies tu futuro exitoso.
               </p>
             </div>
@@ -488,10 +485,12 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
             <div>
               <div className="flex items-center gap-2 mb-6">
-                <img src={CaritasLogo} alt="Cáritas Lima" className="h-10" />
+                <span className="text-xl font-semibold">
+                  Plataforma Solidaria
+                </span>
               </div>
               <p className="text-gray-400 text-sm">
-                Cáritas Lima © 2023.
+                Plataforma Solidaria © 2023.
                 <br />
                 All Rights Reserved
               </p>
@@ -500,7 +499,7 @@ export default function LandingPage() {
             <div>
               <h3 className="text-xl font-bold mb-6">Contactos</h3>
               <ul className="space-y-3 text-gray-300 text-sm">
-                <li>Cáritas Lima</li>
+                <li>Plataforma Solidaria</li>
                 <li>Jr. Chancay N°282</li>
                 <li>Cercado de Lima, Lima, Perú</li>
                 <li>Email: info@caritaslima.org.pe</li>

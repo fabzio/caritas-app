@@ -1,4 +1,3 @@
-import FullColorCaritasLogo from '@frontend/assets/img/landing/logo-fullcolor.webp'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useLoaderData, useNavigate, useSearch } from '@tanstack/react-router'
 import { Button } from '@workspace/ui/components/button'
@@ -101,11 +100,9 @@ export default function ApplyPage() {
         <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12">
           <div className="flex items-center justify-between h-20">
             <div className="flex items-center gap-3">
-              <img
-                src={FullColorCaritasLogo}
-                alt="Cáritas lima"
-                className="h-12"
-              />
+              <span className="text-xl font-semibold">
+                Plataforma Solidaria
+              </span>
             </div>
           </div>
         </nav>
@@ -127,8 +124,8 @@ export default function ApplyPage() {
               </h2>
               <p className="text-gray-600 mb-8 max-w-md mx-auto">
                 Para postular a una beca es necesario haber iniciado sesión en
-                Cáritas365. Inicia sesión o crea una cuenta para continuar con
-                tu postulación.
+                Plataforma Solidaria 365. Inicia sesión o crea una cuenta para
+                continuar con tu postulación.
               </p>
               <Button
                 onClick={handleLoginRedirect}

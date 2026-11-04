@@ -160,7 +160,7 @@ const roleLabels: Record<InvitationRole, string> = {
   educationMember: 'Miembro de educación',
 }
 const organizationTypeLabels: Record<OrganizationType, string> = {
-  caritas: 'Cáritas Lima',
+  caritas: 'Plataforma Solidaria',
   education: 'Centro de Educación',
   health: 'Centro de Salud',
   beneficiary: 'Beneficiario',

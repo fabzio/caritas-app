@@ -208,9 +208,9 @@ export default function DataTable<T>({
           </div>
         )}
       </div>
-      {import.meta.env.DEV && (
+      {/*{import.meta.env.DEV && (
         <ReactTableDevtools initialIsOpen={false} table={table} />
-      )}
+      )}*/}
     </>
   )
 }

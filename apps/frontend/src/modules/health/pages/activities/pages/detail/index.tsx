@@ -195,7 +195,7 @@ export default function ActivityDetailPage() {
                             (name) => (
                               <span
                                 key={name}
-                                className="inline-flex items-center rounded-full border px-3 py-1 text-sm font-medium bg-primary text-secondary-foreground"
+                                className="inline-flex items-center rounded-full border px-3 py-1 text-sm font-medium bg-primary text-primary-foreground"
                               >
                                 {name}
                               </span>

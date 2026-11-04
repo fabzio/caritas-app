@@ -24,7 +24,7 @@ import {
 import { defaultRoles } from 'better-auth/plugins/organization/access'
 import { passkey } from 'better-auth/plugins/passkey'
 import { localization } from 'better-auth-localization'
-import { eq, ilike } from 'drizzle-orm'
+import { eq } from 'drizzle-orm'
 import transporter, { SENDER } from '../mail'
 
 export const auth = betterAuth({
@@ -370,10 +370,14 @@ export const auth = betterAuth({
     localization({
       defaultLocale: 'es-ES',
     }),
-    captcha({
-      provider: 'cloudflare-turnstile',
-      secretKey: env.CLOUDFLARE_TURNSTILE_SECRET_KEY,
-    }),
+    ...(env.NODE_ENV === 'development'
+      ? []
+      : [
+          captcha({
+            provider: 'cloudflare-turnstile',
+            secretKey: env.CLOUDFLARE_TURNSTILE_SECRET_KEY,
+          }),
+        ]),
     emailOTP({
       sendVerificationOTP: async ({ type, otp, email }) => {
         const { subject, html } = (() => {

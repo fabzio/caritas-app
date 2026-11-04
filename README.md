@@ -1,6 +1,6 @@
-# Cáritas Lima - Sistema de Gestión
+# Darity 365 - Sistema de Gestión
 
-Sistema web responsivo para la organización sin fines de lucro **Cáritas Lima** que permite gestionar campañas en dos áreas principales: **educación** y **salud**. Construido con Bun.js, React 19, Elysia.js y PostgreSQL, priorizando la **mejor experiencia de desarrollo** y **buenas prácticas** con máxima **type-safety** 💙.
+Sistema web responsivo para organización sin fines de lucro permite gestionar campañas en dos áreas principales: **educación** y **salud**. Construido con Bun.js, React 19, Elysia.js y PostgreSQL, priorizando la **mejor experiencia de desarrollo** y **buenas prácticas** con máxima **type-safety** 💙.
 
 ## 🚀 Características Principales
 

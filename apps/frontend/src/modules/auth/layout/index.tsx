@@ -12,7 +12,7 @@ export default function AuthLayout({ children }: Readonly<PropsWithChildren>) {
             <div className="flex items-start justify-center rounded-md">
               <img
                 src="/logo.png"
-                alt="Cáritas"
+                alt="Plataforma Solidaria"
                 className="h-full aspect-auto"
               />
               <Badge>365</Badge>

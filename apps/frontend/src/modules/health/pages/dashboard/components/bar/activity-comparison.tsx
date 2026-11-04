@@ -84,7 +84,12 @@ export default function ActivityComparison() {
             />
             {groupby === undefined ? (
               <Bar dataKey="total" fill="var(--chart-1)">
-                <LabelList position="top" offset={8} fontSize={12} />
+                <LabelList
+                  position="top"
+                  offset={8}
+                  fontSize={12}
+                  formatter={(value) => (Number(value) === 0 ? '' : value)}
+                />
               </Bar>
             ) : (
               groupedBar.map((key) => (
@@ -94,6 +99,7 @@ export default function ActivityComparison() {
                     position="top"
                     offset={8}
                     fontSize={12}
+                    formatter={(value) => (Number(value) === 0 ? '' : value)}
                   />
                 </Bar>
               ))

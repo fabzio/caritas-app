@@ -225,7 +225,7 @@ function NavMain({ items }: Readonly<Props>) {
   )
 }
 const mapTypeLabel = {
-  caritas: 'Cáritas',
+  caritas: 'Plataforma Solidaria',
   health: 'Salud',
   education: 'Educación',
   beneficiary: 'Beneficiario',
